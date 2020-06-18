@@ -14,7 +14,6 @@
 ## Small todos
 - Look at other todos in code
 - Add "Why the name amfora" thing to README
-- Add GIF to README
 - Pass `gemini://egsam.pitr.ca/` test
   - Timeout for server not closing connection?
 - Add titles to modal with `modal.GetFrame()`

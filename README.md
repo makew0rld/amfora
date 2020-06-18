@@ -21,6 +21,10 @@ It also aims to be completely cross platform, with full Windows support. If you'
 
 It fully passes Sean Conman's client torture test, with exception of the alternate encodings section, as only UTF-8 and ASCII are supported. It mostly passes the Egsam test.
 
+## Installation
+
+Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On POSIX systems you might have to make the binary executable with `chmod +x <filename>`. On Windows, make sure you click "Advanced > Run anyway" after double-clicking, or something like that.
+
 ## Usage
 
 Just call `amfora` or `amfora <url> <other-url>` on the terminal. On Windows it might be `amfora.exe` instead.

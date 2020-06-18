@@ -3,7 +3,12 @@
 ![Amfora logo](logo.png)
 ##### Modified from: amphora by Alvaro Cabrera from the Noun Project
 
-Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that. It also aims to be completely cross platform, with full Windows support.
+[![go reportcard](https://goreportcard.com/badge/github.com/makeworld-the-better-one/amfora)](https://goreportcard.com/report/github.com/makeworld-the-better-one/amfora)
+[![license GPLv3](https://img.shields.io/github/license/makeworld-the-better-one/amfora)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+
+Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that.
+
+It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not reccomend using the default terminal software. Maybe use [Cmder](https://cmder.net/) instead?
 
 It fully passes Sean Conman's client torture test, with exception of the alternate encodings section, as only UTF-8 and ASCII are supported. It mostly passes the Egsam test.
 

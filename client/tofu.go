@@ -13,7 +13,7 @@ import (
 
 // TOFU implementation.
 // Stores cert hash and expiry for now, like Bombadillo.
-// There is ongoing TOFU discussiong on the mailing list about better
+// There is ongoing TOFU discussion on the mailing list about better
 // ways to do this, and I will update this file once those are decided on.
 
 var ErrTofu = errors.New("server cert does not match TOFU database")

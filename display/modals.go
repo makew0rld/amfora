@@ -42,7 +42,7 @@ var yesNoModal = cview.NewModal().
 	SetTextColor(tcell.ColorWhite).
 	AddButtons([]string{"Yes", "No"})
 
-// Channel to recieve yesNo answer on
+// Channel to receive yesNo answer on
 var yesNoCh = make(chan bool)
 
 func modalInit() {

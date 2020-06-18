@@ -1,7 +1,7 @@
 # Amfora
 
 <center>  <!-- I know, that's not how you usually do it :) -->
-<img src="https://raw.githubusercontent.com/makeworld-the-better-one/amfora/master/logo.png" alt="amphora logo" width="30%">
+<img src="logo.png" alt="amphora logo" width="30%">
 <h6>Modified from: amphora by Alvaro Cabrera from the Noun Project</h6>
 </center>
 
@@ -10,7 +10,9 @@
 [![license GPLv3](https://img.shields.io/github/license/makeworld-the-better-one/amfora)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 <center>  <!-- I know, that's not how you usually do it :) -->
+<a href="https://raw.githubusercontent.com/makeworld-the-better-one/amfora/master/demo-large.gif">
 <img src="demo-large.gif" alt="Demo GIF" width="80%">
+</a>
 </center>
 
 Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that.

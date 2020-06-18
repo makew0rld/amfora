@@ -1,0 +1,58 @@
+# Amfora
+
+![Amfora logo](logo.png)
+##### Modified from: amphora by Alvaro Cabrera from the Noun Project
+
+Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that. It also aims to be completely cross platform, with full Windows support.
+
+It fully passes Sean Conman's client torture test, with exception of the alternate encodings section, as only UTF-8 and ASCII are supported. It mostly passes the Egsam test.
+
+## Usage
+
+Just call `amfora` or `amfora <url> <other-url>` on the terminal. On Windows it might be `amfora.exe` instead.
+
+The project keeps many standard terminal keybindings and is intuitive. Press <kbd>?</kbd> inside the application to pull up the help menu with a list of all the keybindings, and <kbd>Esc</kbd> to leave it. If you have used Bombadillo you will find it similar.
+
+It is designed with large or fullscreen terminals in mind. For optimal usage, make your terminal fullscreen. It was also designed with a dark background terminal in mind, but please file an issue if the colour choices look bad on your terminal setup. 
+
+## Features / Roadmap
+
+- [x] URL browsing with TOFU and error handling
+- [x] Tabbed browsing
+- [x] Support ANSI color codes on pages, even for Windows
+- [x] Styled page content (headings, links)
+- [x] Basic forward/backward history, for each tab
+- [x] Input (Status Code 10 & 11)
+- [ ] Built-in search using GUS
+- [ ] Bookmarks
+- [ ] Search in pages with <kbd>Ctrl-F</kbd>
+- [ ] Download pages and arbitrary data
+- [ ] Full mouse support
+- [ ] Emoji favicons
+  - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
+- [ ] Table of contents for pages
+- [ ] ~~Collapsing of gemini site sections (as determined by headers)~~
+- [ ] Full client certificate UX within the client
+  - *I will be waiting for some spec changes to happen before implementing this*
+  - Create transient and permanent certs within the client, per domain
+  - Manage and browse them
+  - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
+- [ ] Subscribe to RSS and Atom feeds and display them
+- [ ] Support Markdown rendering
+
+## Configuration
+The config file is written in the intuitive [TOML](https://github.com/toml-lang/toml) file format. See [default-config.toml](./default-config.toml) for details. By default this file is available at `~/.config/amfora/config.toml`.
+
+On Windows, the file is in `%APPDATA%\amfora\config.toml`, which usually expands to `C:\Users\<username>\AppData\Roaming\amfora\config.toml`.
+
+## Libraries
+Amfora ❤️ open source!
+
+- [cview](https://gitlab.com/tslocum/cview/) for the TUI
+  - It's a fork of [tview](https://github.com/rivo/tview) with PRs merged and active support
+  - It uses [tcell](https://github.com/gdamore/tcell) for low level terminal operations
+- [Viper](https://github.com/spf13/viper) for configuration and TOFU storing
+- [go-gemini](https://github.com/makeworld-the-better-one/go-gemini), my forked and updated Gemini client/server library
+
+## License
+This project is licensed under the GPL v3.0. See the [LICENSE](./LICENSE) file for details.

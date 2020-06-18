@@ -6,8 +6,6 @@
 ## Bugs
 - Wrapping is messed up on CHAZ post, but nothing else
   - Filed [issue 23](https://gitlab.com/tslocum/cview/-/issues/23)
-- Error modal doesn't show the title
-  - Filed [issue 24](https://gitlab.com/tslocum/cview/-/issues/24)
 - Text background not reset on ANSI pages
   - Filed [issue 25](https://gitlab.com/tslocum/cview/-/issues/25)
 - Inputfield isn't repeatedly in focus
@@ -19,3 +17,4 @@
 - Add GIF to README
 - Pass `gemini://egsam.pitr.ca/` test
   - Timeout for server not closing connection?
+- Add titles to modal with `modal.GetFrame()`

@@ -1,10 +1,17 @@
 # Amfora
 
-![Amfora logo](logo.png)
-##### Modified from: amphora by Alvaro Cabrera from the Noun Project
+<center>  <!-- I know, that's not how you usually do it :) -->
+<img src="https://raw.githubusercontent.com/makeworld-the-better-one/amfora/master/logo.png" alt="amphora logo" width="30%">
+<h6>Modified from: amphora by Alvaro Cabrera from the Noun Project</h6>
+</center>
+
 
 [![go reportcard](https://goreportcard.com/badge/github.com/makeworld-the-better-one/amfora)](https://goreportcard.com/report/github.com/makeworld-the-better-one/amfora)
 [![license GPLv3](https://img.shields.io/github/license/makeworld-the-better-one/amfora)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+
+<center>  <!-- I know, that's not how you usually do it :) -->
+<img src="demo-large.gif" alt="Demo GIF" width="80%">
+</center>
 
 Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that.
 

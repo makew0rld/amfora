@@ -49,9 +49,6 @@ func CanDisplay(res *gemini.Response) bool {
 //
 // Since this only works on non-preformatted blocks, renderGemini
 // should always be used instead.
-//
-// TODO: Style cross-protocol links differently
-//
 func convertRegularGemini(s string, numLinks int) (string, []string) {
 	links := make([]string, 0)
 	lines := strings.Split(s, "\n")

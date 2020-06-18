@@ -24,7 +24,6 @@ var errorModal = cview.NewModal().
 	SetTextColor(tcell.ColorWhite).
 	AddButtons([]string{"Ok"})
 
-// TODO: Support input
 var inputModal = cview.NewModal().
 	SetBackgroundColor(tcell.ColorGreen).
 	SetButtonBackgroundColor(tcell.ColorNavy).

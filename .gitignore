@@ -1,5 +1,6 @@
-# Binary
+# Binaries
 amfora
+amfora-*
 build/
 
 # Test logs

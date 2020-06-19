@@ -19,6 +19,9 @@ import (
 	"gitlab.com/tslocum/cview"
 )
 
+// Charset values that are compatible with UTF-8, lowercased.
+var utfCharsets = []string{"", "utf-8", "us-ascii"}
+
 // CanDisplay returns true if the response is supported by Amfora
 // for displaying on the screen.
 // It also doubles as a function to detect whether something can be stored in a Page struct.
@@ -31,15 +34,16 @@ func CanDisplay(res *gemini.Response) bool {
 	if err != nil {
 		return false
 	}
-	if strings.ToLower(params["charset"]) != "utf-8" && strings.ToLower(params["charset"]) != "us-ascii" && params["charset"] != "" {
-		// Amfora doesn't support other charsets
-		return false
-	}
 	if mediatype != "text/gemini" && mediatype != "text/plain" {
 		// Amfora doesn't support other filetypes
 		return false
 	}
-	return true
+	for _, charset := range utfCharsets {
+		if strings.ToLower(params["charset"]) == charset {
+			return true // Supported
+		}
+	}
+	return false
 }
 
 // convertRegularGemini converts non-preformatted blocks of text/gemini

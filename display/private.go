@@ -109,6 +109,7 @@ func handleURL(u string) (string, bool) {
 	parsed, err := url.Parse(u)
 	if err != nil {
 		Error("URL Error", err.Error())
+		bottomBar.SetText(tabMap[curTab].Url)
 		return "", false
 	}
 
@@ -131,11 +132,13 @@ func handleURL(u string) (string, bool) {
 				Error("Error", err.Error())
 			}
 		}
+		bottomBar.SetText(tabMap[curTab].Url)
 		return "", false
 	}
 	if !strings.HasPrefix(u, "gemini") {
 		// TODO: Replace it with with displaying the URL, once modal titles work
 		Error("Error", "Unsupported protocol, only [::b]gemini[::-] and [::b]http[::-] are supported.")
+		bottomBar.SetText(tabMap[curTab].Url)
 		return "", false
 	}
 	// Gemini URL

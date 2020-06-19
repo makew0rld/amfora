@@ -17,7 +17,7 @@ g|Go to top of document
 G|Go to bottom of document
 spacebar|Open bar at the bottom - type a URL or link number
 Enter|On a page this will start link highlighting. Press Tab and Shift-Tab to pick different links. Press enter again to go to one.
-Ctrl-R|Reload a page. This also clears the cache.
+Ctrl-R, R|Reload a page. This also clears the cache.
 q, Ctrl-Q|Quit
 Shift-NUMBER|Go to a specific tab.
 Shift-0, )|Go to the last tab.

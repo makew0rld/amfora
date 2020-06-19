@@ -96,7 +96,8 @@ func Error(title, text string) {
 	// Add spaces to title for aesthetic reasons
 	title = " " + strings.TrimSpace(title) + " "
 
-	errorModal.SetTitle(title)
+	errorModal.GetFrame().Clear()
+	errorModal.GetFrame().AddText(title, true, cview.AlignCenter, tcell.ColorWhite)
 	errorModal.SetText(text)
 	tabPages.ShowPage("error")
 	tabPages.SendToFront("error")

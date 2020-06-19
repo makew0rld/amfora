@@ -60,7 +60,7 @@ func followLink(prev, next string) {
 	prevParsed, _ := url.Parse(prev)
 	nextParsed, err := url.Parse(next)
 	if err != nil {
-		Error("Error", "Link URL could not be parsed")
+		Error("URL Error", "Link URL could not be parsed")
 		return
 	}
 	nextURL := prevParsed.ResolveReference(nextParsed).String()
@@ -116,11 +116,11 @@ func handleURL(u string) (string, bool) {
 	if strings.HasPrefix(u, "http") {
 		switch strings.TrimSpace(viper.GetString("a-general.http")) {
 		case "", "off":
-			Error("Error", "Opening HTTP URLs is turned off.")
+			Info("Opening HTTP URLs is turned off.")
 		case "default":
 			s, err := webbrowser.Open(u)
 			if err != nil {
-				Error("Error", err.Error())
+				Error("Webbrowser Error", err.Error())
 			} else {
 				Info(s)
 			}
@@ -129,15 +129,14 @@ func handleURL(u string) (string, bool) {
 			fields := strings.Fields(viper.GetString("a-general.http"))
 			err := exec.Command(fields[0], append(fields[1:], u)...).Start()
 			if err != nil {
-				Error("Error", err.Error())
+				Error("HTTP Error", "Error executing custom browser command: "+err.Error())
 			}
 		}
 		bottomBar.SetText(tabMap[curTab].Url)
 		return "", false
 	}
 	if !strings.HasPrefix(u, "gemini") {
-		// TODO: Replace it with with displaying the URL, once modal titles work
-		Error("Error", "Unsupported protocol, only [::b]gemini[::-] and [::b]http[::-] are supported.")
+		Error("Protocol Error", "Only [::b]gemini[::-] and [::b]http[::-] are supported. URL was "+u)
 		bottomBar.SetText(tabMap[curTab].Url)
 		return "", false
 	}
@@ -155,7 +154,7 @@ func handleURL(u string) (string, bool) {
 
 	res, err := client.Fetch(u)
 	if err != nil {
-		Error("Error", err.Error())
+		Error("URL Fetch Error", err.Error())
 		// Set the bar back to original URL
 		bottomBar.SetText(tabMap[curTab].Url)
 		return "", false
@@ -163,7 +162,7 @@ func handleURL(u string) (string, bool) {
 	if renderer.CanDisplay(res) {
 		page, err := renderer.MakePage(u, res)
 		if err != nil {
-			Error("Error", "Issuing creating page: "+err.Error())
+			Error("Page Error", "Issuing creating page: "+err.Error())
 			// Set the bar back to original URL
 			bottomBar.SetText(tabMap[curTab].Url)
 			return "", false
@@ -227,7 +226,7 @@ func handleURL(u string) (string, bool) {
 
 		s, err := webbrowser.Open("https://portal.mozz.us/gemini/" + portalURL)
 		if err != nil {
-			Error("Error", err.Error())
+			Error("Webbrowser Error", err.Error())
 		} else {
 			Info(s)
 		}

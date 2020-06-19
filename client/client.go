@@ -2,8 +2,6 @@
 package client
 
 import (
-	"fmt"
-
 	"github.com/makeworld-the-better-one/go-gemini"
 )
 
@@ -12,7 +10,7 @@ import (
 func Fetch(url string) (*gemini.Response, error) {
 	resp, err := gemini.Fetch(url)
 	if err != nil {
-		return nil, fmt.Errorf("URL could not be fetched: %v", err)
+		return nil, err
 	}
 	ok := handleTofu(resp.Cert)
 	if !ok {

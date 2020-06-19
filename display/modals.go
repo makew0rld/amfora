@@ -54,8 +54,8 @@ func modalInit() {
 
 	errorModal.SetBorder(true)
 	errorModal.SetBorderColor(tcell.ColorWhite)
-	errorModal.SetTitleColor(tcell.ColorWhite)
-	errorModal.SetTitleAlign(cview.AlignCenter)
+	errorModal.GetFrame().SetTitleColor(tcell.ColorWhite)
+	errorModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 	errorModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		tabPages.SwitchToPage(strconv.Itoa(curTab))
 	})
@@ -96,8 +96,7 @@ func Error(title, text string) {
 	// Add spaces to title for aesthetic reasons
 	title = " " + strings.TrimSpace(title) + " "
 
-	errorModal.GetFrame().Clear()
-	errorModal.GetFrame().AddText(title, true, cview.AlignCenter, tcell.ColorWhite)
+	errorModal.GetFrame().SetTitle(title)
 	errorModal.SetText(text)
 	tabPages.ShowPage("error")
 	tabPages.SendToFront("error")

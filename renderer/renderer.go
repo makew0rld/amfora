@@ -17,6 +17,7 @@ import (
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
+	"golang.org/x/text/encoding/ianaindex"
 )
 
 // CanDisplay returns true if the response is supported by Amfora
@@ -31,15 +32,16 @@ func CanDisplay(res *gemini.Response) bool {
 	if err != nil {
 		return false
 	}
-	if strings.ToLower(params["charset"]) != "utf-8" && strings.ToLower(params["charset"]) != "us-ascii" && params["charset"] != "" {
-		// Amfora doesn't support other charsets
-		return false
-	}
 	if mediatype != "text/gemini" && mediatype != "text/plain" {
 		// Amfora doesn't support other filetypes
 		return false
 	}
-	return true
+	// Check if there is an encoding for the charset already
+	if params["charset"] == "" {
+		return true // Means UTF-8
+	}
+	_, err = ianaindex.MIME.Encoding(params["charset"]) // Lowercasing is done inside
+	return err == nil
 }
 
 // convertRegularGemini converts non-preformatted blocks of text/gemini
@@ -207,23 +209,35 @@ func MakePage(url string, res *gemini.Response) (*structs.Page, error) {
 		return nil, errors.New("not valid content for a Page")
 	}
 
-	content, err := ioutil.ReadAll(res.Body) // TODO: Don't use all memory on large pages
+	rawText, err := ioutil.ReadAll(res.Body) // TODO: Don't use all memory on large pages
 	if err != nil {
 		return nil, err
 	}
 	res.Body.Close()
 
-	mediatype, _, _ := mime.ParseMediaType(res.Meta)
+	mediatype, params, _ := mime.ParseMediaType(res.Meta)
+
+	// Convert content first
+	var utfText string
+	if params["charset"] == "" || strings.ToLower(params["charset"]) == "us-ascii" {
+		utfText = string(rawText)
+	} else {
+		encoding, _ := ianaindex.MIME.Encoding(params["charset"])
+		utfText, err = encoding.NewDecoder().String(string(rawText))
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	if mediatype == "text/plain" {
 		return &structs.Page{
 			Url:     url,
-			Content: string(content),
+			Content: utfText,
 			Links:   []string{}, // Plaintext has no links
 		}, nil
 	}
 	if mediatype == "text/gemini" {
-		rendered, links := RenderGemini(string(content))
+		rendered, links := RenderGemini(utfText)
 		return &structs.Page{
 			Url:     url,
 			Content: rendered,

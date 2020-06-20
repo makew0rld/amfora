@@ -20,6 +20,17 @@ import (
 	"golang.org/x/text/encoding/ianaindex"
 )
 
+// Charsets that are compatible with UTF-8 and don't need to be decoded.
+func isUTF8(charset string) bool {
+	utfCharsets := []string{"", "utf-8", "us-ascii"}
+	for i := range utfCharsets {
+		if strings.ToLower(charset) == utfCharsets[i] {
+			return true
+		}
+	}
+	return false
+}
+
 // CanDisplay returns true if the response is supported by Amfora
 // for displaying on the screen.
 // It also doubles as a function to detect whether something can be stored in a Page struct.
@@ -36,12 +47,12 @@ func CanDisplay(res *gemini.Response) bool {
 		// Amfora doesn't support other filetypes
 		return false
 	}
-	// Check if there is an encoding for the charset already
-	if params["charset"] == "" {
-		return true // Means UTF-8
+	if isUTF8(params["charset"]) {
+		return true
 	}
-	_, err = ianaindex.MIME.Encoding(params["charset"]) // Lowercasing is done inside
-	return err == nil
+	enc, err := ianaindex.MIME.Encoding(params["charset"]) // Lowercasing is done inside
+	// Encoding sometimes returns nil, see #3 on this repo and golang/go#19421
+	return err == nil && enc != nil
 }
 
 // convertRegularGemini converts non-preformatted blocks of text/gemini
@@ -219,10 +230,14 @@ func MakePage(url string, res *gemini.Response) (*structs.Page, error) {
 
 	// Convert content first
 	var utfText string
-	if params["charset"] == "" || strings.ToLower(params["charset"]) == "us-ascii" {
+	if isUTF8(params["charset"]) {
 		utfText = string(rawText)
 	} else {
-		encoding, _ := ianaindex.MIME.Encoding(params["charset"])
+		encoding, err := ianaindex.MIME.Encoding(params["charset"])
+		if encoding == nil || err != nil {
+			// Some encoding doesn't exist and wasn't caught in CanDisplay()
+			return nil, errors.New("unsupported encoding")
+		}
 		utfText, err = encoding.NewDecoder().String(string(rawText))
 		if err != nil {
 			return nil, err

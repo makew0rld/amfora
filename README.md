@@ -34,6 +34,7 @@ The project keeps many standard terminal keybindings and is intuitive. Press <kb
 It is designed with large or fullscreen terminals in mind. For optimal usage, make your terminal fullscreen. It was also designed with a dark background terminal in mind, but please file an issue if the colour choices look bad on your terminal setup. 
 
 ## Features / Roadmap
+Features in italics are in the master branch, but not in the latest release.
 
 - [x] URL browsing with TOFU and error handling
 - [x] Tabbed browsing
@@ -41,7 +42,7 @@ It is designed with large or fullscreen terminals in mind. For optimal usage, ma
 - [x] Styled page content (headings, links)
 - [x] Basic forward/backward history, for each tab
 - [x] Input (Status Code 10 & 11)
-- [x] Multiple charset support (over 55)
+- [x] *Multiple charset support (over 55)*
 - [ ] Built-in search using GUS
 - [ ] Bookmarks
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>

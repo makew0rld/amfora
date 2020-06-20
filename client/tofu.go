@@ -15,6 +15,7 @@ import (
 // Stores cert hash and expiry for now, like Bombadillo.
 // There is ongoing TOFU discussion on the mailing list about better
 // ways to do this, and I will update this file once those are decided on.
+// Update: See #7 for some small improvements made.
 
 var ErrTofu = errors.New("server cert does not match TOFU database")
 
@@ -22,22 +23,28 @@ var tofuStore = config.TofuStore
 
 // idKey returns the config/viper key needed to retrieve
 // a cert's ID / fingerprint.
-func idKey(domain string) string {
-	return strings.ReplaceAll(domain, ".", "/")
+func idKey(domain string, port string) string {
+	if port == "1965" || port == "" {
+		return strings.ReplaceAll(domain, ".", "/")
+	}
+	return strings.ReplaceAll(domain, ".", "/") + ":" + port
 }
 
-func expiryKey(domain string) string {
-	return strings.ReplaceAll(strings.TrimSuffix(domain, "."), ".", "/") + "/expiry"
+func expiryKey(domain string, port string) string {
+	if port == "1965" || port == "" {
+		return strings.ReplaceAll(strings.TrimSuffix(domain, "."), ".", "/") + "/expiry"
+	}
+	return strings.ReplaceAll(strings.TrimSuffix(domain, "."), ".", "/") + "/expiry" + ":" + port
 }
 
-func loadTofuEntry(domain string) (string, time.Time, error) {
-	id := tofuStore.GetString(idKey(domain)) // Fingerprint
+func loadTofuEntry(domain string, port string) (string, time.Time, error) {
+	id := tofuStore.GetString(idKey(domain, port)) // Fingerprint
 	if len(id) != 64 {
 		// Not set, or invalid
 		return "", time.Time{}, errors.New("not found")
 	}
 
-	expiry := tofuStore.GetTime(expiryKey(domain))
+	expiry := tofuStore.GetTime(expiryKey(domain, port))
 	if expiry.IsZero() {
 		// Not set
 		return id, time.Time{}, errors.New("not found")
@@ -48,24 +55,20 @@ func loadTofuEntry(domain string) (string, time.Time, error) {
 // certID returns a generic string representing a cert or domain.
 func certID(cert *x509.Certificate) string {
 	h := sha256.New()
-	h.Write(cert.Raw)
+	h.Write(cert.RawSubjectPublicKeyInfo) // Better than cert.Raw, see #7
 	return fmt.Sprintf("%X", h.Sum(nil))
-
-	// The old way that uses the cert public key:
-	// b, err := x509.MarshalPKIXPublicKey(cert.PublicKey)
-	// h := sha256.New()
-	// if err != nil {
-	// 	// Unsupported key type - try to store a hash of the struct instead
-	// 	h.Write([]byte(fmt.Sprint(cert.PublicKey)))
-	// 	return fmt.Sprintf("%X", h.Sum(nil))
-	// }
-	// h.Write(b)
-	// return fmt.Sprintf("%X", h.Sum(nil))
 }
 
-func saveTofuEntry(cert *x509.Certificate) {
-	tofuStore.Set(idKey(cert.Subject.CommonName), certID(cert))
-	tofuStore.Set(expiryKey(cert.Subject.CommonName), cert.NotAfter.UTC())
+// origCertID uses cert.Raw, which was used in v1.0.0 of the app.
+func origCertID(cert *x509.Certificate) string {
+	h := sha256.New()
+	h.Write(cert.Raw) // Better than cert.Raw, see #7
+	return fmt.Sprintf("%X", h.Sum(nil))
+}
+
+func saveTofuEntry(cert *x509.Certificate, port string) {
+	tofuStore.Set(idKey(cert.Subject.CommonName, port), certID(cert))
+	tofuStore.Set(expiryKey(cert.Subject.CommonName, port), cert.NotAfter.UTC())
 	err := tofuStore.WriteConfig()
 	if err != nil {
 		panic(err)
@@ -77,21 +80,26 @@ func saveTofuEntry(cert *x509.Certificate) {
 // It returns a bool indicating if the cert is valid according to
 // the TOFU database.
 // If false is returned, the connection should not go ahead.
-func handleTofu(cert *x509.Certificate) bool {
-	id, expiry, err := loadTofuEntry(cert.Subject.CommonName)
+func handleTofu(cert *x509.Certificate, port string) bool {
+	id, expiry, err := loadTofuEntry(cert.Subject.CommonName, port)
 	if err != nil {
 		// Cert isn't in database or data is malformed
 		// So it can't be checked and anything is valid
-		saveTofuEntry(cert)
-		return true
-	}
-	if certID(cert) == id {
-		// Save cert as the one stored
+		saveTofuEntry(cert, port)
 		return true
 	}
 	if time.Now().After(expiry) {
 		// Old cert expired, so anything is valid
-		saveTofuEntry(cert)
+		saveTofuEntry(cert, port)
+		return true
+	}
+	if certID(cert) == id {
+		// Same cert as the one stored
+		return true
+	}
+	if origCertID(cert) == id {
+		// Valid but uses old ID type
+		saveTofuEntry(cert, port)
 		return true
 	}
 	return false

@@ -19,7 +19,7 @@ Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) c
 
 It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Maybe use [Cmder](https://cmder.net/) instead?
 
-It fully passes Sean Conman's client torture test, with exception of the alternate encodings section, as only UTF-8 and ASCII are supported. It mostly passes the Egsam test.
+It fully passes Sean Conman's client torture test. It mostly passes the Egsam test.
 
 ## Installation
 
@@ -41,6 +41,7 @@ It is designed with large or fullscreen terminals in mind. For optimal usage, ma
 - [x] Styled page content (headings, links)
 - [x] Basic forward/backward history, for each tab
 - [x] Input (Status Code 10 & 11)
+- [x] Multiple charset support (over 55)
 - [ ] Built-in search using GUS
 - [ ] Bookmarks
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>

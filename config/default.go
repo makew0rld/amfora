@@ -4,10 +4,16 @@ package config
 var defaultConf = []byte(`# This is the default config file.
 # It also shows all the default values, if you don't create the file.
 
-# All URL values may omit the scheme and/or port.
+# All URL values may omit the scheme and/or port, as well as the beginning double slash
+# Valid URL examples:
+# gemini://example.com
+# //example.com
+# example.com
+# example.com:1901
 
 [a-general]
 home = "gemini://gemini.circumlunar.space"
+
 # What command to run to open a HTTP URL. Set to "default" to try to guess the browser,
 # or set to "off" to not open HTTP URLs.
 # If a command is set, than the URL will be added (in quotes) to the end of the command.
@@ -29,5 +35,5 @@ wrap_width = 100  # How many columns to wrap a page's text to. Preformatted bloc
 [cache]
 # Zero values mean there is no limit
 max_size = 0  # Size in bytes
-max_pages = 30 # The maximum number of pages the cache can store
+max_pages = 30 # The maximum number of pages the cache will store
 `)

@@ -119,7 +119,9 @@ func Init() {
 			// TODO: Support search
 			// Send the URL/number typed in
 
-			if strings.TrimSpace(bottomBar.GetText()) == "" {
+			query := bottomBar.GetText()
+
+			if strings.TrimSpace(query) == "" {
 				// Ignore
 				bottomBar.SetLabel("")
 				bottomBar.SetText(tabMap[curTab].Url)
@@ -127,15 +129,21 @@ func Init() {
 				return
 			}
 
-			i, err := strconv.Atoi(bottomBar.GetText())
+			i, err := strconv.Atoi(query)
 			if err != nil {
-				// It's a full URL
-				URL(bottomBar.GetText())
+				// It's a full URL or search term
+				// Detect if it's a search or URL
+				if strings.Contains(query, " ") || (!strings.Contains(query, "//") && !strings.Contains(query, ".")) {
+					URL(viper.GetString("a-general.search") + "?" + pathEscape(query))
+				} else {
+					// Full URL
+					URL(query)
+				}
 				bottomBar.SetLabel("")
 				return
 			}
 			if i <= len(tabMap[curTab].Links) && i > 0 {
-				// Valid link number
+				// It's a valid link number
 				followLink(tabMap[curTab].Url, tabMap[curTab].Links[i-1])
 				bottomBar.SetLabel("")
 				return
@@ -195,7 +203,7 @@ func Init() {
 			switch string(event.Rune()) {
 			case " ":
 				// Space starts typing, like Bombadillo
-				bottomBar.SetLabel("[::b]URL: [::-]")
+				bottomBar.SetLabel("[::b]URL or search: [::-]")
 				bottomBar.SetText("")
 				App.SetFocus(bottomBar)
 				return nil

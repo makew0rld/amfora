@@ -18,6 +18,11 @@ import (
 
 // This file contains the functions that aren't part of the public API.
 
+// pathEscape is the same as url.PathEscape, but it also replaces the +.
+func pathEscape(path string) string {
+	return strings.ReplaceAll(url.PathEscape(path), "+", "%2B")
+}
+
 // tabHasContent returns true when the current tab has a page being displayed.
 // The most likely situation where false would be returned is when the default
 // new tab content is being displayed.
@@ -185,7 +190,7 @@ func handleURL(u string) (string, bool) {
 		if ok {
 			// Make another request with the query string added
 			// + chars are replaced because PathEscape doesn't do that
-			parsed.RawQuery = strings.ReplaceAll(url.PathEscape(userInput), "+", "%2B")
+			parsed.RawQuery = pathEscape(userInput)
 			return handleURL(parsed.String())
 		}
 		return "", false

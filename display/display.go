@@ -399,18 +399,6 @@ func Reload() {
 // URL loads and handles the provided URL for the current tab.
 // It should be an absolute URL.
 func URL(u string) {
-	// Old relative URL handling stuff:
-	// parsed, err := url.Parse(u)
-	// if err != nil {
-	// 	Error("Bad URL", err.Error())
-	// 	return
-	// }
-	// if tabHasContent() && parsed.Host == "" {
-	// 	// Relative link
-	// 	followLink(tabMap[curTab].Url, u)
-	// 	return
-	// }
-
 	go func() {
 		final, displayed := handleURL(u)
 		if displayed {

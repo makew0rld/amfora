@@ -83,6 +83,13 @@ var App = cview.NewApplication().
 		// Store width and height for calculations
 		termW = width
 		termH = height
+
+		// Shift new tabs created before app startup, when termW == 0
+		// XXX: This is hacky but works. The biggest issue is that there will sometimes be a tiny flash
+		// of the old not shifted tab on startup.
+		if tabMap[curTab] == &newTabPage {
+			tabViews[curTab].SetText(addLeftMargin(renderedNewTabContent))
+		}
 	})
 
 var renderedNewTabContent string
@@ -289,7 +296,7 @@ func NewTab() {
 		SetRegions(true).
 		SetScrollable(true).
 		SetWrap(false).
-		SetText(renderedNewTabContent).
+		SetText(addLeftMargin(renderedNewTabContent)).
 		SetChangedFunc(func() {
 			App.Draw()
 		}).

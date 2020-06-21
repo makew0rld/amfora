@@ -100,17 +100,21 @@ func followLink(prev, next string) {
 	}()
 }
 
+func addLeftMargin(text string) string {
+	var shifted string
+	for _, line := range strings.Split(text, "\n") {
+		shifted += strings.Repeat(" ", leftMargin()) + line + "\n"
+	}
+	return shifted
+}
+
 // setPage displays a Page on the current tab.
 func setPage(p *structs.Page) {
 	saveScroll() // Save the scroll of the previous page
 
 	if !p.Displayable {
 		// Add margin to page based on terminal width
-		var shifted string
-		for _, line := range strings.Split(p.Content, "\n") {
-			shifted += strings.Repeat(" ", leftMargin()) + line + "\n"
-		}
-		p.Content = shifted
+		p.Content = addLeftMargin(p.Content)
 		p.Displayable = true
 	}
 

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Amfora
+GenericName=Gemini TUI Browser
+Comment=Browse Gemini in the terminal.
+Categories=Network;WebBrowser;ConsoleOnly;
+Keywords=gemini
+Terminal=true
+TryExec=amfora
+Exec=amfora %U
+MimeType=x-scheme-handler/gemini;

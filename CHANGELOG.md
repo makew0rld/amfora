@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Search from bottom bar
 - Wrapping based on terminal width (#1)
 - Right margin for text (#1)
+- Desktop entry file
 
 ## Changed
 - Connection timeout is 15 seconds (was 5s)

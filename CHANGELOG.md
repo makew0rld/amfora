@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reset bottom bar on error / invalid URL
 - Side scrolling doesn't cut off text on the left side (#1)
 
+## Removed
+- Opening multiple URLs from the command line (threading issues)
 
 ## [1.0.0] - 2020-06-18
 Initial release.

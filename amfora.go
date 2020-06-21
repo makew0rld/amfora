@@ -19,14 +19,12 @@ func main() {
 	}
 	display.Init()
 
-	for _, url := range os.Args[1:] {
-		display.NewTab()
-		display.URL(url)
-	}
-
 	if len(os.Args[1:]) == 0 {
 		// There should always be a tab
 		display.NewTab()
+	} else {
+		display.NewTab()
+		display.URL(os.Args[1])
 	}
 
 	if err = display.App.Run(); err != nil {

@@ -7,5 +7,5 @@ Categories=Network;WebBrowser;ConsoleOnly;
 Keywords=gemini
 Terminal=true
 TryExec=amfora
-Exec=amfora %U
+Exec=amfora %u
 MimeType=x-scheme-handler/gemini;

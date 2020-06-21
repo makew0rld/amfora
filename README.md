@@ -33,7 +33,7 @@ update-desktop-database ~/.local/share/applications
 
 ## Usage
 
-Just call `amfora` or `amfora <url> <other-url>` on the terminal. On Windows it might be `amfora.exe` instead.
+Just call `amfora` or `amfora <url>` on the terminal. On Windows it might be `amfora.exe` instead.
 
 The project keeps many standard terminal keybindings and is intuitive. Press <kbd>?</kbd> inside the application to pull up the help menu with a list of all the keybindings, and <kbd>Esc</kbd> to leave it. If you have used Bombadillo you will find it similar.
 

@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
@@ -18,10 +17,11 @@ import (
 // into a cview-compatible format.
 // It also returns a slice of link URLs.
 // numLinks is the number of links that exist so far.
+// width is the number of columns to wrap to.
 //
-// Since this only works on non-preformatted blocks, renderGemini
+// Since this only works on non-preformatted blocks, RenderGemini
 // should always be used instead.
-func convertRegularGemini(s string, numLinks int) (string, []string) {
+func convertRegularGemini(s string, numLinks int, width int) (string, []string) {
 	links := make([]string, 0)
 	lines := strings.Split(s, "\n")
 	wrappedLines := make([]string, 0) // Final result
@@ -111,13 +111,13 @@ func convertRegularGemini(s string, numLinks int) (string, []string) {
 				lines[i] = strings.TrimPrefix(lines[i], ">")
 				lines[i] = strings.TrimPrefix(lines[i], " ")
 
-				temp := cview.WordWrap(lines[i], config.GetWrapWidth())
+				temp := cview.WordWrap(lines[i], width)
 				for i := range temp {
 					temp[i] = "> " + temp[i]
 				}
 				wrappedLines = append(wrappedLines, temp...)
 			} else {
-				wrappedLines = append(wrappedLines, cview.WordWrap(lines[i], config.GetWrapWidth())...)
+				wrappedLines = append(wrappedLines, cview.WordWrap(lines[i], width)...)
 			}
 		}
 	}
@@ -125,9 +125,9 @@ func convertRegularGemini(s string, numLinks int) (string, []string) {
 	return strings.Join(wrappedLines, "\r\n"), links
 }
 
-// renderGemini converts text/gemini into a cview displayable format.
+// RenderGemini converts text/gemini into a cview displayable format.
 // It also returns a slice of link URLs.
-func RenderGemini(s string) (string, []string) {
+func RenderGemini(s string, width int) (string, []string) {
 	s = cview.Escape(s)
 	if viper.GetBool("a-general.color") {
 		s = cview.TranslateANSI(s)
@@ -148,7 +148,7 @@ func RenderGemini(s string) (string, []string) {
 				rendered += buf
 			} else {
 				// Not preformatted, regular text
-				ren, lks := convertRegularGemini(buf, len(links))
+				ren, lks := convertRegularGemini(buf, len(links), width)
 				links = append(links, lks...)
 				rendered += ren
 			}
@@ -166,7 +166,7 @@ func RenderGemini(s string) (string, []string) {
 	} else {
 		// Not preformatted, regular text
 		// Same code as in the loop above
-		ren, lks := convertRegularGemini(buf, len(links))
+		ren, lks := convertRegularGemini(buf, len(links), width)
 		links = append(links, lks...)
 		rendered += ren
 	}

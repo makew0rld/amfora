@@ -13,10 +13,33 @@ import (
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
-	//"github.com/makeworld-the-better-one/amfora/cview"
 )
 
 // This file contains the functions that aren't part of the public API.
+
+func leftMargin() int {
+	return int(float64(termW) * viper.GetFloat64("a-general.left_margin"))
+}
+
+func textWidth() int {
+	if termW <= 0 {
+		// This prevent a flash of 1-column text on startup, when the terminal
+		// width hasn't been initialized.
+		return viper.GetInt("a-general.max_width")
+	}
+
+	rightMargin := leftMargin()
+	if leftMargin() > 10 {
+		// 10 is the max right margin
+		rightMargin = 10
+	}
+
+	max := termW - leftMargin() - rightMargin
+	if max < viper.GetInt("a-general.max_width") {
+		return max
+	}
+	return viper.GetInt("a-general.max_width")
+}
 
 // pathEscape is the same as url.PathEscape, but it also replaces the +.
 func pathEscape(path string) string {
@@ -81,7 +104,17 @@ func followLink(prev, next string) {
 func setPage(p *structs.Page) {
 	saveScroll() // Save the scroll of the previous page
 
-	// Change page
+	if !p.Displayable {
+		// Add margin to page based on terminal width
+		var shifted string
+		for _, line := range strings.Split(p.Content, "\n") {
+			shifted += strings.Repeat(" ", leftMargin()) + line + "\n"
+		}
+		p.Content = shifted
+		p.Displayable = true
+	}
+
+	// Change page on screen
 	tabMap[curTab] = p
 	tabViews[curTab].SetText(p.Content)
 	tabViews[curTab].Highlight("") // Turn off highlights
@@ -165,7 +198,7 @@ func handleURL(u string) (string, bool) {
 		return "", false
 	}
 	if renderer.CanDisplay(res) {
-		page, err := renderer.MakePage(u, res)
+		page, err := renderer.MakePage(u, res, textWidth())
 		if err != nil {
 			Error("Page Error", "Issuing creating page: "+err.Error())
 			// Set the bar back to original URL

@@ -31,7 +31,7 @@ Just call `amfora` or `amfora <url> <other-url>` on the terminal. On Windows it 
 
 The project keeps many standard terminal keybindings and is intuitive. Press <kbd>?</kbd> inside the application to pull up the help menu with a list of all the keybindings, and <kbd>Esc</kbd> to leave it. If you have used Bombadillo you will find it similar.
 
-It is designed with large or fullscreen terminals in mind. For optimal usage, make your terminal fullscreen. It was also designed with a dark background terminal in mind, but please file an issue if the colour choices look bad on your terminal setup. 
+It is designed with large or fullscreen terminals in mind. For optimal usage, make your terminal fullscreen. It was also designed with a dark background terminal in mind, but please file an issue if the colour choices look bad on your terminal setup. It was tested with left-to-right languages, and will likely not work as well with right-to-left languages like Arabic.
 
 ## Features / Roadmap
 Features in *italics* are in the master branch, but not in the latest release.

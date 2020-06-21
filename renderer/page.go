@@ -46,7 +46,7 @@ func CanDisplay(res *gemini.Response) bool {
 	return err == nil && enc != nil
 }
 
-func MakePage(url string, res *gemini.Response) (*structs.Page, error) {
+func MakePage(url string, res *gemini.Response, width int) (*structs.Page, error) {
 	if !CanDisplay(res) {
 		return nil, errors.New("not valid content for a Page")
 	}
@@ -83,7 +83,7 @@ func MakePage(url string, res *gemini.Response) (*structs.Page, error) {
 		}, nil
 	}
 	if mediatype == "text/gemini" {
-		rendered, links := RenderGemini(utfText)
+		rendered, links := RenderGemini(utfText, width)
 		return &structs.Page{
 			Url:     url,
 			Content: rendered,

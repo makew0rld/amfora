@@ -23,7 +23,10 @@ http = "default"
 search = "gemini://gus.guru/search"  # Any URL that will accept a query string can be put here
 color = true  # Whether colors will be used in the terminal
 bullets = true  # Whether to replace list asterisks with unicode bullets
-wrap_width = 100  # How many columns to wrap a page's text to. Preformatted blocks are not wrapped.
+
+# A number from 0 to 1, indicating what percentage of the terminal width the left margin should take up.
+left_margin = 0.15
+max_width = 100  # The max number of columns to wrap a page's text to. Preformatted blocks are not wrapped.
 
 [bookmarks]
 # Make sure to quote the key names if you edit this part yourself

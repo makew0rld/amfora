@@ -95,7 +95,8 @@ func Init() error {
 	viper.SetDefault("a-general.search", "gus.guru/search")
 	viper.SetDefault("a-general.color", true)
 	viper.SetDefault("a-general.bullets", true)
-	viper.SetDefault("a-general.wrap_width", 100)
+	viper.SetDefault("a-general.left_margin", 0.15)
+	viper.SetDefault("a-general.max_width", 100)
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
 
@@ -111,12 +112,4 @@ func Init() error {
 	cache.SetMaxPages(viper.GetInt("cache.max_pages"))
 
 	return nil
-}
-
-func GetWrapWidth() int {
-	i := viper.GetInt("a-general.wrap_width")
-	if i <= 0 {
-		return 100 // The default
-	}
-	return i
 }

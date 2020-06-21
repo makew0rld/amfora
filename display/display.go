@@ -13,13 +13,15 @@ import (
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"gitlab.com/tslocum/cview"
-	//"github.com/makeworld-the-better-one/amfora/cview"
 )
 
 var curTab = -1                          // What number tab is currently visible, -1 means there are no tabs at all
 var tabMap = make(map[int]*structs.Page) // Map of tab number to page
 // Holds the actual tab primitives
 var tabViews = make(map[int]*cview.TextView)
+
+var termW int
+var termH int
 
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField().
@@ -64,17 +66,24 @@ var layout = cview.NewFlex().
 	SetDirection(cview.FlexRow).
 	AddItem(tabRow, 1, 1, false).
 	AddItem(nil, 1, 1, false). // One line of empty space above the page
-	//AddItem(tabPages, 0, 1, true).
-	AddItem(cview.NewFlex(). // The page text in the middle is held in another flex, to center it
-					SetDirection(cview.FlexColumn).
-					AddItem(nil, 0, 1, false).
-					AddItem(tabPages, 0, 7, true). // The text occupies 5/6 of the screen horizontally
-					AddItem(nil, 0, 1, false),
-					0, 1, true).
+	AddItem(tabPages, 0, 1, true).
+	// AddItem(cview.NewFlex(). // The page text in the middle is held in another flex, to center it
+	// 				SetDirection(cview.FlexColumn).
+	// 				AddItem(nil, 0, 1, false).
+	// 				AddItem(tabPages, 0, 7, true). // The text occupies 7/9 of the screen horizontally
+	// 				AddItem(nil, 0, 1, false),
+	// 				0, 1, true).
 	AddItem(nil, 1, 1, false). // One line of empty space before bottomBar
 	AddItem(bottomBar, 1, 1, false)
 
-var App = cview.NewApplication().EnableMouse(false).SetRoot(layout, true)
+var App = cview.NewApplication().
+	EnableMouse(false).
+	SetRoot(layout, true).
+	SetAfterResizeFunc(func(width int, height int) {
+		// Store width and height for calculations
+		termW = width
+		termH = height
+	})
 
 var renderedNewTabContent string
 var newTabLinks []string
@@ -116,8 +125,8 @@ func Init() {
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
 		switch key {
 		case tcell.KeyEnter:
-			// TODO: Support search
-			// Send the URL/number typed in
+			// Figure out whether it's a URL, link number, or search
+			// And send out a request
 
 			query := bottomBar.GetText()
 
@@ -163,7 +172,7 @@ func Init() {
 	})
 
 	// Render the default new tab content ONCE and store it for later
-	renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent)
+	renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent, textWidth())
 	newTabPage = structs.Page{Content: renderedNewTabContent, Links: newTabLinks}
 
 	modalInit()

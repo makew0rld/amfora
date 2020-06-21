@@ -11,24 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Store ports in TOFU database (#7)
 - Search from bottom bar
 - Wrapping based on terminal width (#1)
+- `left_margin` config option
 - Right margin for text (#1)
 - Desktop entry file
 
-## Changed
+### Changed
 - Connection timeout is 15 seconds (was 5s)
 - Hash `SubjectPublicKeyInfo` for TOFU instead (#7)
+- `wrap_width` config option became `max_width`
 
 ### Fixed
 - Reset bottom bar on error / invalid URL
 - Side scrolling doesn't cut off text on the left side (#1)
 
-## Removed
+### Removed
 - Opening multiple URLs from the command line (threading issues)
 
 ## [1.0.0] - 2020-06-18
 Initial release.
 
-## Added
+### Added
 - Tabbed browsing
 - TOFU
 - Styled content

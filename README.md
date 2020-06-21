@@ -23,7 +23,13 @@ It fully passes Sean Conman's client torture test, including the new Unicode tes
 
 ## Installation
 
-Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On POSIX systems you might have to make the binary executable with `chmod +x <filename>`. On Windows, make sure you click "Advanced > Run anyway" after double-clicking, or something like that.
+Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you might have to make the binary executable with `chmod +x <filename>`. On Windows, make sure you click "Advanced > Run anyway" after double-clicking, or something like that.
+
+Unix systems can install the desktop entry file to get Amfora to appear when they search for applications:
+```bash
+curl -sSL https://raw.githubusercontent.com/makeworld-the-better-one/amfora/master/amfora.desktop -o ~/.local/share/applications/amfora.desktop
+update-desktop-database ~/.local/share/applications
+```
 
 ## Usage
 

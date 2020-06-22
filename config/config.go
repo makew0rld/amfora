@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
@@ -37,17 +38,29 @@ func Init() error {
 		configDir = amforaAppData
 	} else {
 		// Unix / POSIX system
-		configDir = filepath.Join(home, ".config", "amfora")
+		xdg_config, ok := os.LookupEnv("XDG_CONFIG_HOME")
+		if ok && strings.TrimSpace(xdg_config) != "" {
+			configDir = filepath.Join(xdg_config, "amfora")
+		} else {
+			// Default to ~/.config/amfora
+			configDir = filepath.Join(home, ".config", "amfora")
+		}
 	}
 	configPath = filepath.Join(configDir, "config.toml")
 
 	// Cache TOFU db directory and file paths
-	// Windows just stores it in APPDATA along with other stuff
 	if runtime.GOOS == "windows" {
+		// Windows just stores it in APPDATA along with other stuff
 		tofuDBDir = amforaAppData
 	} else {
 		// XDG cache dir on POSIX systems
-		tofuDBDir = filepath.Join(home, ".cache", "amfora")
+		xdg_cache, ok := os.LookupEnv("XDG_CACHE_HOME")
+		if ok && strings.TrimSpace(xdg_cache) != "" {
+			tofuDBDir = filepath.Join(xdg_cache, "amfora")
+		} else {
+			// Default to ~/.cache/amfora
+			tofuDBDir = filepath.Join(home, ".cache", "amfora")
+		}
 	}
 	tofuDBPath = filepath.Join(tofuDBDir, "tofu.toml")
 

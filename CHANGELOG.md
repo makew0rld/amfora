@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Right margin for text (#1)
 - Desktop entry file
 - Option to continue anyway when cert doesn't match TOFU database
+- Display all `text/*` documents, not just gemini and plain (#12)
 
 ### Changed
 - Connection timeout is 15 seconds (was 5s)

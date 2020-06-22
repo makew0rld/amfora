@@ -34,7 +34,7 @@ func CanDisplay(res *gemini.Response) bool {
 	if err != nil {
 		return false
 	}
-	if mediatype != "text/gemini" && mediatype != "text/plain" {
+	if !strings.HasPrefix(mediatype, "text/") {
 		// Amfora doesn't support other filetypes
 		return false
 	}
@@ -75,19 +75,18 @@ func MakePage(url string, res *gemini.Response, width int) (*structs.Page, error
 		}
 	}
 
-	if mediatype == "text/plain" {
-		return &structs.Page{
-			Url:     url,
-			Content: utfText,
-			Links:   []string{}, // Plaintext has no links
-		}, nil
-	}
 	if mediatype == "text/gemini" {
 		rendered, links := RenderGemini(utfText, width)
 		return &structs.Page{
 			Url:     url,
 			Content: rendered,
 			Links:   links,
+		}, nil
+	} else if strings.HasPrefix(mediatype, "text/") {
+		return &structs.Page{
+			Url:     url,
+			Content: utfText,
+			Links:   []string{}, // Non-gemini links are not supported
 		}, nil
 	}
 

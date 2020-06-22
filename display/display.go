@@ -21,7 +21,6 @@ var tabMap = make(map[int]*structs.Page) // Map of tab number to page
 var tabViews = make(map[int]*cview.TextView)
 
 var termW int
-var termH int
 
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField().
@@ -80,9 +79,8 @@ var App = cview.NewApplication().
 	EnableMouse(false).
 	SetRoot(layout, true).
 	SetAfterResizeFunc(func(width int, height int) {
-		// Store width and height for calculations
+		// Store for calculations
 		termW = width
-		termH = height
 
 		// Shift new tabs created before app startup, when termW == 0
 		// XXX: This is hacky but works. The biggest issue is that there will sometimes be a tiny flash

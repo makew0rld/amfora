@@ -21,12 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hash `SubjectPublicKeyInfo` for TOFU instead (#7)
 - `wrap_width` config option became `max_width`
 
+### Removed
+- Opening multiple URLs from the command line (threading issues)
+
 ### Fixed
 - Reset bottom bar on error / invalid URL
 - Side scrolling doesn't cut off text on the left side (#1)
+- Mark status code 21 as invalid
 
-### Removed
-- Opening multiple URLs from the command line (threading issues)
 
 ## [1.0.0] - 2020-06-18
 Initial release.

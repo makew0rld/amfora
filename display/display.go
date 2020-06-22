@@ -297,6 +297,7 @@ func NewTab() {
 		SetScrollable(true).
 		SetWrap(false).
 		SetText(addLeftMargin(renderedNewTabContent)).
+		ScrollToBeginning().
 		SetChangedFunc(func() {
 			App.Draw()
 		}).
@@ -344,7 +345,7 @@ func NewTab() {
 	bottomBar.SetLabel("")
 	bottomBar.SetText("")
 
-	// Force a draw, just in case
+	// Draw just in case
 	App.Draw()
 }
 

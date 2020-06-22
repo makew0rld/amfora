@@ -53,18 +53,18 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [ ] Bookmarks
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>
 - [ ] Download pages and arbitrary data
-- [ ] Full mouse support
 - [ ] Emoji favicons
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
+- [ ] Full mouse support
 - [ ] Table of contents for pages
-- [ ] ~~Collapsing of gemini site sections (as determined by headers)~~
 - [ ] Full client certificate UX within the client
-  - *I will be waiting for some spec changes to happen before implementing this*
+  - *I will be waiting for some spec changes/recommendations to happen before implementing this*
   - Create transient and permanent certs within the client, per domain
   - Manage and browse them
   - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
 - [ ] Subscribe to RSS and Atom feeds and display them
 - [ ] Support Markdown rendering
+- [ ] History browser
 
 ## Configuration
 The config file is written in the intuitive [TOML](https://github.com/toml-lang/toml) file format. See [default-config.toml](./default-config.toml) for details. By default this file is available at `~/.config/amfora/config.toml`.

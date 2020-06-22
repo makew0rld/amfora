@@ -1,6 +1,7 @@
 package display
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -35,7 +36,6 @@ var inputCh = make(chan string)
 var inputModalText string // The current text of the input field in the modal
 
 var yesNoModal = cview.NewModal().
-	SetBackgroundColor(tcell.ColorPurple).
 	SetButtonBackgroundColor(tcell.ColorNavy).
 	SetButtonTextColor(tcell.ColorWhite).
 	SetTextColor(tcell.ColorWhite).
@@ -143,7 +143,26 @@ func Input(prompt string) (string, bool) {
 
 // YesNo displays a modal asking a yes-or-no question.
 func YesNo(prompt string) bool {
-	yesNoModal.SetText(prompt)
+	yesNoModal.SetText(prompt).SetBackgroundColor(tcell.ColorPurple)
+	tabPages.ShowPage("yesno")
+	tabPages.SendToFront("yesno")
+	App.SetFocus(yesNoModal)
+	App.Draw()
+
+	resp := <-yesNoCh
+	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	return resp
+}
+
+// Tofu displays the TOFU warning modal.
+// It returns a bool indicating whether the user wants to continue.
+func Tofu(host string) bool {
+	// Reuses yesno modal, with error colour
+
+	yesNoModal.SetBackgroundColor(tcell.ColorMaroon)
+	yesNoModal.SetText(
+		fmt.Sprintf("%s's certificate has changed, possibly indicating an security issue. Are you sure you want to continue anyway?", host),
+	)
 	tabPages.ShowPage("yesno")
 	tabPages.SendToFront("yesno")
 	App.SetFocus(yesNoModal)

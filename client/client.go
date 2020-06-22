@@ -18,7 +18,7 @@ func Fetch(u string) (*gemini.Response, error) {
 	parsed, _ := url.Parse(u)
 	ok := handleTofu(resp.Cert, parsed.Port())
 	if !ok {
-		return nil, ErrTofu
+		return resp, ErrTofu
 	}
 	return resp, err
 }

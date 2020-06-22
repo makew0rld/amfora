@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `left_margin` config option
 - Right margin for text (#1)
 - Desktop entry file
+- Option to continue anyway when cert doesn't match TOFU database
 
 ### Changed
 - Connection timeout is 15 seconds (was 5s)

@@ -140,7 +140,7 @@ func setPage(p *structs.Page) {
 // The second returned item is a bool indicating if page content was displayed.
 // It returns false for Errors, other protocols, etc.
 func handleURL(u string) (string, bool) {
-	defer App.Draw() // Make sure modals get displayed
+	defer App.Draw() // Just in case
 
 	//logger.Log.Printf("Sent: %s", u)
 
@@ -178,7 +178,7 @@ func handleURL(u string) (string, bool) {
 		return "", false
 	}
 	if !strings.HasPrefix(u, "gemini") {
-		Error("Protocol Error", "Only [::b]gemini[::-] and [::b]http[::-] are supported. URL was "+u)
+		Error("Protocol Error", "Only gemini and HTTP are supported. URL was "+u)
 		bottomBar.SetText(tabMap[curTab].Url)
 		return "", false
 	}
@@ -195,7 +195,17 @@ func handleURL(u string) (string, bool) {
 	App.Draw()
 
 	res, err := client.Fetch(u)
-	if err != nil {
+	if err == client.ErrTofu {
+		if Tofu(parsed.Host) {
+			// They want to continue anyway
+			client.RemoveTofuEntry(res.Cert, parsed.Port())
+			return handleURL(u)
+		}
+		// They don't want to continue
+		// Set the bar back to original URL
+		bottomBar.SetText(tabMap[curTab].Url)
+		return "", false
+	} else if err != nil {
 		Error("URL Fetch Error", err.Error())
 		// Set the bar back to original URL
 		bottomBar.SetText(tabMap[curTab].Url)

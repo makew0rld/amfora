@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reset bottom bar on error / invalid URL
 - Side scrolling doesn't cut off text on the left side (#1)
 - Mark status code 21 as invalid
+- You can't type on the bottom bar as it's loading
 
 
 ## [1.0.0] - 2020-06-18

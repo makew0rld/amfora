@@ -142,6 +142,8 @@ func setPage(p *structs.Page) {
 func handleURL(u string) (string, bool) {
 	defer App.Draw() // Just in case
 
+	App.SetFocus(tabViews[curTab])
+
 	//logger.Log.Printf("Sent: %s", u)
 
 	u = normalizeURL(u)

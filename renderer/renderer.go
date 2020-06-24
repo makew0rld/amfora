@@ -29,17 +29,29 @@ func convertRegularGemini(s string, numLinks int, width int) (string, []string) 
 	for i := range lines {
 		lines[i] = strings.TrimRight(lines[i], " \r\t\n")
 
-		if strings.HasPrefix(lines[i], "#") && viper.GetBool("a-general.color") {
-
+		if strings.HasPrefix(lines[i], "#") {
 			// Headings
-			if strings.HasPrefix(lines[i], "###") {
-				lines[i] = "[fuchsia::b]" + lines[i] + "[-::-]"
-			}
-			if strings.HasPrefix(lines[i], "##") {
-				lines[i] = "[lime::b]" + lines[i] + "[-::-]"
-			}
-			if strings.HasPrefix(lines[i], "#") {
-				lines[i] = "[red::b]" + lines[i] + "[-::-]"
+			if viper.GetBool("a-general.color") {
+				if strings.HasPrefix(lines[i], "###") {
+					lines[i] = "[fuchsia::b]" + lines[i] + "[-::-]"
+				}
+				if strings.HasPrefix(lines[i], "##") {
+					lines[i] = "[lime::b]" + lines[i] + "[-::-]"
+				}
+				if strings.HasPrefix(lines[i], "#") {
+					lines[i] = "[red::b]" + lines[i] + "[-::-]"
+				}
+			} else {
+				// Just bold, no colors
+				if strings.HasPrefix(lines[i], "###") {
+					lines[i] = "[::b]" + lines[i] + "[::-]"
+				}
+				if strings.HasPrefix(lines[i], "##") {
+					lines[i] = "[::b]" + lines[i] + "[::-]"
+				}
+				if strings.HasPrefix(lines[i], "#") {
+					lines[i] = "[::b]" + lines[i] + "[::-]"
+				}
 			}
 
 			// Links
@@ -84,8 +96,8 @@ func convertRegularGemini(s string, numLinks int, width int) (string, []string) 
 				}
 			} else {
 				// No colours allowed
-				lines[i] = `[::b][` + strconv.Itoa(numLinks+len(links)) + "[]  " +
-					`["` + strconv.Itoa(numLinks+len(links)-1) + `"]` + linkText + `[""][-]`
+				lines[i] = `[::b][` + strconv.Itoa(numLinks+len(links)) + "[][::-]  " +
+					`["` + strconv.Itoa(numLinks+len(links)-1) + `"]` + linkText + `[""]`
 			}
 
 			// Lists

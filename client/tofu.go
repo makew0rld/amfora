@@ -105,11 +105,9 @@ func handleTofu(cert *x509.Certificate, port string) bool {
 	return false
 }
 
-// RemoveTofuEntry invalidates the TOFU entry in the database for the given cert and port.
-// This will make any cert for that domain valid.
-//
+// ResetTofuEntry forces the cert passed to be valid, overwriting any previous TOFU entry.
 // The port string can be empty, to indicate port 1965.
-func RemoveTofuEntry(cert *x509.Certificate, port string) {
+func ResetTofuEntry(cert *x509.Certificate, port string) {
 	tofuStore.Set(idKey(cert.Subject.CommonName, port), "")
 	tofuStore.WriteConfig()
 }

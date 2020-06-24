@@ -228,13 +228,14 @@ func handleURL(u string) (string, bool) {
 	if err == client.ErrTofu {
 		if Tofu(parsed.Host) {
 			// They want to continue anyway
-			client.RemoveTofuEntry(res.Cert, parsed.Port())
-			return handleURL(u)
+			client.ResetTofuEntry(res.Cert, parsed.Port())
+			// Response can be used further down
+		} else {
+			// They don't want to continue
+			// Set the bar back to original URL
+			bottomBar.SetText(tabMap[curTab].Url)
+			return "", false
 		}
-		// They don't want to continue
-		// Set the bar back to original URL
-		bottomBar.SetText(tabMap[curTab].Url)
-		return "", false
 	} else if err != nil {
 		Error("URL Fetch Error", err.Error())
 		// Set the bar back to original URL

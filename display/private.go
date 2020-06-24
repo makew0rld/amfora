@@ -61,6 +61,10 @@ func tabHasContent() bool {
 		// Likely the default content page
 		return false
 	}
+	if strings.HasPrefix(tabMap[curTab].Url, "about:") {
+		return false
+	}
+
 	_, ok := tabMap[curTab]
 	return ok // If there's a page, return true
 }
@@ -84,16 +88,44 @@ func applyScroll() {
 // followLink should be used when the user "clicks" a link on a page.
 // Not when a URL is opened on a new tab for the first time.
 func followLink(prev, next string) {
-	saveScroll() // Likely called later on anyway, here just in case
-	prevParsed, _ := url.Parse(prev)
-	nextParsed, err := url.Parse(next)
+
+	// Copied from URL()
+	if next == "about:bookmarks" {
+		Bookmarks()
+		addToHist("about:bookmarks")
+		return
+	}
+	if strings.HasPrefix(next, "about:") {
+		Error("Error", "Not a valid 'about:' URL for linking")
+		return
+	}
+
+	if tabHasContent() {
+		saveScroll() // Likely called later on anyway, here just in case
+		prevParsed, _ := url.Parse(prev)
+		nextParsed, err := url.Parse(next)
+		if err != nil {
+			Error("URL Error", "Link URL could not be parsed")
+			return
+		}
+		nextURL := prevParsed.ResolveReference(nextParsed).String()
+		go func() {
+			final, displayed := handleURL(nextURL)
+			if displayed {
+				addToHist(final)
+			}
+		}()
+		return
+	}
+	// No content on current tab, so the "prev" URL is not valid.
+	// An example is the about:newtab page
+	_, err := url.Parse(next)
 	if err != nil {
 		Error("URL Error", "Link URL could not be parsed")
 		return
 	}
-	nextURL := prevParsed.ResolveReference(nextParsed).String()
 	go func() {
-		final, displayed := handleURL(nextURL)
+		final, displayed := handleURL(next)
 		if displayed {
 			addToHist(final)
 		}
@@ -112,15 +144,9 @@ func addLeftMargin(text string) string {
 func setPage(p *structs.Page) {
 	saveScroll() // Save the scroll of the previous page
 
-	if !p.Displayable {
-		// Add margin to page based on terminal width
-		p.Content = addLeftMargin(p.Content)
-		p.Displayable = true
-	}
-
 	// Change page on screen
 	tabMap[curTab] = p
-	tabViews[curTab].SetText(p.Content)
+	tabViews[curTab].SetText(addLeftMargin(p.Content))
 	tabViews[curTab].Highlight("") // Turn off highlights
 	tabViews[curTab].ScrollToBeginning()
 
@@ -144,11 +170,13 @@ func handleURL(u string) (string, bool) {
 
 	App.SetFocus(tabViews[curTab])
 
-	//logger.Log.Printf("Sent: %s", u)
+	// To allow linking to the bookmarks page, and history browsing
+	if u == "about:bookmarks" {
+		Bookmarks()
+		return "about:bookmarks", true
+	}
 
 	u = normalizeURL(u)
-
-	//logger.Log.Printf("Normalized: %s", u)
 
 	parsed, err := url.Parse(u)
 	if err != nil {

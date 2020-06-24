@@ -9,7 +9,8 @@ import (
 	"gitlab.com/tslocum/cview"
 )
 
-// This file contains code for all the popups / modals used in the display
+// This file contains code for the popups / modals used in the display.
+// The bookmark modal is in bookmarks.go
 
 var infoModal = cview.NewModal().
 	SetBackgroundColor(tcell.ColorGray).
@@ -45,20 +46,30 @@ var yesNoModal = cview.NewModal().
 var yesNoCh = make(chan bool)
 
 func modalInit() {
+	tabPages.AddPage("info", infoModal, false, false).
+		AddPage("error", errorModal, false, false).
+		AddPage("input", inputModal, false, false).
+		AddPage("yesno", yesNoModal, false, false).
+		AddPage("bkmk", bkmkModal, false, false)
+
 	// Modal functions that can't be added up above, because they return the wrong type
+
 	infoModal.SetBorder(true)
 	infoModal.SetBorderColor(tcell.ColorWhite)
 	infoModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		tabPages.SwitchToPage(strconv.Itoa(curTab))
 	})
+	infoModal.GetFrame().SetTitleColor(tcell.ColorWhite)
+	infoModal.GetFrame().SetTitleAlign(cview.AlignCenter)
+	infoModal.GetFrame().SetTitle(" Info ")
 
 	errorModal.SetBorder(true)
 	errorModal.SetBorderColor(tcell.ColorWhite)
-	errorModal.GetFrame().SetTitleColor(tcell.ColorWhite)
-	errorModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 	errorModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		tabPages.SwitchToPage(strconv.Itoa(curTab))
 	})
+	errorModal.GetFrame().SetTitleColor(tcell.ColorWhite)
+	errorModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 
 	inputModal.SetBorder(true)
 	inputModal.SetBorderColor(tcell.ColorWhite)
@@ -72,6 +83,9 @@ func modalInit() {
 
 		//tabPages.SwitchToPage(strconv.Itoa(curTab)) - handled in Input()
 	})
+	inputModal.GetFrame().SetTitleColor(tcell.ColorWhite)
+	inputModal.GetFrame().SetTitleAlign(cview.AlignCenter)
+	inputModal.GetFrame().SetTitle(" Input ")
 
 	yesNoModal.SetBorder(true)
 	yesNoModal.SetBorderColor(tcell.ColorWhite)
@@ -84,6 +98,10 @@ func modalInit() {
 
 		//tabPages.SwitchToPage(strconv.Itoa(curTab)) - Handled in YesNo()
 	})
+	yesNoModal.GetFrame().SetTitleColor(tcell.ColorWhite)
+	yesNoModal.GetFrame().SetTitleAlign(cview.AlignCenter)
+
+	bkmkInit()
 }
 
 // Error displays an error on the screen in a modal.
@@ -157,7 +175,7 @@ func YesNo(prompt string) bool {
 // Tofu displays the TOFU warning modal.
 // It returns a bool indicating whether the user wants to continue.
 func Tofu(host string) bool {
-	// Reuses yesno modal, with error colour
+	// Reuses yesNoModal, with error colour
 
 	yesNoModal.SetBackgroundColor(tcell.ColorMaroon)
 	yesNoModal.SetText(

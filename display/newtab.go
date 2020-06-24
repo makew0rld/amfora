@@ -8,6 +8,8 @@ Press the ? key at any time to bring up the help, and see other keybindings. Mos
 
 Happy browsing!
 
-=> //gemini.circumlunar.space Gemini homepage
+=> about:bookmarks Bookmarks
+
+=> //gemini.circumlunar.space Project Gemini
 => https://github.com/makeworld-the-better-one/amfora Amfora homepage [HTTPS]
 `

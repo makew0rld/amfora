@@ -5,13 +5,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/spf13/viper"
-
-	"github.com/makeworld-the-better-one/amfora/renderer"
-
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
+	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
+	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
 
@@ -28,24 +26,13 @@ var bottomBar = cview.NewInputField().
 	SetFieldTextColor(tcell.ColorBlack).
 	SetLabelColor(tcell.ColorGreen)
 
-var helpTable = cview.NewTable().
-	SetSelectable(false, false).
-	SetFixed(1, 2).
-	SetBorders(true).
-	SetBordersColor(tcell.ColorGray)
-
 // Viewer for the tab primitives
 // Pages are named as strings of tab numbers - so the textview for the first tab
 // is held in the page named "0".
-// The only pages that don't confine to this scheme named after the modals above,
-// which is used to draw modals on top the current tab.
+// The only pages that don't confine to this scheme are those named after modals,
+// which are used to draw modals on top the current tab.
 // Ex: "info", "error", "input", "yesno"
-var tabPages = cview.NewPages().
-	AddPage("help", helpTable, true, false).
-	AddPage("info", infoModal, false, false).
-	AddPage("error", errorModal, false, false).
-	AddPage("input", inputModal, false, false).
-	AddPage("yesno", yesNoModal, false, false)
+var tabPages = cview.NewPages()
 
 // The tabs at the top with titles
 var tabRow = cview.NewTextView().
@@ -116,15 +103,17 @@ func Init() {
 			if c == 0 {
 				tableCell = cview.NewTableCell(cells[cell]).
 					SetAttributes(tcell.AttrBold).
-					SetExpansion(1)
+					SetExpansion(1).
+					SetAlign(cview.AlignCenter)
 			} else {
-				tableCell = cview.NewTableCell(cells[cell]).
+				tableCell = cview.NewTableCell("  " + cells[cell]).
 					SetExpansion(2)
 			}
 			helpTable.SetCell(r, c, tableCell)
 			cell++
 		}
 	}
+	tabPages.AddPage("help", helpTable, true, false)
 
 	bottomBar.SetBackgroundColor(tcell.ColorWhite)
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
@@ -147,7 +136,7 @@ func Init() {
 			if err != nil {
 				// It's a full URL or search term
 				// Detect if it's a search or URL
-				if strings.Contains(query, " ") || (!strings.Contains(query, "//") && !strings.Contains(query, ".")) {
+				if strings.Contains(query, " ") || (!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
 					URL(viper.GetString("a-general.search") + "?" + pathEscape(query))
 				} else {
 					// Full URL
@@ -178,7 +167,7 @@ func Init() {
 
 	// Render the default new tab content ONCE and store it for later
 	renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent, textWidth())
-	newTabPage = structs.Page{Content: renderedNewTabContent, Links: newTabLinks}
+	newTabPage = structs.Page{Content: renderedNewTabContent, Links: newTabLinks, Url: "about:newtab"}
 
 	modalInit()
 
@@ -211,6 +200,13 @@ func Init() {
 			return nil
 		case tcell.KeyCtrlQ:
 			Stop()
+			return nil
+		case tcell.KeyCtrlB:
+			Bookmarks()
+			addToHist("about:bookmarks")
+			return nil
+		case tcell.KeyCtrlD:
+			go addBookmark()
 			return nil
 		case tcell.KeyRune:
 			// Regular key was sent
@@ -422,6 +418,22 @@ func Reload() {
 // URL loads and handles the provided URL for the current tab.
 // It should be an absolute URL.
 func URL(u string) {
+	// Some code is copied in followLink()
+
+	if u == "about:bookmarks" {
+		Bookmarks()
+		addToHist("about:bookmarks")
+		return
+	}
+	if u == "about:newtab" {
+		setPage(&newTabPage)
+		return
+	}
+	if strings.HasPrefix(u, "about:") {
+		Error("Error", "Not a valid 'about:' URL.")
+		return
+	}
+
 	go func() {
 		final, displayed := handleURL(u)
 		if displayed {
@@ -432,11 +444,4 @@ func URL(u string) {
 
 func NumTabs() int {
 	return len(tabViews)
-}
-
-// Help displays the help and keybindings.
-func Help() {
-	helpTable.ScrollToBeginning()
-	tabPages.SwitchToPage("help")
-	App.Draw()
 }

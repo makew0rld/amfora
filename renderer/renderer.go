@@ -71,7 +71,8 @@ func convertRegularGemini(s string, numLinks int, width int) (string, []string) 
 			links = append(links, url)
 
 			if viper.GetBool("a-general.color") {
-				if pU, _ := urlPkg.Parse(url); pU.Scheme == "" || pU.Scheme == "gemini" {
+				pU, err := urlPkg.Parse(url)
+				if err == nil && (pU.Scheme == "" || pU.Scheme == "gemini" || pU.Scheme == "about") {
 					// A gemini link
 					// Add the link text in blue (in a region), and a gray link number to the left of it
 					lines[i] = `[silver::b][` + strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +

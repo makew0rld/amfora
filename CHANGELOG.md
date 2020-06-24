@@ -6,12 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Support over 55 charsets (#3)
-- Add titles to error modals
+- **Bookmarks** (#10)
+- **Support over 55 charsets** (#3)
+- **Search using the bottom bar**
+- Add titles to all modals
 - Store ports in TOFU database (#7)
 - Search from bottom bar
 - Wrapping based on terminal width (#1)
-- `left_margin` config option
+- `left_margin` config option (#1)
 - Right margin for text (#1)
 - Desktop entry file
 - Option to continue anyway when cert doesn't match TOFU database
@@ -21,7 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Connection timeout is 15 seconds (was 5s)
 - Hash `SubjectPublicKeyInfo` for TOFU instead (#7)
-- `wrap_width` config option became `max_width`
+- `wrap_width` config option became `max_width` (#1)
+- Make the help table look better
 
 ### Removed
 - Opening multiple URLs from the command line (threading issues)
@@ -30,7 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reset bottom bar on error / invalid URL
 - Side scrolling doesn't cut off text on the left side (#1)
 - Mark status code 21 as invalid
-- You can't type on the bottom bar as it's loading
+- Bottom bar is not in focus after clicking Enter
+- Badly formed links on pages can no longer crash the browser
 
 
 ## [1.0.0] - 2020-06-18

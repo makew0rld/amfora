@@ -2,7 +2,7 @@
 
 <center>  <!-- I know, that's not how you usually do it :) -->
 <img src="logo.png" alt="amphora logo" width="30%">
-<h6><em>Modified from: amphora by Alvaro Cabrera from the Noun Project</em></h6>
+<h6>Image modified from: amphora by Alvaro Cabrera from the Noun Project</h6>
 </center>
 
 
@@ -27,7 +27,7 @@ It fully passes Sean Conman's client torture test, including the new Unicode tes
 
 Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you might have to make the binary executable with `chmod +x <filename>`. On Windows, make sure you click "Advanced > Run anyway" after double-clicking, or something like that.
 
-Unix systems can install the desktop entry file to get Amfora to appear when they search for applications:
+Unix systems can install the desktop entry file to get Amfora to appear when they search for applications (*this doesn't entirely work yet*):
 ```bash
 curl -sSL https://raw.githubusercontent.com/makeworld-the-better-one/amfora/master/amfora.desktop -o ~/.local/share/applications/amfora.desktop
 update-desktop-database ~/.local/share/applications
@@ -52,9 +52,9 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Styled page content (headings, links)
 - [x] Basic forward/backward history, for each tab
 - [x] Input (Status Code 10 & 11)
-- [x] *Multiple charset support (over 55)*
-- [x] *Built-in search (uses GUS by default)*
-- [x] *Bookmarks*
+- [x] Multiple charset support (over 55)
+- [x] Built-in search (uses GUS by default)
+- [x] Bookmarks
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>
 - [ ] Download pages and arbitrary data
 - [ ] Emoji favicons

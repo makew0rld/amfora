@@ -6,6 +6,5 @@ Comment=Browse Gemini in the terminal.
 Categories=Network;WebBrowser;ConsoleOnly;
 Keywords=gemini
 Terminal=true
-TryExec=amfora
 Exec=amfora %u
 MimeType=x-scheme-handler/gemini;

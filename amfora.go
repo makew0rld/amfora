@@ -18,12 +18,12 @@ func main() {
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--version" || os.Args[1] == "-v" {
-			fmt.Println(version)
+			fmt.Print(version + "\r\n")
 			return
 		}
 		if os.Args[1] == "--help" || os.Args[1] == "-h" {
-			fmt.Println("Amfora is a fancy terminal browser for the Gemini protocol.\r\n")
-			fmt.Println("Usage:\r\namfora [URL]\r\namfora --version, -v")
+			fmt.Print("Amfora is a fancy terminal browser for the Gemini protocol.\r\n\r\n")
+			fmt.Print("Usage:\r\namfora [URL]\r\namfora --version, -v\r\n")
 			return
 		}
 	}
@@ -34,11 +34,8 @@ func main() {
 	}
 	display.Init()
 
-	if len(os.Args[1:]) == 0 {
-		// There should always be a tab
-		display.NewTab()
-	} else {
-		display.NewTab()
+	display.NewTab()
+	if len(os.Args[1:]) > 0 {
 		display.URL(os.Args[1])
 	}
 

@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make the help table look better
 
 ### Removed
-- Opening multiple URLs from the command line (threading issues)
+- Opening multiple URLs from the command line
 
 ### Fixed
 - Reset bottom bar on error / invalid URL

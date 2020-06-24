@@ -99,8 +99,9 @@ func openBkmkModal(name string, exists bool) (string, int) {
 func Bookmarks() {
 	// Gather bookmarks
 	rawContent := "# Bookmarks\r\n\r\n"
-	for url, name := range bookmarks.All() {
-		rawContent += fmt.Sprintf("=> %s %s\r\n", url, name)
+	m, keys := bookmarks.All()
+	for i := range keys {
+		rawContent += fmt.Sprintf("=> %s %s\r\n", keys[i], m[keys[i]])
 	}
 	// Render and display
 	content, links := renderer.RenderGemini(rawContent, textWidth())

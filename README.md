@@ -2,7 +2,7 @@
 
 <center>  <!-- I know, that's not how you usually do it :) -->
 <img src="logo.png" alt="amphora logo" width="30%">
-<h6>Modified from: amphora by Alvaro Cabrera from the Noun Project</h6>
+<h6><em>Modified from: amphora by Alvaro Cabrera from the Noun Project</em></h6>
 </center>
 
 
@@ -14,6 +14,8 @@
 <img src="demo-large.gif" alt="Demo GIF" width="80%">
 </a>
 </center>
+
+###### Recording of v1.0.0
 
 Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that.
 
@@ -34,6 +36,8 @@ update-desktop-database ~/.local/share/applications
 ## Usage
 
 Just call `amfora` or `amfora <url>` on the terminal. On Windows it might be `amfora.exe` instead.
+
+To determine the version, you can run `amfora --version` or `amfora -v`.
 
 The project keeps many standard terminal keybindings and is intuitive. Press <kbd>?</kbd> inside the application to pull up the help menu with a list of all the keybindings, and <kbd>Esc</kbd> to leave it. If you have used Bombadillo you will find it similar.
 

@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Mark status code 21 as invalid
 - Bottom bar is not in focus after clicking Enter
 - Badly formed links on pages can no longer crash the browser
+- Disabling color in config affects UI elements (#16)
 
 
 ## [1.0.0] - 2020-06-18

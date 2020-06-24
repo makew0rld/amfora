@@ -5,19 +5,16 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/makeworld-the-better-one/amfora/renderer"
-	"github.com/makeworld-the-better-one/amfora/structs"
-
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
+	"github.com/makeworld-the-better-one/amfora/renderer"
+	"github.com/makeworld-the-better-one/amfora/structs"
+	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
 
 // For adding and removing bookmarks, basically a clone of the input modal.
 var bkmkModal = cview.NewModal().
-	SetBackgroundColor(tcell.ColorTeal).
-	SetButtonBackgroundColor(tcell.ColorNavy).
-	SetButtonTextColor(tcell.ColorWhite).
 	SetTextColor(tcell.ColorWhite)
 
 // bkmkCh is for the user action
@@ -25,6 +22,20 @@ var bkmkCh = make(chan int) // 1, 0, -1 for add/update, cancel, and remove
 var bkmkModalText string    // The current text of the input field in the modal
 
 func bkmkInit() {
+	if viper.GetBool("a-general.color") {
+		bkmkModal.SetBackgroundColor(tcell.ColorTeal).
+			SetButtonBackgroundColor(tcell.ColorNavy).
+			SetButtonTextColor(tcell.ColorWhite)
+	} else {
+		bkmkModal.SetBackgroundColor(tcell.ColorBlack).
+			SetButtonBackgroundColor(tcell.ColorWhite).
+			SetButtonTextColor(tcell.ColorBlack)
+		bkmkModal.GetForm().
+			SetLabelColor(tcell.ColorWhite).
+			SetFieldBackgroundColor(tcell.ColorWhite).
+			SetFieldTextColor(tcell.ColorBlack)
+	}
+
 	bkmkModal.SetBorder(true)
 	bkmkModal.SetBorderColor(tcell.ColorWhite)
 	bkmkModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {

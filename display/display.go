@@ -23,8 +23,7 @@ var termW int
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField().
 	SetFieldBackgroundColor(tcell.ColorWhite).
-	SetFieldTextColor(tcell.ColorBlack).
-	SetLabelColor(tcell.ColorGreen)
+	SetFieldTextColor(tcell.ColorBlack)
 
 // Viewer for the tab primitives
 // Pages are named as strings of tab numbers - so the textview for the first tab
@@ -115,6 +114,11 @@ func Init() {
 	}
 	tabPages.AddPage("help", helpTable, true, false)
 
+	if viper.GetBool("a-general.color") {
+		bottomBar.SetLabelColor(tcell.ColorGreen)
+	} else {
+		bottomBar.SetLabelColor(tcell.ColorBlack)
+	}
 	bottomBar.SetBackgroundColor(tcell.ColorWhite)
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
 		switch key {
@@ -333,7 +337,11 @@ func NewTab() {
 
 	// Add tab number to the actual place where tabs are show on the screen
 	// Tab regions are 0-indexed but text displayed on the screen starts at 1
-	fmt.Fprintf(tabRow, `["%d"][darkcyan]  %d  [white][""]|`, curTab, curTab+1)
+	if viper.GetBool("a-general.color") {
+		fmt.Fprintf(tabRow, `["%d"][darkcyan]  %d  [white][""]|`, curTab, curTab+1)
+	} else {
+		fmt.Fprintf(tabRow, `["%d"]  %d  [""]|`, curTab, curTab+1)
+	}
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
 
 	bottomBar.SetLabel("")
@@ -376,8 +384,14 @@ func CloseTab() {
 	tabPages.SwitchToPage(strconv.Itoa(curTab)) // Go to previous page
 	// Rewrite the tab display
 	tabRow.Clear()
-	for i := 0; i < NumTabs(); i++ {
-		fmt.Fprintf(tabRow, `["%d"][darkcyan]  %d  [white][""]|`, i, i+1)
+	if viper.GetBool("a-general.color") {
+		for i := 0; i < NumTabs(); i++ {
+			fmt.Fprintf(tabRow, `["%d"][darkcyan]  %d  [white][""]|`, i, i+1)
+		}
+	} else {
+		for i := 0; i < NumTabs(); i++ {
+			fmt.Fprintf(tabRow, `["%d"]  %d  [""]|`, i, i+1)
+		}
 	}
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
 

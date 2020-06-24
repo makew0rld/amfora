@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gdamore/tcell"
+	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
 
@@ -13,23 +14,14 @@ import (
 // The bookmark modal is in bookmarks.go
 
 var infoModal = cview.NewModal().
-	SetBackgroundColor(tcell.ColorGray).
-	SetButtonBackgroundColor(tcell.ColorNavy).
-	SetButtonTextColor(tcell.ColorWhite).
 	SetTextColor(tcell.ColorWhite).
 	AddButtons([]string{"Ok"})
 
 var errorModal = cview.NewModal().
-	SetBackgroundColor(tcell.ColorMaroon).
-	SetButtonBackgroundColor(tcell.ColorNavy).
-	SetButtonTextColor(tcell.ColorWhite).
 	SetTextColor(tcell.ColorWhite).
 	AddButtons([]string{"Ok"})
 
 var inputModal = cview.NewModal().
-	SetBackgroundColor(tcell.ColorGreen).
-	SetButtonBackgroundColor(tcell.ColorNavy).
-	SetButtonTextColor(tcell.ColorWhite).
 	SetTextColor(tcell.ColorWhite).
 	AddButtons([]string{"Send", "Cancel"})
 
@@ -37,8 +29,6 @@ var inputCh = make(chan string)
 var inputModalText string // The current text of the input field in the modal
 
 var yesNoModal = cview.NewModal().
-	SetButtonBackgroundColor(tcell.ColorNavy).
-	SetButtonTextColor(tcell.ColorWhite).
 	SetTextColor(tcell.ColorWhite).
 	AddButtons([]string{"Yes", "No"})
 
@@ -51,6 +41,39 @@ func modalInit() {
 		AddPage("input", inputModal, false, false).
 		AddPage("yesno", yesNoModal, false, false).
 		AddPage("bkmk", bkmkModal, false, false)
+
+	// Color setup
+	if viper.GetBool("a-general.color") {
+		infoModal.SetBackgroundColor(tcell.ColorGray).
+			SetButtonBackgroundColor(tcell.ColorNavy).
+			SetButtonTextColor(tcell.ColorWhite)
+		errorModal.SetBackgroundColor(tcell.ColorMaroon).
+			SetButtonBackgroundColor(tcell.ColorNavy).
+			SetButtonTextColor(tcell.ColorWhite)
+		inputModal.SetBackgroundColor(tcell.ColorGreen).
+			SetButtonBackgroundColor(tcell.ColorNavy).
+			SetButtonTextColor(tcell.ColorWhite)
+		yesNoModal.SetButtonBackgroundColor(tcell.ColorNavy).
+			SetButtonTextColor(tcell.ColorWhite)
+	} else {
+		infoModal.SetBackgroundColor(tcell.ColorBlack).
+			SetButtonBackgroundColor(tcell.ColorWhite).
+			SetButtonTextColor(tcell.ColorBlack)
+		errorModal.SetBackgroundColor(tcell.ColorBlack).
+			SetButtonBackgroundColor(tcell.ColorWhite).
+			SetButtonTextColor(tcell.ColorBlack)
+		inputModal.SetBackgroundColor(tcell.ColorBlack).
+			SetButtonBackgroundColor(tcell.ColorWhite).
+			SetButtonTextColor(tcell.ColorBlack)
+		inputModal.GetForm().
+			SetLabelColor(tcell.ColorWhite).
+			SetFieldBackgroundColor(tcell.ColorWhite).
+			SetFieldTextColor(tcell.ColorBlack)
+
+		// YesNo background color is changed in funcs
+		yesNoModal.SetButtonBackgroundColor(tcell.ColorWhite).
+			SetButtonTextColor(tcell.ColorBlack)
+	}
 
 	// Modal functions that can't be added up above, because they return the wrong type
 
@@ -161,7 +184,12 @@ func Input(prompt string) (string, bool) {
 
 // YesNo displays a modal asking a yes-or-no question.
 func YesNo(prompt string) bool {
-	yesNoModal.SetText(prompt).SetBackgroundColor(tcell.ColorPurple)
+	if viper.GetBool("a-general.color") {
+		yesNoModal.SetBackgroundColor(tcell.ColorPurple)
+	} else {
+		yesNoModal.SetBackgroundColor(tcell.ColorBlack)
+	}
+	yesNoModal.SetText(prompt)
 	tabPages.ShowPage("yesno")
 	tabPages.SendToFront("yesno")
 	App.SetFocus(yesNoModal)
@@ -177,9 +205,13 @@ func YesNo(prompt string) bool {
 func Tofu(host string) bool {
 	// Reuses yesNoModal, with error colour
 
-	yesNoModal.SetBackgroundColor(tcell.ColorMaroon)
+	if viper.GetBool("a-general.color") {
+		yesNoModal.SetBackgroundColor(tcell.ColorMaroon)
+	} else {
+		yesNoModal.SetBackgroundColor(tcell.ColorBlack)
+	}
 	yesNoModal.SetText(
-		fmt.Sprintf("%s's certificate has changed, possibly indicating an security issue. Are you sure you want to continue anyway?", host),
+		fmt.Sprintf("%s's certificate has changed, possibly indicating an security issue. Are you sure you want to continue?", host),
 	)
 	tabPages.ShowPage("yesno")
 	tabPages.SendToFront("yesno")

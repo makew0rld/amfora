@@ -228,8 +228,8 @@ func handleURL(u string) (string, bool) {
 	if err == client.ErrTofu {
 		if Tofu(parsed.Host) {
 			// They want to continue anyway
-			client.ResetTofuEntry(res.Cert, parsed.Port())
-			// Response can be used further down
+			client.ResetTofuEntry(parsed.Hostname(), parsed.Port(), res.Cert)
+			// Response can be used further down, no need to reload
 		} else {
 			// They don't want to continue
 			// Set the bar back to original URL

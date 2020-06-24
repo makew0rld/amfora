@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Disabling color in config affects UI elements (#16)
 - Keep bold for headings even with color disabled
 - Don't make whole link text bold when color is disabled
+- Get domain from URL for TOFU, not from certificate
 
 
 ## [1.0.0] - 2020-06-18

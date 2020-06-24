@@ -62,17 +62,14 @@ func certID(cert *x509.Certificate) string {
 // origCertID uses cert.Raw, which was used in v1.0.0 of the app.
 func origCertID(cert *x509.Certificate) string {
 	h := sha256.New()
-	h.Write(cert.Raw) // Better than cert.Raw, see #7
+	h.Write(cert.Raw)
 	return fmt.Sprintf("%X", h.Sum(nil))
 }
 
-func saveTofuEntry(cert *x509.Certificate, port string) {
-	tofuStore.Set(idKey(cert.Subject.CommonName, port), certID(cert))
-	tofuStore.Set(expiryKey(cert.Subject.CommonName, port), cert.NotAfter.UTC())
-	err := tofuStore.WriteConfig()
-	if err != nil {
-		panic(err)
-	}
+func saveTofuEntry(domain, port string, cert *x509.Certificate) {
+	tofuStore.Set(idKey(domain, port), certID(cert))
+	tofuStore.Set(expiryKey(domain, port), cert.NotAfter.UTC())
+	tofuStore.WriteConfig()
 }
 
 // handleTofu is the abstracted interface for taking care of TOFU.
@@ -80,17 +77,17 @@ func saveTofuEntry(cert *x509.Certificate, port string) {
 // It returns a bool indicating if the cert is valid according to
 // the TOFU database.
 // If false is returned, the connection should not go ahead.
-func handleTofu(cert *x509.Certificate, port string) bool {
-	id, expiry, err := loadTofuEntry(cert.Subject.CommonName, port)
+func handleTofu(domain, port string, cert *x509.Certificate) bool {
+	id, expiry, err := loadTofuEntry(domain, port)
 	if err != nil {
 		// Cert isn't in database or data is malformed
 		// So it can't be checked and anything is valid
-		saveTofuEntry(cert, port)
+		saveTofuEntry(domain, port, cert)
 		return true
 	}
 	if time.Now().After(expiry) {
 		// Old cert expired, so anything is valid
-		saveTofuEntry(cert, port)
+		saveTofuEntry(domain, port, cert)
 		return true
 	}
 	if certID(cert) == id {
@@ -99,7 +96,7 @@ func handleTofu(cert *x509.Certificate, port string) bool {
 	}
 	if origCertID(cert) == id {
 		// Valid but uses old ID type
-		saveTofuEntry(cert, port)
+		saveTofuEntry(domain, port, cert)
 		return true
 	}
 	return false
@@ -107,7 +104,6 @@ func handleTofu(cert *x509.Certificate, port string) bool {
 
 // ResetTofuEntry forces the cert passed to be valid, overwriting any previous TOFU entry.
 // The port string can be empty, to indicate port 1965.
-func ResetTofuEntry(cert *x509.Certificate, port string) {
-	tofuStore.Set(idKey(cert.Subject.CommonName, port), "")
-	tofuStore.WriteConfig()
+func ResetTofuEntry(domain, port string, cert *x509.Certificate) {
+	saveTofuEntry(domain, port, cert)
 }

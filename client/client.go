@@ -10,15 +10,15 @@ import (
 // Fetch returns response data and an error.
 // The error text is human friendly and should be displayed.
 func Fetch(u string) (*gemini.Response, error) {
-	resp, err := gemini.Fetch(u)
+	res, err := gemini.Fetch(u)
 	if err != nil {
 		return nil, err
 	}
 
 	parsed, _ := url.Parse(u)
-	ok := handleTofu(resp.Cert, parsed.Port())
+	ok := handleTofu(parsed.Hostname(), parsed.Port(), res.Cert)
 	if !ok {
-		return resp, ErrTofu
+		return res, ErrTofu
 	}
-	return resp, err
+	return res, err
 }

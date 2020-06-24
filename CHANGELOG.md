@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Option to continue anyway when cert doesn't match TOFU database
 - Display all `text/*` documents, not just gemini and plain (#12)
 - Prefer XDG environment variables if they're set, to specify config dir, etc (#11)
+- Version and help commands - `-v`, `--version`, `--help`, `-h` (#14)
 
 ### Changed
 - Connection timeout is 15 seconds (was 5s)

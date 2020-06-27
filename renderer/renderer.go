@@ -103,7 +103,7 @@ func convertRegularGemini(s string, numLinks int, width int) (string, []string) 
 			// Lists
 		} else if strings.HasPrefix(lines[i], "* ") {
 			if viper.GetBool("a-general.bullets") {
-				lines[i] = " 🞄" + lines[i][1:]
+				lines[i] = " \u2022" + lines[i][1:]
 			}
 			// Optionally list lines could be colored here too, if color is enabled
 		}

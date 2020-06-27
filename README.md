@@ -19,15 +19,17 @@
 
 Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that.
 
-It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Maybe use [Cmder](https://cmder.net/) instead?
+It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Maybe use [Cmder](https://cmder.net/) instead. Note that some of the application colors will not display correctly on most Windows terminals, but all functionality will still work.
 
 It fully passes Sean Conman's client torture test, including the new Unicode tests. It mostly passes the Egsam test.
 
 ## Installation
 
-Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you might have to make the binary executable with `chmod +x <filename>`. On Windows, make sure you click "Advanced > Run anyway" after double-clicking, or something like that.
+Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you might have to make the file executable with `chmod +x <filename>`. You should also move the binary to `/usr/local/bin`.
 
-Unix systems can install the desktop entry file to get Amfora to appear when they search for applications (*this doesn't entirely work yet*):
+On Windows, make sure you click "Advanced > Run anyway" after double-clicking, or something like that.
+
+Unix systems can install the desktop entry file to get Amfora to appear when they search for applications:
 ```bash
 curl -sSL https://raw.githubusercontent.com/makeworld-the-better-one/amfora/master/amfora.desktop -o ~/.local/share/applications/amfora.desktop
 update-desktop-database ~/.local/share/applications

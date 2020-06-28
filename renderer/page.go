@@ -83,10 +83,11 @@ func MakePage(url string, res *gemini.Response, width int) (*structs.Page, error
 			Links:   links,
 		}, nil
 	} else if strings.HasPrefix(mediatype, "text/") {
+		// Treated as plaintext
 		return &structs.Page{
 			Url:     url,
 			Content: utfText,
-			Links:   []string{}, // Non-gemini links are not supported
+			Links:   []string{},
 		}, nil
 	}
 

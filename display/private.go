@@ -132,21 +132,40 @@ func followLink(prev, next string) {
 	}()
 }
 
-func addLeftMargin(text string) string {
-	var shifted string
-	for _, line := range strings.Split(text, "\n") {
-		shifted += strings.Repeat(" ", leftMargin()) + line + "\n"
+func setLeftMargin(p *structs.Page) {
+	lM := leftMargin()
+	if lM != p.LeftMargin {
+		// Left margin needs to be added or changed
+
+		var shifted string
+
+		if p.LeftMargin < 1 {
+			// The page content doesn't have a margin yet
+			lines := strings.Split(p.Content, "\n")
+			for i := range lines {
+				shifted += strings.Repeat(" ", lM) + lines[i] + "\n"
+			}
+		} else {
+			// Old margin needs to be removed, new one added
+			lines := strings.Split(p.Content, "\n")
+			for i := range lines {
+				shifted += strings.Repeat(" ", lM) + lines[i][p.LeftMargin:] + "\n"
+			}
+		}
+		p.Content = shifted
+		p.LeftMargin = lM
 	}
-	return shifted
 }
 
 // setPage displays a Page on the current tab.
 func setPage(p *structs.Page) {
 	saveScroll() // Save the scroll of the previous page
 
+	setLeftMargin(p)
+
 	// Change page on screen
 	tabMap[curTab] = p
-	tabViews[curTab].SetText(addLeftMargin(p.Content))
+	tabViews[curTab].SetText(p.Content)
 	tabViews[curTab].Highlight("") // Turn off highlights
 	tabViews[curTab].ScrollToBeginning()
 

@@ -72,7 +72,8 @@ var App = cview.NewApplication().
 		// XXX: This is hacky but works. The biggest issue is that there will sometimes be a tiny flash
 		// of the old not shifted tab on startup.
 		if tabMap[curTab] == &newTabPage {
-			tabViews[curTab].SetText(addLeftMargin(renderedNewTabContent))
+			setLeftMargin(tabMap[curTab])
+			tabViews[curTab].SetText(tabMap[curTab].Content)
 		}
 	})
 
@@ -289,12 +290,13 @@ func NewTab() {
 
 	curTab = NumTabs()
 	tabMap[curTab] = &newTabPage
+	setLeftMargin(tabMap[curTab])
 	tabViews[curTab] = cview.NewTextView().
 		SetDynamicColors(true).
 		SetRegions(true).
 		SetScrollable(true).
 		SetWrap(false).
-		SetText(addLeftMargin(renderedNewTabContent)).
+		SetText(tabMap[curTab].Content).
 		ScrollToBeginning().
 		SetChangedFunc(func() {
 			App.Draw()
@@ -426,6 +428,7 @@ func SwitchTab(tab int) {
 
 func Reload() {
 	cache.Remove(tabMap[curTab].Url)
+	tabMap[curTab].LeftMargin = 0 // Redo left margin
 	go handleURL(tabMap[curTab].Url)
 }
 

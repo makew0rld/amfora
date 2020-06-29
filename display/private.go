@@ -17,6 +17,18 @@ import (
 
 // This file contains the functions that aren't part of the public API.
 
+// pageUp scrolls up 75% of the height of the terminal, like Bombadillo.
+func pageUp() {
+	row, col := tabViews[curTab].GetScrollOffset()
+	tabViews[curTab].ScrollTo(row-(termH/4)*3, col)
+}
+
+// pageDown scrolls down 75% of the height of the terminal, like Bombadillo.
+func pageDown() {
+	row, col := tabViews[curTab].GetScrollOffset()
+	tabViews[curTab].ScrollTo(row+(termH/4)*3, col)
+}
+
 func leftMargin() int {
 	return int(float64(termW) * viper.GetFloat64("a-general.left_margin"))
 }

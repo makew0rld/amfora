@@ -20,7 +20,9 @@ var tabMap = make(map[int]*structs.Page) // Map of tab number to page
 // Holds the actual tab primitives
 var tabViews = make(map[int]*cview.TextView)
 
+// Terminal dimensions
 var termW int
+var termH int
 
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField().
@@ -69,6 +71,7 @@ var App = cview.NewApplication().
 	SetAfterResizeFunc(func(width int, height int) {
 		// Store for calculations
 		termW = width
+		termH = height
 
 		// Shift new tabs created before app startup, when termW == 0
 		// XXX: This is hacky but works. The biggest issue is that there will sometimes be a tiny flash
@@ -247,6 +250,12 @@ func Init() {
 		case tcell.KeyCtrlD:
 			go addBookmark()
 			return nil
+		case tcell.KeyPgUp:
+			pageUp()
+			return nil
+		case tcell.KeyPgDn:
+			pageDown()
+			return nil
 		case tcell.KeyRune:
 			// Regular key was sent
 			switch string(event.Rune()) {
@@ -271,6 +280,13 @@ func Init() {
 			case "?":
 				Help()
 				return nil
+			case "u":
+				pageUp()
+				return nil
+			case "d":
+				pageDown()
+				return nil
+
 			// Shift+NUMBER keys, for switching to a specific tab
 			case "!":
 				SwitchTab(0)

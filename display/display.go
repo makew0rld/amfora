@@ -2,6 +2,8 @@ package display
 
 import (
 	"fmt"
+	"net/url"
+	"path"
 	"strconv"
 	"strings"
 
@@ -122,6 +124,8 @@ func Init() {
 	}
 	bottomBar.SetBackgroundColor(tcell.ColorWhite)
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
+		defer bottomBar.SetLabel("")
+
 		switch key {
 		case tcell.KeyEnter:
 			// Figure out whether it's a URL, link number, or search
@@ -131,9 +135,31 @@ func Init() {
 
 			if strings.TrimSpace(query) == "" {
 				// Ignore
-				bottomBar.SetLabel("")
 				bottomBar.SetText(tabMap[curTab].Url)
 				App.SetFocus(tabViews[curTab])
+				return
+			}
+			if query == ".." && !strings.HasPrefix(query, "about:") {
+				// Go up a directory
+				parsed, err := url.Parse(tabMap[curTab].Url)
+				if err != nil {
+					// This shouldn't occur
+					return
+				}
+				if parsed.Path == "/" {
+					// Can't go up further
+					bottomBar.SetText(tabMap[curTab].Url)
+					App.SetFocus(tabViews[curTab])
+					return
+				}
+
+				// Ex: /test/foo/ -> /test/foo//.. -> /test -> /test/
+				parsed.Path = path.Clean(parsed.Path+"/..") + "/"
+				if parsed.Path == "//" {
+					// Fix double slash that occurs at domain root
+					parsed.Path = "/"
+				}
+				URL(parsed.String())
 				return
 			}
 
@@ -147,23 +173,19 @@ func Init() {
 					// Full URL
 					URL(query)
 				}
-				bottomBar.SetLabel("")
 				return
 			}
 			if i <= len(tabMap[curTab].Links) && i > 0 {
 				// It's a valid link number
 				followLink(tabMap[curTab].Url, tabMap[curTab].Links[i-1])
-				bottomBar.SetLabel("")
 				return
 			}
 			// Invalid link number
-			bottomBar.SetLabel("")
 			bottomBar.SetText(tabMap[curTab].Url)
 			App.SetFocus(tabViews[curTab])
 
 		case tcell.KeyEscape:
 			// Set back to what it was
-			bottomBar.SetLabel("")
 			bottomBar.SetText(tabMap[curTab].Url)
 			App.SetFocus(tabViews[curTab])
 		}

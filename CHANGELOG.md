@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Bottom bar now says `URL/Num./Search: ` when space is pressed
+- Update to [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) v0.6.0
 
 ### Fixed
 - Actual unicode bullet symbol is used for lists: U+2022

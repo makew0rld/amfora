@@ -190,6 +190,18 @@ func Init() {
 			return event
 		}
 
+		// History arrow keys
+		if event.Modifiers() == tcell.ModAlt {
+			if event.Key() == tcell.KeyLeft {
+				histBack()
+				return nil
+			}
+			if event.Key() == tcell.KeyRight {
+				histForward()
+				return nil
+			}
+		}
+
 		switch event.Key() {
 		case tcell.KeyCtrlT:
 			NewTab()

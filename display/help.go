@@ -13,8 +13,8 @@ Esc|Leave the help
 Arrow keys, h/j/k/l|Scroll and move a page.
 Tab|Navigate to the next item in a popup.
 Shift-Tab|Navigate to the previous item in a popup.
-b|Go back a page
-f|Go forward a page
+b, Alt-Left|Go back a page
+f, Alt-Right|Go forward a page
 g|Go to top of document
 G|Go to bottom of document
 spacebar|Open bar at the bottom - type a URL or link number

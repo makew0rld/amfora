@@ -65,17 +65,7 @@ func bkmkInit() {
 func openBkmkModal(name string, exists bool) (string, int) {
 	// Basically a copy of Input()
 
-	// Remove and re-add input field - to clear the old text
-	if bkmkModal.GetForm().GetFormItemCount() > 0 {
-		bkmkModal.GetForm().RemoveFormItem(0)
-	}
-	bkmkModalText = ""
-	bkmkModal.GetForm().AddInputField("Name: ", name, 0, nil,
-		func(text string) {
-			// Store for use later
-			bkmkModalText = text
-		})
-
+	// Reset buttons before input field, to make sure the input is in focus
 	bkmkModal.ClearButtons()
 	if exists {
 		bkmkModal.SetText("Change or remove the bookmark for the current page?")
@@ -84,6 +74,16 @@ func openBkmkModal(name string, exists bool) (string, int) {
 		bkmkModal.SetText("Create a bookmark for the current page?")
 		bkmkModal.AddButtons([]string{"Add", "Cancel"})
 	}
+
+	// Remove and re-add input field - to clear the old text
+	bkmkModal.GetForm().Clear(false)
+	bkmkModalText = ""
+	bkmkModal.GetForm().AddInputField("Name: ", name, 0, nil,
+		func(text string) {
+			// Store for use later
+			bkmkModalText = text
+		})
+
 	tabPages.ShowPage("bkmk")
 	tabPages.SendToFront("bkmk")
 	App.SetFocus(bkmkModal)

@@ -22,8 +22,8 @@ var errorModal = cview.NewModal().
 	AddButtons([]string{"Ok"})
 
 var inputModal = cview.NewModal().
-	SetTextColor(tcell.ColorWhite).
-	AddButtons([]string{"Send", "Cancel"})
+	SetTextColor(tcell.ColorWhite)
+	//AddButtons([]string{"Send", "Cancel"}) - Added in func
 
 var inputCh = make(chan string)
 var inputModalText string // The current text of the input field in the modal
@@ -157,10 +157,11 @@ func Info(s string) {
 // Input pulls up a modal that asks for input, and returns the user's input.
 // It returns an bool indicating if the user chose to send input or not.
 func Input(prompt string) (string, bool) {
-	// Remove and re-add input field - to clear the old text
-	if inputModal.GetForm().GetFormItemCount() > 0 {
-		inputModal.GetForm().RemoveFormItem(0)
-	}
+	// Remove elements and re-add them - to clear input text and keep input in focus
+	inputModal.ClearButtons()
+	inputModal.GetForm().Clear(false)
+
+	inputModal.AddButtons([]string{"Send", "Cancel"})
 	inputModalText = ""
 	inputModal.GetForm().AddInputField("", "", 0, nil,
 		func(text string) {

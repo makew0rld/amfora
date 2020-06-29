@@ -288,6 +288,11 @@ func handleURL(u string) (string, bool) {
 			// Make another request with the query string added
 			// + chars are replaced because PathEscape doesn't do that
 			parsed.RawQuery = pathEscape(userInput)
+			if len(parsed.String()) > 1024 {
+				// 1024 is the max size for URLs in the spec
+				Error("Input Error", "URL for that input would be too long.")
+				return "", false
+			}
 			return handleURL(parsed.String())
 		}
 		return "", false

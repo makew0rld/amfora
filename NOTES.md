@@ -1,7 +1,9 @@
 # Notes
 
-- All the maps and stuff could be replaced with a `tab` struct
-- And then just one single map of tab number to `tab`
+- Simplify into one struct
+  - All the maps and stuff could be replaced with a `tab` struct
+  - And then just one single map of tab number to `tab`
+  - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
 
 ## Bugs
 - Wrapping messes up on brackets

@@ -355,18 +355,32 @@ func NewTab() {
 			// Altered from: https://gitlab.com/tslocum/cview/-/blob/master/demos/textview/main.go
 			// Handles being able to select and "click" links with the enter and tab keys
 
+			if key == tcell.KeyEsc {
+				// Stop highlighting
+				tabViews[curTab].Highlight("")
+				bottomBar.SetLabel("")
+				bottomBar.SetText(tabMap[curTab].Url)
+			}
+
 			currentSelection := tabViews[curTab].GetHighlights()
 			numSelections := len(tabMap[curTab].Links)
+
 			if key == tcell.KeyEnter {
 				if len(currentSelection) > 0 && len(tabMap[curTab].Links) > 0 {
 					// A link was selected, "click" it and load the page it's for
+					bottomBar.SetLabel("")
 					linkN, _ := strconv.Atoi(currentSelection[0])
 					followLink(tabMap[curTab].Url, tabMap[curTab].Links[linkN])
 					return
 				} else {
 					tabViews[curTab].Highlight("0").ScrollToHighlight()
+					// Display link URL in bottomBar
+					bottomBar.SetLabel("[::b]Link: [::-]")
+					bottomBar.SetText(tabMap[curTab].Links[0])
 				}
 			} else if len(currentSelection) > 0 {
+				// There's still a selection, but a different key was pressed, not Enter
+
 				index, _ := strconv.Atoi(currentSelection[0])
 				if key == tcell.KeyTab {
 					index = (index + 1) % numSelections
@@ -376,6 +390,9 @@ func NewTab() {
 					return
 				}
 				tabViews[curTab].Highlight(strconv.Itoa(index)).ScrollToHighlight()
+				// Display link URL in bottomBar
+				bottomBar.SetLabel("[::b]Link: [::-]")
+				bottomBar.SetText(tabMap[curTab].Links[index])
 			}
 		})
 

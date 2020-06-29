@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - You can type `..` in the bottom bar to go up a directory in the URL (#21)
 - Error popup for when input string would result in a too long out-of-spec URL (#25)
 - Paging, using <kbd>d</kbd> and <kbd>u</kbd>, as well as <kbd>Page Up</kbd> and <kbd>Page Down</kbd> (#19)
+- <kbd>Esc</kbd> can exit link highlighting mode (#24)
+- Selected link URL is displayed in the bottom bar (#24)
 
 ### Changed
 - Bottom bar now says `URL/Num./Search: ` when space is pressed

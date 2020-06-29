@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Alt-Left and Alt-Right for history navigation (#23)
 
+### Changed
+- Bottom bar now says `URL/Num./Search: ` when space is pressed
+
 ### Fixed
 - Actual unicode bullet symbol is used for lists: U+2022
 - Performance when loading very long cached pages improved (#26)

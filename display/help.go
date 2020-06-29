@@ -27,7 +27,7 @@ Ctrl-W|Close tab. For now, only the right-most tab can be closed.
 Ctrl-R, R|Reload a page, discarding the cached version.
 Ctrl-B|View bookmarks
 Ctrl-D|Add, change, or remove a bookmark for the current page.
-q, Ctrl-Q|Quit
+q, Ctrl-Q, Ctrl-C|Quit
 `)
 
 var helpTable = cview.NewTable().

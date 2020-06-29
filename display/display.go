@@ -230,7 +230,7 @@ func Init() {
 			switch string(event.Rune()) {
 			case " ":
 				// Space starts typing, like Bombadillo
-				bottomBar.SetLabel("[::b]URL or search: [::-]")
+				bottomBar.SetLabel("[::b]URL/Num./Search: [::-]")
 				bottomBar.SetText("")
 				App.SetFocus(bottomBar)
 				return nil

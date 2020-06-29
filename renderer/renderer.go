@@ -124,13 +124,33 @@ func convertRegularGemini(s string, numLinks int, width int) (string, []string) 
 				lines[i] = strings.TrimPrefix(lines[i], ">")
 				lines[i] = strings.TrimPrefix(lines[i], " ")
 
-				temp := cview.WordWrap(lines[i], width)
-				for i := range temp {
-					temp[i] = "> " + temp[i]
-				}
-				wrappedLines = append(wrappedLines, temp...)
+				// Anonymous function to allow recovery from potential WordWrap panic
+				func() {
+					defer func() {
+						if r := recover(); r != nil {
+							// Add unwrapped line instead
+							wrappedLines = append(wrappedLines, "> "+lines[i])
+						}
+					}()
+
+					temp := cview.WordWrap(lines[i], width)
+					for i := range temp {
+						temp[i] = "> " + temp[i]
+					}
+					wrappedLines = append(wrappedLines, temp...)
+				}()
 			} else {
-				wrappedLines = append(wrappedLines, cview.WordWrap(lines[i], width)...)
+				// Anonymous function to allow recovery from potential WordWrap panic
+				func() {
+					defer func() {
+						if r := recover(); r != nil {
+							// Add unwrapped line instead
+							wrappedLines = append(wrappedLines, lines[i])
+						}
+					}()
+
+					wrappedLines = append(wrappedLines, cview.WordWrap(lines[i], width)...)
+				}()
 			}
 		}
 	}

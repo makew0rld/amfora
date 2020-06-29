@@ -4,8 +4,11 @@
 - And then just one single map of tab number to `tab`
 
 ## Bugs
-- Wrapping is messed up on CHAZ post, but nothing else
+- Wrapping messes up on brackets
   - Filed [issue 23](https://gitlab.com/tslocum/cview/-/issues/23)
+- Wrapping panics on strings with brackets and Asian characters
+  - Filed cview [issue 27](https://gitlab.com/tslocum/cview/-/issues/27)
+  - The panicking was reported and fixed in Amfora [issue 20](https://github.com/makeworld-the-better-one/amfora/issues/20), but the lines are now just not wrapped
 - Text background not reset on ANSI pages
   - Filed [issue 25](https://gitlab.com/tslocum/cview/-/issues/25)
 - Modal styling messed up when wrapped - example occurence is the error modal for a long unsupported scheme URL

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Actual unicode bullet symbol is used for lists: U+2022
 - Performance when loading very long cached pages improved (#26)
+- Doesn't crash when wrapping certain complex lines (#20)
 
 ## [1.1.0] - 2020-06-24
 ### Added

@@ -24,6 +24,10 @@ var tabViews = make(map[int]*cview.TextView)
 var termW int
 var termH int
 
+// The link currently selected when in link selection mode
+// Set to "" when not in that mode
+var selectedLink string
+
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField().
 	SetFieldBackgroundColor(tcell.ColorWhite).
@@ -91,34 +95,7 @@ func Init() {
 		App.Draw()
 	})
 
-	// Populate help table
-	helpTable.SetDoneFunc(func(key tcell.Key) {
-		if key == tcell.KeyEsc {
-			tabPages.SwitchToPage(strconv.Itoa(curTab))
-		}
-	})
-	rows := strings.Count(helpCells, "\n") + 1
-	cells := strings.Split(
-		strings.ReplaceAll(helpCells, "\n", "|"),
-		"|")
-	cell := 0
-	for r := 0; r < rows; r++ {
-		for c := 0; c < 2; c++ {
-			var tableCell *cview.TableCell
-			if c == 0 {
-				tableCell = cview.NewTableCell(cells[cell]).
-					SetAttributes(tcell.AttrBold).
-					SetExpansion(1).
-					SetAlign(cview.AlignCenter)
-			} else {
-				tableCell = cview.NewTableCell("  " + cells[cell]).
-					SetExpansion(2)
-			}
-			helpTable.SetCell(r, c, tableCell)
-			cell++
-		}
-	}
-	tabPages.AddPage("help", helpTable, true, false)
+	helpInit()
 
 	if viper.GetBool("a-general.color") {
 		bottomBar.SetLabelColor(tcell.ColorGreen)
@@ -142,7 +119,7 @@ func Init() {
 				App.SetFocus(tabViews[curTab])
 				return
 			}
-			if query == ".." && !strings.HasPrefix(query, "about:") {
+			if query == ".." && tabHasContent() {
 				// Go up a directory
 				parsed, err := url.Parse(tabMap[curTab].Url)
 				if err != nil {
@@ -168,22 +145,44 @@ func Init() {
 
 			i, err := strconv.Atoi(query)
 			if err != nil {
-				// It's a full URL or search term
-				// Detect if it's a search or URL
-				if strings.Contains(query, " ") || (!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
-					URL(viper.GetString("a-general.search") + "?" + pathEscape(query))
+				if strings.HasPrefix(query, "new:") && len(query) > 4 {
+					// They're trying to open a link number in a new tab
+					i, err = strconv.Atoi(query[4:])
+					if err != nil {
+						return
+					}
+					if i <= len(tabMap[curTab].Links) && i > 0 {
+						// Open new tab and load link
+						oldTab := curTab
+						NewTab()
+						// Resolve and follow link manually
+						prevParsed, _ := url.Parse(tabMap[oldTab].Url)
+						nextParsed, err := url.Parse(tabMap[oldTab].Links[i-1])
+						if err != nil {
+							Error("URL Error", "link URL could not be parsed")
+							return
+						}
+						URL(prevParsed.ResolveReference(nextParsed).String())
+						return
+					}
 				} else {
-					// Full URL
-					URL(query)
+					// It's a full URL or search term
+					// Detect if it's a search or URL
+					if strings.Contains(query, " ") || (!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
+						URL(viper.GetString("a-general.search") + "?" + pathEscape(query))
+					} else {
+						// Full URL
+						URL(query)
+					}
+					return
 				}
-				return
 			}
 			if i <= len(tabMap[curTab].Links) && i > 0 {
 				// It's a valid link number
 				followLink(tabMap[curTab].Url, tabMap[curTab].Links[i-1])
 				return
 			}
-			// Invalid link number
+			// Invalid link number, don't do anything
 			bottomBar.SetText(tabMap[curTab].Url)
 			App.SetFocus(tabViews[curTab])
 
@@ -229,7 +228,15 @@ func Init() {
 
 		switch event.Key() {
 		case tcell.KeyCtrlT:
-			NewTab()
+			if selectedLink != "" {
+				next, err := resolveRelLink(tabMap[curTab].Url, selectedLink)
+				if err != nil {
+					Error("URL Error", err.Error())
+					return nil
+				}
+				NewTab()
+				URL(next)
+			}
 			return nil
 		case tcell.KeyCtrlW:
 			CloseTab()
@@ -360,6 +367,7 @@ func NewTab() {
 				tabViews[curTab].Highlight("")
 				bottomBar.SetLabel("")
 				bottomBar.SetText(tabMap[curTab].Url)
+				selectedLink = ""
 			}
 
 			currentSelection := tabViews[curTab].GetHighlights()
@@ -369,6 +377,7 @@ func NewTab() {
 				if len(currentSelection) > 0 && len(tabMap[curTab].Links) > 0 {
 					// A link was selected, "click" it and load the page it's for
 					bottomBar.SetLabel("")
+					selectedLink = ""
 					linkN, _ := strconv.Atoi(currentSelection[0])
 					followLink(tabMap[curTab].Url, tabMap[curTab].Links[linkN])
 					return
@@ -377,6 +386,7 @@ func NewTab() {
 					// Display link URL in bottomBar
 					bottomBar.SetLabel("[::b]Link: [::-]")
 					bottomBar.SetText(tabMap[curTab].Links[0])
+					selectedLink = tabMap[curTab].Links[0]
 				}
 			} else if len(currentSelection) > 0 {
 				// There's still a selection, but a different key was pressed, not Enter
@@ -393,6 +403,7 @@ func NewTab() {
 				// Display link URL in bottomBar
 				bottomBar.SetLabel("[::b]Link: [::-]")
 				bottomBar.SetText(tabMap[curTab].Links[index])
+				selectedLink = tabMap[curTab].Links[index]
 			}
 		})
 
@@ -494,6 +505,10 @@ func SwitchTab(tab int) {
 }
 
 func Reload() {
+	if !tabHasContent() {
+		return
+	}
+
 	cache.Remove(tabMap[curTab].Url)
 	tabMap[curTab].LeftMargin = 0 // Redo left margin
 	go handleURL(tabMap[curTab].Url)

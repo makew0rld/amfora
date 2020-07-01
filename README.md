@@ -61,6 +61,7 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [ ] Download pages and arbitrary data
 - [ ] Emoji favicons
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
+- [ ] Stream support
 - [ ] Full mouse support
 - [ ] Table of contents for pages
 - [ ] Full client certificate UX within the client

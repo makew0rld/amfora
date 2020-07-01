@@ -1,6 +1,7 @@
 package display
 
 import (
+	"errors"
 	"net/url"
 	"os/exec"
 	"strings"
@@ -97,6 +98,22 @@ func applyScroll() {
 	tabViews[curTab].ScrollTo(tabMap[curTab].Row, tabMap[curTab].Column)
 }
 
+// resolveRelLink returns an absolute link for the given absolute link and relative one.
+// It also returns an error if it could not resolve the links, which should be displayed
+// to the user.
+func resolveRelLink(prev, next string) (string, error) {
+	if !tabHasContent() {
+		return next, nil
+	}
+
+	prevParsed, _ := url.Parse(prev)
+	nextParsed, err := url.Parse(next)
+	if err != nil {
+		return "", errors.New("link URL could not be parsed")
+	}
+	return prevParsed.ResolveReference(nextParsed).String(), nil
+}
+
 // followLink should be used when the user "clicks" a link on a page.
 // Not when a URL is opened on a new tab for the first time.
 func followLink(prev, next string) {
@@ -113,14 +130,12 @@ func followLink(prev, next string) {
 	}
 
 	if tabHasContent() {
-		saveScroll() // Likely called later on anyway, here just in case
-		prevParsed, _ := url.Parse(prev)
-		nextParsed, err := url.Parse(next)
+		saveScroll() // Likely called later on, it's here just in case
+		nextURL, err := resolveRelLink(prev, next)
 		if err != nil {
-			Error("URL Error", "Link URL could not be parsed")
+			Error("URL Error", err.Error())
 			return
 		}
-		nextURL := prevParsed.ResolveReference(nextParsed).String()
 		go func() {
 			final, displayed := handleURL(nextURL)
 			if displayed {
@@ -161,7 +176,9 @@ func setLeftMargin(p *structs.Page) {
 			// Old margin needs to be removed, new one added
 			lines := strings.Split(p.Content, "\n")
 			for i := range lines {
-				shifted += strings.Repeat(" ", lM) + lines[i][p.LeftMargin:] + "\n"
+				if lines[i] != "" {
+					shifted += strings.Repeat(" ", lM) + lines[i][p.LeftMargin:] + "\n"
+				}
 			}
 		}
 		p.Content = shifted

@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Paging, using <kbd>d</kbd> and <kbd>u</kbd>, as well as <kbd>Page Up</kbd> and <kbd>Page Down</kbd> (#19)
 - <kbd>Esc</kbd> can exit link highlighting mode (#24)
 - Selected link URL is displayed in the bottom bar (#24)
+- Pressing <kbd>Ctrl-T</kbd> with a link selected opens it in a new tab (#27)
+- Writing `new:N` in the bottom bar will open link number N in a new tab (#27)
 
 ### Changed
 - Bottom bar now says `URL/Num./Search: ` when space is pressed
@@ -22,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance when loading very long cached pages improved (#26)
 - Doesn't crash when wrapping certain complex lines (#20)
 - Input fields are always in focus when they appear (#5)
+- Reloading the new tab page doesn't cause an error popup
 
 ## [1.1.0] - 2020-06-24
 ### Added

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Selected link URL is displayed in the bottom bar (#24)
 - Pressing <kbd>Ctrl-T</kbd> with a link selected opens it in a new tab (#27)
 - Writing `new:N` in the bottom bar will open link number N in a new tab (#27)
+- Quote lines are now in italics (#28)
 
 ### Changed
 - Bottom bar now says `URL/Num./Search: ` when space is pressed
@@ -30,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reloading the new tab page doesn't cause an error popup
 - Help table cells are hardwrapped so the text can still be read entirely on an 80-column terminal
 - New tab text is wrapped to terminal width like other pages (#31)
+- TOFU "continue anyway" popup has a question mark at the end
 
 ## [1.1.0] - 2020-06-24
 ### Added

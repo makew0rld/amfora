@@ -212,7 +212,7 @@ func Tofu(host string) bool {
 		yesNoModal.SetBackgroundColor(tcell.ColorBlack)
 	}
 	yesNoModal.SetText(
-		fmt.Sprintf("%s's certificate has changed, possibly indicating an security issue. Are you sure you want to continue?", host),
+		fmt.Sprintf("%s's certificate has changed, possibly indicating an security issue. Are you sure you want to continue? ", host),
 	)
 	tabPages.ShowPage("yesno")
 	tabPages.SendToFront("yesno")

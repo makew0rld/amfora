@@ -3,7 +3,6 @@
 package cache
 
 import (
-	"net/url"
 	"strings"
 	"sync"
 
@@ -50,11 +49,6 @@ func removeUrl(url string) {
 func Add(p *structs.Page) {
 	if p.Url == "" || strings.HasPrefix(p.Url, "about:") {
 		// Just in case, these pages shouldn't be cached
-		return
-	}
-	// Never cache pages with query strings, to reduce unexpected behaviour
-	parsed, err := url.Parse(p.Url)
-	if err == nil && parsed.RawQuery != "" {
 		return
 	}
 

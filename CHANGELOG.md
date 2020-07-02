@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bottom bar now says `URL/Num./Search: ` when space is pressed
 - Update to [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) v0.6.0
 - Help layout doesn't have borders anymore
+- Pages with query strings are still cached (#29)
+- URLs or searches typed in the bottom bar are not loaded from the cache (#29)
 
 ### Fixed
 - Actual unicode bullet symbol is used for lists: U+2022

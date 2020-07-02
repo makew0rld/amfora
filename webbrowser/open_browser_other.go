@@ -5,5 +5,5 @@ package webbrowser
 import "fmt"
 
 func Open(url string) (string, error) {
-	return "", fmt.Errorf("unsupported os for default HTTP handling. Set a command in the config")
+	return "", fmt.Errorf("unsupported OS for default HTTP handling. Set a command in the config")
 }

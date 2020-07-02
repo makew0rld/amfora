@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Input fields are always in focus when they appear (#5)
 - Reloading the new tab page doesn't cause an error popup
 - Help table cells are hardwrapped so the text can still be read entirely on an 80-column terminal
+- New tab text is wrapped to terminal width like other pages (#31)
 
 ## [1.1.0] - 2020-06-24
 ### Added

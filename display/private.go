@@ -176,9 +176,7 @@ func setLeftMargin(p *structs.Page) {
 			// Old margin needs to be removed, new one added
 			lines := strings.Split(p.Content, "\n")
 			for i := range lines {
-				if lines[i] != "" {
-					shifted += strings.Repeat(" ", lM) + lines[i][p.LeftMargin:] + "\n"
-				}
+				shifted += strings.Repeat(" ", lM) + lines[i][p.LeftMargin:] + "\n"
 			}
 		}
 		p.Content = shifted

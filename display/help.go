@@ -32,6 +32,7 @@ Ctrl-T|New tab, or if a link is selected,
 |this will open the link in a new tab.
 Ctrl-W|Close tab. For now, only the right-most tab can be closed.
 Ctrl-R, R|Reload a page, discarding the cached version.
+|This can also be used if you resize your terminal.
 Ctrl-B|View bookmarks
 Ctrl-D|Add, change, or remove a bookmark for the current page.
 q, Ctrl-Q, Ctrl-C|Quit

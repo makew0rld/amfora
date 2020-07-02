@@ -69,6 +69,10 @@ var layout = cview.NewFlex().
 	AddItem(nil, 1, 1, false). // One line of empty space before bottomBar
 	AddItem(bottomBar, 1, 1, false)
 
+var renderedNewTabContent string
+var newTabLinks []string
+var newTabPage structs.Page
+
 var App = cview.NewApplication().
 	EnableMouse(false).
 	SetRoot(layout, true).
@@ -81,14 +85,13 @@ var App = cview.NewApplication().
 		// XXX: This is hacky but works. The biggest issue is that there will sometimes be a tiny flash
 		// of the old not shifted tab on startup.
 		if tabMap[curTab] == &newTabPage {
+			renderedNewTabContent, _ = renderer.RenderGemini(newTabContent, textWidth())
+			newTabPage.Content = renderedNewTabContent
+			newTabPage.LeftMargin = 0
 			setLeftMargin(tabMap[curTab])
 			tabViews[curTab].SetText(tabMap[curTab].Content)
 		}
 	})
-
-var renderedNewTabContent string
-var newTabLinks []string
-var newTabPage structs.Page
 
 func Init() {
 	tabRow.SetChangedFunc(func() {

@@ -231,7 +231,9 @@ func Init() {
 
 		switch event.Key() {
 		case tcell.KeyCtrlT:
-			if selectedLink != "" {
+			if selectedLink == "" {
+				NewTab()
+			} else {
 				next, err := resolveRelLink(tabMap[curTab].Url, selectedLink)
 				if err != nil {
 					Error("URL Error", err.Error())
@@ -347,6 +349,12 @@ func NewTab() {
 	// Set the textView options, and the changed func to App.Draw()
 	// SetDoneFunc to do link highlighting
 	// Add view to pages and switch to it
+
+	// But first, turn off link selecting mode in the current tab
+	if curTab > -1 {
+		tabViews[curTab].Highlight("")
+	}
+	selectedLink = ""
 
 	curTab = NumTabs()
 	tabMap[curTab] = &newTabPage

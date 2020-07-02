@@ -18,12 +18,18 @@ b, Alt-Left|Go back in the history
 f, Alt-Right|Go forward in the history
 g|Go to top of document
 G|Go to bottom of document
-spacebar|Open bar at the bottom - type a URL, link number, or search term. You can also type two dots (..) to go up a directory in the URL, as well as new:N to open link number N in a new tab instead of the current one.
-Enter|On a page this will start link highlighting. Press Tab and Shift-Tab to pick different links. Press Enter again to go to one, or Esc to stop.
+spacebar|Open bar at the bottom - type a URL, link number, search term.
+|You can also type two dots (..) to go up a directory in the URL.
+|Typing new:N will open link number N in a new tab
+|instead of the current one.
+Enter|On a page this will start link highlighting.
+|Press Tab and Shift-Tab to pick different links.
+|Press Enter again to go to one, or Esc to stop.
 Shift-NUMBER|Go to a specific tab.
 Shift-0, )|Go to the last tab.
 Ctrl-H|Go home
-Ctrl-T|New tab, or if a link is selected, this will open the link in a new tab.
+Ctrl-T|New tab, or if a link is selected,
+|this will open the link in a new tab.
 Ctrl-W|Close tab. For now, only the right-most tab can be closed.
 Ctrl-R, R|Reload a page, discarding the cached version.
 Ctrl-B|View bookmarks
@@ -33,7 +39,7 @@ q, Ctrl-Q, Ctrl-C|Quit
 
 var helpTable = cview.NewTable().
 	SetSelectable(false, false).
-	SetBorders(true).
+	SetBorders(false).
 	SetBordersColor(tcell.ColorGray)
 
 // Help displays the help and keybindings.
@@ -55,17 +61,27 @@ func helpInit() {
 		strings.ReplaceAll(helpCells, "\n", "|"),
 		"|")
 	cell := 0
+	extraRows := 0 // Rows continued from the previous, without spacing
 	for r := 0; r < rows; r++ {
 		for c := 0; c < 2; c++ {
 			var tableCell *cview.TableCell
 			if c == 0 {
-				tableCell = cview.NewTableCell(cells[cell]).
+				// First column, the keybinding
+				tableCell = cview.NewTableCell(" " + cells[cell]).
 					SetAttributes(tcell.AttrBold).
-					SetAlign(cview.AlignCenter)
+					SetAlign(cview.AlignLeft)
 			} else {
-				tableCell = cview.NewTableCell("  " + cells[cell])
+				tableCell = cview.NewTableCell(" " + cells[cell])
 			}
-			helpTable.SetCell(r, c, tableCell)
+			if c == 0 && cells[cell] == "" || (cell > 0 && cells[cell-1] == "" && c == 1) {
+				// The keybinding column for this row was blank, meaning the explanation
+				// column is continued from the previous row.
+				// The row should be added without any spacing rows
+				helpTable.SetCell(((2*r)-extraRows/2)-1, c, tableCell)
+				extraRows++
+			} else {
+				helpTable.SetCell((2*r)-extraRows/2, c, tableCell) // Every other row, for readability
+			}
 			cell++
 		}
 	}

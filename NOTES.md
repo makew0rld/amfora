@@ -5,7 +5,7 @@
   - And then just one single map of tab number to `tab`
   - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
 
-## Bugs
+## Upstream Bugs
 - Wrapping messes up on brackets
   - Filed [issue 23](https://gitlab.com/tslocum/cview/-/issues/23)
 - Wrapping panics on strings with brackets and Asian characters
@@ -18,3 +18,5 @@
   - Add some bold back into modal text after this is fixed
 - Bookmark keys aren't deleted, just set to `""`
   - Waiting on [this viper PR](https://github.com/spf13/viper/pull/519) to be merged
+- Help table cells aren't dynamically wrapped
+  - Filed [issue 29](https://gitlab.com/tslocum/cview/-/issues/29)

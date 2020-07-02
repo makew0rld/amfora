@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Bottom bar now says `URL/Num./Search: ` when space is pressed
 - Update to [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) v0.6.0
+- Help layout doesn't have borders anymore
 
 ### Fixed
 - Actual unicode bullet symbol is used for lists: U+2022
@@ -25,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Doesn't crash when wrapping certain complex lines (#20)
 - Input fields are always in focus when they appear (#5)
 - Reloading the new tab page doesn't cause an error popup
+- Help table cells are hardwrapped so the text can still be read entirely on an 80-column terminal
 
 ## [1.1.0] - 2020-06-24
 ### Added

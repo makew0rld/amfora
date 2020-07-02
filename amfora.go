@@ -8,7 +8,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/display"
 )
 
-var version = "1.2.0-alpha"
+var version = "1.2.0"
 
 func main() {
 	// err := logger.Init()

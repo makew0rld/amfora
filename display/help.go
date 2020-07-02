@@ -88,5 +88,3 @@ func helpInit() {
 	}
 	tabPages.AddPage("help", helpTable, true, false)
 }
-
-// TODO: Wrap cell text so it's not offscreen

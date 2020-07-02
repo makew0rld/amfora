@@ -25,7 +25,7 @@ It fully passes Sean Conman's client torture test, including the new Unicode tes
 
 ## Installation
 
-Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you might have to make the file executable with `chmod +x <filename>`. You should also move the binary to `/usr/local/bin`.
+Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you might have to make the file executable with `chmod +x <filename>`. You should also move the binary to `/usr/local/bin/`.
 
 On Windows, make sure you click "Advanced > Run anyway" after double-clicking, or something like that.
 
@@ -43,7 +43,9 @@ To determine the version, you can run `amfora --version` or `amfora -v`.
 
 The project keeps many standard terminal keybindings and is intuitive. Press <kbd>?</kbd> inside the application to pull up the help menu with a list of all the keybindings, and <kbd>Esc</kbd> to leave it. If you have used Bombadillo you will find it similar.
 
-It is designed with large or fullscreen terminals in mind. For optimal usage, make your terminal fullscreen. It was also designed with a dark background terminal in mind, but please file an issue if the colour choices look bad on your terminal setup. It was tested with left-to-right languages, and will likely not work as well with right-to-left languages like Arabic.
+It is designed with large terminals in mind, but should look and work well at any reasonable terminal size.
+
+It was tested with left-to-right languages, and will likely not work as well with right-to-left languages like Arabic.
 
 ## Features / Roadmap
 Features in *italics* are in the master branch, but not in the latest release.

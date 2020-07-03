@@ -13,6 +13,38 @@ import (
 	"gitlab.com/tslocum/cview"
 )
 
+// wrapLine wraps a line to the provided width, and adds the provided prefix and suffix to each wrapped line.
+// It recovers from wrapping panics and should never cause a panic.
+// It returns a slice of lines, without newlines at the end.
+//
+// Set includeFirst to true if the prefix and suffix should be applied to the first wrapped line as well
+func wrapLine(line string, width int, prefix, suffix string, includeFirst bool) []string {
+	// Anonymous function to allow recovery from potential WordWrap panic
+	var ret []string
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				// Use unwrapped line instead
+				if includeFirst {
+					ret = []string{prefix + line + suffix}
+				} else {
+					ret = []string{line}
+				}
+			}
+		}()
+
+		wrapped := cview.WordWrap(line, width)
+		for i := range wrapped {
+			if !includeFirst && i == 0 {
+				continue
+			}
+			wrapped[i] = prefix + wrapped[i] + suffix
+		}
+		ret = wrapped
+	}()
+	return ret
+}
+
 // convertRegularGemini converts non-preformatted blocks of text/gemini
 // into a cview-compatible format.
 // It also returns a slice of link URLs.
@@ -33,25 +65,15 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 			// Headings
 			if viper.GetBool("a-general.color") {
 				if strings.HasPrefix(lines[i], "###") {
-					lines[i] = "[fuchsia::b]" + lines[i] + "[-::-]"
-				}
-				if strings.HasPrefix(lines[i], "##") {
-					lines[i] = "[lime::b]" + lines[i] + "[-::-]"
-				}
-				if strings.HasPrefix(lines[i], "#") {
-					lines[i] = "[red::b]" + lines[i] + "[-::-]"
+					wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "[fuchsia::b]", "[-::-]", true)...)
+				} else if strings.HasPrefix(lines[i], "##") {
+					wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "[lime::b]", "[-::-]", true)...)
+				} else if strings.HasPrefix(lines[i], "#") {
+					wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "[red::b]", "[-::-]", true)...)
 				}
 			} else {
 				// Just bold, no colors
-				if strings.HasPrefix(lines[i], "###") {
-					lines[i] = "[::b]" + lines[i] + "[::-]"
-				}
-				if strings.HasPrefix(lines[i], "##") {
-					lines[i] = "[::b]" + lines[i] + "[::-]"
-				}
-				if strings.HasPrefix(lines[i], "#") {
-					lines[i] = "[::b]" + lines[i] + "[::-]"
-				}
+				wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "[::b]", "[-::-]", true)...)
 			}
 
 			// Links
@@ -82,78 +104,67 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 
 			links = append(links, url)
 
+			// Wrap and add link text
+
+			// Wrap the link text, but add some spaces to indent the wrapped lines past the link number
+			wrappedLink := wrapLine(linkText, width,
+				strings.Repeat(" ", len(strconv.Itoa(numLinks+len(links)))+4), // +4 for spaces and brackets
+				"",
+				false, // Don't indent the first line, it's the one with link number
+			)
+
+			// Set the style tags
+			// Add them to the first line
+
 			if viper.GetBool("a-general.color") {
 				pU, err := urlPkg.Parse(url)
 				if err == nil && (pU.Scheme == "" || pU.Scheme == "gemini" || pU.Scheme == "about") {
 					// A gemini link
 					// Add the link text in blue (in a region), and a gray link number to the left of it
-					lines[i] = `[silver::b][` + strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
-						`[dodgerblue]["` + strconv.Itoa(numLinks+len(links)-1) + `"]` + linkText + `[""][-]`
+					wrappedLink[0] = `[silver::b][` + strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
+						`[dodgerblue]["` + strconv.Itoa(numLinks+len(links)-1) + `"]` +
+						wrappedLink[0]
 				} else {
 					// Not a gemini link, use purple instead
-					lines[i] = `[silver::b][` + strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
-						`[#8700d7]["` + strconv.Itoa(numLinks+len(links)-1) + `"]` + linkText + `[""][-]`
+					wrappedLink[0] = `[silver::b][` + strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
+						`[#8700d7]["` + strconv.Itoa(numLinks+len(links)-1) + `"]` +
+						wrappedLink[0]
 				}
 			} else {
 				// No colours allowed
-				lines[i] = `[::b][` + strconv.Itoa(numLinks+len(links)) + "[][::-]  " +
-					`["` + strconv.Itoa(numLinks+len(links)-1) + `"]` + linkText + `[""]`
+				wrappedLink[0] = `[::b][` + strconv.Itoa(numLinks+len(links)) + "[][::-]  " +
+					`["` + strconv.Itoa(numLinks+len(links)-1) + `"]` +
+					wrappedLink[0]
 			}
+
+			wrappedLink[len(wrappedLink)-1] += `[""][-]` // Close region and formatting at the end
+
+			wrappedLines = append(wrappedLines, wrappedLink...)
 
 			// Lists
 		} else if strings.HasPrefix(lines[i], "* ") {
 			if viper.GetBool("a-general.bullets") {
-				lines[i] = " \u2022" + lines[i][1:]
+				// Wrap list item, and indent wrapped lines past the bullet
+				wrappedItem := wrapLine(lines[i][1:], width, "   ", "", false)
+				// Add bullet
+				wrappedItem[0] = " \u2022" + wrappedItem[0]
+				wrappedLines = append(wrappedLines, wrappedItem...)
 			}
 			// Optionally list lines could be colored here too, if color is enabled
-		}
+		} else if strings.HasPrefix(lines[i], ">") {
+			// It's a quote line, add extra quote symbols and italics to the start of each wrapped line
 
-		// Final processing of each line: wrapping
+			// Remove beginning quote and maybe space
+			lines[i] = strings.TrimPrefix(lines[i], ">")
+			lines[i] = strings.TrimPrefix(lines[i], " ")
+			wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "> [::i]", "[::-]", true)...)
 
-		if strings.TrimSpace(lines[i]) == "" {
+		} else if strings.TrimSpace(lines[i]) == "" {
 			// Just add empty line without processing
 			wrappedLines = append(wrappedLines, "")
 		} else {
-			if (strings.HasPrefix(lines[i], "[silver::b]") && viper.GetBool("a-general.color")) || strings.HasPrefix(lines[i], "[::b]") {
-				// It's a link line, so don't wrap it
-				wrappedLines = append(wrappedLines, lines[i])
-			} else if strings.HasPrefix(lines[i], ">") {
-				// It's a quote line, add extra quote symbols to the start of each wrapped line
-
-				// Remove beginning quote and maybe space
-				lines[i] = strings.TrimPrefix(lines[i], ">")
-				lines[i] = strings.TrimPrefix(lines[i], " ")
-
-				// Text is also made italic, lower down in code
-
-				// Anonymous function to allow recovery from potential WordWrap panic
-				func() {
-					defer func() {
-						if r := recover(); r != nil {
-							// Add unwrapped line instead
-							wrappedLines = append(wrappedLines, "> [::i]"+lines[i]+"[::-]")
-						}
-					}()
-
-					temp := cview.WordWrap(lines[i], width)
-					for i := range temp {
-						temp[i] = "> [::i]" + temp[i] + "[::-]"
-					}
-					wrappedLines = append(wrappedLines, temp...)
-				}()
-			} else {
-				// Anonymous function to allow recovery from potential WordWrap panic
-				func() {
-					defer func() {
-						if r := recover(); r != nil {
-							// Add unwrapped line instead
-							wrappedLines = append(wrappedLines, lines[i])
-						}
-					}()
-
-					wrappedLines = append(wrappedLines, cview.WordWrap(lines[i], width)...)
-				}()
-			}
+			// Regular line, just wrap it
+			wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "", "", true)...)
 		}
 	}
 

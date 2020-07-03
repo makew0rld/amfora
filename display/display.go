@@ -6,6 +6,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
@@ -71,7 +72,9 @@ var layout = cview.NewFlex().
 
 var renderedNewTabContent string
 var newTabLinks []string
-var newTabPage structs.Page
+var newTabPage *structs.Page
+
+var reformatMuts = make(map[int]*sync.Mutex) // Mutex for each tab
 
 var App = cview.NewApplication().
 	EnableMouse(false).
@@ -82,7 +85,12 @@ var App = cview.NewApplication().
 		termH = height
 
 		// Make sure the current tab content is reformatted when the terminal size changes
-		reformatAndDisplayPage(tabMap[curTab])
+		go func(tab int) {
+			reformatMuts[tab].Lock() // Only one reformat job per tab
+			defer reformatMuts[tab].Unlock()
+			// Use the current tab, but don't affect other tabs if the user switches tabs
+			reformatAndDisplayPage(tab, tabMap[tab])
+		}(curTab)
 	})
 
 func Init() {
@@ -194,12 +202,12 @@ func Init() {
 
 	// Render the default new tab content ONCE and store it for later
 	renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
-	newTabPage = structs.Page{
+	newTabPage = &structs.Page{
 		Raw:     newTabContent,
 		Content: renderedNewTabContent,
 		Links:   newTabLinks,
 		Url:     "about:newtab",
-		Width:   termW,
+		Width:   -1, // Force reformatting on first display
 	}
 
 	modalInit()
@@ -358,7 +366,9 @@ func NewTab() {
 	selectedLink = ""
 
 	curTab = NumTabs()
-	tabMap[curTab] = &newTabPage
+	reformatPage(newTabPage)
+	tabMap[curTab] = newTabPage
+	reformatMuts[curTab] = &sync.Mutex{}
 	tabViews[curTab] = cview.NewTextView().
 		SetDynamicColors(true).
 		SetRegions(true).
@@ -462,6 +472,7 @@ func CloseTab() {
 	delete(tabMap, curTab)
 	tabPages.RemovePage(strconv.Itoa(curTab))
 	delete(tabViews, curTab)
+	delete(reformatMuts, curTab)
 
 	delete(tabHist, curTab)
 	delete(tabHistPos, curTab)
@@ -505,7 +516,7 @@ func SwitchTab(tab int) {
 	}
 
 	curTab = tab % NumTabs()
-	reformatAndDisplayPage(tabMap[curTab])
+	reformatAndDisplayPage(curTab, tabMap[curTab])
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
 
@@ -536,7 +547,7 @@ func URL(u string) {
 		return
 	}
 	if u == "about:newtab" {
-		setPage(&newTabPage)
+		setPage(newTabPage)
 		return
 	}
 	if strings.HasPrefix(u, "about:") {

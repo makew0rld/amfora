@@ -35,6 +35,8 @@ func main() {
 	display.Init()
 
 	display.NewTab()
+	display.NewTab() // Open extra tab and close it to fully initialize the app and wrapping
+	display.CloseTab()
 	if len(os.Args[1:]) > 0 {
 		display.URL(os.Args[1])
 	}

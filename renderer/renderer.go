@@ -21,7 +21,7 @@ import (
 //
 // Since this only works on non-preformatted blocks, RenderGemini
 // should always be used instead.
-func convertRegularGemini(s string, numLinks int, width int) (string, []string) {
+func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 	links := make([]string, 0)
 	lines := strings.Split(s, "\n")
 	wrappedLines := make([]string, 0) // Final result
@@ -162,7 +162,10 @@ func convertRegularGemini(s string, numLinks int, width int) (string, []string) 
 
 // RenderGemini converts text/gemini into a cview displayable format.
 // It also returns a slice of link URLs.
-func RenderGemini(s string, width int) (string, []string) {
+//
+// width is the number of columns to wrap to.
+// leftMargin is the number of blank spaces to prepend to each line.
+func RenderGemini(s string, width, leftMargin int) (string, []string) {
 	s = cview.Escape(s)
 	if viper.GetBool("a-general.color") {
 		s = cview.TranslateANSI(s)
@@ -204,6 +207,14 @@ func RenderGemini(s string, width int) (string, []string) {
 		ren, lks := convertRegularGemini(buf, len(links), width)
 		links = append(links, lks...)
 		rendered += ren
+	}
+
+	if leftMargin > 0 {
+		renLines := strings.Split(rendered, "\n")
+		for i := range renLines {
+			renLines[i] = strings.Repeat(" ", leftMargin) + renLines[i]
+		}
+		return strings.Join(renLines, "\n"), links
 	}
 
 	return rendered, links

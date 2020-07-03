@@ -81,16 +81,8 @@ var App = cview.NewApplication().
 		termW = width
 		termH = height
 
-		// Shift new tabs created before app startup, when termW == 0
-		// XXX: This is hacky but works. The biggest issue is that there will sometimes be a tiny flash
-		// of the old not shifted tab on startup.
-		if tabMap[curTab] == &newTabPage {
-			renderedNewTabContent, _ = renderer.RenderGemini(newTabContent, textWidth())
-			newTabPage.Content = renderedNewTabContent
-			newTabPage.LeftMargin = 0
-			setLeftMargin(tabMap[curTab])
-			tabViews[curTab].SetText(tabMap[curTab].Content)
-		}
+		// Make sure the current tab content is reformatted when the terminal size changes
+		reformatAndDisplayPage(tabMap[curTab])
 	})
 
 func Init() {
@@ -201,8 +193,14 @@ func Init() {
 	})
 
 	// Render the default new tab content ONCE and store it for later
-	renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent, textWidth())
-	newTabPage = structs.Page{Content: renderedNewTabContent, Links: newTabLinks, Url: "about:newtab"}
+	renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
+	newTabPage = structs.Page{
+		Raw:     newTabContent,
+		Content: renderedNewTabContent,
+		Links:   newTabLinks,
+		Url:     "about:newtab",
+		Width:   termW,
+	}
 
 	modalInit()
 
@@ -361,7 +359,6 @@ func NewTab() {
 
 	curTab = NumTabs()
 	tabMap[curTab] = &newTabPage
-	setLeftMargin(tabMap[curTab])
 	tabViews[curTab] = cview.NewTextView().
 		SetDynamicColors(true).
 		SetRegions(true).
@@ -508,6 +505,7 @@ func SwitchTab(tab int) {
 	}
 
 	curTab = tab % NumTabs()
+	reformatAndDisplayPage(tabMap[curTab])
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
 
@@ -524,7 +522,6 @@ func Reload() {
 	}
 
 	cache.Remove(tabMap[curTab].Url)
-	tabMap[curTab].LeftMargin = 0 // Redo left margin
 	go handleURL(tabMap[curTab].Url)
 }
 

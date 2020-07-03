@@ -159,36 +159,36 @@ func followLink(prev, next string) {
 	}()
 }
 
-func setLeftMargin(p *structs.Page) {
-	lM := leftMargin()
-	if lM != p.LeftMargin {
-		// Left margin needs to be added or changed
-
-		var shifted string
-
-		if p.LeftMargin < 1 {
-			// The page content doesn't have a margin yet
-			lines := strings.Split(p.Content, "\n")
-			for i := range lines {
-				shifted += strings.Repeat(" ", lM) + lines[i] + "\n"
-			}
-		} else {
-			// Old margin needs to be removed, new one added
-			lines := strings.Split(p.Content, "\n")
-			for i := range lines {
-				shifted += strings.Repeat(" ", lM) + lines[i][p.LeftMargin:] + "\n"
-			}
-		}
-		p.Content = shifted
-		p.LeftMargin = lM
+// reformatPage will take the raw page content and reformat it according to the current terminal dimensions.
+// It should be called when the terminal size changes.
+// It will not waste resources if the passed page is already fitted to the current terminal width, and can be
+// called safely even when the page might be already formatted properly.
+func reformatPage(p *structs.Page) {
+	if p.Width == termW {
+		// No changes to make
+		return
 	}
+	// Links are not recorded because they won't change
+	rendered, _ := renderer.RenderGemini(p.Raw, textWidth(), leftMargin())
+	p.Content = rendered
+	p.Width = termW
+}
+
+// reformatAndDisplayPage is for reformatting a page that is already being displayed.
+// setPage should be used when a page is being loaded for the first time.
+func reformatAndDisplayPage(p *structs.Page) {
+	saveScroll()
+	reformatPage(tabMap[curTab])
+	tabViews[curTab].SetText(tabMap[curTab].Content)
+	applyScroll() // Go back to where you were, roughly
 }
 
 // setPage displays a Page on the current tab.
 func setPage(p *structs.Page) {
 	saveScroll() // Save the scroll of the previous page
 
-	setLeftMargin(p)
+	// Make sure the page content is fitted to the terminal every time it's displayed
+	reformatPage(p)
 
 	// Change page on screen
 	tabMap[curTab] = p
@@ -289,7 +289,8 @@ func handleURL(u string) (string, bool) {
 		return "", false
 	}
 	if renderer.CanDisplay(res) {
-		page, err := renderer.MakePage(u, res, textWidth())
+		page, err := renderer.MakePage(u, res, textWidth(), leftMargin())
+		page.Width = termW
 		if err != nil {
 			Error("Page Error", "Issuing creating page: "+err.Error())
 			// Set the bar back to original URL

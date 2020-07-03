@@ -70,13 +70,3 @@ func TestGet(t *testing.T) {
 		t.Error("page urls don't match")
 	}
 }
-
-func TestQueryString(t *testing.T) {
-	// Pages with URLs with query strings don't get added
-	reset()
-	Add(&queryPage)
-	_, ok := Get(queryPage.Url)
-	if ok {
-		t.Fatal("Get should not find the page, because it had query string")
-	}
-}

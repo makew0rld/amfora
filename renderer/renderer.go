@@ -13,6 +13,16 @@ import (
 	"gitlab.com/tslocum/cview"
 )
 
+// RenderPlainText should be used to format plain text pages.
+func RenderPlainText(s string, leftMargin int) string {
+	var shifted string
+	lines := strings.Split(cview.Escape(s), "\n")
+	for i := range lines {
+		shifted += strings.Repeat(" ", leftMargin) + lines[i] + "\n"
+	}
+	return shifted
+}
+
 // wrapLine wraps a line to the provided width, and adds the provided prefix and suffix to each wrapped line.
 // It recovers from wrapping panics and should never cause a panic.
 // It returns a slice of lines, without newlines at the end.

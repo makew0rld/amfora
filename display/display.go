@@ -203,11 +203,12 @@ func Init() {
 	// Render the default new tab content ONCE and store it for later
 	renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
 	newTabPage = &structs.Page{
-		Raw:     newTabContent,
-		Content: renderedNewTabContent,
-		Links:   newTabLinks,
-		Url:     "about:newtab",
-		Width:   -1, // Force reformatting on first display
+		Raw:       newTabContent,
+		Content:   renderedNewTabContent,
+		Links:     newTabLinks,
+		Url:       "about:newtab",
+		Width:     -1, // Force reformatting on first display
+		Mediatype: structs.TextGemini,
 	}
 
 	modalInit()

@@ -80,26 +80,20 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 	if mediatype == "text/gemini" {
 		rendered, links := RenderGemini(utfText, width, leftMargin)
 		return &structs.Page{
-			Url:     url,
-			Raw:     utfText,
-			Content: rendered,
-			Links:   links,
+			Mediatype: structs.TextGemini,
+			Url:       url,
+			Raw:       utfText,
+			Content:   rendered,
+			Links:     links,
 		}, nil
 	} else if strings.HasPrefix(mediatype, "text/") {
 		// Treated as plaintext
-
-		// Add left margin
-		var shifted string
-		lines := strings.Split(utfText, "\n")
-		for i := range lines {
-			shifted += strings.Repeat(" ", leftMargin) + lines[i] + "\n"
-		}
-
 		return &structs.Page{
-			Url:     url,
-			Raw:     utfText,
-			Content: shifted,
-			Links:   []string{},
+			Mediatype: structs.TextPlain,
+			Url:       url,
+			Raw:       utfText,
+			Content:   RenderPlainText(utfText, leftMargin),
+			Links:     []string{},
 		}, nil
 	}
 

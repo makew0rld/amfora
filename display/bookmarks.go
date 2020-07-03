@@ -106,11 +106,12 @@ func Bookmarks() {
 	// Render and display
 	content, links := renderer.RenderGemini(rawContent, textWidth(), leftMargin())
 	page := structs.Page{
-		Raw:     rawContent,
-		Content: content,
-		Links:   links,
-		Url:     "about:bookmarks",
-		Width:   termW,
+		Raw:       rawContent,
+		Content:   content,
+		Links:     links,
+		Url:       "about:bookmarks",
+		Width:     termW,
+		Mediatype: structs.TextGemini,
 	}
 	setPage(&page)
 }

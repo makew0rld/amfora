@@ -168,8 +168,17 @@ func reformatPage(p *structs.Page) {
 		// No changes to make
 		return
 	}
-	// Links are not recorded because they won't change
-	rendered, _ := renderer.RenderGemini(p.Raw, textWidth(), leftMargin())
+
+	var rendered string
+	if p.Mediatype == structs.TextGemini {
+		// Links are not recorded because they won't change
+		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin())
+	} else if p.Mediatype == structs.TextPlain {
+		rendered = renderer.RenderPlainText(p.Raw, leftMargin())
+	} else {
+		// Rendering this type is not implemented
+		return
+	}
 	p.Content = rendered
 	p.Width = termW
 }

@@ -89,7 +89,7 @@ var App = cview.NewApplication().
 			reformatMuts[tab].Lock() // Only one reformat job per tab
 			defer reformatMuts[tab].Unlock()
 			// Use the current tab, but don't affect other tabs if the user switches tabs
-			reformatAndDisplayPage(tab, tabMap[tab])
+			reformatPageAndSetView(tab, tabMap[tab])
 		}(curTab)
 	})
 
@@ -517,7 +517,7 @@ func SwitchTab(tab int) {
 	}
 
 	curTab = tab % NumTabs()
-	reformatAndDisplayPage(curTab, tabMap[curTab])
+	reformatPageAndSetView(curTab, tabMap[curTab])
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
 

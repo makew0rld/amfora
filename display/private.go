@@ -183,9 +183,9 @@ func reformatPage(p *structs.Page) {
 	p.Width = termW
 }
 
-// reformatAndDisplayPage is for reformatting a page that is already being displayed.
+// reformatPageAndSetView is for reformatting a page that is already being displayed.
 // setPage should be used when a page is being loaded for the first time.
-func reformatAndDisplayPage(tab int, p *structs.Page) {
+func reformatPageAndSetView(tab int, p *structs.Page) {
 	saveScroll()
 	reformatPage(p)
 	tabViews[tab].SetText(p.Content)

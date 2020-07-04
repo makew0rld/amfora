@@ -54,8 +54,9 @@ func textWidth() int {
 	return viper.GetInt("a-general.max_width")
 }
 
-// pathEscape is the same as url.PathEscape, but it also replaces the +.
-func pathEscape(path string) string {
+// queryEscape is the same as url.PathEscape, but it also replaces the +.
+// This is because Gemini requires percent-escaping for queries.
+func queryEscape(path string) string {
 	return strings.ReplaceAll(url.PathEscape(path), "+", "%2B")
 }
 
@@ -220,6 +221,10 @@ func setPage(p *structs.Page) {
 // If there is some error, it will return "".
 // The second returned item is a bool indicating if page content was displayed.
 // It returns false for Errors, other protocols, etc.
+//
+// TODO: Add tab number param - now the func only saves the values like the content
+// and bottom bar.
+// TODO: Some other func that constantly updates bottom bar values
 func handleURL(u string) (string, bool) {
 	defer App.Draw() // Just in case
 
@@ -324,7 +329,7 @@ func handleURL(u string) (string, bool) {
 		if ok {
 			// Make another request with the query string added
 			// + chars are replaced because PathEscape doesn't do that
-			parsed.RawQuery = pathEscape(userInput)
+			parsed.RawQuery = queryEscape(userInput)
 			if len(parsed.String()) > 1024 {
 				// 1024 is the max size for URLs in the spec
 				Error("Input Error", "URL for that input would be too long.")

@@ -172,7 +172,7 @@ func Init() {
 					// It's a full URL or search term
 					// Detect if it's a search or URL
 					if strings.Contains(query, " ") || (!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
-						u := viper.GetString("a-general.search") + "?" + pathEscape(query)
+						u := viper.GetString("a-general.search") + "?" + queryEscape(query)
 						cache.Remove(u) // Don't use the cached version of the search
 						URL(u)
 					} else {

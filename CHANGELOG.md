@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Link and heading lines are wrapped just like regular text lines
 - Wrapped list items are indented to stay behind the bullet (#35)
+- Certificate expiry date is stored when the cert IDs match (#39)
 
 ### Changed
 - Pages are rewrapped dynamically, whenever the terminal size changes (#33)

@@ -85,17 +85,22 @@ func handleTofu(domain, port string, cert *x509.Certificate) bool {
 		saveTofuEntry(domain, port, cert)
 		return true
 	}
-	if time.Now().After(expiry) {
-		// Old cert expired, so anything is valid
-		saveTofuEntry(domain, port, cert)
-		return true
-	}
 	if certID(cert) == id {
 		// Same cert as the one stored
+
+		// Store expiry again in case it changed
+		tofuStore.Set(expiryKey(domain, port), cert.NotAfter.UTC())
+		tofuStore.WriteConfig()
+
 		return true
 	}
 	if origCertID(cert) == id {
 		// Valid but uses old ID type
+		saveTofuEntry(domain, port, cert)
+		return true
+	}
+	if time.Now().After(expiry) {
+		// Old cert expired, so anything is valid
 		saveTofuEntry(domain, port, cert)
 		return true
 	}

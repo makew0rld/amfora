@@ -113,27 +113,27 @@ func Bookmarks() {
 		Width:     termW,
 		Mediatype: structs.TextGemini,
 	}
-	setPage(&page)
+	setPage(curTab, &page)
 }
 
 // addBookmark goes through the process of adding a bookmark for the current page.
 // It is the high-level way of doing it. It should be called in a goroutine.
 // It can also be called to edit an existing bookmark.
 func addBookmark() {
-	if !strings.HasPrefix(tabMap[curTab].Url, "gemini://") {
+	if !strings.HasPrefix(tabs[curTab].page.Url, "gemini://") {
 		// Can't make bookmarks for other kinds of URLs
 		return
 	}
 
-	name, exists := bookmarks.Get(tabMap[curTab].Url)
+	name, exists := bookmarks.Get(tabs[curTab].page.Url)
 	// Open a bookmark modal with the current name of the bookmark, if it exists
 	newName, action := openBkmkModal(name, exists)
 	switch action {
 	case 1:
 		// Add/change the bookmark
-		bookmarks.Set(tabMap[curTab].Url, newName)
+		bookmarks.Set(tabs[curTab].page.Url, newName)
 	case -1:
-		bookmarks.Remove(tabMap[curTab].Url)
+		bookmarks.Remove(tabs[curTab].page.Url)
 	}
 	// Other case is action = 0, meaning "Cancel", so nothing needs to happen
 }

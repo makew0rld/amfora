@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Pages are rewrapped dynamically, whenever the terminal size changes (#33)
 
+### Fixed
+- Many potential loading race conditions eliminated
+
 ## [1.2.0] - 2020-07-02
 ### Added
 - Alt-Left and Alt-Right for history navigation (#23)

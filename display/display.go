@@ -6,7 +6,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
@@ -16,18 +15,12 @@ import (
 	"gitlab.com/tslocum/cview"
 )
 
-var curTab = -1                          // What number tab is currently visible, -1 means there are no tabs at all
-var tabMap = make(map[int]*structs.Page) // Map of tab number to page
-// Holds the actual tab primitives
-var tabViews = make(map[int]*cview.TextView)
+var tabs []*tab // Slice of all the current browser tabs
+var curTab = -1 // What tab is currently visible - index for the tabs slice (-1 means there are no tabs)
 
 // Terminal dimensions
 var termW int
 var termH int
-
-// The link currently selected when in link selection mode
-// Set to "" when not in that mode
-var selectedLink string
 
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField().
@@ -74,8 +67,6 @@ var renderedNewTabContent string
 var newTabLinks []string
 var newTabPage *structs.Page
 
-var reformatMuts = make(map[int]*sync.Mutex) // Mutex for each tab
-
 var App = cview.NewApplication().
 	EnableMouse(false).
 	SetRoot(layout, true).
@@ -86,10 +77,10 @@ var App = cview.NewApplication().
 
 		// Make sure the current tab content is reformatted when the terminal size changes
 		go func(tab int) {
-			reformatMuts[tab].Lock() // Only one reformat job per tab
-			defer reformatMuts[tab].Unlock()
+			tabs[tab].reformatMut.Lock() // Only one reformat job per tab
+			defer tabs[tab].reformatMut.Unlock()
 			// Use the current tab, but don't affect other tabs if the user switches tabs
-			reformatPageAndSetView(tab, tabMap[tab])
+			reformatPageAndSetView(tab, tabs[tab].page)
 		}(curTab)
 	})
 
@@ -109,6 +100,8 @@ func Init() {
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
 		defer bottomBar.SetLabel("")
 
+		tab := curTab
+
 		switch key {
 		case tcell.KeyEnter:
 			// Figure out whether it's a URL, link number, or search
@@ -118,21 +111,23 @@ func Init() {
 
 			if strings.TrimSpace(query) == "" {
 				// Ignore
-				bottomBar.SetText(tabMap[curTab].Url)
-				App.SetFocus(tabViews[curTab])
+				bottomBar.SetText(tabs[tab].page.Url)
+				tabs[tab].saveBottomBar() // Store new bottomBar text
+				App.SetFocus(tabs[tab].view)
 				return
 			}
-			if query == ".." && tabHasContent() {
+			if query == ".." && tabs[tab].hasContent() {
 				// Go up a directory
-				parsed, err := url.Parse(tabMap[curTab].Url)
+				parsed, err := url.Parse(tabs[tab].page.Url)
 				if err != nil {
 					// This shouldn't occur
 					return
 				}
 				if parsed.Path == "/" {
 					// Can't go up further
-					bottomBar.SetText(tabMap[curTab].Url)
-					App.SetFocus(tabViews[curTab])
+					bottomBar.SetText(tabs[tab].page.Url)
+					tabs[tab].saveBottomBar()
+					App.SetFocus(tabs[tab].view)
 					return
 				}
 
@@ -154,13 +149,13 @@ func Init() {
 					if err != nil {
 						return
 					}
-					if i <= len(tabMap[curTab].Links) && i > 0 {
+					if i <= len(tabs[tab].page.Links) && i > 0 {
 						// Open new tab and load link
-						oldTab := curTab
+						oldTab := tab
 						NewTab()
 						// Resolve and follow link manually
-						prevParsed, _ := url.Parse(tabMap[oldTab].Url)
-						nextParsed, err := url.Parse(tabMap[oldTab].Links[i-1])
+						prevParsed, _ := url.Parse(tabs[oldTab].page.Url)
+						nextParsed, err := url.Parse(tabs[oldTab].page.Links[i-1])
 						if err != nil {
 							Error("URL Error", "link URL could not be parsed")
 							return
@@ -183,19 +178,21 @@ func Init() {
 					return
 				}
 			}
-			if i <= len(tabMap[curTab].Links) && i > 0 {
+			if i <= len(tabs[tab].page.Links) && i > 0 {
 				// It's a valid link number
-				followLink(tabMap[curTab].Url, tabMap[curTab].Links[i-1])
+				followLink(tab, tabs[tab].page.Url, tabs[tab].page.Links[i-1])
 				return
 			}
 			// Invalid link number, don't do anything
-			bottomBar.SetText(tabMap[curTab].Url)
-			App.SetFocus(tabViews[curTab])
+			bottomBar.SetText(tabs[tab].page.Url)
+			tabs[tab].saveBottomBar()
+			App.SetFocus(tabs[tab].view)
 
 		case tcell.KeyEscape:
 			// Set back to what it was
-			bottomBar.SetText(tabMap[curTab].Url)
-			App.SetFocus(tabViews[curTab])
+			bottomBar.SetText(tabs[tab].page.Url)
+			tabs[tab].saveBottomBar()
+			App.SetFocus(tabs[tab].view)
 		}
 		// Other potential keys are Tab and Backtab, they are ignored
 	})
@@ -241,16 +238,16 @@ func Init() {
 
 		switch event.Key() {
 		case tcell.KeyCtrlT:
-			if selectedLink == "" {
-				NewTab()
-			} else {
-				next, err := resolveRelLink(tabMap[curTab].Url, selectedLink)
+			if tabs[curTab].mode == modeLinkSelect {
+				next, err := resolveRelLink(curTab, tabs[curTab].page.Url, tabs[curTab].selected)
 				if err != nil {
 					Error("URL Error", err.Error())
 					return nil
 				}
 				NewTab()
 				URL(next)
+			} else {
+				NewTab()
 			}
 			return nil
 		case tcell.KeyCtrlW:
@@ -267,16 +264,16 @@ func Init() {
 			return nil
 		case tcell.KeyCtrlB:
 			Bookmarks()
-			addToHist("about:bookmarks")
+			tabs[curTab].addToHistory("about:bookmarks")
 			return nil
 		case tcell.KeyCtrlD:
 			go addBookmark()
 			return nil
 		case tcell.KeyPgUp:
-			pageUp()
+			tabs[curTab].pageUp()
 			return nil
 		case tcell.KeyPgDn:
-			pageDown()
+			tabs[curTab].pageDown()
 			return nil
 		case tcell.KeyRune:
 			// Regular key was sent
@@ -285,6 +282,7 @@ func Init() {
 				// Space starts typing, like Bombadillo
 				bottomBar.SetLabel("[::b]URL/Num./Search: [::-]")
 				bottomBar.SetText("")
+				// Don't save bottom bar, so that whenever you switch tabs, it's not in that mode
 				App.SetFocus(bottomBar)
 				return nil
 			case "q":
@@ -303,10 +301,10 @@ func Init() {
 				Help()
 				return nil
 			case "u":
-				pageUp()
+				tabs[curTab].pageUp()
 				return nil
 			case "d":
-				pageDown()
+				tabs[curTab].pageDown()
 				return nil
 
 			// Shift+NUMBER keys, for switching to a specific tab
@@ -355,87 +353,31 @@ func Stop() {
 // NewTab opens a new tab and switches to it, displaying the
 // the default empty content because there's no URL.
 func NewTab() {
-	// Create TextView in tabViews and change curTab
-	// Set the textView options, and the changed func to App.Draw()
+	// Create TextView and change curTab
+	// Set the TextView options, and the changed func to App.Draw()
 	// SetDoneFunc to do link highlighting
 	// Add view to pages and switch to it
 
-	// But first, turn off link selecting mode in the current tab
+	// Process current tab before making a new one
 	if curTab > -1 {
-		tabViews[curTab].Highlight("")
+		// Turn off link selecting mode in the current tab
+		tabs[curTab].view.Highlight("")
+		// Save bottomBar state
+		tabs[curTab].saveBottomBar()
 	}
-	selectedLink = ""
 
 	curTab = NumTabs()
 	reformatPage(newTabPage)
-	tabMap[curTab] = newTabPage
-	reformatMuts[curTab] = &sync.Mutex{}
-	tabViews[curTab] = cview.NewTextView().
-		SetDynamicColors(true).
-		SetRegions(true).
-		SetScrollable(true).
-		SetWrap(false).
-		SetText(tabMap[curTab].Content).
-		ScrollToBeginning().
-		SetChangedFunc(func() {
-			App.Draw()
-		}).
-		SetDoneFunc(func(key tcell.Key) {
-			// Altered from: https://gitlab.com/tslocum/cview/-/blob/master/demos/textview/main.go
-			// Handles being able to select and "click" links with the enter and tab keys
 
-			if key == tcell.KeyEsc {
-				// Stop highlighting
-				tabViews[curTab].Highlight("")
-				bottomBar.SetLabel("")
-				bottomBar.SetText(tabMap[curTab].Url)
-				selectedLink = ""
-			}
+	tabs[curTab] = makeNewTab()
+	tabs[curTab].page = newTabPage
 
-			currentSelection := tabViews[curTab].GetHighlights()
-			numSelections := len(tabMap[curTab].Links)
-
-			if key == tcell.KeyEnter {
-				if len(currentSelection) > 0 && len(tabMap[curTab].Links) > 0 {
-					// A link was selected, "click" it and load the page it's for
-					bottomBar.SetLabel("")
-					selectedLink = ""
-					linkN, _ := strconv.Atoi(currentSelection[0])
-					followLink(tabMap[curTab].Url, tabMap[curTab].Links[linkN])
-					return
-				} else {
-					tabViews[curTab].Highlight("0").ScrollToHighlight()
-					// Display link URL in bottomBar
-					bottomBar.SetLabel("[::b]Link: [::-]")
-					bottomBar.SetText(tabMap[curTab].Links[0])
-					selectedLink = tabMap[curTab].Links[0]
-				}
-			} else if len(currentSelection) > 0 {
-				// There's still a selection, but a different key was pressed, not Enter
-
-				index, _ := strconv.Atoi(currentSelection[0])
-				if key == tcell.KeyTab {
-					index = (index + 1) % numSelections
-				} else if key == tcell.KeyBacktab {
-					index = (index - 1 + numSelections) % numSelections
-				} else {
-					return
-				}
-				tabViews[curTab].Highlight(strconv.Itoa(index)).ScrollToHighlight()
-				// Display link URL in bottomBar
-				bottomBar.SetLabel("[::b]Link: [::-]")
-				bottomBar.SetText(tabMap[curTab].Links[index])
-				selectedLink = tabMap[curTab].Links[index]
-			}
-		})
-
-	tabHist[curTab] = []string{}
 	// Can't go backwards, but this isn't the first page either.
 	// The first page will be the next one the user goes to.
-	tabHistPos[curTab] = -1
+	tabs[curTab].history.pos = -1
 
-	tabPages.AddAndSwitchToPage(strconv.Itoa(curTab), tabViews[curTab], true)
-	App.SetFocus(tabViews[curTab])
+	tabPages.AddAndSwitchToPage(strconv.Itoa(curTab), tabs[curTab].view, true)
+	App.SetFocus(tabs[curTab].view)
 
 	// Add tab number to the actual place where tabs are show on the screen
 	// Tab regions are 0-indexed but text displayed on the screen starts at 1
@@ -448,6 +390,7 @@ func NewTab() {
 
 	bottomBar.SetLabel("")
 	bottomBar.SetText("")
+	tabs[curTab].saveBottomBar()
 
 	// Draw just in case
 	App.Draw()
@@ -470,13 +413,8 @@ func CloseTab() {
 		return
 	}
 
-	delete(tabMap, curTab)
+	tabs = tabs[:len(tabs)-1]
 	tabPages.RemovePage(strconv.Itoa(curTab))
-	delete(tabViews, curTab)
-	delete(reformatMuts, curTab)
-
-	delete(tabHist, curTab)
-	delete(tabHistPos, curTab)
 
 	if curTab <= 0 {
 		curTab = NumTabs() - 1
@@ -498,8 +436,8 @@ func CloseTab() {
 	}
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
 
-	bottomBar.SetLabel("")
-	bottomBar.SetText(tabMap[curTab].Url)
+	// Set previous tab's bottomBar state
+	tabs[curTab].applyBottomBar()
 
 	// Just in case
 	App.Draw()
@@ -516,25 +454,37 @@ func SwitchTab(tab int) {
 		tab = NumTabs() - 1
 	}
 
+	// Save current tab attributes
+	if curTab > -1 {
+		// Save bottomBar state
+		tabs[curTab].saveBottomBar()
+	}
+
 	curTab = tab % NumTabs()
-	reformatPageAndSetView(curTab, tabMap[curTab])
+
+	// Display tab
+	reformatPageAndSetView(curTab, tabs[curTab].page)
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
-
-	bottomBar.SetLabel("")
-	bottomBar.SetText(tabMap[curTab].Url)
+	tabs[curTab].applyBottomBar()
 
 	// Just in case
 	App.Draw()
 }
 
 func Reload() {
-	if !tabHasContent() {
+	if !tabs[curTab].hasContent() {
 		return
 	}
 
-	cache.Remove(tabMap[curTab].Url)
-	go handleURL(tabMap[curTab].Url)
+	cache.Remove(tabs[curTab].page.Url)
+	go func(tab int) {
+		handleURL(tab, tabs[tab].page.Url) // goURL is not used bc history shouldn't be added to
+		if tab == curTab {
+			// Display the bottomBar state that handleURL set
+			tabs[tab].applyBottomBar()
+		}
+	}(curTab)
 }
 
 // URL loads and handles the provided URL for the current tab.
@@ -544,11 +494,11 @@ func URL(u string) {
 
 	if u == "about:bookmarks" {
 		Bookmarks()
-		addToHist("about:bookmarks")
+		tabs[curTab].addToHistory("about:bookmarks")
 		return
 	}
 	if u == "about:newtab" {
-		setPage(newTabPage)
+		setPage(curTab, newTabPage)
 		return
 	}
 	if strings.HasPrefix(u, "about:") {
@@ -556,14 +506,9 @@ func URL(u string) {
 		return
 	}
 
-	go func() {
-		final, displayed := handleURL(u)
-		if displayed {
-			addToHist(final)
-		}
-	}()
+	go goURL(curTab, u)
 }
 
 func NumTabs() int {
-	return len(tabViews)
+	return len(tabs)
 }

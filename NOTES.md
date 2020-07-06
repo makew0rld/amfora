@@ -1,6 +1,12 @@
 # Notes
 
 - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
+- Switch to UUIDs for each tab maybe? So that if `handleURL` completes after the tab is closed (and reopened) it doesn't go anywhere
+  - New UUID every time a new page is loaded?
+
+## Bugs
+- Can't go back or do other things while page is loading - need a way to stop `handleURL`
+- `handleURL` will reference a tab that doesn't exist and cause a panic if the tab is closed
 
 ## Upstream Bugs
 - Wrapping messes up on brackets

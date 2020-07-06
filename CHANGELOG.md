@@ -9,12 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Link and heading lines are wrapped just like regular text lines
 - Wrapped list items are indented to stay behind the bullet (#35)
 - Certificate expiry date is stored when the cert IDs match (#39)
+- What link was selected is remembered as you browse through history
 
 ### Changed
 - Pages are rewrapped dynamically, whenever the terminal size changes (#33)
 
 ### Fixed
-- Many potential loading race conditions eliminated
+- Many potential network and display race conditions eliminated
+- Whether a tab is loading stays indicated when you switch away from it and go back
 
 ## [1.2.0] - 2020-07-02
 ### Added

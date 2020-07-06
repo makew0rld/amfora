@@ -71,7 +71,7 @@ func followLink(tab int, prev, next string) {
 
 	// Copied from URL()
 	if next == "about:bookmarks" {
-		Bookmarks()
+		Bookmarks(tab)
 		tabs[tab].addToHistory("about:bookmarks")
 		return
 	}
@@ -190,7 +190,7 @@ func handleURL(tab int, u string) (string, bool) {
 
 	// To allow linking to the bookmarks page, and history browsing
 	if u == "about:bookmarks" {
-		Bookmarks()
+		Bookmarks(tab)
 		return "about:bookmarks", true
 	}
 
@@ -241,9 +241,14 @@ func handleURL(tab int, u string) (string, bool) {
 	// Otherwise download it
 	bottomBar.SetText("Loading...")
 	tabs[tab].barText = "Loading..." // Save it too, in case the tab switches during loading
+	tabs[tab].mode = tabModeLoading
+	defer func(t int) {
+		tabs[t].mode = tabModeDone
+	}(tab)
 	App.Draw()
 
 	res, err := client.Fetch(u)
+
 	if err == client.ErrTofu {
 		if Tofu(parsed.Host) {
 			// They want to continue anyway
@@ -270,7 +275,7 @@ func handleURL(tab int, u string) (string, bool) {
 			tabs[tab].barText = tabs[tab].page.Url
 			return "", false
 		}
-		cache.Add(page)
+		go cache.Add(page)
 		setPage(tab, page)
 		return u, true
 	}

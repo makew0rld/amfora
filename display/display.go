@@ -224,87 +224,99 @@ func Init() {
 			return event
 		}
 
-		// History arrow keys
-		if event.Modifiers() == tcell.ModAlt {
-			if event.Key() == tcell.KeyLeft {
-				histBack()
-				return nil
-			}
-			if event.Key() == tcell.KeyRight {
-				histForward()
-				return nil
-			}
-		}
+		if tabs[curTab].mode == tabModeDone {
+			// All the keys and operations that can only work while NOT loading
 
-		switch event.Key() {
-		case tcell.KeyCtrlT:
-			if tabs[curTab].mode == modeLinkSelect {
-				next, err := resolveRelLink(curTab, tabs[curTab].page.Url, tabs[curTab].selected)
-				if err != nil {
-					Error("URL Error", err.Error())
+			// History arrow keys
+			if event.Modifiers() == tcell.ModAlt {
+				if event.Key() == tcell.KeyLeft {
+					histBack()
 					return nil
 				}
-				NewTab()
-				URL(next)
-			} else {
-				NewTab()
+				if event.Key() == tcell.KeyRight {
+					histForward()
+					return nil
+				}
 			}
-			return nil
+
+			switch event.Key() {
+			case tcell.KeyCtrlT:
+				if tabs[curTab].page.Mode == structs.ModeLinkSelect {
+					next, err := resolveRelLink(curTab, tabs[curTab].page.Url, tabs[curTab].page.Selected)
+					if err != nil {
+						Error("URL Error", err.Error())
+						return nil
+					}
+					NewTab()
+					URL(next)
+				} else {
+					NewTab()
+				}
+				return nil
+			case tcell.KeyCtrlR:
+				Reload()
+				return nil
+			case tcell.KeyCtrlH:
+				URL(viper.GetString("a-general.home"))
+				return nil
+			case tcell.KeyCtrlB:
+				Bookmarks(curTab)
+				tabs[curTab].addToHistory("about:bookmarks")
+				return nil
+			case tcell.KeyCtrlD:
+				go addBookmark()
+				return nil
+			case tcell.KeyPgUp:
+				tabs[curTab].pageUp()
+				return nil
+			case tcell.KeyPgDn:
+				tabs[curTab].pageDown()
+				return nil
+			case tcell.KeyRune:
+				// Regular key was sent
+				switch string(event.Rune()) {
+				case " ":
+					// Space starts typing, like Bombadillo
+					bottomBar.SetLabel("[::b]URL/Num./Search: [::-]")
+					bottomBar.SetText("")
+					// Don't save bottom bar, so that whenever you switch tabs, it's not in that mode
+					App.SetFocus(bottomBar)
+					return nil
+				case "R":
+					Reload()
+					return nil
+				case "b":
+					histBack()
+					return nil
+				case "f":
+					histForward()
+					return nil
+				case "u":
+					tabs[curTab].pageUp()
+					return nil
+				case "d":
+					tabs[curTab].pageDown()
+					return nil
+				}
+			}
+		}
+		// All the keys and operations that can work while a tab IS loading
+
+		switch event.Key() {
 		case tcell.KeyCtrlW:
 			CloseTab()
-			return nil
-		case tcell.KeyCtrlR:
-			Reload()
-			return nil
-		case tcell.KeyCtrlH:
-			URL(viper.GetString("a-general.home"))
 			return nil
 		case tcell.KeyCtrlQ:
 			Stop()
 			return nil
-		case tcell.KeyCtrlB:
-			Bookmarks()
-			tabs[curTab].addToHistory("about:bookmarks")
-			return nil
-		case tcell.KeyCtrlD:
-			go addBookmark()
-			return nil
-		case tcell.KeyPgUp:
-			tabs[curTab].pageUp()
-			return nil
-		case tcell.KeyPgDn:
-			tabs[curTab].pageDown()
-			return nil
 		case tcell.KeyRune:
 			// Regular key was sent
 			switch string(event.Rune()) {
-			case " ":
-				// Space starts typing, like Bombadillo
-				bottomBar.SetLabel("[::b]URL/Num./Search: [::-]")
-				bottomBar.SetText("")
-				// Don't save bottom bar, so that whenever you switch tabs, it's not in that mode
-				App.SetFocus(bottomBar)
-				return nil
 			case "q":
 				Stop()
 				return nil
-			case "R":
-				Reload()
-				return nil
-			case "b":
-				histBack()
-				return nil
-			case "f":
-				histForward()
-				return nil
 			case "?":
 				Help()
-				return nil
-			case "u":
-				tabs[curTab].pageUp()
-				return nil
-			case "d":
-				tabs[curTab].pageDown()
 				return nil
 
 			// Shift+NUMBER keys, for switching to a specific tab
@@ -340,6 +352,8 @@ func Init() {
 				return nil
 			}
 		}
+
+		// Let another element handle the event, it's not a special global key
 		return event
 	})
 }
@@ -367,10 +381,9 @@ func NewTab() {
 	}
 
 	curTab = NumTabs()
-	reformatPage(newTabPage)
 
-	tabs[curTab] = makeNewTab()
-	tabs[curTab].page = newTabPage
+	tabs = append(tabs, makeNewTab())
+	setPage(curTab, newTabPage)
 
 	// Can't go backwards, but this isn't the first page either.
 	// The first page will be the next one the user goes to.
@@ -436,8 +449,11 @@ func CloseTab() {
 	}
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
 
-	// Set previous tab's bottomBar state
+	// Restore previous tab's state
+	tabs[curTab].applySelected()
 	tabs[curTab].applyBottomBar()
+
+	App.SetFocus(tabs[curTab].view)
 
 	// Just in case
 	App.Draw()
@@ -466,7 +482,10 @@ func SwitchTab(tab int) {
 	reformatPageAndSetView(curTab, tabs[curTab].page)
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
+	tabs[curTab].applySelected()
 	tabs[curTab].applyBottomBar()
+
+	App.SetFocus(tabs[curTab].view)
 
 	// Just in case
 	App.Draw()
@@ -493,7 +512,7 @@ func URL(u string) {
 	// Some code is copied in followLink()
 
 	if u == "about:bookmarks" {
-		Bookmarks()
+		Bookmarks(curTab)
 		tabs[curTab].addToHistory("about:bookmarks")
 		return
 	}

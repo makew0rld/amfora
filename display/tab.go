@@ -13,11 +13,10 @@ import (
 type tabMode int
 
 const (
-	modeOff        tabMode = iota // Regular mode
-	modeLinkSelect                // When the enter key is pressed, allow for tab-based link navigation
+	tabModeDone tabMode = iota
+	tabModeLoading
 )
 
-// tabHist holds the history for a tab.
 type tabHistory struct {
 	urls []string
 	pos  int // Position: where in the list of URLs we are
@@ -27,11 +26,9 @@ type tabHistory struct {
 type tab struct {
 	page        *structs.Page
 	view        *cview.TextView
-	mode        tabMode
 	history     *tabHistory
+	mode        tabMode
 	reformatMut *sync.Mutex // Mutex for reformatting, so there's only one reformat job at once
-	selected    string      // The current text or link selected
-	selectedID  string      // The cview region ID for the selected text/link
 	barLabel    string      // The bottomBar label for the tab
 	barText     string      // The bottomBar text for the tab
 }
@@ -39,7 +36,7 @@ type tab struct {
 // makeNewTab initializes an tab struct with no content.
 func makeNewTab() *tab {
 	t := tab{
-		page: &structs.Page{},
+		page: &structs.Page{Mode: structs.ModeOff},
 		view: cview.NewTextView().
 			SetDynamicColors(true).
 			SetRegions(true).
@@ -48,9 +45,9 @@ func makeNewTab() *tab {
 			SetChangedFunc(func() {
 				App.Draw()
 			}),
-		mode:        modeOff,
 		history:     &tabHistory{},
 		reformatMut: &sync.Mutex{},
+		mode:        tabModeDone,
 	}
 	t.view.SetDoneFunc(func(key tcell.Key) {
 		// Altered from: https://gitlab.com/tslocum/cview/-/blob/master/demos/textview/main.go
@@ -58,34 +55,43 @@ func makeNewTab() *tab {
 
 		tab := curTab // Don't let it change in the middle of the code
 
-		defer tabs[tab].saveBottomBar()
-
-		if key == tcell.KeyEsc {
+		if key == tcell.KeyEsc && tabs[tab].mode == tabModeDone {
 			// Stop highlighting
-			tabs[tab].view.Highlight("")
 			bottomBar.SetLabel("")
 			bottomBar.SetText(tabs[tab].page.Url)
-			tabs[tab].mode = modeOff
+			tabs[tab].clearSelected()
+			tabs[tab].saveBottomBar()
+			return
+		}
+
+		if len(tabs[tab].page.Links) <= 0 {
+			// No links on page
+			return
 		}
 
 		currentSelection := tabs[tab].view.GetHighlights()
 		numSelections := len(tabs[tab].page.Links)
 
 		if key == tcell.KeyEnter {
-			if len(currentSelection) > 0 && len(tabs[tab].page.Links) > 0 {
+			if len(currentSelection) > 0 {
 				// A link was selected, "click" it and load the page it's for
 				bottomBar.SetLabel("")
-				tabs[tab].mode = modeOff
 				linkN, _ := strconv.Atoi(currentSelection[0])
+				tabs[tab].page.Selected = tabs[tab].page.Links[linkN]
+				tabs[tab].page.SelectedID = currentSelection[0]
 				followLink(tab, tabs[tab].page.Url, tabs[tab].page.Links[linkN])
 				return
 			} else {
+				// They've started link highlighting
+				tabs[tab].page.Mode = structs.ModeLinkSelect
+
 				tabs[tab].view.Highlight("0").ScrollToHighlight()
 				// Display link URL in bottomBar
 				bottomBar.SetLabel("[::b]Link: [::-]")
 				bottomBar.SetText(tabs[tab].page.Links[0])
-				tabs[tab].selected = tabs[tab].page.Links[0]
-				tabs[tab].selectedID = "0"
+				tabs[tab].saveBottomBar()
+				tabs[tab].page.Selected = tabs[tab].page.Links[0]
+				tabs[tab].page.SelectedID = "0"
 			}
 		} else if len(currentSelection) > 0 {
 			// There's still a selection, but a different key was pressed, not Enter
@@ -102,8 +108,9 @@ func makeNewTab() *tab {
 			// Display link URL in bottomBar
 			bottomBar.SetLabel("[::b]Link: [::-]")
 			bottomBar.SetText(tabs[tab].page.Links[index])
-			tabs[tab].selected = tabs[tab].page.Links[index]
-			tabs[tab].selectedID = currentSelection[0]
+			tabs[tab].saveBottomBar()
+			tabs[tab].page.Selected = tabs[tab].page.Links[index]
+			tabs[tab].page.SelectedID = strconv.Itoa(index)
 		}
 	})
 
@@ -178,4 +185,36 @@ func (t *tab) saveBottomBar() {
 func (t *tab) applyBottomBar() {
 	bottomBar.SetLabel(t.barLabel)
 	bottomBar.SetText(t.barText)
+}
+
+// clearSelected turns off any selection that was going on.
+// It does not affect the bottomBar.
+func (t *tab) clearSelected() {
+	t.page.Mode = structs.ModeOff
+	t.page.Selected = ""
+	t.page.SelectedID = ""
+	t.view.Highlight("")
+}
+
+// applySelected selects whatever is stored as the selected element in the struct,
+// and sets the mode accordingly.
+// It is safe to call if nothing was selected previously.
+//
+// applyBottomBar should be called after, as this func might set some bottomBar values.
+func (t *tab) applySelected() {
+	if t.page.Mode == structs.ModeOff {
+		// Just in case
+		t.page.Selected = ""
+		t.page.SelectedID = ""
+		t.view.Highlight("")
+		return
+	} else if t.page.Mode == structs.ModeLinkSelect {
+		t.view.Highlight(t.page.SelectedID).ScrollToHighlight()
+
+		if t.mode == tabModeDone {
+			// Page is not loading so bottomBar can change
+			t.barLabel = "[::b]Link: [::-]"
+			t.barText = t.page.Selected
+		}
+	}
 }

@@ -9,6 +9,7 @@ func histForward() {
 	go func(tab int) {
 		handleURL(tab, tabs[tab].history.urls[tabs[tab].history.pos]) // Load that position in history
 		tabs[tab].applyScroll()
+		tabs[tab].applySelected()
 		if tab == curTab {
 			// Display the bottomBar state that handleURL set
 			tabs[tab].applyBottomBar()
@@ -25,6 +26,7 @@ func histBack() {
 	go func(tab int) {
 		handleURL(tab, tabs[tab].history.urls[tabs[tab].history.pos]) // Load that position in history
 		tabs[tab].applyScroll()
+		tabs[tab].applySelected()
 		if tab == curTab {
 			// Display the bottomBar state that handleURL set
 			tabs[tab].applyBottomBar()

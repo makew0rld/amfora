@@ -1,35 +1,35 @@
 package display
 
-func histForward() {
-	if tabs[curTab].history.pos >= len(tabs[curTab].history.urls)-1 {
+func histForward(t *tab) {
+	if t.history.pos >= len(t.history.urls)-1 {
 		// Already on the most recent URL in the history
 		return
 	}
-	tabs[curTab].history.pos++
-	go func(tab int) {
-		handleURL(tab, tabs[tab].history.urls[tabs[tab].history.pos]) // Load that position in history
-		tabs[tab].applyScroll()
-		tabs[tab].applySelected()
-		if tab == curTab {
+	t.history.pos++
+	go func(tt *tab) {
+		handleURL(tt, tt.history.urls[tt.history.pos]) // Load that position in history
+		tt.applyScroll()
+		tt.applySelected()
+		if tt == tabs[curTab] {
 			// Display the bottomBar state that handleURL set
-			tabs[tab].applyBottomBar()
+			tt.applyBottomBar()
 		}
-	}(curTab)
+	}(t)
 }
 
-func histBack() {
-	if tabs[curTab].history.pos <= 0 {
+func histBack(t *tab) {
+	if t.history.pos <= 0 {
 		// First tab in history
 		return
 	}
-	tabs[curTab].history.pos--
-	go func(tab int) {
-		handleURL(tab, tabs[tab].history.urls[tabs[tab].history.pos]) // Load that position in history
-		tabs[tab].applyScroll()
-		tabs[tab].applySelected()
-		if tab == curTab {
+	t.history.pos--
+	go func(tt *tab) {
+		handleURL(tt, tt.history.urls[tt.history.pos]) // Load that position in history
+		tt.applyScroll()
+		tt.applySelected()
+		if tt == tabs[curTab] {
 			// Display the bottomBar state that handleURL set
-			tabs[tab].applyBottomBar()
+			tt.applyBottomBar()
 		}
-	}(curTab)
+	}(t)
 }

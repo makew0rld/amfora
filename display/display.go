@@ -65,7 +65,7 @@ var layout = cview.NewFlex().
 
 var renderedNewTabContent string
 var newTabLinks []string
-var newTabPage *structs.Page
+var newTabPage structs.Page
 
 var App = cview.NewApplication().
 	EnableMouse(false).
@@ -76,12 +76,12 @@ var App = cview.NewApplication().
 		termH = height
 
 		// Make sure the current tab content is reformatted when the terminal size changes
-		go func(tab int) {
-			tabs[tab].reformatMut.Lock() // Only one reformat job per tab
-			defer tabs[tab].reformatMut.Unlock()
+		go func(t *tab) {
+			t.reformatMut.Lock() // Only one reformat job per tab
+			defer t.reformatMut.Unlock()
 			// Use the current tab, but don't affect other tabs if the user switches tabs
-			reformatPageAndSetView(tab, tabs[tab].page)
-		}(curTab)
+			reformatPageAndSetView(t, t.page)
+		}(tabs[curTab])
 	})
 
 func Init() {
@@ -180,7 +180,7 @@ func Init() {
 			}
 			if i <= len(tabs[tab].page.Links) && i > 0 {
 				// It's a valid link number
-				followLink(tab, tabs[tab].page.Url, tabs[tab].page.Links[i-1])
+				followLink(tabs[tab], tabs[tab].page.Url, tabs[tab].page.Links[i-1])
 				return
 			}
 			// Invalid link number, don't do anything
@@ -199,7 +199,7 @@ func Init() {
 
 	// Render the default new tab content ONCE and store it for later
 	renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
-	newTabPage = &structs.Page{
+	newTabPage = structs.Page{
 		Raw:       newTabContent,
 		Content:   renderedNewTabContent,
 		Links:     newTabLinks,
@@ -230,11 +230,11 @@ func Init() {
 			// History arrow keys
 			if event.Modifiers() == tcell.ModAlt {
 				if event.Key() == tcell.KeyLeft {
-					histBack()
+					histBack(tabs[curTab])
 					return nil
 				}
 				if event.Key() == tcell.KeyRight {
-					histForward()
+					histForward(tabs[curTab])
 					return nil
 				}
 			}
@@ -242,7 +242,7 @@ func Init() {
 			switch event.Key() {
 			case tcell.KeyCtrlT:
 				if tabs[curTab].page.Mode == structs.ModeLinkSelect {
-					next, err := resolveRelLink(curTab, tabs[curTab].page.Url, tabs[curTab].page.Selected)
+					next, err := resolveRelLink(tabs[curTab], tabs[curTab].page.Url, tabs[curTab].page.Selected)
 					if err != nil {
 						Error("URL Error", err.Error())
 						return nil
@@ -260,7 +260,7 @@ func Init() {
 				URL(viper.GetString("a-general.home"))
 				return nil
 			case tcell.KeyCtrlB:
-				Bookmarks(curTab)
+				Bookmarks(tabs[curTab])
 				tabs[curTab].addToHistory("about:bookmarks")
 				return nil
 			case tcell.KeyCtrlD:
@@ -286,10 +286,10 @@ func Init() {
 					Reload()
 					return nil
 				case "b":
-					histBack()
+					histBack(tabs[curTab])
 					return nil
 				case "f":
-					histForward()
+					histForward(tabs[curTab])
 					return nil
 				case "u":
 					tabs[curTab].pageUp()
@@ -383,7 +383,8 @@ func NewTab() {
 	curTab = NumTabs()
 
 	tabs = append(tabs, makeNewTab())
-	setPage(curTab, newTabPage)
+	temp := newTabPage // Copy
+	setPage(tabs[curTab], &temp)
 
 	// Can't go backwards, but this isn't the first page either.
 	// The first page will be the next one the user goes to.
@@ -479,7 +480,7 @@ func SwitchTab(tab int) {
 	curTab = tab % NumTabs()
 
 	// Display tab
-	reformatPageAndSetView(curTab, tabs[curTab].page)
+	reformatPageAndSetView(tabs[curTab], tabs[curTab].page)
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
 	tabs[curTab].applySelected()
@@ -497,13 +498,13 @@ func Reload() {
 	}
 
 	cache.Remove(tabs[curTab].page.Url)
-	go func(tab int) {
-		handleURL(tab, tabs[tab].page.Url) // goURL is not used bc history shouldn't be added to
-		if tab == curTab {
+	go func(t *tab) {
+		handleURL(t, t.page.Url) // goURL is not used bc history shouldn't be added to
+		if t == tabs[curTab] {
 			// Display the bottomBar state that handleURL set
-			tabs[tab].applyBottomBar()
+			t.applyBottomBar()
 		}
-	}(curTab)
+	}(tabs[curTab])
 }
 
 // URL loads and handles the provided URL for the current tab.
@@ -512,12 +513,13 @@ func URL(u string) {
 	// Some code is copied in followLink()
 
 	if u == "about:bookmarks" {
-		Bookmarks(curTab)
+		Bookmarks(tabs[curTab])
 		tabs[curTab].addToHistory("about:bookmarks")
 		return
 	}
 	if u == "about:newtab" {
-		setPage(curTab, newTabPage)
+		temp := newTabPage // Copy
+		setPage(tabs[curTab], &temp)
 		return
 	}
 	if strings.HasPrefix(u, "about:") {
@@ -525,7 +527,7 @@ func URL(u string) {
 		return
 	}
 
-	go goURL(curTab, u)
+	go goURL(tabs[curTab], u)
 }
 
 func NumTabs() int {

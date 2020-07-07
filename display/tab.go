@@ -79,7 +79,7 @@ func makeNewTab() *tab {
 				linkN, _ := strconv.Atoi(currentSelection[0])
 				tabs[tab].page.Selected = tabs[tab].page.Links[linkN]
 				tabs[tab].page.SelectedID = currentSelection[0]
-				followLink(tab, tabs[tab].page.Url, tabs[tab].page.Links[linkN])
+				followLink(tabs[tab], tabs[tab].page.Url, tabs[tab].page.Links[linkN])
 				return
 			} else {
 				// They've started link highlighting

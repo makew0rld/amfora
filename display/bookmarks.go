@@ -96,7 +96,7 @@ func openBkmkModal(name string, exists bool) (string, int) {
 }
 
 // Bookmarks displays the bookmarks page on the current tab.
-func Bookmarks(tab int) {
+func Bookmarks(t *tab) {
 	// Gather bookmarks
 	rawContent := "# Bookmarks\r\n\r\n"
 	m, keys := bookmarks.All()
@@ -113,8 +113,8 @@ func Bookmarks(tab int) {
 		Width:     termW,
 		Mediatype: structs.TextGemini,
 	}
-	setPage(curTab, &page)
-	tabs[tab].applyBottomBar()
+	setPage(t, &page)
+	t.applyBottomBar()
 }
 
 // addBookmark goes through the process of adding a bookmark for the current page.

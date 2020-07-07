@@ -212,6 +212,7 @@ func handleURL(t *tab, u string) (string, bool) {
 			t.barLabel = oldLable
 			t.barText = oldText
 		}
+		t.mode = tabModeDone
 		return s, b
 	}
 
@@ -271,9 +272,6 @@ func handleURL(t *tab, u string) (string, bool) {
 	bottomBar.SetText("Loading...")
 	t.barText = "Loading..." // Save it too, in case the tab switches during loading
 	t.mode = tabModeLoading
-	defer func(tt *tab) {
-		tt.mode = tabModeDone
-	}(t)
 	App.Draw()
 
 	res, err := client.Fetch(u)

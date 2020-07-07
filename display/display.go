@@ -98,9 +98,16 @@ func Init() {
 	}
 	bottomBar.SetBackgroundColor(tcell.ColorWhite)
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
-		defer bottomBar.SetLabel("")
-
 		tab := curTab
+
+		// Reset func to set the bottomBar back to what it was before
+		// Use for errors.
+		reset := func() {
+			bottomBar.SetLabel("")
+			tabs[tab].applySelected()
+			tabs[tab].applyBottomBar()
+			App.SetFocus(tabs[tab].view)
+		}
 
 		switch key {
 		case tcell.KeyEnter:
@@ -111,9 +118,7 @@ func Init() {
 
 			if strings.TrimSpace(query) == "" {
 				// Ignore
-				bottomBar.SetText(tabs[tab].page.Url)
-				tabs[tab].saveBottomBar() // Store new bottomBar text
-				App.SetFocus(tabs[tab].view)
+				reset()
 				return
 			}
 			if query == ".." && tabs[tab].hasContent() {
@@ -125,9 +130,7 @@ func Init() {
 				}
 				if parsed.Path == "/" {
 					// Can't go up further
-					bottomBar.SetText(tabs[tab].page.Url)
-					tabs[tab].saveBottomBar()
-					App.SetFocus(tabs[tab].view)
+					reset()
 					return
 				}
 
@@ -147,6 +150,7 @@ func Init() {
 					// They're trying to open a link number in a new tab
 					i, err = strconv.Atoi(query[4:])
 					if err != nil {
+						reset()
 						return
 					}
 					if i <= len(tabs[tab].page.Links) && i > 0 {
@@ -158,6 +162,7 @@ func Init() {
 						nextParsed, err := url.Parse(tabs[oldTab].page.Links[i-1])
 						if err != nil {
 							Error("URL Error", "link URL could not be parsed")
+							reset()
 							return
 						}
 						URL(prevParsed.ResolveReference(nextParsed).String())
@@ -184,15 +189,13 @@ func Init() {
 				return
 			}
 			// Invalid link number, don't do anything
-			bottomBar.SetText(tabs[tab].page.Url)
-			tabs[tab].saveBottomBar()
-			App.SetFocus(tabs[tab].view)
+			reset()
+			return
 
 		case tcell.KeyEscape:
 			// Set back to what it was
-			bottomBar.SetText(tabs[tab].page.Url)
-			tabs[tab].saveBottomBar()
-			App.SetFocus(tabs[tab].view)
+			reset()
+			return
 		}
 		// Other potential keys are Tab and Backtab, they are ignored
 	})

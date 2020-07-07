@@ -20,8 +20,9 @@ import (
 
 // isValidTab indicates whether the passed tab is still being used, even if it's not currently displayed.
 func isValidTab(t *tab) bool {
-	for i := range tabs {
-		if tabs[i] == t {
+	tempTabs := tabs
+	for i := range tempTabs {
+		if tempTabs[i] == t {
 			return true
 		}
 	}

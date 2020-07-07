@@ -104,8 +104,7 @@ func Init() {
 		// Use for errors.
 		reset := func() {
 			bottomBar.SetLabel("")
-			tabs[tab].applySelected()
-			tabs[tab].applyBottomBar()
+			tabs[tab].applyAll()
 			App.SetFocus(tabs[tab].view)
 		}
 
@@ -454,8 +453,7 @@ func CloseTab() {
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
 
 	// Restore previous tab's state
-	tabs[curTab].applySelected()
-	tabs[curTab].applyBottomBar()
+	tabs[curTab].applyAll()
 
 	App.SetFocus(tabs[curTab].view)
 
@@ -486,8 +484,7 @@ func SwitchTab(tab int) {
 	reformatPageAndSetView(tabs[curTab], tabs[curTab].page)
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
 	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
-	tabs[curTab].applySelected()
-	tabs[curTab].applyBottomBar()
+	tabs[curTab].applyAll()
 
 	App.SetFocus(tabs[curTab].view)
 
@@ -500,7 +497,7 @@ func Reload() {
 		return
 	}
 
-	cache.Remove(tabs[curTab].page.Url)
+	go cache.Remove(tabs[curTab].page.Url)
 	go func(t *tab) {
 		handleURL(t, t.page.Url) // goURL is not used bc history shouldn't be added to
 		if t == tabs[curTab] {

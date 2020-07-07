@@ -1,20 +1,18 @@
 package display
 
+// applyHist is a history.go internal function, to load a URL in the history.
+func applyHist(t *tab) {
+	handleURL(t, t.history.urls[t.history.pos]) // Load that position in history
+	t.applyAll()
+}
+
 func histForward(t *tab) {
 	if t.history.pos >= len(t.history.urls)-1 {
 		// Already on the most recent URL in the history
 		return
 	}
 	t.history.pos++
-	go func(tt *tab) {
-		handleURL(tt, tt.history.urls[tt.history.pos]) // Load that position in history
-		tt.applyScroll()
-		tt.applySelected()
-		if tt == tabs[curTab] {
-			// Display the bottomBar state that handleURL set
-			tt.applyBottomBar()
-		}
-	}(t)
+	go applyHist(t)
 }
 
 func histBack(t *tab) {
@@ -23,13 +21,5 @@ func histBack(t *tab) {
 		return
 	}
 	t.history.pos--
-	go func(tt *tab) {
-		handleURL(tt, tt.history.urls[tt.history.pos]) // Load that position in history
-		tt.applyScroll()
-		tt.applySelected()
-		if tt == tabs[curTab] {
-			// Display the bottomBar state that handleURL set
-			tt.applyBottomBar()
-		}
-	}(t)
+	go applyHist(t)
 }

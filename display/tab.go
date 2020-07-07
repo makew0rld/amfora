@@ -209,12 +209,22 @@ func (t *tab) applySelected() {
 		t.view.Highlight("")
 		return
 	} else if t.page.Mode == structs.ModeLinkSelect {
-		t.view.Highlight(t.page.SelectedID).ScrollToHighlight()
+		t.view.Highlight(t.page.SelectedID)
 
 		if t.mode == tabModeDone {
 			// Page is not loading so bottomBar can change
 			t.barLabel = "[::b]Link: [::-]"
 			t.barText = t.page.Selected
 		}
+	}
+}
+
+// applyAll uses applyScroll and applySelected to put a tab's TextView back the way it was.
+// It also uses applyBottomBar if this is the current tab.
+func (t *tab) applyAll() {
+	t.applySelected()
+	t.applyScroll()
+	if t == tabs[curTab] {
+		t.applyBottomBar()
 	}
 }

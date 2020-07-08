@@ -111,7 +111,7 @@ func NumPages() int {
 }
 
 // Get returns the page struct, and a bool indicating if the page was in the cache or not.
-// An empty page struct is returned if the page isn't in the cache
+// An empty page struct is returned if the page isn't in the cache.
 func Get(url string) (*structs.Page, bool) {
 	lock.RLock()
 	defer lock.RUnlock()

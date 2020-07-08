@@ -18,16 +18,15 @@ import (
 
 // This file contains the functions that aren't part of the public API.
 
-// pageUp scrolls up 75% of the height of the terminal, like Bombadillo.
-func pageUp() {
-	row, col := tabViews[curTab].GetScrollOffset()
-	tabViews[curTab].ScrollTo(row-(termH/4)*3, col)
-}
-
-// pageDown scrolls down 75% of the height of the terminal, like Bombadillo.
-func pageDown() {
-	row, col := tabViews[curTab].GetScrollOffset()
-	tabViews[curTab].ScrollTo(row+(termH/4)*3, col)
+// isValidTab indicates whether the passed tab is still being used, even if it's not currently displayed.
+func isValidTab(t *tab) bool {
+	tempTabs := tabs
+	for i := range tempTabs {
+		if tempTabs[i] == t {
+			return true
+		}
+	}
+	return false
 }
 
 func leftMargin() int {
@@ -54,55 +53,17 @@ func textWidth() int {
 	return viper.GetInt("a-general.max_width")
 }
 
-// pathEscape is the same as url.PathEscape, but it also replaces the +.
-func pathEscape(path string) string {
+// queryEscape is the same as url.PathEscape, but it also replaces the +.
+// This is because Gemini requires percent-escaping for queries.
+func queryEscape(path string) string {
 	return strings.ReplaceAll(url.PathEscape(path), "+", "%2B")
-}
-
-// tabHasContent returns true when the current tab has a page being displayed.
-// The most likely situation where false would be returned is when the default
-// new tab content is being displayed.
-func tabHasContent() bool {
-	if curTab < 0 {
-		return false
-	}
-	if len(tabViews) < curTab {
-		// There isn't a TextView for the current tab number
-		return false
-	}
-	if tabMap[curTab].Url == "" {
-		// Likely the default content page
-		return false
-	}
-	if strings.HasPrefix(tabMap[curTab].Url, "about:") {
-		return false
-	}
-
-	_, ok := tabMap[curTab]
-	return ok // If there's a page, return true
-}
-
-// saveScroll saves where in the page the user was.
-// It should be used whenever moving from one page to another.
-func saveScroll() {
-	// It will also be saved in the cache because the cache uses the same pointer
-	row, col := tabViews[curTab].GetScrollOffset()
-	tabMap[curTab].Row = row
-	tabMap[curTab].Column = col
-}
-
-// applyScroll applies the saved scroll values to the current page and tab.
-// It should only be used when going backward and forward, not when
-// loading a new page (that might have scroll vals cached anyway).
-func applyScroll() {
-	tabViews[curTab].ScrollTo(tabMap[curTab].Row, tabMap[curTab].Column)
 }
 
 // resolveRelLink returns an absolute link for the given absolute link and relative one.
 // It also returns an error if it could not resolve the links, which should be displayed
 // to the user.
-func resolveRelLink(prev, next string) (string, error) {
-	if !tabHasContent() {
+func resolveRelLink(t *tab, prev, next string) (string, error) {
+	if !t.hasContent() {
 		return next, nil
 	}
 
@@ -116,12 +77,13 @@ func resolveRelLink(prev, next string) (string, error) {
 
 // followLink should be used when the user "clicks" a link on a page.
 // Not when a URL is opened on a new tab for the first time.
-func followLink(prev, next string) {
+// It will handle setting the bottomBar.
+func followLink(t *tab, prev, next string) {
 
 	// Copied from URL()
 	if next == "about:bookmarks" {
-		Bookmarks()
-		addToHist("about:bookmarks")
+		Bookmarks(t)
+		t.addToHistory("about:bookmarks")
 		return
 	}
 	if strings.HasPrefix(next, "about:") {
@@ -129,19 +91,14 @@ func followLink(prev, next string) {
 		return
 	}
 
-	if tabHasContent() {
-		saveScroll() // Likely called later on, it's here just in case
-		nextURL, err := resolveRelLink(prev, next)
+	if t.hasContent() {
+		t.saveScroll() // Likely called later on, it's here just in case
+		nextURL, err := resolveRelLink(t, prev, next)
 		if err != nil {
 			Error("URL Error", err.Error())
 			return
 		}
-		go func() {
-			final, displayed := handleURL(nextURL)
-			if displayed {
-				addToHist(final)
-			}
-		}()
+		go goURL(t, nextURL)
 		return
 	}
 	// No content on current tab, so the "prev" URL is not valid.
@@ -151,12 +108,7 @@ func followLink(prev, next string) {
 		Error("URL Error", "Link URL could not be parsed")
 		return
 	}
-	go func() {
-		final, displayed := handleURL(next)
-		if displayed {
-			addToHist(final)
-		}
-	}()
+	go goURL(t, next)
 }
 
 // reformatPage will take the raw page content and reformat it according to the current terminal dimensions.
@@ -185,30 +137,54 @@ func reformatPage(p *structs.Page) {
 
 // reformatPageAndSetView is for reformatting a page that is already being displayed.
 // setPage should be used when a page is being loaded for the first time.
-func reformatPageAndSetView(tab int, p *structs.Page) {
-	saveScroll()
+func reformatPageAndSetView(t *tab, p *structs.Page) {
+	t.saveScroll()
 	reformatPage(p)
-	tabViews[tab].SetText(p.Content)
-	applyScroll() // Go back to where you were, roughly
+	t.view.SetText(p.Content)
+	t.applyScroll() // Go back to where you were, roughly
 }
 
-// setPage displays a Page on the current tab.
-func setPage(p *structs.Page) {
-	saveScroll() // Save the scroll of the previous page
+// setPage displays a Page on the passed tab number.
+// The bottomBar is not actually changed in this func
+func setPage(t *tab, p *structs.Page) {
+	if !isValidTab(t) {
+		// Don't waste time reformatting an invalid tab
+		return
+	}
+
+	t.saveScroll() // Save the scroll of the previous page
 
 	// Make sure the page content is fitted to the terminal every time it's displayed
 	reformatPage(p)
 
 	// Change page on screen
-	tabMap[curTab] = p
-	tabViews[curTab].SetText(p.Content)
-	tabViews[curTab].Highlight("") // Turn off highlights
-	tabViews[curTab].ScrollToBeginning()
+	t.page = p
+	t.view.SetText(p.Content)
+	t.view.Highlight("") // Turn off highlights, other funcs may restore if necessary
+	t.view.ScrollToBeginning()
 
 	// Setup display
-	App.SetFocus(tabViews[curTab])
-	bottomBar.SetLabel("")
-	bottomBar.SetText(p.Url)
+	App.SetFocus(t.view)
+
+	// Save bottom bar for the tab - TODO: other funcs will apply/display it
+	t.barLabel = ""
+	t.barText = p.Url
+}
+
+// goURL is like handleURL, but takes care of history and the bottomBar.
+// It should be preferred over handleURL in most cases.
+// It has no return values to be processed.
+//
+// It should be called in a goroutine.
+func goURL(t *tab, u string) {
+	final, displayed := handleURL(t, u)
+	if displayed {
+		t.addToHistory(final)
+	}
+	if t == tabs[curTab] {
+		// Display the bottomBar state that handleURL set
+		t.applyBottomBar()
+	}
 }
 
 // handleURL displays whatever action is needed for the provided URL,
@@ -220,15 +196,36 @@ func setPage(p *structs.Page) {
 // If there is some error, it will return "".
 // The second returned item is a bool indicating if page content was displayed.
 // It returns false for Errors, other protocols, etc.
-func handleURL(u string) (string, bool) {
+//
+// The bottomBar is not actually changed in this func, except during loading.
+// The func that calls this one should apply the bottomBar values if necessary.
+func handleURL(t *tab, u string) (string, bool) {
 	defer App.Draw() // Just in case
 
-	App.SetFocus(tabViews[curTab])
+	// Save for resetting on error
+	oldLable := t.barLabel
+	oldText := t.barText
+
+	// Custom return function
+	ret := func(s string, b bool) (string, bool) {
+		if !b {
+			// Reset bottomBar if page wasn't loaded
+			t.barLabel = oldLable
+			t.barText = oldText
+		}
+		t.mode = tabModeDone
+		return s, b
+	}
+
+	t.barLabel = ""
+	bottomBar.SetLabel("")
+
+	App.SetFocus(t.view)
 
 	// To allow linking to the bookmarks page, and history browsing
 	if u == "about:bookmarks" {
-		Bookmarks()
-		return "about:bookmarks", true
+		Bookmarks(t)
+		return ret("about:bookmarks", true)
 	}
 
 	u = normalizeURL(u)
@@ -236,8 +233,7 @@ func handleURL(u string) (string, bool) {
 	parsed, err := url.Parse(u)
 	if err != nil {
 		Error("URL Error", err.Error())
-		bottomBar.SetText(tabMap[curTab].Url)
-		return "", false
+		return ret("", false)
 	}
 
 	if strings.HasPrefix(u, "http") {
@@ -259,27 +255,33 @@ func handleURL(u string) (string, bool) {
 				Error("HTTP Error", "Error executing custom browser command: "+err.Error())
 			}
 		}
-		bottomBar.SetText(tabMap[curTab].Url)
-		return "", false
+		return ret("", false)
 	}
 	if !strings.HasPrefix(u, "gemini") {
 		Error("Protocol Error", "Only gemini and HTTP are supported. URL was "+u)
-		bottomBar.SetText(tabMap[curTab].Url)
-		return "", false
+		return ret("", false)
 	}
 	// Gemini URL
 
 	// Load page from cache if possible
 	page, ok := cache.Get(u)
 	if ok {
-		setPage(page)
-		return u, true
+		setPage(t, page)
+		return ret(u, true)
 	}
 	// Otherwise download it
 	bottomBar.SetText("Loading...")
+	t.barText = "Loading..." // Save it too, in case the tab switches during loading
+	t.mode = tabModeLoading
 	App.Draw()
 
 	res, err := client.Fetch(u)
+
+	// Loading may have taken a while, make sure tab is still valid
+	if !isValidTab(t) {
+		return ret("", false)
+	}
+
 	if err == client.ErrTofu {
 		if Tofu(parsed.Host) {
 			// They want to continue anyway
@@ -287,35 +289,30 @@ func handleURL(u string) (string, bool) {
 			// Response can be used further down, no need to reload
 		} else {
 			// They don't want to continue
-			// Set the bar back to original URL
-			bottomBar.SetText(tabMap[curTab].Url)
-			return "", false
+			return ret("", false)
 		}
 	} else if err != nil {
 		Error("URL Fetch Error", err.Error())
-		// Set the bar back to original URL
-		bottomBar.SetText(tabMap[curTab].Url)
-		return "", false
+		return ret("", false)
 	}
 	if renderer.CanDisplay(res) {
 		page, err := renderer.MakePage(u, res, textWidth(), leftMargin())
+		// Rendering may have taken a while, make sure tab is still valid
+		if !isValidTab(t) {
+			return ret("", false)
+		}
+
 		page.Width = termW
 		if err != nil {
 			Error("Page Error", "Issuing creating page: "+err.Error())
-			// Set the bar back to original URL
-			bottomBar.SetText(tabMap[curTab].Url)
-			return "", false
+			return ret("", false)
 		}
-		cache.Add(page)
-		setPage(page)
-		return u, true
+		go cache.Add(page)
+		setPage(t, page)
+		return ret(u, true)
 	}
 	// Not displayable
 	// Could be a non 20 (or 21) status code, or a different kind of document
-
-	// Set the bar back to original URL
-	bottomBar.SetText(tabMap[curTab].Url)
-	App.Draw()
 
 	// Handle each status code
 	switch gemini.SimplifyStatus(res.Status) {
@@ -324,36 +321,35 @@ func handleURL(u string) (string, bool) {
 		if ok {
 			// Make another request with the query string added
 			// + chars are replaced because PathEscape doesn't do that
-			parsed.RawQuery = pathEscape(userInput)
+			parsed.RawQuery = queryEscape(userInput)
 			if len(parsed.String()) > 1024 {
 				// 1024 is the max size for URLs in the spec
 				Error("Input Error", "URL for that input would be too long.")
-				return "", false
+				return ret("", false)
 			}
-			return handleURL(parsed.String())
+			return ret(handleURL(t, parsed.String()))
 		}
-		return "", false
+		return ret("", false)
 	case 30:
 		parsedMeta, err := url.Parse(res.Meta)
 		if err != nil {
 			Error("Redirect Error", "Invalid URL: "+err.Error())
-			return "", false
+			return ret("", false)
 		}
 		redir := parsed.ResolveReference(parsedMeta).String()
-
 		if YesNo("Follow redirect?\n" + redir) {
-			return handleURL(redir)
+			return handleURL(t, redir)
 		}
-		return "", false
+		return ret("", false)
 	case 40:
-		Error("Temporary Failure", cview.Escape(res.Meta)) // Escaped just in case, to not allow malicious meta strings
-		return "", false
+		Error("Temporary Failure", cview.Escape(res.Meta))
+		return ret("", false)
 	case 50:
 		Error("Permanent Failure", cview.Escape(res.Meta))
-		return "", false
+		return ret("", false)
 	case 60:
 		Info("The server requested a certificate. Cert handling is coming to Amfora soon!")
-		return "", false
+		return ret("", false)
 	}
 	// Status code 20, but not a document that can be displayed
 	yes := YesNo("This type of file can't be displayed. Downloading will be implemented soon. Would like to open the file in a HTTPS proxy for now?")
@@ -376,7 +372,7 @@ func handleURL(u string) (string, bool) {
 		}
 		App.Draw()
 	}
-	return "", false
+	return ret("", false)
 }
 
 // normalizeURL attempts to make URLs that are different strings

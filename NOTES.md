@@ -1,9 +1,10 @@
 # Notes
 
-- Simplify into one struct
-  - All the maps and stuff could be replaced with a `Tab` struct
-  - And then just one single map of tab number to `Tab`
-  - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
+- URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
+
+## Issues
+- Can't go back or do other things while page is loading - need a way to stop `handleURL`
+- Change renderer to start style tags on each new line of wrapped link, to prevent left margin from being highlighted
 
 ## Upstream Bugs
 - Wrapping messes up on brackets

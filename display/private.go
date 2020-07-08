@@ -171,6 +171,30 @@ func setPage(t *tab, p *structs.Page) {
 	t.barText = p.Url
 }
 
+// handleHTTP is used by handleURL.
+// It opens HTTP links and displays Info and Error modals.
+func handleHTTP(u string, showInfo bool) {
+	switch strings.TrimSpace(viper.GetString("a-general.http")) {
+	case "", "off":
+		Error("HTTP Error", "Opening HTTP URLs is turned off.")
+	case "default":
+		s, err := webbrowser.Open(u)
+		if err != nil {
+			Error("Webbrowser Error", err.Error())
+		} else if showInfo {
+			Info(s)
+		}
+	default:
+		// The config has a custom command to execute for HTTP URLs
+		fields := strings.Fields(viper.GetString("a-general.http"))
+		err := exec.Command(fields[0], append(fields[1:], u)...).Start()
+		if err != nil {
+			Error("HTTP Error", "Error executing custom browser command: "+err.Error())
+		}
+	}
+	App.Draw()
+}
+
 // goURL is like handleURL, but takes care of history and the bottomBar.
 // It should be preferred over handleURL in most cases.
 // It has no return values to be processed.
@@ -237,24 +261,7 @@ func handleURL(t *tab, u string) (string, bool) {
 	}
 
 	if strings.HasPrefix(u, "http") {
-		switch strings.TrimSpace(viper.GetString("a-general.http")) {
-		case "", "off":
-			Info("Opening HTTP URLs is turned off.")
-		case "default":
-			s, err := webbrowser.Open(u)
-			if err != nil {
-				Error("Webbrowser Error", err.Error())
-			} else {
-				Info(s)
-			}
-		default:
-			// The config has a custom command to execute for HTTP URLs
-			fields := strings.Fields(viper.GetString("a-general.http"))
-			err := exec.Command(fields[0], append(fields[1:], u)...).Start()
-			if err != nil {
-				Error("HTTP Error", "Error executing custom browser command: "+err.Error())
-			}
-		}
+		handleHTTP(u, true)
 		return ret("", false)
 	}
 	if !strings.HasPrefix(u, "gemini") {
@@ -364,13 +371,7 @@ func handleURL(t *tab, u string) (string, bool) {
 		}
 		portalURL = strings.TrimPrefix(portalURL, "gemini://") + "?raw=1"
 
-		s, err := webbrowser.Open("https://portal.mozz.us/gemini/" + portalURL)
-		if err != nil {
-			Error("Webbrowser Error", err.Error())
-		} else {
-			Info(s)
-		}
-		App.Draw()
+		handleHTTP("https://portal.mozz.us/gemini/"+portalURL, false)
 	}
 	return ret("", false)
 }

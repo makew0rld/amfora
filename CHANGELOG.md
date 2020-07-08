@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Many potential network and display race conditions eliminated
 - Whether a tab is loading stays indicated when you switch away from it and go back
 - Plain text documents are displayed faithfully (there were some edge conditions)
+- Opening files in portal.mozz.us uses the `http` setting in the config (#42)
 
 ## [1.2.0] - 2020-07-02
 ### Added

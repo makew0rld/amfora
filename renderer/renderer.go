@@ -155,7 +155,7 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 		} else if strings.HasPrefix(lines[i], "* ") {
 			if viper.GetBool("a-general.bullets") {
 				// Wrap list item, and indent wrapped lines past the bullet
-				wrappedItem := wrapLine(lines[i][1:], width, "   ", "", false)
+				wrappedItem := wrapLine(lines[i][1:], width, "    ", "", false)
 				// Add bullet
 				wrappedItem[0] = " \u2022" + wrappedItem[0]
 				wrappedLines = append(wrappedLines, wrappedItem...)

@@ -18,22 +18,26 @@ func main() {
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--version" || os.Args[1] == "-v" {
-			fmt.Print(version + "\r\n")
+			fmt.Println(version)
 			return
 		}
 		if os.Args[1] == "--help" || os.Args[1] == "-h" {
-			fmt.Print("Amfora is a fancy terminal browser for the Gemini protocol.\r\n\r\n")
-			fmt.Print("Usage:\r\namfora [URL]\r\namfora --version, -v\r\n")
+			fmt.Println("Amfora is a fancy terminal browser for the Gemini protocol.")
+			fmt.Println()
+			fmt.Println("Usage:")
+			fmt.Println("amfora [URL]")
+			fmt.Println("amfora --version, -v")
 			return
 		}
 	}
 
 	err := config.Init()
 	if err != nil {
-		panic(err)
+		fmt.Printf("Config error: %v\n", err)
+		os.Exit(1)
 	}
-	display.Init()
 
+	display.Init()
 	display.NewTab()
 	display.NewTab() // Open extra tab and close it to fully initialize the app and wrapping
 	display.CloseTab()

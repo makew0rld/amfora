@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -24,10 +25,13 @@ var BkmkStore = viper.New()
 var bkmkDir string
 var bkmkPath string
 
+// For other pkgs to use
+var DownloadsDir string
+
 func Init() error {
 	home, err := homedir.Dir()
 	if err != nil {
-		panic(err)
+		return err
 	}
 	// Store AppData path
 	if runtime.GOOS == "windows" {
@@ -144,6 +148,7 @@ func Init() error {
 	viper.SetDefault("a-general.bullets", true)
 	viper.SetDefault("a-general.left_margin", 0.15)
 	viper.SetDefault("a-general.max_width", 100)
+	viper.SetDefault("a-general.downloads", "")
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
 
@@ -152,6 +157,37 @@ func Init() error {
 	err = viper.ReadInConfig()
 	if err != nil {
 		return err
+	}
+
+	// Setup downloads dir
+	if viper.GetString("a-general.downloads") == "" {
+		// Find default Downloads dir
+		// This seems to work for all OSes?
+		DownloadsDir = filepath.Join(home, "Downloads")
+		// Create it just in case
+		err = os.MkdirAll(DownloadsDir, 0755)
+		if err != nil {
+			return fmt.Errorf("downloads path could not be created: %s", DownloadsDir)
+		}
+	} else {
+		// Validate path
+		dDir := viper.GetString("a-general.downloads")
+		di, err := os.Stat(dDir)
+		if err == nil {
+			if !di.IsDir() {
+				return fmt.Errorf("downloads path specified is not a directory: %s", dDir)
+			}
+		} else if os.IsNotExist(err) {
+			// Try to create path
+			err = os.MkdirAll(dDir, 0755)
+			if err != nil {
+				return fmt.Errorf("downloads path could not be created: %s", dDir)
+			}
+		} else {
+			// Some other error
+			return fmt.Errorf("couldn't access downloads directory: %s", dDir)
+		}
+		DownloadsDir = dDir
 	}
 
 	// Setup cache from config

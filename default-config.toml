@@ -24,6 +24,7 @@ left_margin = 0.15
 max_width = 100  # The max number of columns to wrap a page's text to. Preformatted blocks are not wrapped.
 # 'downloads' is the path to a downloads folder.
 # An empty value means the code will find the default downloads folder for your system.
+# If the path does not exist it will be created.
 downloads = "" 
 # Options for page cache - which is only for text/gemini pages
 # Increase the cache size to speed up browsing at the expense of memory

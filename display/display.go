@@ -274,6 +274,18 @@ func Init() {
 			case tcell.KeyPgDn:
 				tabs[curTab].pageDown()
 				return nil
+			case tcell.KeyCtrlS:
+				if tabs[curTab].hasContent() {
+					savePath, err := downloadPage(tabs[curTab].page)
+					if err != nil {
+						Error("Download Error", fmt.Sprintf("Error saving page content: %v", err))
+					} else {
+						Info(fmt.Sprintf("Page content saved to %s. ", savePath))
+					}
+				} else {
+					Info("The current page has no content, so it couldn't be downloaded.")
+				}
+				return nil
 			case tcell.KeyRune:
 				// Regular key was sent
 				switch string(event.Rune()) {

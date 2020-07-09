@@ -115,39 +115,57 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 			links = append(links, url)
 
 			// Wrap and add link text
-
 			// Wrap the link text, but add some spaces to indent the wrapped lines past the link number
-			wrappedLink := wrapLine(linkText, width,
-				strings.Repeat(" ", len(strconv.Itoa(numLinks+len(links)))+4), // +4 for spaces and brackets
-				"",
-				false, // Don't indent the first line, it's the one with link number
-			)
-
 			// Set the style tags
 			// Add them to the first line
+
+			var wrappedLink []string
 
 			if viper.GetBool("a-general.color") {
 				pU, err := urlPkg.Parse(url)
 				if err == nil && (pU.Scheme == "" || pU.Scheme == "gemini" || pU.Scheme == "about") {
 					// A gemini link
 					// Add the link text in blue (in a region), and a gray link number to the left of it
+
+					wrappedLink = wrapLine(linkText, width,
+						strings.Repeat(" ", len(strconv.Itoa(numLinks+len(links)))+4)+ // +4 for spaces and brackets
+							`["`+strconv.Itoa(numLinks+len(links)-1)+`"][dodgerblue]`,
+						`[-][""]`,
+						false, // Don't indent the first line, it's the one with link number
+					)
+
+					// Add special stuff to first line, like the link number
 					wrappedLink[0] = `[silver::b][` + strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
-						`[dodgerblue]["` + strconv.Itoa(numLinks+len(links)-1) + `"]` +
-						wrappedLink[0]
+						`["` + strconv.Itoa(numLinks+len(links)-1) + `"][dodgerblue]` +
+						wrappedLink[0] + `[-][""]`
 				} else {
 					// Not a gemini link, use purple instead
+
+					wrappedLink = wrapLine(linkText, width,
+						strings.Repeat(" ", len(strconv.Itoa(numLinks+len(links)))+4)+ // +4 for spaces and brackets
+							`["`+strconv.Itoa(numLinks+len(links)-1)+`"][#8700d7]`,
+						`[-][""]`,
+						false, // Don't indent the first line, it's the one with link number
+					)
+
 					wrappedLink[0] = `[silver::b][` + strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
-						`[#8700d7]["` + strconv.Itoa(numLinks+len(links)-1) + `"]` +
-						wrappedLink[0]
+						`["` + strconv.Itoa(numLinks+len(links)-1) + `"][#8700d7]` +
+						wrappedLink[0] + `[-][""]`
 				}
 			} else {
 				// No colours allowed
+
+				wrappedLink = wrapLine(linkText, width,
+					strings.Repeat(" ", len(strconv.Itoa(numLinks+len(links)))+4)+ // +4 for spaces and brackets
+						`["`+strconv.Itoa(numLinks+len(links)-1)+`"]`,
+					`[""]`,
+					false, // Don't indent the first line, it's the one with link number
+				)
+
 				wrappedLink[0] = `[::b][` + strconv.Itoa(numLinks+len(links)) + "[][::-]  " +
 					`["` + strconv.Itoa(numLinks+len(links)-1) + `"]` +
-					wrappedLink[0]
+					wrappedLink[0] + `[""]`
 			}
-
-			wrappedLink[len(wrappedLink)-1] += `[""][-]` // Close region and formatting at the end
 
 			wrappedLines = append(wrappedLines, wrappedLink...)
 

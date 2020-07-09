@@ -16,14 +16,15 @@ home = "gemini://gemini.circumlunar.space"
 # If a command is set, than the URL will be added (in quotes) to the end of the command.
 # A space will be prepended if necessary.
 http = "default"
-
 search = "gemini://gus.guru/search"  # Any URL that will accept a query string can be put here
 color = true  # Whether colors will be used in the terminal
 bullets = true  # Whether to replace list asterisks with unicode bullets
 # A number from 0 to 1, indicating what percentage of the terminal width the left margin should take up.
 left_margin = 0.15
 max_width = 100  # The max number of columns to wrap a page's text to. Preformatted blocks are not wrapped.
-
+# 'downloads' is the path to a downloads folder.
+# An empty value means the code will find the default downloads folder for your system.
+downloads = "" 
 # Options for page cache - which is only for text/gemini pages
 # Increase the cache size to speed up browsing at the expense of memory
 [cache]

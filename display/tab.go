@@ -55,7 +55,11 @@ func makeNewTab() *tab {
 
 		tab := curTab // Don't let it change in the middle of the code
 
-		if key == tcell.KeyEsc && tabs[tab].mode == tabModeDone {
+		if tabs[tab].mode != tabModeDone {
+			return
+		}
+
+		if key == tcell.KeyEsc {
 			// Stop highlighting
 			bottomBar.SetLabel("")
 			bottomBar.SetText(tabs[tab].page.Url)

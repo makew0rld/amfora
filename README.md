@@ -35,6 +35,19 @@ curl -sSL https://raw.githubusercontent.com/makeworld-the-better-one/amfora/mast
 update-desktop-database ~/.local/share/applications
 ```
 
+### For developers
+This section is for programmers who want to install from source.
+
+Install latest release:
+```
+GO111MODULE=on go get -u github.com/makeworld-the-better-one/amfora
+```
+
+Install latest commit:
+```
+GO111MODULE=on go get -u github.com/makeworld-the-better-one/amfora@master
+```
+
 ## Usage
 
 Just call `amfora` or `amfora <url>` on the terminal. On Windows it might be `amfora.exe` instead.
@@ -59,8 +72,8 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Multiple charset support (over 55)
 - [x] Built-in search (uses GUS by default)
 - [x] Bookmarks
+- [x] *Download pages and arbitrary data*
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>
-- [ ] Download pages and arbitrary data
 - [ ] Emoji favicons
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
 - [ ] Stream support

@@ -40,7 +40,9 @@ func modalInit() {
 		AddPage("error", errorModal, false, false).
 		AddPage("input", inputModal, false, false).
 		AddPage("yesno", yesNoModal, false, false).
-		AddPage("bkmk", bkmkModal, false, false)
+		AddPage("bkmk", bkmkModal, false, false).
+		AddPage("dlChoice", dlChoiceModal, false, false).
+		AddPage("dl", dlModal, false, false)
 
 	// Color setup
 	if viper.GetBool("a-general.color") {
@@ -125,6 +127,7 @@ func modalInit() {
 	yesNoModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 
 	bkmkInit()
+	dlInit()
 }
 
 // Error displays an error on the screen in a modal.

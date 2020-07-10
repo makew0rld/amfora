@@ -166,7 +166,7 @@ func setPage(t *tab, p *structs.Page) {
 	// Setup display
 	App.SetFocus(t.view)
 
-	// Save bottom bar for the tab - TODO: other funcs will apply/display it
+	// Save bottom bar for the tab - other funcs will apply/display it
 	t.barLabel = ""
 	t.barText = p.Url
 }
@@ -359,20 +359,7 @@ func handleURL(t *tab, u string) (string, bool) {
 		return ret("", false)
 	}
 	// Status code 20, but not a document that can be displayed
-	yes := YesNo("This type of file can't be displayed. Downloading will be implemented soon. Would like to open the file in a HTTPS proxy for now?")
-	if yes {
-		// Open in mozz's proxy
-		portalURL := u
-		if parsed.RawQuery != "" {
-			// Remove query and add encoded version on the end
-			query := parsed.RawQuery
-			parsed.RawQuery = ""
-			portalURL = parsed.String() + "%3F" + query
-		}
-		portalURL = strings.TrimPrefix(portalURL, "gemini://") + "?raw=1"
-
-		handleHTTP("https://portal.mozz.us/gemini/"+portalURL, false)
-	}
+	go dlChoice(u, res)
 	return ret("", false)
 }
 

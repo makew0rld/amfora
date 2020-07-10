@@ -225,6 +225,11 @@ func Init() {
 			// An InputField is in focus, nothing should interrupt
 			return event
 		}
+		_, ok = App.GetFocus().(*cview.Modal)
+		if ok {
+			// It's focused on a modal right now, nothing should interrupt
+			return event
+		}
 
 		if tabs[curTab].mode == tabModeDone {
 			// All the keys and operations that can only work while NOT loading

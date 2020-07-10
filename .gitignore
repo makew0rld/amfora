@@ -3,6 +3,9 @@ amfora
 amfora-*
 build/
 
+# Recording
+rec.yml
+
 # Test logs
 *.log
 

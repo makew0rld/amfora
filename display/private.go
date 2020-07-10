@@ -292,7 +292,7 @@ func handleURL(t *tab, u string) (string, bool) {
 	}
 
 	if err == client.ErrTofu {
-		if Tofu(parsed.Host) {
+		if Tofu(parsed.Host, client.GetExpiry(parsed.Hostname(), parsed.Port())) {
 			// They want to continue anyway
 			client.ResetTofuEntry(parsed.Hostname(), parsed.Port(), res.Cert)
 			// Response can be used further down, no need to reload

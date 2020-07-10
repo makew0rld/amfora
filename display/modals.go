@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/dustin/go-humanize"
 	"github.com/gdamore/tcell"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
@@ -193,6 +195,7 @@ func YesNo(prompt string) bool {
 	} else {
 		yesNoModal.SetBackgroundColor(tcell.ColorBlack)
 	}
+	yesNoModal.GetFrame().SetTitle("")
 	yesNoModal.SetText(prompt)
 	tabPages.ShowPage("yesno")
 	tabPages.SendToFront("yesno")
@@ -206,7 +209,7 @@ func YesNo(prompt string) bool {
 
 // Tofu displays the TOFU warning modal.
 // It returns a bool indicating whether the user wants to continue.
-func Tofu(host string) bool {
+func Tofu(host string, expiry time.Time) bool {
 	// Reuses yesNoModal, with error colour
 
 	if viper.GetBool("a-general.color") {
@@ -214,8 +217,12 @@ func Tofu(host string) bool {
 	} else {
 		yesNoModal.SetBackgroundColor(tcell.ColorBlack)
 	}
+	yesNoModal.GetFrame().SetTitle(" TOFU ")
 	yesNoModal.SetText(
-		fmt.Sprintf("%s's certificate has changed, possibly indicating an security issue. Are you sure you want to continue? ", host),
+		fmt.Sprintf("%s's certificate has changed, possibly indicating an security issue. The certificate would have expired %s. Are you sure you want to continue? ",
+			host,
+			humanize.Time(expiry),
+		),
 	)
 	tabPages.ShowPage("yesno")
 	tabPages.SendToFront("yesno")

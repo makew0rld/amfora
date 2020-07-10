@@ -112,3 +112,9 @@ func handleTofu(domain, port string, cert *x509.Certificate) bool {
 func ResetTofuEntry(domain, port string, cert *x509.Certificate) {
 	saveTofuEntry(domain, port, cert)
 }
+
+// GetExpiry returns the stored expiry date for the given host.
+// The time will be empty (zero) if there is not expiry date stored for that host.
+func GetExpiry(domain, port string) time.Time {
+	return tofuStore.GetTime(expiryKey(domain, port))
+}

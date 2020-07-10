@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Pages are rewrapped dynamically, whenever the terminal size changes (#33)
+- TOFU warning message mentions how long the previous cert was still valid for (#34)
 
 ### Fixed
 - Many potential network and display race conditions eliminated

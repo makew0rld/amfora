@@ -1,15 +1,21 @@
 package renderer
 
 import (
+	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"mime"
 	"strings"
+	"time"
 
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/go-gemini"
+	"github.com/spf13/viper"
 	"golang.org/x/text/encoding/ianaindex"
 )
+
+var ErrTooLarge = errors.New("page content would be too large")
+var ErrTimedOut = errors.New("page download timed out")
 
 // isUTF8 returns true for charsets that are compatible with UTF-8 and don't need to be decoded.
 func isUTF8(charset string) bool {
@@ -53,11 +59,27 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 		return nil, errors.New("not valid content for a Page")
 	}
 
-	rawText, err := ioutil.ReadAll(res.Body) // TODO: Don't use all memory on large pages
-	if err != nil {
+	buf := new(bytes.Buffer)
+	go func() {
+		time.Sleep(time.Duration(viper.GetInt("a-general.page_max_time")) * time.Second)
+		res.Body.Close()
+	}()
+
+	_, err := io.CopyN(buf, res.Body, viper.GetInt64("a-general.page_max_size")) // 2 MiB max
+	res.Body.Close()
+	rawText := buf.Bytes()
+	if err == nil {
+		// Content was larger than 2 MiB
+		return nil, ErrTooLarge
+	} else if err != io.EOF {
+		if strings.HasSuffix(err.Error(), "use of closed network connection") {
+			// Timed out
+			return nil, ErrTimedOut
+		}
+		// Some other error
 		return nil, err
 	}
-	res.Body.Close()
+	// Otherwise, the error is EOF, which is what we want.
 
 	mediatype, params, _ := mime.ParseMediaType(res.Meta)
 

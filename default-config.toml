@@ -26,6 +26,11 @@ max_width = 100  # The max number of columns to wrap a page's text to. Preformat
 # An empty value means the code will find the default downloads folder for your system.
 # If the path does not exist it will be created.
 downloads = "" 
+# Max size for displayable content in bytes - after that size a download window pops up
+page_max_size = 2097152  # 2 MiB
+# Max time it takes to load a page in seconds - after that a download window pops up
+page_max_time = 10
+
 # Options for page cache - which is only for text/gemini pages
 # Increase the cache size to speed up browsing at the expense of memory
 [cache]

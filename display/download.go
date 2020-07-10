@@ -24,7 +24,6 @@ import (
 // For choosing between download and the portal - copy of YesNo basically
 var dlChoiceModal = cview.NewModal().
 	SetTextColor(tcell.ColorWhite).
-	SetText("That file could not be displayed. What would you like to do?").
 	AddButtons([]string{"Download", "Open in portal", "Cancel"})
 
 // Channel to indicate what choice they made using the button text
@@ -72,7 +71,7 @@ func dlInit() {
 
 // dlChoice displays the download choice modal and acts on the user's choice.
 // It should run in a goroutine.
-func dlChoice(u string, resp *gemini.Response) {
+func dlChoice(text, u string, resp *gemini.Response) {
 	defer resp.Body.Close()
 
 	parsed, err := url.Parse(u)
@@ -81,6 +80,7 @@ func dlChoice(u string, resp *gemini.Response) {
 		return
 	}
 
+	dlChoiceModal.SetText(text)
 	tabPages.ShowPage("dlChoice")
 	tabPages.SendToFront("dlChoice")
 	App.SetFocus(dlChoiceModal)

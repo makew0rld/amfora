@@ -309,11 +309,27 @@ func handleURL(t *tab, u string) (string, bool) {
 			return ret("", false)
 		}
 
-		page.Width = termW
+		// Make new request for downloading purposes
+		res, clientErr := client.Fetch(u)
+		if clientErr != nil && clientErr != client.ErrTofu {
+			Error("URL Fetch Error", err.Error())
+			return ret("", false)
+		}
+
+		if err == renderer.ErrTooLarge {
+			go dlChoice("That page is too large. What would you like to do?", u, res)
+			return ret("", false)
+		}
+		if err == renderer.ErrTimedOut {
+			go dlChoice("Loading that page timed out. What would you like to do?", u, res)
+			return ret("", false)
+		}
 		if err != nil {
 			Error("Page Error", "Issuing creating page: "+err.Error())
 			return ret("", false)
 		}
+
+		page.Width = termW
 		go cache.Add(page)
 		setPage(t, page)
 		return ret(u, true)
@@ -359,7 +375,7 @@ func handleURL(t *tab, u string) (string, bool) {
 		return ret("", false)
 	}
 	// Status code 20, but not a document that can be displayed
-	go dlChoice(u, res)
+	go dlChoice("That file could not be displayed. What would you like to do?", u, res)
 	return ret("", false)
 }
 

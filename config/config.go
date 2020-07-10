@@ -149,6 +149,8 @@ func Init() error {
 	viper.SetDefault("a-general.left_margin", 0.15)
 	viper.SetDefault("a-general.max_width", 100)
 	viper.SetDefault("a-general.downloads", "")
+	viper.SetDefault("a-general.page_max_size", 2097152)
+	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
 

@@ -8,7 +8,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/display"
 )
 
-var version = "1.3.0-unreleased"
+var version = "1.3.0"
 
 func main() {
 	// err := logger.Init()
@@ -18,7 +18,7 @@ func main() {
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--version" || os.Args[1] == "-v" {
-			fmt.Println(version)
+			fmt.Println("amfora v" + version)
 			return
 		}
 		if os.Args[1] == "--help" || os.Args[1] == "-h" {

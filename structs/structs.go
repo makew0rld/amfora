@@ -13,6 +13,7 @@ type PageMode int
 const (
 	ModeOff        PageMode = iota // Regular mode
 	ModeLinkSelect                 // When the enter key is pressed, allow for tab-based link navigation
+	ModeSearch                     // When a keyword is being searched in a page - TODO: NOT USED YET
 )
 
 // Page is for storing UTF-8 text/gemini pages, as well as text/plain pages.
@@ -32,9 +33,9 @@ type Page struct {
 
 // Size returns an approx. size of a Page in bytes.
 func (p *Page) Size() int {
-	b := len(p.Raw) + len(p.Content) + len(p.Url) + len(p.Selected) + len(p.SelectedID)
+	n := len(p.Raw) + len(p.Content) + len(p.Url) + len(p.Selected) + len(p.SelectedID)
 	for i := range p.Links {
-		b += len(p.Links[i])
+		n += len(p.Links[i])
 	}
-	return b
+	return n
 }

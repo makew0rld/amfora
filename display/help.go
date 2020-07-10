@@ -35,6 +35,7 @@ Ctrl-R, R|Reload a page, discarding the cached version.
 |This can also be used if you resize your terminal.
 Ctrl-B|View bookmarks
 Ctrl-D|Add, change, or remove a bookmark for the current page.
+Ctrl-S|Save the current page to your downloads.
 q, Ctrl-Q, Ctrl-C|Quit
 `)
 

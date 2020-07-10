@@ -13,6 +13,21 @@ import (
 	"gitlab.com/tslocum/cview"
 )
 
+// RenderANSI renders plain text pages containing ANSI codes.
+// Practically, it is used for the text/x-ansi.
+func RenderANSI(s string, leftMargin int) string {
+	s = cview.Escape(s)
+	if viper.GetBool("a-general.color") {
+		s = cview.TranslateANSI(s)
+	}
+	var shifted string
+	lines := strings.Split(s, "\n")
+	for i := range lines {
+		shifted += strings.Repeat(" ", leftMargin) + lines[i] + "\n"
+	}
+	return shifted
+}
+
 // RenderPlainText should be used to format plain text pages.
 func RenderPlainText(s string, leftMargin int) string {
 	var shifted string

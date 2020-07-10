@@ -5,6 +5,7 @@ type Mediatype string
 const (
 	TextGemini Mediatype = "text/gemini"
 	TextPlain  Mediatype = "text/plain"
+	TextAnsi   Mediatype = "text/x-ansi"
 )
 
 type PageMode int

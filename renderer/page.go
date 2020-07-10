@@ -109,14 +109,25 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 			Links:     links,
 		}, nil
 	} else if strings.HasPrefix(mediatype, "text/") {
-		// Treated as plaintext
-		return &structs.Page{
-			Mediatype: structs.TextPlain,
-			Url:       url,
-			Raw:       utfText,
-			Content:   RenderPlainText(utfText, leftMargin),
-			Links:     []string{},
-		}, nil
+		if mediatype == "text/x-ansi" || strings.HasSuffix(url, ".ans") {
+			// ANSI
+			return &structs.Page{
+				Mediatype: structs.TextAnsi,
+				Url:       url,
+				Raw:       utfText,
+				Content:   RenderANSI(utfText, leftMargin),
+				Links:     []string{},
+			}, nil
+		} else {
+			// Treated as plaintext
+			return &structs.Page{
+				Mediatype: structs.TextPlain,
+				Url:       url,
+				Raw:       utfText,
+				Content:   RenderPlainText(utfText, leftMargin),
+				Links:     []string{},
+			}, nil
+		}
 	}
 
 	return nil, errors.New("displayable mediatype is not handled in the code, implementation error")

@@ -127,6 +127,8 @@ func reformatPage(p *structs.Page) {
 		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin())
 	} else if p.Mediatype == structs.TextPlain {
 		rendered = renderer.RenderPlainText(p.Raw, leftMargin())
+	} else if p.Mediatype == structs.TextAnsi {
+		rendered = renderer.RenderANSI(p.Raw, leftMargin())
 	} else {
 		// Rendering this type is not implemented
 		return

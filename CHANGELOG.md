@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Wrapped list items are indented to stay behind the bullet (#35)
 - Certificate expiry date is stored when the cert IDs match (#39)
 - What link was selected is remembered as you browse through history
+- Render ANSI codes in `text/x-ansi` pages, or text pages that end with `.ans`
 
 ### Changed
 - Pages are rewrapped dynamically, whenever the terminal size changes (#33)

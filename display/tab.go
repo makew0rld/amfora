@@ -76,28 +76,29 @@ func makeNewTab() *tab {
 		currentSelection := tabs[tab].view.GetHighlights()
 		numSelections := len(tabs[tab].page.Links)
 
-		if key == tcell.KeyEnter {
-			if len(currentSelection) > 0 {
-				// A link was selected, "click" it and load the page it's for
-				bottomBar.SetLabel("")
-				linkN, _ := strconv.Atoi(currentSelection[0])
-				tabs[tab].page.Selected = tabs[tab].page.Links[linkN]
-				tabs[tab].page.SelectedID = currentSelection[0]
-				followLink(tabs[tab], tabs[tab].page.Url, tabs[tab].page.Links[linkN])
-				return
-			} else {
-				// They've started link highlighting
-				tabs[tab].page.Mode = structs.ModeLinkSelect
+		if key == tcell.KeyEnter && len(currentSelection) > 0 {
+			// A link is selected and enter was pressed: "click" it and load the page it's for
+			bottomBar.SetLabel("")
+			linkN, _ := strconv.Atoi(currentSelection[0])
+			tabs[tab].page.Selected = tabs[tab].page.Links[linkN]
+			tabs[tab].page.SelectedID = currentSelection[0]
+			followLink(tabs[tab], tabs[tab].page.Url, tabs[tab].page.Links[linkN])
+			return
+		}
+		if len(currentSelection) <= 0 && (key == tcell.KeyEnter || key == tcell.KeyTab) {
+			// They've started link highlighting
+			tabs[tab].page.Mode = structs.ModeLinkSelect
 
-				tabs[tab].view.Highlight("0").ScrollToHighlight()
-				// Display link URL in bottomBar
-				bottomBar.SetLabel("[::b]Link: [::-]")
-				bottomBar.SetText(tabs[tab].page.Links[0])
-				tabs[tab].saveBottomBar()
-				tabs[tab].page.Selected = tabs[tab].page.Links[0]
-				tabs[tab].page.SelectedID = "0"
-			}
-		} else if len(currentSelection) > 0 {
+			tabs[tab].view.Highlight("0").ScrollToHighlight()
+			// Display link URL in bottomBar
+			bottomBar.SetLabel("[::b]Link: [::-]")
+			bottomBar.SetText(tabs[tab].page.Links[0])
+			tabs[tab].saveBottomBar()
+			tabs[tab].page.Selected = tabs[tab].page.Links[0]
+			tabs[tab].page.SelectedID = "0"
+		}
+
+		if len(currentSelection) > 0 {
 			// There's still a selection, but a different key was pressed, not Enter
 
 			index, _ := strconv.Atoi(currentSelection[0])

@@ -80,11 +80,12 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [ ] Full mouse support
 - [ ] Table of contents for pages
 - [ ] Full client certificate UX within the client
-  - *I will be waiting for some spec changes/recommendations to happen before implementing this*
   - Create transient and permanent certs within the client, per domain
   - Manage and browse them
+  - Similar to [Kristall](https://github.com/MasterQ32/kristall)
   - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
 - [ ] Subscribe to RSS and Atom feeds and display them
+  - Subscribing to page changes, similar to how Spacewalk works, will also be supported
 - [ ] Support Markdown rendering
 - [ ] History browser
 

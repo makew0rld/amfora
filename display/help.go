@@ -22,7 +22,7 @@ spacebar|Open bar at the bottom - type a URL, link number, search term.
 |You can also type two dots (..) to go up a directory in the URL.
 |Typing new:N will open link number N in a new tab
 |instead of the current one.
-Enter|On a page this will start link highlighting.
+Enter, Tab|On a page this will start link highlighting.
 |Press Tab and Shift-Tab to pick different links.
 |Press Enter again to go to one, or Esc to stop.
 Shift-NUMBER|Go to a specific tab.

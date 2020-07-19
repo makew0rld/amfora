@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - <kbd>Tab</kbd> now also enters link selecting mode, like <kbd>Enter</kbd> (#48)
+- Number keys can be pressed to navigate to links 1 through 10 (#47)
 
 ### Fixed
 - You can't change link selection while the page is loading

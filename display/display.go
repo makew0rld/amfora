@@ -317,6 +317,19 @@ func Init() {
 					tabs[curTab].pageDown()
 					return nil
 				}
+
+				// Number key: 1-9, 0
+				i, err := strconv.Atoi(string(event.Rune()))
+				if err == nil {
+					if i == 0 {
+						i = 10 // 0 key is for link 10
+					}
+					if i <= len(tabs[curTab].page.Links) && i > 0 {
+						// It's a valid link number
+						followLink(tabs[curTab], tabs[curTab].page.Url, tabs[curTab].page.Links[i-1])
+						return nil
+					}
+				}
 			}
 		}
 		// All the keys and operations that can work while a tab IS loading

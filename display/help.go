@@ -36,7 +36,8 @@ Ctrl-R, R|Reload a page, discarding the cached version.
 Ctrl-B|View bookmarks
 Ctrl-D|Add, change, or remove a bookmark for the current page.
 Ctrl-S|Save the current page to your downloads.
-q, Ctrl-Q, Ctrl-C|Quit
+q, Ctrl-Q|Quit
+Ctrl-C|Hard quit. This can be used when in the middle of downloading, for example.
 `)
 
 var helpTable = cview.NewTable().

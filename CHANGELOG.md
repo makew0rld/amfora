@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Number keys can be pressed to navigate to links 1 through 10 (#47)
 - Permanent redirects are cached for the session (#22)
 
+### Changed
+- Documented <kbd>Ctrl-C</kbd> has "Hard quit"
+
 ### Fixed
 - You can't change link selection while the page is loading
 - Only one request is made for each URL - `v1.3.0` accidentally made two requests each time (#50)

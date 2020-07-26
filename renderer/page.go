@@ -65,11 +65,11 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 		res.Body.Close()
 	}()
 
-	_, err := io.CopyN(buf, res.Body, viper.GetInt64("a-general.page_max_size")) // 2 MiB max
+	_, err := io.CopyN(buf, res.Body, viper.GetInt64("a-general.page_max_size")+1)
 	res.Body.Close()
 	rawText := buf.Bytes()
 	if err == nil {
-		// Content was larger than 2 MiB
+		// Content was larger than max size
 		return nil, ErrTooLarge
 	} else if err != io.EOF {
 		if strings.HasSuffix(err.Error(), "use of closed network connection") {

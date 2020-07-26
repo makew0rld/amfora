@@ -159,8 +159,15 @@ func downloadURL(u string, resp *gemini.Response) {
 	App.SetFocus(dlModal)
 	App.Draw()
 
-	io.Copy(io.MultiWriter(f, bar), resp.Body)
+	_, err = io.Copy(io.MultiWriter(f, bar), resp.Body)
 	done = true
+	if err != nil {
+		tabPages.HidePage("dl")
+		Error("Download Error", err.Error())
+		f.Close()
+		os.Remove(savePath) // Remove partial file
+		return
+	}
 	dlModal.SetText(fmt.Sprintf("Download complete! File saved to %s.", savePath))
 	dlModal.ClearButtons()
 	dlModal.AddButtons([]string{"Ok"})

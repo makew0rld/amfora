@@ -255,18 +255,23 @@ func handleURL(t *tab, u string) (string, bool) {
 			return ret("", false)
 		}
 
-		// Make new request for downloading purposes
-		res, clientErr := client.Fetch(u)
-		if clientErr != nil && clientErr != client.ErrTofu {
-			Error("URL Fetch Error", err.Error())
-			return ret("", false)
-		}
-
 		if err == renderer.ErrTooLarge {
+			// Make new request for downloading purposes
+			res, clientErr := client.Fetch(u)
+			if clientErr != nil && clientErr != client.ErrTofu {
+				Error("URL Fetch Error", err.Error())
+				return ret("", false)
+			}
 			go dlChoice("That page is too large. What would you like to do?", u, res)
 			return ret("", false)
 		}
 		if err == renderer.ErrTimedOut {
+			// Make new request for downloading purposes
+			res, clientErr := client.Fetch(u)
+			if clientErr != nil && clientErr != client.ErrTofu {
+				Error("URL Fetch Error", err.Error())
+				return ret("", false)
+			}
 			go dlChoice("Loading that page timed out. What would you like to do?", u, res)
 			return ret("", false)
 		}

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - <kbd>Tab</kbd> now also enters link selecting mode, like <kbd>Enter</kbd> (#48)
 - Number keys can be pressed to navigate to links 1 through 10 (#47)
+- Permanent redirects are cached for the session (#22)
 
 ### Fixed
 - You can't change link selection while the page is loading
@@ -27,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Pages are rewrapped dynamically, whenever the terminal size changes (#33)
 - TOFU warning message mentions how long the previous cert was still valid for (#34)
+- Update [cview](https://gitlab.com/tslocum/cview/) to latest commit
 
 ### Fixed
 - Many potential network and display race conditions eliminated

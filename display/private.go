@@ -198,6 +198,7 @@ func handleURL(t *tab, u string) (string, bool) {
 	}
 
 	u = normalizeURL(u)
+	u = cache.Redirect(u)
 
 	parsed, err := url.Parse(u)
 	if err != nil {
@@ -306,6 +307,9 @@ func handleURL(t *tab, u string) (string, bool) {
 		}
 		redir := parsed.ResolveReference(parsedMeta).String()
 		if YesNo("Follow redirect?\n" + redir) {
+			if res.Status == gemini.StatusRedirectPermanent {
+				go cache.AddRedir(u, redir)
+			}
 			return handleURL(t, redir)
 		}
 		return ret("", false)

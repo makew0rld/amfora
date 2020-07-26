@@ -1,5 +1,6 @@
-// Package cache provides an interface for a cache of strings, aka text/gemini pages.
+// Package cache provides an interface for a cache of strings, aka text/gemini pages, and redirects.
 // It is fully thread safe.
+// The redirect cache is not limited.
 package cache
 
 import (

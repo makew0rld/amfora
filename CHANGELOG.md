@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - You can't change link selection while the page is loading
 - Only one request is made for each URL - `v1.3.0` accidentally made two requests each time (#50)
+- Using the `..` command doesn't keep the query string (#49)
 
 
 ## [1.3.0] - 2020-07-10

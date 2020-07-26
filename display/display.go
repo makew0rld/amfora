@@ -139,6 +139,7 @@ func Init() {
 					// Fix double slash that occurs at domain root
 					parsed.Path = "/"
 				}
+				parsed.RawQuery = "" // Remove query
 				URL(parsed.String())
 				return
 			}

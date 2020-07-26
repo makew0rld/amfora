@@ -341,6 +341,9 @@ func Init() {
 		case tcell.KeyCtrlQ:
 			Stop()
 			return nil
+		case tcell.KeyCtrlC:
+			Stop()
+			return nil
 		case tcell.KeyRune:
 			// Regular key was sent
 			switch string(event.Rune()) {

@@ -51,6 +51,7 @@ var helpTable = cview.NewTable().
 func Help() {
 	helpTable.ScrollToBeginning()
 	tabPages.SwitchToPage("help")
+	App.SetFocus(helpTable)
 	App.Draw()
 }
 
@@ -59,6 +60,8 @@ func helpInit() {
 	helpTable.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEsc {
 			tabPages.SwitchToPage(strconv.Itoa(curTab))
+			App.SetFocus(tabs[curTab].view)
+			App.Draw()
 		}
 	})
 	rows := strings.Count(helpCells, "\n") + 1

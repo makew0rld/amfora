@@ -105,6 +105,8 @@ func Init() {
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
 		tab := curTab
 
+		tabs[tab].saveScroll()
+
 		// Reset func to set the bottomBar back to what it was before
 		// Use for errors.
 		reset := func() {
@@ -197,7 +199,7 @@ func Init() {
 			reset()
 			return
 
-		case tcell.KeyEscape:
+		case tcell.KeyEsc:
 			// Set back to what it was
 			reset()
 			return

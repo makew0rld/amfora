@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## [Unreleased]
 ### Added
 - **Themeing** - check out [default-config.toml](./default-config.toml) for details (#46)
@@ -24,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Using the `..` command doesn't keep the query string (#49)
 - Any error that occurs when downloading a file will be displayed, and the partially downloaded file will be deleted
 - Allow for opening a new tab while the current one is loading
+- Pressing Escape after typing in the bottom bar no longer jumps you back to the top of the page
 
 
 ## [1.3.0] - 2020-07-10
@@ -46,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Whether a tab is loading stays indicated when you switch away from it and go back
 - Plain text documents are displayed faithfully (there were some edge conditions)
 - Opening files in portal.mozz.us uses the `http` setting in the config (#42)
+
 
 ## [1.2.0] - 2020-07-02
 ### Added
@@ -75,6 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Help table cells are hardwrapped so the text can still be read entirely on an 80-column terminal
 - New tab text is wrapped to terminal width like other pages (#31)
 - TOFU "continue anyway" popup has a question mark at the end
+
 
 ## [1.1.0] - 2020-06-24
 ### Added

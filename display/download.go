@@ -77,6 +77,8 @@ func dlInit() {
 	dlModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		if buttonLabel == "Ok" {
 			tabPages.SwitchToPage(strconv.Itoa(curTab))
+			App.SetFocus(tabs[curTab].view)
+			App.Draw()
 		}
 	})
 }
@@ -117,10 +119,12 @@ func dlChoice(text, u string, resp *gemini.Response) {
 		portalURL = strings.TrimPrefix(portalURL, "gemini://") + "?raw=1"
 		handleHTTP("https://portal.mozz.us/gemini/"+portalURL, false)
 		tabPages.SwitchToPage(strconv.Itoa(curTab))
+		App.SetFocus(tabs[curTab].view)
 		App.Draw()
 		return
 	}
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 }
 

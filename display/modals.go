@@ -113,12 +113,16 @@ func modalInit() {
 		SetTitle(" Info ")
 	infoModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		tabPages.SwitchToPage(strconv.Itoa(curTab))
+		App.SetFocus(tabs[curTab].view)
+		App.Draw()
 	})
 
 	errorModal.SetBorder(true)
 	errorModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 	errorModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		tabPages.SwitchToPage(strconv.Itoa(curTab))
+		App.SetFocus(tabs[curTab].view)
+		App.Draw()
 	})
 
 	inputModal.SetBorder(true)
@@ -142,8 +146,6 @@ func modalInit() {
 			return
 		}
 		yesNoCh <- false
-
-		//tabPages.SwitchToPage(strconv.Itoa(curTab)) - Handled in YesNo()
 	})
 
 	bkmkInit()
@@ -199,7 +201,11 @@ func Input(prompt string) (string, bool) {
 	App.Draw()
 
 	resp := <-inputCh
+
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	App.SetFocus(tabs[curTab].view)
+	App.Draw()
+
 	if resp == "" {
 		return "", false
 	}
@@ -232,6 +238,8 @@ func YesNo(prompt string) bool {
 
 	resp := <-yesNoCh
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	App.SetFocus(tabs[curTab].view)
+	App.Draw()
 	return resp
 }
 
@@ -269,5 +277,7 @@ func Tofu(host string, expiry time.Time) bool {
 
 	resp := <-yesNoCh
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	App.SetFocus(tabs[curTab].view)
+	App.Draw()
 	return resp
 }

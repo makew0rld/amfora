@@ -63,8 +63,6 @@ func bkmkInit() {
 		case "Cancel":
 			bkmkCh <- 0
 		}
-
-		//tabPages.SwitchToPage(strconv.Itoa(curTab)) - handled in bkmk()
 	})
 }
 
@@ -102,6 +100,8 @@ func openBkmkModal(name string, exists bool) (string, int) {
 
 	action := <-bkmkCh
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	App.SetFocus(tabs[curTab].view)
+	App.Draw()
 
 	return bkmkModalText, action
 }

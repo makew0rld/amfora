@@ -6,7 +6,7 @@
 - Pressing Escape in the bottom bar jumps back to the top of the page
 
 ## Regressions
-- Switching to another tab scrolls page back to the top - same with closing
+
 
 ## Upstream Bugs
 - Wrapping messes up on brackets

@@ -419,6 +419,7 @@ func NewTab() {
 		tabs[curTab].view.Highlight("")
 		// Save bottomBar state
 		tabs[curTab].saveBottomBar()
+		tabs[curTab].saveScroll()
 	}
 
 	curTab = NumTabs()
@@ -525,6 +526,7 @@ func SwitchTab(tab int) {
 	if curTab > -1 {
 		// Save bottomBar state
 		tabs[curTab].saveBottomBar()
+		tabs[curTab].saveScroll()
 	}
 
 	curTab = tab % NumTabs()

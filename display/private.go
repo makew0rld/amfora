@@ -319,7 +319,7 @@ func handleURL(t *tab, u string) (string, bool) {
 			if res.Status == gemini.StatusRedirectPermanent {
 				go cache.AddRedir(u, redir)
 			}
-			return handleURL(t, redir)
+			return ret(handleURL(t, redir))
 		}
 		return ret("", false)
 	case 40:

@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any error that occurs when downloading a file will be displayed, and the partially downloaded file will be deleted
 - Allow for opening a new tab while the current one is loading
 - Pressing Escape after typing in the bottom bar no longer jumps you back to the top of the page
+- Repeated redirects where the last one is cancelled by the user doesn't leave the `Loading...` text in the bottom bar (#53)
 
 
 ## [1.3.0] - 2020-07-10

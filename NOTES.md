@@ -2,7 +2,7 @@
 
 ## Issues
 - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
-- Can't go back or do other things while page is loading - need a way to stop `handleURL`
+
 
 ## Regressions
 

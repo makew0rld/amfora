@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
+## [1.4.0] - 2020-07-28
 ### Added
 - **Themeing** - check out [default-config.toml](./default-config.toml) for details (#46)
 - <kbd>Tab</kbd> now also enters link selecting mode, like <kbd>Enter</kbd> (#48)
@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.ansi` is also supported for `text/x-ansi` files, as well as the already supported `.ans`
 
 ### Changed
-- Documented <kbd>Ctrl-C</kbd> has "Hard quit"
+- Documented <kbd>Ctrl-C</kbd> as "Hard quit"
 - Updated [cview](https://gitlab.com/tslocum/cview/) to latest commit: `cc7796c4ca44e3908f80d93e92e73694562d936a`
 - The bottom bar label now uses the same color as the tabs at the top
 - Tab and blue link colors were changed very slightly to be part of the 256 Xterm colors, for better terminal support

@@ -253,19 +253,6 @@ func Init() {
 			}
 
 			switch event.Key() {
-			case tcell.KeyCtrlT:
-				if tabs[curTab].page.Mode == structs.ModeLinkSelect {
-					next, err := resolveRelLink(tabs[curTab], tabs[curTab].page.Url, tabs[curTab].page.Selected)
-					if err != nil {
-						Error("URL Error", err.Error())
-						return nil
-					}
-					NewTab()
-					URL(next)
-				} else {
-					NewTab()
-				}
-				return nil
 			case tcell.KeyCtrlR:
 				Reload()
 				return nil
@@ -341,6 +328,19 @@ func Init() {
 		// All the keys and operations that can work while a tab IS loading
 
 		switch event.Key() {
+		case tcell.KeyCtrlT:
+			if tabs[curTab].page.Mode == structs.ModeLinkSelect {
+				next, err := resolveRelLink(tabs[curTab], tabs[curTab].page.Url, tabs[curTab].page.Selected)
+				if err != nil {
+					Error("URL Error", err.Error())
+					return nil
+				}
+				NewTab()
+				URL(next)
+			} else {
+				NewTab()
+			}
+			return nil
 		case tcell.KeyCtrlW:
 			CloseTab()
 			return nil

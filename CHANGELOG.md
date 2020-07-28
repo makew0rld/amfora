@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Only one request is made for each URL - `v1.3.0` accidentally made two requests each time (#50)
 - Using the `..` command doesn't keep the query string (#49)
 - Any error that occurs when downloading a file will be displayed, and the partially downloaded file will be deleted
+- Allow for opening a new tab while the current one is loading
 
 
 ## [1.3.0] - 2020-07-10

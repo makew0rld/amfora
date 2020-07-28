@@ -9,7 +9,7 @@ import (
 )
 
 var helpCells = strings.TrimSpace(`
-?|Bring up this help.
+?|Bring up this help. You can scroll!
 Esc|Leave the help
 Arrow keys, h/j/k/l|Scroll and move a page.
 Tab|Navigate to the next item in a popup.
@@ -22,6 +22,7 @@ spacebar|Open bar at the bottom - type a URL, link number, search term.
 |You can also type two dots (..) to go up a directory in the URL.
 |Typing new:N will open link number N in a new tab
 |instead of the current one.
+Numbers|Go to links 1-10 respectively.
 Enter, Tab|On a page this will start link highlighting.
 |Press Tab and Shift-Tab to pick different links.
 |Press Enter again to go to one, or Esc to stop.
@@ -37,13 +38,14 @@ Ctrl-B|View bookmarks
 Ctrl-D|Add, change, or remove a bookmark for the current page.
 Ctrl-S|Save the current page to your downloads.
 q, Ctrl-Q|Quit
-Ctrl-C|Hard quit. This can be used when in the middle of downloading, for example.
+Ctrl-C|Hard quit. This can be used when in the middle of downloading,
+|for example.
 `)
 
 var helpTable = cview.NewTable().
 	SetSelectable(false, false).
 	SetBorders(false).
-	SetBordersColor(tcell.ColorGray)
+	SetScrollBarVisibility(cview.ScrollBarNever)
 
 // Help displays the help and keybindings.
 func Help() {

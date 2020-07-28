@@ -24,13 +24,13 @@ type tabHistory struct {
 
 // tab hold the information needed for each browser tab.
 type tab struct {
-	page        *structs.Page
-	view        *cview.TextView
-	history     *tabHistory
-	mode        tabMode
-	reformatMut *sync.Mutex // Mutex for reformatting, so there's only one reformat job at once
-	barLabel    string      // The bottomBar label for the tab
-	barText     string      // The bottomBar text for the tab
+	page       *structs.Page
+	view       *cview.TextView
+	history    *tabHistory
+	mode       tabMode
+	reformatMu *sync.Mutex // Mutex for reformatting, so there's only one reformat job at once
+	barLabel   string      // The bottomBar label for the tab
+	barText    string      // The bottomBar text for the tab
 }
 
 // makeNewTab initializes an tab struct with no content.
@@ -45,9 +45,9 @@ func makeNewTab() *tab {
 			SetChangedFunc(func() {
 				App.Draw()
 			}),
-		history:     &tabHistory{},
-		reformatMut: &sync.Mutex{},
-		mode:        tabModeDone,
+		history:    &tabHistory{},
+		reformatMu: &sync.Mutex{},
+		mode:       tabModeDone,
 	}
 	t.view.SetDoneFunc(func(key tcell.Key) {
 		// Altered from: https://gitlab.com/tslocum/cview/-/blob/master/demos/textview/main.go

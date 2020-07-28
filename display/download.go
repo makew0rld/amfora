@@ -23,50 +23,62 @@ import (
 
 // For choosing between download and the portal - copy of YesNo basically
 var dlChoiceModal = cview.NewModal().
-	SetTextColor(tcell.ColorWhite).
 	AddButtons([]string{"Download", "Open in portal", "Cancel"})
 
 // Channel to indicate what choice they made using the button text
 var dlChoiceCh = make(chan string)
 
-var dlModal = cview.NewModal().
-	SetTextColor(tcell.ColorWhite)
+var dlModal = cview.NewModal()
 
 func dlInit() {
 	if viper.GetBool("a-general.color") {
-		dlChoiceModal.SetButtonBackgroundColor(tcell.ColorNavy).
-			SetButtonTextColor(tcell.ColorWhite).
-			SetBackgroundColor(tcell.ColorPurple)
-		dlModal.SetButtonBackgroundColor(tcell.ColorNavy).
-			SetButtonTextColor(tcell.ColorWhite).
-			SetBackgroundColor(tcell.Color130) // DarkOrange3, #af5f00
+		dlChoiceModal.SetButtonBackgroundColor(config.GetColor("btn_bg")).
+			SetButtonTextColor(config.GetColor("btn_text")).
+			SetBackgroundColor(config.GetColor("dl_choice_modal_bg")).
+			SetTextColor(config.GetColor("dl_choice_modal_text"))
+		dlChoiceModal.GetFrame().
+			SetBorderColor(config.GetColor("dl_choice_modal_text")).
+			SetTitleColor(config.GetColor("dl_choice_modal_text"))
+
+		dlModal.SetButtonBackgroundColor(config.GetColor("btn_bg")).
+			SetButtonTextColor(config.GetColor("btn_text")).
+			SetBackgroundColor(config.GetColor("dl_modal_bg")).
+			SetTextColor(config.GetColor("dl_modal_text"))
+		dlModal.GetFrame().
+			SetBorderColor(config.GetColor("dl_modal_text")).
+			SetTitleColor(config.GetColor("dl_modal_text"))
 	} else {
 		dlChoiceModal.SetButtonBackgroundColor(tcell.ColorWhite).
 			SetButtonTextColor(tcell.ColorBlack).
-			SetBackgroundColor(tcell.ColorBlack)
+			SetBackgroundColor(tcell.ColorBlack).
+			SetTextColor(tcell.ColorWhite)
+		dlChoiceModal.SetBorderColor(tcell.ColorWhite)
+		dlChoiceModal.GetFrame().SetTitleColor(tcell.ColorWhite)
+
 		dlModal.SetButtonBackgroundColor(tcell.ColorWhite).
 			SetButtonTextColor(tcell.ColorBlack).
-			SetBackgroundColor(tcell.ColorBlack)
+			SetBackgroundColor(tcell.ColorBlack).
+			SetTextColor(tcell.ColorWhite)
+		dlModal.GetFrame().
+			SetBorderColor(tcell.ColorWhite).
+			SetTitleColor(tcell.ColorWhite)
 	}
 
 	dlChoiceModal.SetBorder(true)
-	dlChoiceModal.SetBorderColor(tcell.ColorWhite)
+	dlChoiceModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 	dlChoiceModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		dlChoiceCh <- buttonLabel
 	})
-	dlChoiceModal.GetFrame().SetTitleColor(tcell.ColorWhite)
-	dlChoiceModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 
 	dlModal.SetBorder(true)
-	dlModal.SetBorderColor(tcell.ColorWhite)
+	dlModal.GetFrame().
+		SetTitleAlign(cview.AlignCenter).
+		SetTitle(" Download ")
 	dlModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		if buttonLabel == "Ok" {
 			tabPages.SwitchToPage(strconv.Itoa(curTab))
 		}
 	})
-	dlModal.GetFrame().SetTitleColor(tcell.ColorWhite)
-	dlModal.GetFrame().SetTitleAlign(cview.AlignCenter)
-	dlModal.GetFrame().SetTitle(" Download ")
 }
 
 // dlChoice displays the download choice modal and acts on the user's choice.

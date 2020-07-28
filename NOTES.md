@@ -3,6 +3,9 @@
 ## Issues
 - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
 - Can't go back or do other things while page is loading - need a way to stop `handleURL`
+- Allow for opening a new tab while the current one is loading
+- Can't leave the help window
+- Can't interact with page after clicking Cancel on bkmk (and other?) modal(s)
 
 ## Upstream Bugs
 - Wrapping messes up on brackets

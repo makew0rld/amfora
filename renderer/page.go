@@ -109,7 +109,7 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 			Links:     links,
 		}, nil
 	} else if strings.HasPrefix(mediatype, "text/") {
-		if mediatype == "text/x-ansi" || strings.HasSuffix(url, ".ans") {
+		if mediatype == "text/x-ansi" || strings.HasSuffix(url, ".ans") || strings.HasSuffix(url, ".ansi") {
 			// ANSI
 			return &structs.Page{
 				Mediatype: structs.TextAnsi,

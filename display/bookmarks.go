@@ -7,6 +7,7 @@ import (
 
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
+	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/spf13/viper"
@@ -14,8 +15,7 @@ import (
 )
 
 // For adding and removing bookmarks, basically a clone of the input modal.
-var bkmkModal = cview.NewModal().
-	SetTextColor(tcell.ColorWhite)
+var bkmkModal = cview.NewModal()
 
 // bkmkCh is for the user action
 var bkmkCh = make(chan int) // 1, 0, -1 for add/update, cancel, and remove
@@ -23,21 +23,35 @@ var bkmkModalText string    // The current text of the input field in the modal
 
 func bkmkInit() {
 	if viper.GetBool("a-general.color") {
-		bkmkModal.SetBackgroundColor(tcell.ColorTeal).
-			SetButtonBackgroundColor(tcell.ColorNavy).
-			SetButtonTextColor(tcell.ColorWhite)
+		bkmkModal.SetBackgroundColor(config.GetColor("bkmk_modal_bg")).
+			SetButtonBackgroundColor(config.GetColor("btn_bg")).
+			SetButtonTextColor(config.GetColor("btn_text")).
+			SetTextColor(config.GetColor("bkmk_modal_text"))
+		bkmkModal.GetForm().
+			SetLabelColor(config.GetColor("bkmk_modal_label")).
+			SetFieldBackgroundColor(config.GetColor("bkmk_modal_field_bg")).
+			SetFieldTextColor(config.GetColor("bkmk_modal_field_text"))
+		bkmkModal.GetFrame().
+			SetBorderColor(config.GetColor("bkmk_modal_text")).
+			SetTitleColor(config.GetColor("bkmk_modal_text"))
 	} else {
 		bkmkModal.SetBackgroundColor(tcell.ColorBlack).
 			SetButtonBackgroundColor(tcell.ColorWhite).
-			SetButtonTextColor(tcell.ColorBlack)
+			SetButtonTextColor(tcell.ColorBlack).
+			SetTextColor(tcell.ColorWhite)
 		bkmkModal.GetForm().
 			SetLabelColor(tcell.ColorWhite).
 			SetFieldBackgroundColor(tcell.ColorWhite).
 			SetFieldTextColor(tcell.ColorBlack)
+		bkmkModal.GetFrame().
+			SetBorderColor(tcell.ColorWhite).
+			SetTitleColor(tcell.ColorWhite)
 	}
 
 	bkmkModal.SetBorder(true)
-	bkmkModal.SetBorderColor(tcell.ColorWhite)
+	bkmkModal.GetFrame().
+		SetTitleAlign(cview.AlignCenter).
+		SetTitle(" Add Bookmark ")
 	bkmkModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		switch buttonLabel {
 		case "Add":
@@ -52,9 +66,6 @@ func bkmkInit() {
 
 		//tabPages.SwitchToPage(strconv.Itoa(curTab)) - handled in bkmk()
 	})
-	bkmkModal.GetFrame().SetTitleColor(tcell.ColorWhite)
-	bkmkModal.GetFrame().SetTitleAlign(cview.AlignCenter)
-	bkmkModal.GetFrame().SetTitle(" Add Bookmark ")
 }
 
 // Bkmk displays the "Add a bookmark" modal.

@@ -9,6 +9,7 @@ import (
 
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
+	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/spf13/viper"
@@ -23,9 +24,7 @@ var termW int
 var termH int
 
 // The user input and URL display bar at the bottom
-var bottomBar = cview.NewInputField().
-	SetFieldBackgroundColor(tcell.ColorWhite).
-	SetFieldTextColor(tcell.ColorBlack)
+var bottomBar = cview.NewInputField()
 
 // Viewer for the tab primitives
 // Pages are named as strings of tab numbers - so the textview for the first tab
@@ -50,18 +49,7 @@ var tabRow = cview.NewTextView().
 
 // Root layout
 var layout = cview.NewFlex().
-	SetDirection(cview.FlexRow).
-	AddItem(tabRow, 1, 1, false).
-	AddItem(nil, 1, 1, false). // One line of empty space above the page
-	AddItem(tabPages, 0, 1, true).
-	// AddItem(cview.NewFlex(). // The page text in the middle is held in another flex, to center it
-	// 				SetDirection(cview.FlexColumn).
-	// 				AddItem(nil, 0, 1, false).
-	// 				AddItem(tabPages, 0, 7, true). // The text occupies 7/9 of the screen horizontally
-	// 				AddItem(nil, 0, 1, false),
-	// 				0, 1, true).
-	AddItem(nil, 1, 1, false). // One line of empty space before bottomBar
-	AddItem(bottomBar, 1, 1, false)
+	SetDirection(cview.FlexRow)
 
 var renderedNewTabContent string
 var newTabLinks []string
@@ -77,8 +65,8 @@ var App = cview.NewApplication().
 
 		// Make sure the current tab content is reformatted when the terminal size changes
 		go func(t *tab) {
-			t.reformatMut.Lock() // Only one reformat job per tab
-			defer t.reformatMut.Unlock()
+			t.reformatMu.Lock() // Only one reformat job per tab
+			defer t.reformatMu.Unlock()
 			// Use the current tab, but don't affect other tabs if the user switches tabs
 			reformatPageAndSetView(t, t.page)
 		}(tabs[curTab])
@@ -91,12 +79,29 @@ func Init() {
 
 	helpInit()
 
+	layout.
+		AddItem(tabRow, 1, 1, false).
+		AddItem(nil, 1, 1, false). // One line of empty space above the page
+		AddItem(tabPages, 0, 1, true).
+		AddItem(nil, 1, 1, false). // One line of empty space before bottomBar
+		AddItem(bottomBar, 1, 1, false)
+
 	if viper.GetBool("a-general.color") {
-		bottomBar.SetLabelColor(tcell.ColorGreen)
+		layout.SetBackgroundColor(config.GetColor("bg"))
+		tabRow.SetBackgroundColor(config.GetColor("bg"))
+
+		bottomBar.SetBackgroundColor(config.GetColor("bottombar_bg"))
+		bottomBar.
+			SetLabelColor(config.GetColor("bottombar_label")).
+			SetFieldBackgroundColor(config.GetColor("bottombar_bg")).
+			SetFieldTextColor(config.GetColor("bottombar_text"))
 	} else {
-		bottomBar.SetLabelColor(tcell.ColorBlack)
+		bottomBar.SetBackgroundColor(tcell.ColorWhite)
+		bottomBar.
+			SetLabelColor(tcell.ColorBlack).
+			SetFieldBackgroundColor(tcell.ColorWhite).
+			SetFieldTextColor(tcell.ColorBlack)
 	}
-	bottomBar.SetBackgroundColor(tcell.ColorWhite)
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
 		tab := curTab
 
@@ -432,7 +437,12 @@ func NewTab() {
 	// Add tab number to the actual place where tabs are show on the screen
 	// Tab regions are 0-indexed but text displayed on the screen starts at 1
 	if viper.GetBool("a-general.color") {
-		fmt.Fprintf(tabRow, `["%d"][darkcyan]  %d  [white][""]|`, curTab, curTab+1)
+		fmt.Fprintf(tabRow, `["%d"][%s]  %d  [%s][""]|`,
+			curTab,
+			config.GetColorString("tab_num"),
+			curTab+1,
+			config.GetColorString("tab_divider"),
+		)
 	} else {
 		fmt.Fprintf(tabRow, `["%d"]  %d  [""]|`, curTab, curTab+1)
 	}
@@ -477,7 +487,12 @@ func CloseTab() {
 	tabRow.Clear()
 	if viper.GetBool("a-general.color") {
 		for i := 0; i < NumTabs(); i++ {
-			fmt.Fprintf(tabRow, `["%d"][darkcyan]  %d  [white][""]|`, i, i+1)
+			fmt.Fprintf(tabRow, `["%d"][%s]  %d  [%s][""]|`,
+				i,
+				config.GetColorString("tab_num"),
+				i+1,
+				config.GetColorString("tab_divider"),
+			)
 		}
 	} else {
 		for i := 0; i < NumTabs(); i++ {

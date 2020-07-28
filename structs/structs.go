@@ -21,7 +21,7 @@ type Page struct {
 	Url        string
 	Mediatype  Mediatype
 	Raw        string   // The raw response, as received over the network
-	Content    string   // The processed content, NOT raw. Uses cview colour tags. All link/link texts must have region tags. It will also have a left margin.
+	Content    string   // The processed content, NOT raw. Uses cview color tags. All link/link texts must have region tags. It will also have a left margin.
 	Links      []string // URLs, for each region in the content.
 	Row        int      // Scroll position
 	Column     int      // ditto

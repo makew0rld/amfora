@@ -7,12 +7,12 @@ import (
 // Functions for caching redirects.
 
 var redirUrls = make(map[string]string) // map original URL to redirect
-var redirMut = sync.RWMutex{}
+var redirMu = sync.RWMutex{}
 
 // AddRedir adds a original-to-redirect pair to the cache.
 func AddRedir(og, redir string) {
-	redirMut.Lock()
-	defer redirMut.Unlock()
+	redirMu.Lock()
+	defer redirMu.Unlock()
 
 	for k, v := range redirUrls {
 		if og == v {
@@ -32,8 +32,8 @@ func AddRedir(og, redir string) {
 
 // ClearRedirs removes all redirects from the cache.
 func ClearRedirs() {
-	redirMut.Lock()
-	defer redirMut.Unlock()
+	redirMu.Lock()
+	defer redirMu.Unlock()
 	redirUrls = make(map[string]string)
 }
 
@@ -41,8 +41,8 @@ func ClearRedirs() {
 // exists for that URL in the cache.
 // If one does not then the original URL is returned.
 func Redirect(u string) string {
-	redirMut.RLock()
-	defer redirMut.RUnlock()
+	redirMu.RLock()
+	defer redirMu.RUnlock()
 
 	// A single lookup is enough, because AddRedir
 	// removes loops and chains.
@@ -54,7 +54,7 @@ func Redirect(u string) string {
 }
 
 func NumRedirs() int {
-	redirMut.RLock()
-	defer redirMut.RUnlock()
+	redirMu.RLock()
+	defer redirMu.RUnlock()
 	return len(redirUrls)
 }

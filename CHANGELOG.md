@@ -6,18 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Themeing** - check out [default-config.toml](./default-config.toml) for details (#46)
 - <kbd>Tab</kbd> now also enters link selecting mode, like <kbd>Enter</kbd> (#48)
 - Number keys can be pressed to navigate to links 1 through 10 (#47)
 - Permanent redirects are cached for the session (#22)
+- `.ansi` is also supported for `text/x-ansi` files, as well as the already supported `.ans`
 
 ### Changed
 - Documented <kbd>Ctrl-C</kbd> has "Hard quit"
+- Updated [cview](https://gitlab.com/tslocum/cview/) to latest commit: `cc7796c4ca44e3908f80d93e92e73694562d936a`
+- The bottom bar label now uses the same color as the tabs at the top
+- Tab and blue link colors were changed very slightly to be part of the 256 Xterm colors, for better terminal support
 
 ### Fixed
 - You can't change link selection while the page is loading
 - Only one request is made for each URL - `v1.3.0` accidentally made two requests each time (#50)
 - Using the `..` command doesn't keep the query string (#49)
-- Any error that occurs when downloading a file will be displayed, and the partially download file will be deleted
+- Any error that occurs when downloading a file will be displayed, and the partially downloaded file will be deleted
 
 
 ## [1.3.0] - 2020-07-10
@@ -34,7 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Pages are rewrapped dynamically, whenever the terminal size changes (#33)
 - TOFU warning message mentions how long the previous cert was still valid for (#34)
-- Update [cview](https://gitlab.com/tslocum/cview/) to latest commit
 
 ### Fixed
 - Many potential network and display race conditions eliminated

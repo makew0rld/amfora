@@ -5,10 +5,12 @@
 package renderer
 
 import (
+	"fmt"
 	urlPkg "net/url"
 	"strconv"
 	"strings"
 
+	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
@@ -33,7 +35,9 @@ func RenderPlainText(s string, leftMargin int) string {
 	var shifted string
 	lines := strings.Split(cview.Escape(s), "\n")
 	for i := range lines {
-		shifted += strings.Repeat(" ", leftMargin) + lines[i] + "\n"
+		shifted += strings.Repeat(" ", leftMargin) +
+			"[" + config.GetColorString("regular_text") + "]" + lines[i] + "[-]" +
+			"\n"
 	}
 	return shifted
 }
@@ -70,6 +74,17 @@ func wrapLine(line string, width int, prefix, suffix string, includeFirst bool) 
 	return ret
 }
 
+// tagLines splits a string into lines and adds a the given
+// string to the start and another to the end.
+// It is used for adding cview color tags.
+func tagLines(s, start, end string) string {
+	lines := strings.Split(s, "\n")
+	for i := range lines {
+		lines[i] = start + lines[i] + end
+	}
+	return strings.Join(lines, "\n")
+}
+
 // convertRegularGemini converts non-preformatted blocks of text/gemini
 // into a cview-compatible format.
 // It also returns a slice of link URLs.
@@ -88,14 +103,16 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 
 		if strings.HasPrefix(lines[i], "#") {
 			// Headings
+			var tag string
 			if viper.GetBool("a-general.color") {
 				if strings.HasPrefix(lines[i], "###") {
-					wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "[fuchsia::b]", "[-::-]", true)...)
+					tag = fmt.Sprintf("[%s::b]", config.GetColorString("hdg_3"))
 				} else if strings.HasPrefix(lines[i], "##") {
-					wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "[lime::b]", "[-::-]", true)...)
+					tag = fmt.Sprintf("[%s::b]", config.GetColorString("hdg_2"))
 				} else if strings.HasPrefix(lines[i], "#") {
-					wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "[red::b]", "[-::-]", true)...)
+					tag = fmt.Sprintf("[%s::b]", config.GetColorString("hdg_1"))
 				}
+				wrappedLines = append(wrappedLines, wrapLine(lines[i], width, tag, "[-::-]", true)...)
 			} else {
 				// Just bold, no colors
 				wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "[::b]", "[-::-]", true)...)
@@ -141,34 +158,37 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 				if err == nil && (pU.Scheme == "" || pU.Scheme == "gemini" || pU.Scheme == "about") {
 					// A gemini link
 					// Add the link text in blue (in a region), and a gray link number to the left of it
+					// Those are the default colors, anyway
 
 					wrappedLink = wrapLine(linkText, width,
 						strings.Repeat(" ", len(strconv.Itoa(numLinks+len(links)))+4)+ // +4 for spaces and brackets
-							`["`+strconv.Itoa(numLinks+len(links)-1)+`"][dodgerblue]`,
+							`["`+strconv.Itoa(numLinks+len(links)-1)+`"][`+config.GetColorString("amfora_link")+`]`,
 						`[-][""]`,
 						false, // Don't indent the first line, it's the one with link number
 					)
 
 					// Add special stuff to first line, like the link number
-					wrappedLink[0] = `[silver::b][` + strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
-						`["` + strconv.Itoa(numLinks+len(links)-1) + `"][dodgerblue]` +
+					wrappedLink[0] = fmt.Sprintf(`[%s::b][`, config.GetColorString("link_number")) +
+						strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
+						`["` + strconv.Itoa(numLinks+len(links)-1) + `"][` + config.GetColorString("amfora_link") + `]` +
 						wrappedLink[0] + `[-][""]`
 				} else {
-					// Not a gemini link, use purple instead
+					// Not a gemini link
 
 					wrappedLink = wrapLine(linkText, width,
 						strings.Repeat(" ", len(strconv.Itoa(numLinks+len(links)))+4)+ // +4 for spaces and brackets
-							`["`+strconv.Itoa(numLinks+len(links)-1)+`"][#8700d7]`,
+							`["`+strconv.Itoa(numLinks+len(links)-1)+`"][`+config.GetColorString("foreign_link")+`]`,
 						`[-][""]`,
 						false, // Don't indent the first line, it's the one with link number
 					)
 
-					wrappedLink[0] = `[silver::b][` + strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
-						`["` + strconv.Itoa(numLinks+len(links)-1) + `"][#8700d7]` +
+					wrappedLink[0] = fmt.Sprintf(`[%s::b][`, config.GetColorString("link_number")) +
+						strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
+						`["` + strconv.Itoa(numLinks+len(links)-1) + `"][` + config.GetColorString("foreign_link") + `]` +
 						wrappedLink[0] + `[-][""]`
 				}
 			} else {
-				// No colours allowed
+				// No colors allowed
 
 				wrappedLink = wrapLine(linkText, width,
 					strings.Repeat(" ", len(strconv.Itoa(numLinks+len(links)))+4)+ // +4 for spaces and brackets
@@ -188,9 +208,12 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 		} else if strings.HasPrefix(lines[i], "* ") {
 			if viper.GetBool("a-general.bullets") {
 				// Wrap list item, and indent wrapped lines past the bullet
-				wrappedItem := wrapLine(lines[i][1:], width, "    ", "", false)
+				wrappedItem := wrapLine(lines[i][1:], width,
+					fmt.Sprintf("    [%s]", config.GetColorString("list_text")),
+					"[-]", false)
 				// Add bullet
-				wrappedItem[0] = " \u2022" + wrappedItem[0]
+				wrappedItem[0] = fmt.Sprintf(" [%s]\u2022", config.GetColorString("list_text")) +
+					wrappedItem[0] + "[-]"
 				wrappedLines = append(wrappedLines, wrappedItem...)
 			}
 			// Optionally list lines could be colored here too, if color is enabled
@@ -200,14 +223,19 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 			// Remove beginning quote and maybe space
 			lines[i] = strings.TrimPrefix(lines[i], ">")
 			lines[i] = strings.TrimPrefix(lines[i], " ")
-			wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "> [::i]", "[::-]", true)...)
+			wrappedLines = append(wrappedLines,
+				wrapLine(lines[i], width, fmt.Sprintf("[%s::i]> ", config.GetColorString("quote_text")),
+					"[-::-]", true)...,
+			)
 
 		} else if strings.TrimSpace(lines[i]) == "" {
 			// Just add empty line without processing
 			wrappedLines = append(wrappedLines, "")
 		} else {
 			// Regular line, just wrap it
-			wrappedLines = append(wrappedLines, wrapLine(lines[i], width, "", "", true)...)
+			wrappedLines = append(wrappedLines, wrapLine(lines[i], width,
+				fmt.Sprintf("[%s]", config.GetColorString("regular_text")),
+				"[-]", true)...)
 		}
 	}
 
@@ -237,7 +265,11 @@ func RenderGemini(s string, width, leftMargin int) (string, []string) {
 			if pre {
 				// In a preformatted block, so add the text as is
 				// Don't add the current line with backticks
-				rendered += buf
+				rendered += tagLines(
+					buf,
+					fmt.Sprintf("[%s]", config.GetColorString("preformatted_text")),
+					"[-]",
+				)
 			} else {
 				// Not preformatted, regular text
 				ren, lks := convertRegularGemini(buf, len(links), width)

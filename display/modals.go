@@ -8,6 +8,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/gdamore/tcell"
+	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
@@ -16,22 +17,16 @@ import (
 // The bookmark modal is in bookmarks.go
 
 var infoModal = cview.NewModal().
-	SetTextColor(tcell.ColorWhite).
 	AddButtons([]string{"Ok"})
 
 var errorModal = cview.NewModal().
-	SetTextColor(tcell.ColorWhite).
 	AddButtons([]string{"Ok"})
 
-var inputModal = cview.NewModal().
-	SetTextColor(tcell.ColorWhite)
-	//AddButtons([]string{"Send", "Cancel"}) - Added in func
-
+var inputModal = cview.NewModal()
 var inputCh = make(chan string)
 var inputModalText string // The current text of the input field in the modal
 
 var yesNoModal = cview.NewModal().
-	SetTextColor(tcell.ColorWhite).
 	AddButtons([]string{"Yes", "No"})
 
 // Channel to receive yesNo answer on
@@ -48,29 +43,60 @@ func modalInit() {
 
 	// Color setup
 	if viper.GetBool("a-general.color") {
-		infoModal.SetBackgroundColor(tcell.ColorGray).
-			SetButtonBackgroundColor(tcell.ColorNavy).
-			SetButtonTextColor(tcell.ColorWhite)
-		errorModal.SetBackgroundColor(tcell.ColorMaroon).
-			SetButtonBackgroundColor(tcell.ColorNavy).
-			SetButtonTextColor(tcell.ColorWhite)
-		inputModal.SetBackgroundColor(tcell.ColorGreen).
-			SetButtonBackgroundColor(tcell.ColorNavy).
-			SetButtonTextColor(tcell.ColorWhite)
-		yesNoModal.SetButtonBackgroundColor(tcell.ColorNavy).
-			SetButtonTextColor(tcell.ColorWhite)
+		infoModal.SetBackgroundColor(config.GetColor("info_modal_bg")).
+			SetButtonBackgroundColor(config.GetColor("btn_bg")).
+			SetButtonTextColor(config.GetColor("btn_text")).
+			SetTextColor(config.GetColor("info_modal_text"))
+		infoModal.GetFrame().
+			SetBorderColor(config.GetColor("info_modal_text")).
+			SetTitleColor(config.GetColor("info_modal_text"))
+
+		errorModal.SetBackgroundColor(config.GetColor("error_modal_bg")).
+			SetButtonBackgroundColor(config.GetColor("btn_bg")).
+			SetButtonTextColor(config.GetColor("btn_text")).
+			SetTextColor(config.GetColor("error_modal_text"))
+		errorModal.GetFrame().
+			SetBorderColor(config.GetColor("error_modal_text")).
+			SetTitleColor(config.GetColor("error_modal_text"))
+
+		inputModal.SetBackgroundColor(config.GetColor("input_modal_bg")).
+			SetButtonBackgroundColor(config.GetColor("btn_bg")).
+			SetButtonTextColor(config.GetColor("btn_text")).
+			SetTextColor(config.GetColor("input_modal_text"))
+		inputModal.GetFrame().
+			SetBorderColor(config.GetColor("input_modal_text")).
+			SetTitleColor(config.GetColor("input_modal_text"))
+		inputModal.GetForm().
+			SetFieldBackgroundColor(config.GetColor("input_modal_field_bg")).
+			SetFieldTextColor(config.GetColor("input_modal_field_text"))
+
+		yesNoModal.SetButtonBackgroundColor(config.GetColor("btn_bg")).
+			SetButtonTextColor(config.GetColor("btn_text"))
 	} else {
 		infoModal.SetBackgroundColor(tcell.ColorBlack).
 			SetButtonBackgroundColor(tcell.ColorWhite).
-			SetButtonTextColor(tcell.ColorBlack)
+			SetButtonTextColor(tcell.ColorBlack).
+			SetTextColor(tcell.ColorWhite)
+		infoModal.GetFrame().
+			SetBorderColor(tcell.ColorWhite).
+			SetTitleColor(tcell.ColorWhite)
+
 		errorModal.SetBackgroundColor(tcell.ColorBlack).
 			SetButtonBackgroundColor(tcell.ColorWhite).
-			SetButtonTextColor(tcell.ColorBlack)
+			SetButtonTextColor(tcell.ColorBlack).
+			SetTextColor(tcell.ColorWhite)
+		errorModal.GetFrame().
+			SetBorderColor(tcell.ColorWhite).
+			SetTitleColor(tcell.ColorWhite)
+
 		inputModal.SetBackgroundColor(tcell.ColorBlack).
 			SetButtonBackgroundColor(tcell.ColorWhite).
-			SetButtonTextColor(tcell.ColorBlack)
+			SetButtonTextColor(tcell.ColorBlack).
+			SetTextColor(tcell.ColorWhite)
+		inputModal.GetFrame().
+			SetBorderColor(tcell.ColorWhite).
+			SetTitleColor(tcell.ColorWhite)
 		inputModal.GetForm().
-			SetLabelColor(tcell.ColorWhite).
 			SetFieldBackgroundColor(tcell.ColorWhite).
 			SetFieldTextColor(tcell.ColorBlack)
 
@@ -82,24 +108,23 @@ func modalInit() {
 	// Modal functions that can't be added up above, because they return the wrong type
 
 	infoModal.SetBorder(true)
-	infoModal.SetBorderColor(tcell.ColorWhite)
+	infoModal.GetFrame().
+		SetTitleAlign(cview.AlignCenter).
+		SetTitle(" Info ")
 	infoModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		tabPages.SwitchToPage(strconv.Itoa(curTab))
 	})
-	infoModal.GetFrame().SetTitleColor(tcell.ColorWhite)
-	infoModal.GetFrame().SetTitleAlign(cview.AlignCenter)
-	infoModal.GetFrame().SetTitle(" Info ")
 
 	errorModal.SetBorder(true)
-	errorModal.SetBorderColor(tcell.ColorWhite)
+	errorModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 	errorModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		tabPages.SwitchToPage(strconv.Itoa(curTab))
 	})
-	errorModal.GetFrame().SetTitleColor(tcell.ColorWhite)
-	errorModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 
 	inputModal.SetBorder(true)
-	inputModal.SetBorderColor(tcell.ColorWhite)
+	inputModal.GetFrame().
+		SetTitleAlign(cview.AlignCenter).
+		SetTitle(" Input ")
 	inputModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		if buttonLabel == "Send" {
 			inputCh <- inputModalText
@@ -107,15 +132,10 @@ func modalInit() {
 		}
 		// Empty string indicates no input
 		inputCh <- ""
-
-		//tabPages.SwitchToPage(strconv.Itoa(curTab)) - handled in Input()
 	})
-	inputModal.GetFrame().SetTitleColor(tcell.ColorWhite)
-	inputModal.GetFrame().SetTitleAlign(cview.AlignCenter)
-	inputModal.GetFrame().SetTitle(" Input ")
 
 	yesNoModal.SetBorder(true)
-	yesNoModal.SetBorderColor(tcell.ColorWhite)
+	yesNoModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 	yesNoModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		if buttonLabel == "Yes" {
 			yesNoCh <- true
@@ -125,8 +145,6 @@ func modalInit() {
 
 		//tabPages.SwitchToPage(strconv.Itoa(curTab)) - Handled in YesNo()
 	})
-	yesNoModal.GetFrame().SetTitleColor(tcell.ColorWhite)
-	yesNoModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 
 	bkmkInit()
 	dlInit()
@@ -174,7 +192,7 @@ func Input(prompt string) (string, bool) {
 			inputModalText = text
 		})
 
-	inputModal.SetText(prompt)
+	inputModal.SetText(prompt + " ")
 	tabPages.ShowPage("input")
 	tabPages.SendToFront("input")
 	App.SetFocus(inputModal)
@@ -191,9 +209,19 @@ func Input(prompt string) (string, bool) {
 // YesNo displays a modal asking a yes-or-no question.
 func YesNo(prompt string) bool {
 	if viper.GetBool("a-general.color") {
-		yesNoModal.SetBackgroundColor(tcell.ColorPurple)
+		yesNoModal.
+			SetBackgroundColor(config.GetColor("yesno_modal_bg")).
+			SetTextColor(config.GetColor("yesno_modal_text"))
+		yesNoModal.GetFrame().
+			SetBorderColor(config.GetColor("yesno_modal_text")).
+			SetTitleColor(config.GetColor("yesno_modal_text"))
 	} else {
-		yesNoModal.SetBackgroundColor(tcell.ColorBlack)
+		yesNoModal.
+			SetBackgroundColor(tcell.ColorBlack).
+			SetTextColor(tcell.ColorWhite)
+		yesNoModal.GetFrame().
+			SetBorderColor(tcell.ColorWhite).
+			SetTitleColor(tcell.ColorWhite)
 	}
 	yesNoModal.GetFrame().SetTitle("")
 	yesNoModal.SetText(prompt)
@@ -210,12 +238,22 @@ func YesNo(prompt string) bool {
 // Tofu displays the TOFU warning modal.
 // It returns a bool indicating whether the user wants to continue.
 func Tofu(host string, expiry time.Time) bool {
-	// Reuses yesNoModal, with error colour
+	// Reuses yesNoModal, with error color
 
 	if viper.GetBool("a-general.color") {
-		yesNoModal.SetBackgroundColor(tcell.ColorMaroon)
+		yesNoModal.
+			SetBackgroundColor(config.GetColor("tofu_modal_bg")).
+			SetTextColor(config.GetColor("tofu_modal_text"))
+		yesNoModal.GetFrame().
+			SetBorderColor(config.GetColor("tofu_modal_text")).
+			SetTitleColor(config.GetColor("tofu_modal_text"))
 	} else {
-		yesNoModal.SetBackgroundColor(tcell.ColorBlack)
+		yesNoModal.
+			SetBackgroundColor(tcell.ColorBlack).
+			SetTextColor(tcell.ColorWhite)
+		yesNoModal.
+			SetBorderColor(tcell.ColorWhite).
+			SetTitleColor(tcell.ColorWhite)
 	}
 	yesNoModal.GetFrame().SetTitle(" TOFU ")
 	yesNoModal.SetText(

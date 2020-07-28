@@ -7,9 +7,11 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
+	"gitlab.com/tslocum/cview"
 )
 
 var amforaAppData string // Where amfora files are stored on Windows - cached here
@@ -195,6 +197,25 @@ func Init() error {
 	// Setup cache from config
 	cache.SetMaxSize(viper.GetInt("cache.max_size"))
 	cache.SetMaxPages(viper.GetInt("cache.max_pages"))
+
+	// Theme
+	configTheme := viper.Sub("theme")
+	if configTheme != nil {
+		for k, v := range configTheme.AllSettings() {
+			colorStr, ok := v.(string)
+			if !ok {
+				return fmt.Errorf(`value for "%s" is not a string: %v`, k, v)
+			}
+			color := tcell.GetColor(strings.ToLower(colorStr))
+			if color == tcell.ColorDefault {
+				return fmt.Errorf(`invalid color format for "%s": %s`, k, colorStr)
+			}
+			SetColor(k, color)
+		}
+	}
+	if viper.GetBool("a-general.color") {
+		cview.Styles.PrimitiveBackgroundColor = GetColor("bg")
+	} // Otherwise it's black by default
 
 	return nil
 }

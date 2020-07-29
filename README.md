@@ -73,7 +73,7 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Built-in search (uses GUS by default)
 - [x] Bookmarks
 - [x] Download pages and arbitrary data
-- [x] Themeing
+- [x] Theming
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>
 - [ ] Emoji favicons
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details

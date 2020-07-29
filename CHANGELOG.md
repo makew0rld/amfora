@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.4.0] - 2020-07-28
 ### Added
-- **Themeing** - check out [default-config.toml](./default-config.toml) for details (#46)
+- **Theming** - check out [default-config.toml](./default-config.toml) for details (#46)
 - <kbd>Tab</kbd> now also enters link selecting mode, like <kbd>Enter</kbd> (#48)
 - Number keys can be pressed to navigate to links 1 through 10 (#47)
 - Permanent redirects are cached for the session (#22)

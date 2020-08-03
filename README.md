@@ -25,6 +25,8 @@ It fully passes Sean Conman's client torture test, including the new Unicode tes
 
 ## Installation
 
+### Binary
+
 Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you might have to make the file executable with `chmod +x <filename>`. You should also move the binary to `/usr/local/bin/`.
 
 On Windows, make sure you click "Advanced > Run anyway" after double-clicking, or something like that.
@@ -35,7 +37,15 @@ curl -sSL https://raw.githubusercontent.com/makeworld-the-better-one/amfora/mast
 update-desktop-database ~/.local/share/applications
 ```
 
-### For developers
+### Arch Linux
+
+Arch Linux users can install Amfora from AUR. It has the package name `amfora`.
+
+```
+yay -S amfora
+```
+
+### From Source
 This section is for programmers who want to install from source.
 
 Install latest release:
@@ -74,19 +84,18 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Bookmarks
 - [x] Download pages and arbitrary data
 - [x] Theming
-- [ ] Search in pages with <kbd>Ctrl-F</kbd>
+- [ ] Subscribe to RSS and Atom feeds and display them
+  - Subscribing to page changes, similar to how Spacewalk works, will also be supported
 - [ ] Emoji favicons
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
 - [ ] Stream support
-- [ ] Full mouse support
-- [ ] Table of contents for pages
 - [ ] Full client certificate UX within the client
   - Create transient and permanent certs within the client, per domain
   - Manage and browse them
   - Similar to [Kristall](https://github.com/MasterQ32/kristall)
   - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
-- [ ] Subscribe to RSS and Atom feeds and display them
-  - Subscribing to page changes, similar to how Spacewalk works, will also be supported
+- [ ] Table of contents for pages
+- [ ] Search in pages with <kbd>Ctrl-F</kbd>
 - [ ] Support Markdown rendering
 - [ ] History browser
 

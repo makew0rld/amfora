@@ -39,10 +39,21 @@ update-desktop-database ~/.local/share/applications
 
 ### Arch Linux
 
-Arch Linux users can install Amfora from AUR. It has the package name `amfora`.
+Arch Linux users can install Amfora from AUR. It has the package name `amfora`, and is maintained by @pboyd.
 
 ```
 yay -S amfora
+```
+
+### Homebrew
+
+If you use [Homebrew](https://brew.sh/), you can install the package maintained by @Jackymancs4.
+```
+brew install jackymancs4/tap/amfora
+```
+You can update it with:
+```
+brew upgrade amfora
 ```
 
 ### From Source

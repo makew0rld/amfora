@@ -42,12 +42,12 @@ func removeUrl(url string) {
 	}
 }
 
-// Add adds a page to the cache, removing earlier pages as needed
+// AddPage adds a page to the cache, removing earlier pages as needed
 // to keep the cache inside its limits.
 //
 // If your page is larger than the max cache size, the provided page
 // will silently not be added to the cache.
-func Add(p *structs.Page) {
+func AddPage(p *structs.Page) {
 	if p.Url == "" || strings.HasPrefix(p.Url, "about:") {
 		// Just in case, these pages shouldn't be cached
 		return
@@ -62,11 +62,11 @@ func Add(p *structs.Page) {
 	// There should only ever be 1 page to remove at most,
 	// but this handles more just in case.
 	for NumPages() >= maxPages && maxPages > 0 {
-		Remove(urls[0])
+		RemovePage(urls[0])
 	}
 	// Do the same but for cache size
-	for Size()+p.Size() > maxSize && maxSize > 0 {
-		Remove(urls[0])
+	for SizePages()+p.Size() > maxSize && maxSize > 0 {
+		RemovePage(urls[0])
 	}
 
 	lock.Lock()
@@ -77,25 +77,25 @@ func Add(p *structs.Page) {
 	urls = append(urls, p.Url)
 }
 
-// Remove will remove a page from the cache.
+// RemovePage will remove a page from the cache.
 // Even if the page doesn't exist there will be no error.
-func Remove(url string) {
+func RemovePage(url string) {
 	lock.Lock()
 	defer lock.Unlock()
 	delete(pages, url)
 	removeUrl(url)
 }
 
-// Clear removes all pages from the cache.
-func Clear() {
+// ClearPages removes all pages from the cache.
+func ClearPages() {
 	lock.Lock()
 	defer lock.Unlock()
 	pages = make(map[string]*structs.Page)
 	urls = make([]string, 0)
 }
 
-// Size returns the approx. current size of the cache in bytes.
-func Size() int {
+// SizePages returns the approx. current size of the cache in bytes.
+func SizePages() int {
 	lock.RLock()
 	defer lock.RUnlock()
 	n := 0
@@ -111,9 +111,9 @@ func NumPages() int {
 	return len(pages)
 }
 
-// Get returns the page struct, and a bool indicating if the page was in the cache or not.
+// GetPage returns the page struct, and a bool indicating if the page was in the cache or not.
 // An empty page struct is returned if the page isn't in the cache.
-func Get(url string) (*structs.Page, bool) {
+func GetPage(url string) (*structs.Page, bool) {
 	lock.RLock()
 	defer lock.RUnlock()
 	p, ok := pages[url]

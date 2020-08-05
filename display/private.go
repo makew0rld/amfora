@@ -221,7 +221,7 @@ func handleURL(t *tab, u string) (string, bool) {
 	// Gemini URL
 
 	// Load page from cache if possible
-	page, ok := cache.Get(u)
+	page, ok := cache.GetPage(u)
 	if ok {
 		setPage(t, page)
 		return ret(u, true)
@@ -285,7 +285,7 @@ func handleURL(t *tab, u string) (string, bool) {
 		}
 
 		page.Width = termW
-		go cache.Add(page)
+		go cache.AddPage(page)
 		setPage(t, page)
 		return ret(u, true)
 	}

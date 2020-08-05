@@ -180,11 +180,11 @@ func Init() {
 					// Detect if it's a search or URL
 					if strings.Contains(query, " ") || (!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
 						u := viper.GetString("a-general.search") + "?" + queryEscape(query)
-						cache.Remove(u) // Don't use the cached version of the search
+						cache.RemovePage(u) // Don't use the cached version of the search
 						URL(u)
 					} else {
 						// Full URL
-						cache.Remove(query) // Don't use cached version for manually entered URL
+						cache.RemovePage(query) // Don't use cached version for manually entered URL
 						URL(query)
 					}
 					return
@@ -550,7 +550,7 @@ func Reload() {
 		return
 	}
 
-	go cache.Remove(tabs[curTab].page.Url)
+	go cache.RemovePage(tabs[curTab].page.Url)
 	go func(t *tab) {
 		handleURL(t, t.page.Url) // goURL is not used bc history shouldn't be added to
 		if t == tabs[curTab] {

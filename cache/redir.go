@@ -1,8 +1,6 @@
 package cache
 
-import (
-	"sync"
-)
+import "sync"
 
 // Functions for caching redirects.
 

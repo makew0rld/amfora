@@ -97,7 +97,7 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Theming
 - [ ] Subscribe to RSS and Atom feeds and display them
   - Subscribing to page changes, similar to how Spacewalk works, will also be supported
-- [ ] Emoji favicons
+- [x] *Emoji favicons*
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
 - [ ] Stream support
 - [ ] Full client certificate UX within the client

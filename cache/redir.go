@@ -31,8 +31,8 @@ func AddRedir(og, redir string) {
 // ClearRedirs removes all redirects from the cache.
 func ClearRedirs() {
 	redirMu.Lock()
-	defer redirMu.Unlock()
 	redirUrls = make(map[string]string)
+	redirMu.Unlock()
 }
 
 // Redirect takes the provided URL and returns a redirected version, if a redirect

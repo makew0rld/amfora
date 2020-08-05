@@ -29,6 +29,7 @@ type Page struct {
 	Selected   string   // The current text or link selected
 	SelectedID string   // The cview region ID for the selected text/link
 	Mode       PageMode
+	Favicon    string
 }
 
 // Size returns an approx. size of a Page in bytes.

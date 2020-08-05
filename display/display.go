@@ -486,24 +486,7 @@ func CloseTab() {
 	}
 
 	tabPages.SwitchToPage(strconv.Itoa(curTab)) // Go to previous page
-	// Rewrite the tab display
-	tabRow.Clear()
-	if viper.GetBool("a-general.color") {
-		for i := 0; i < NumTabs(); i++ {
-			fmt.Fprintf(tabRow, `["%d"][%s]  %d  [%s][""]|`,
-				i,
-				config.GetColorString("tab_num"),
-				i+1,
-				config.GetColorString("tab_divider"),
-			)
-		}
-	} else {
-		for i := 0; i < NumTabs(); i++ {
-			fmt.Fprintf(tabRow, `["%d"]  %d  [""]|`, i, i+1)
-		}
-	}
-	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
-
+	rewriteTabRow()
 	// Restore previous tab's state
 	tabs[curTab].applyAll()
 
@@ -550,8 +533,10 @@ func Reload() {
 		return
 	}
 
-	go cache.RemovePage(tabs[curTab].page.Url)
+	parsed, _ := url.Parse(tabs[curTab].page.Url)
 	go func(t *tab) {
+		cache.RemovePage(tabs[curTab].page.Url)
+		cache.RemoveFavicon(parsed.Host)
 		handleURL(t, t.page.Url) // goURL is not used bc history shouldn't be added to
 		if t == tabs[curTab] {
 			// Display the bottomBar state that handleURL set

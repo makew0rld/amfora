@@ -67,7 +67,6 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 
 	_, err := io.CopyN(buf, res.Body, viper.GetInt64("a-general.page_max_size")+1)
 	res.Body.Close()
-	rawText := buf.Bytes()
 	if err == nil {
 		// Content was larger than max size
 		return nil, ErrTooLarge
@@ -86,14 +85,14 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 	// Convert content first
 	var utfText string
 	if isUTF8(params["charset"]) {
-		utfText = string(rawText)
+		utfText = buf.String()
 	} else {
 		encoding, err := ianaindex.MIME.Encoding(params["charset"])
 		if encoding == nil || err != nil {
 			// Some encoding doesn't exist and wasn't caught in CanDisplay()
 			return nil, errors.New("unsupported encoding")
 		}
-		utfText, err = encoding.NewDecoder().String(string(rawText))
+		utfText, err = encoding.NewDecoder().String(buf.String())
 		if err != nil {
 			return nil, err
 		}

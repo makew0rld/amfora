@@ -1,16 +1,22 @@
 package display
 
 import (
+	"bytes"
+	"fmt"
+	"io"
 	"net/url"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/client"
+	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/webbrowser"
 	"github.com/makeworld-the-better-one/go-gemini"
+	"github.com/makeworld-the-better-one/go-isemoji"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
@@ -106,8 +112,16 @@ func setPage(t *tab, p *structs.Page) {
 	// Make sure the page content is fitted to the terminal every time it's displayed
 	reformatPage(p)
 
-	// Change page on screen
+	oldFav := t.page.Favicon
+
 	t.page = p
+
+	go func() {
+		parsed, _ := url.Parse(p.Url)
+		handleFavicon(t, parsed.Host, oldFav)
+	}()
+
+	// Change page on screen
 	t.view.SetText(p.Content)
 	t.view.Highlight("") // Turn off highlights, other funcs may restore if necessary
 	t.view.ScrollToBeginning()
@@ -142,6 +156,81 @@ func handleHTTP(u string, showInfo bool) {
 		}
 	}
 	App.Draw()
+}
+
+// handleFavicon handles getting and displaying a favicon.
+// `old` is the previous favicon for the tab.
+func handleFavicon(t *tab, host, old string) {
+	defer func() {
+		// Update display if needed
+		if t.page.Favicon != old && isValidTab(t) {
+			rewriteTabRow()
+		}
+	}()
+
+	if !viper.GetBool("a-general.emoji_favicons") {
+		// Not enabled
+		return
+	}
+	if t.page.Favicon != "" {
+		return
+	}
+	if host == "" {
+		return
+	}
+
+	fav := cache.GetFavicon(host)
+	if fav == cache.KnownNoFavicon {
+		// It's been cached that this host doesn't have a favicon
+		return
+	}
+	if fav != "" {
+		t.page.Favicon = fav
+		rewriteTabRow()
+		return
+	}
+
+	// No favicon cached
+	res, err := client.Fetch("gemini://" + host + "/favicon.txt")
+	if err != nil {
+		if res != nil {
+			res.Body.Close()
+		}
+		cache.AddFavicon(host, cache.KnownNoFavicon)
+		return
+	}
+	defer res.Body.Close()
+
+	if res.Status != 20 {
+		cache.AddFavicon(host, cache.KnownNoFavicon)
+		return
+	}
+	if !strings.HasPrefix(res.Meta, "text/plain") {
+		cache.AddFavicon(host, cache.KnownNoFavicon)
+		return
+	}
+	// It's a regular plain response
+
+	buf := new(bytes.Buffer)
+	_, err = io.CopyN(buf, res.Body, 29+2+1) // 29 is the max emoji length, +2 for CRLF, +1 so that the right size will EOF
+	if err == nil {
+		// Content was too large
+		cache.AddFavicon(host, cache.KnownNoFavicon)
+		return
+	} else if err != io.EOF {
+		// Some network reading error
+		// No favicon is NOT known, could be a temporary error
+		return
+	}
+	// EOF, which is what we want.
+	emoji := strings.TrimRight(buf.String(), "\r\n")
+	if !isemoji.IsEmoji(emoji) {
+		cache.AddFavicon(host, cache.KnownNoFavicon)
+		return
+	}
+	// Valid favicon found
+	t.page.Favicon = emoji
+	cache.AddFavicon(host, emoji)
 }
 
 // goURL is like handleURL, but takes care of history and the bottomBar.
@@ -335,4 +424,33 @@ func handleURL(t *tab, u string) (string, bool) {
 	// Status code 20, but not a document that can be displayed
 	go dlChoice("That file could not be displayed. What would you like to do?", u, res)
 	return ret("", false)
+}
+
+// rewriteTabRow clears the tabRow and writes all the tabs number/favicons into it.
+func rewriteTabRow() {
+	tabRow.Clear()
+	if viper.GetBool("a-general.color") {
+		for i := 0; i < NumTabs(); i++ {
+			char := strconv.Itoa(i + 1)
+			if tabs[i].page.Favicon != "" {
+				char = tabs[i].page.Favicon
+			}
+			fmt.Fprintf(tabRow, `["%d"][%s]  %s  [%s][""]|`,
+				i,
+				config.GetColorString("tab_num"),
+				char,
+				config.GetColorString("tab_divider"),
+			)
+		}
+	} else {
+		for i := 0; i < NumTabs(); i++ {
+			char := strconv.Itoa(i + 1)
+			if tabs[i].page.Favicon != "" {
+				char = tabs[i].page.Favicon
+			}
+			fmt.Fprintf(tabRow, `["%d"]  %s  [""]|`, i, char)
+		}
+	}
+	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
+	App.Draw()
 }

@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+### Added
+
+### Changed
+
+### Fixed
+- Two digit (and higher) link texts are now in line with one digit ones (#60)
+
+
 ## [1.4.0] - 2020-07-28
 ### Added
 - **Theming** - check out [default-config.toml](./default-config.toml) for details (#46)

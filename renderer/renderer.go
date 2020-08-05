@@ -145,6 +145,26 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 			}
 
 			links = append(links, url)
+			num := numLinks + len(links) // Visible link number, one-indexed
+
+			var indent int
+			if num > 99 {
+				// Indent link text by 3 or more spaces
+				indent = len(strconv.Itoa(num)) + 4 // +4 indent for spaces and brackets
+			} else {
+				// One digit and two digit links have the same spacing - see #60
+				indent = 5 // +4 indent for spaces and brackets, and 1 for link number
+			}
+
+			// Spacing after link number: 1 or 2 spaces?
+			var spacing string
+			if num > 9 {
+				// One space to keep it in line with other links - see #60
+				spacing = " "
+			} else {
+				// One digit numbers use two spaces
+				spacing = "  "
+			}
 
 			// Wrap and add link text
 			// Wrap the link text, but add some spaces to indent the wrapped lines past the link number
@@ -161,44 +181,44 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 					// Those are the default colors, anyway
 
 					wrappedLink = wrapLine(linkText, width,
-						strings.Repeat(" ", len(strconv.Itoa(numLinks+len(links)))+4)+ // +4 for spaces and brackets
-							`["`+strconv.Itoa(numLinks+len(links)-1)+`"][`+config.GetColorString("amfora_link")+`]`,
+						strings.Repeat(" ", indent)+
+							`["`+strconv.Itoa(num-1)+`"][`+config.GetColorString("amfora_link")+`]`,
 						`[-][""]`,
 						false, // Don't indent the first line, it's the one with link number
 					)
 
 					// Add special stuff to first line, like the link number
 					wrappedLink[0] = fmt.Sprintf(`[%s::b][`, config.GetColorString("link_number")) +
-						strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
-						`["` + strconv.Itoa(numLinks+len(links)-1) + `"][` + config.GetColorString("amfora_link") + `]` +
+						strconv.Itoa(num) + "[]" + "[-::-]" + spacing +
+						`["` + strconv.Itoa(num-1) + `"][` + config.GetColorString("amfora_link") + `]` +
 						wrappedLink[0] + `[-][""]`
 				} else {
 					// Not a gemini link
 
 					wrappedLink = wrapLine(linkText, width,
-						strings.Repeat(" ", len(strconv.Itoa(numLinks+len(links)))+4)+ // +4 for spaces and brackets
-							`["`+strconv.Itoa(numLinks+len(links)-1)+`"][`+config.GetColorString("foreign_link")+`]`,
+						strings.Repeat(" ", indent)+
+							`["`+strconv.Itoa(num-1)+`"][`+config.GetColorString("foreign_link")+`]`,
 						`[-][""]`,
 						false, // Don't indent the first line, it's the one with link number
 					)
 
 					wrappedLink[0] = fmt.Sprintf(`[%s::b][`, config.GetColorString("link_number")) +
-						strconv.Itoa(numLinks+len(links)) + "[]" + "[-::-]  " +
-						`["` + strconv.Itoa(numLinks+len(links)-1) + `"][` + config.GetColorString("foreign_link") + `]` +
+						strconv.Itoa(num) + "[]" + "[-::-]" + spacing +
+						`["` + strconv.Itoa(num-1) + `"][` + config.GetColorString("foreign_link") + `]` +
 						wrappedLink[0] + `[-][""]`
 				}
 			} else {
 				// No colors allowed
 
 				wrappedLink = wrapLine(linkText, width,
-					strings.Repeat(" ", len(strconv.Itoa(numLinks+len(links)))+4)+ // +4 for spaces and brackets
-						`["`+strconv.Itoa(numLinks+len(links)-1)+`"]`,
+					strings.Repeat(" ", len(strconv.Itoa(num))+4)+ // +4 for spaces and brackets
+						`["`+strconv.Itoa(num-1)+`"]`,
 					`[""]`,
 					false, // Don't indent the first line, it's the one with link number
 				)
 
-				wrappedLink[0] = `[::b][` + strconv.Itoa(numLinks+len(links)) + "[][::-]  " +
-					`["` + strconv.Itoa(numLinks+len(links)-1) + `"]` +
+				wrappedLink[0] = `[::b][` + strconv.Itoa(num) + "[][::-]  " +
+					`["` + strconv.Itoa(num-1) + `"]` +
 					wrappedLink[0] + `[""]`
 			}
 

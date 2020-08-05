@@ -205,7 +205,7 @@ func handleFavicon(t *tab, host, old string) {
 		cache.AddFavicon(host, cache.KnownNoFavicon)
 		return
 	}
-	if !strings.HasPrefix(res.Meta, "text/plain") {
+	if !strings.HasPrefix(res.Meta, "text/") {
 		cache.AddFavicon(host, cache.KnownNoFavicon)
 		return
 	}

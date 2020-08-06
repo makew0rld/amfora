@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -49,10 +48,4 @@ func RemoveFavicon(host string) {
 	favMu.Lock()
 	delete(favicons, host)
 	favMu.Unlock()
-}
-
-func AllFavicons() string {
-	favMu.RLock()
-	defer favMu.RUnlock()
-	return fmt.Sprintf("%v", favicons)
 }

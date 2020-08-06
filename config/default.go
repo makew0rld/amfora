@@ -11,6 +11,7 @@ var defaultConf = []byte(`# This is the default config file.
 # example.com
 # example.com:123
 
+
 [a-general]
 # Press Ctrl-H to access it
 home = "gemini://gemini.circumlunar.space"
@@ -49,10 +50,18 @@ page_max_time = 10
 # Whether to replace tab numbers with emoji favicons, which are cached.
 emoji_favicons = false
 
+[keybindings]
+# In the future there will be more settings here.
 
+# Hold down shift and press the numbers on your keyboard (1,2,3,4,5,6,7,8,9,0) to set this up.
+# It is default set to be accurate for US keyboards.
+shift_numbers = "!@#$%^&*()"
+
+
+[cache]
 # Options for page cache - which is only for text/gemini pages
 # Increase the cache size to speed up browsing at the expense of memory
-[cache]
+
 # Zero values mean there is no limit
 max_size = 0  # Size in bytes
 max_pages = 30 # The maximum number of pages the cache will store

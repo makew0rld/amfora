@@ -354,44 +354,24 @@ func Init() {
 			return nil
 		case tcell.KeyRune:
 			// Regular key was sent
+
+			if num, err := config.KeyToNum(event.Rune()); err == nil {
+				// It's a Shift+Num key
+				if num == 0 {
+					// Zero key goes to the last tab
+					SwitchTab(NumTabs() - 1)
+				} else {
+					SwitchTab(num - 1)
+				}
+				return nil
+			}
+
 			switch string(event.Rune()) {
 			case "q":
 				Stop()
 				return nil
 			case "?":
 				Help()
-				return nil
-
-			// Shift+NUMBER keys, for switching to a specific tab
-			case "!":
-				SwitchTab(0)
-				return nil
-			case "@":
-				SwitchTab(1)
-				return nil
-			case "#":
-				SwitchTab(2)
-				return nil
-			case "$":
-				SwitchTab(3)
-				return nil
-			case "%":
-				SwitchTab(4)
-				return nil
-			case "^":
-				SwitchTab(5)
-				return nil
-			case "&":
-				SwitchTab(6)
-				return nil
-			case "*":
-				SwitchTab(7)
-				return nil
-			case "(":
-				SwitchTab(8)
-				return nil
-			case ")": // Zero key goes to the last tab
-				SwitchTab(NumTabs() - 1)
 				return nil
 			}
 		}

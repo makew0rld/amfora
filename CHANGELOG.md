@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Emoji favicons can now be seen if `emoji_favicons` is enabled in the config (#62)
+- The `shift_numbers` key in the config was added, so that non US keyboard users can navigate tabs (#64)
 
 ### Changed
 

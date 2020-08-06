@@ -28,6 +28,8 @@ Enter, Tab|On a page this will start link highlighting.
 |Press Enter again to go to one, or Esc to stop.
 Shift-NUMBER|Go to a specific tab.
 Shift-0, )|Go to the last tab.
+F1|Previous tab
+F2|Next tab
 Ctrl-H|Go home
 Ctrl-T|New tab, or if a link is selected,
 |this will open the link in a new tab.

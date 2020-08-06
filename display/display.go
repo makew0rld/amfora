@@ -352,6 +352,14 @@ func Init() {
 		case tcell.KeyCtrlC:
 			Stop()
 			return nil
+		case tcell.KeyF1:
+			// Wrap around, allow for modulo with negative numbers
+			n := NumTabs()
+			SwitchTab((((curTab - 1) % n) + n) % n)
+			return nil
+		case tcell.KeyF2:
+			SwitchTab((curTab + 1) % NumTabs())
+			return nil
 		case tcell.KeyRune:
 			// Regular key was sent
 

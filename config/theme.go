@@ -8,7 +8,7 @@ import (
 )
 
 // Functions to allow themeing configuration.
-// UI element colors are mapped to a string key, such as "error" or "tab_background"
+// UI element colors are mapped to a string key, such as "error" or "tab_bg"
 // These are the same keys used in the config file.
 
 var themeMu = sync.RWMutex{}
@@ -64,8 +64,8 @@ var theme = map[string]tcell.Color{
 
 func SetColor(key string, color tcell.Color) {
 	themeMu.Lock()
-	defer themeMu.Unlock()
 	theme[key] = color
+	themeMu.Unlock()
 }
 
 // GetColor will return tcell.ColorBlack if there is no color for the provided key.

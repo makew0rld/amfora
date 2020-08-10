@@ -6,6 +6,7 @@ import (
 
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/display"
+	"github.com/makeworld-the-better-one/amfora/feeds"
 )
 
 var version = "1.5.0-unreleased"
@@ -33,7 +34,12 @@ func main() {
 
 	err := config.Init()
 	if err != nil {
-		fmt.Printf("Config error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Config error: %v\n", err)
+		os.Exit(1)
+	}
+	err = feeds.Init()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Config error: %v\n", err)
 		os.Exit(1)
 	}
 

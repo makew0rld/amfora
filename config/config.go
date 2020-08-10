@@ -1,7 +1,11 @@
+// Package config initializes all files required for Amfora, even those used by
+// other packages. It also reads in the config file and initializes a Viper and
+// the theme
 package config
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -31,9 +35,9 @@ var bkmkPath string
 var DownloadsDir string
 
 // Feeds
-var Feeds = viper.New()
-var feedsDir string
-var feedsPath string
+var FeedJson io.ReadCloser
+var feedDir string
+var FeedPath string
 
 func Init() error {
 
@@ -100,6 +104,22 @@ func Init() error {
 	}
 	bkmkPath = filepath.Join(bkmkDir, "bookmarks.toml")
 
+	// Feeds dir and path
+	if runtime.GOOS == "windows" {
+		// In APPDATA beside other Amfora files
+		feedDir = amforaAppData
+	} else {
+		// XDG data dir on POSIX systems
+		xdg_data, ok := os.LookupEnv("XDG_DATA_HOME")
+		if ok && strings.TrimSpace(xdg_data) != "" {
+			feedDir = filepath.Join(xdg_data, "amfora")
+		} else {
+			// Default to ~/.local/share/amfora
+			feedDir = filepath.Join(home, ".local", "share", "amfora")
+		}
+	}
+	FeedPath = filepath.Join(feedDir, "feeds.json")
+
 	// *** Create necessary files and folders ***
 
 	// Config
@@ -135,6 +155,13 @@ func Init() error {
 	if err == nil {
 		f.Close()
 	}
+	// Feeds
+	err = os.MkdirAll(feedDir, 0755)
+	if err != nil {
+		return err
+	}
+	f, _ = os.OpenFile(FeedPath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
+	FeedJson = f
 
 	// *** Downloads paths, setup, and creation ***
 

@@ -19,7 +19,7 @@
 
 Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that.
 
-It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Maybe use Powershell (comes with Windows) or [Cmder](https://cmder.net/) instead. Note that some of the application colors will not display correctly on most Windows terminals, but all functionality will still work.
+It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Use [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701) instead. Note that some of the application colors might not display correctly on Windows, but all functionality will still work.
 
 It fully passes Sean Conman's client torture test, including the new Unicode tests. It mostly passes the Egsam test.
 

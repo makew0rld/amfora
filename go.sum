@@ -124,8 +124,8 @@ github.com/lucasb-eyer/go-colorful v1.0.3 h1:QIbQXiugsb+q10B+MI+7DI1oQLdmnep86tW
 github.com/lucasb-eyer/go-colorful v1.0.3/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 github.com/magiconair/properties v1.8.1 h1:ZC2Vc7/ZFkGmsVC9KvOjumD+G5lXy2RtTKyzRKO2BQ4=
 github.com/magiconair/properties v1.8.1/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
-github.com/makeworld-the-better-one/go-gemini v0.7.0 h1:TCerE47eYHLXj6RQDjfd5HdGVbcVqpBC6OoPBlyY7q4=
-github.com/makeworld-the-better-one/go-gemini v0.7.0/go.mod h1:P7/FbZ+IEIbA/d+A0Y3w2GNgD8SA2AcNv7aDGJbaWG4=
+github.com/makeworld-the-better-one/go-gemini v0.8.2 h1:wRlNRO31ckXH29av1KM9wzkr9Rj3tnncsIeb9ehkSUQ=
+github.com/makeworld-the-better-one/go-gemini v0.8.2/go.mod h1:P7/FbZ+IEIbA/d+A0Y3w2GNgD8SA2AcNv7aDGJbaWG4=
 github.com/makeworld-the-better-one/go-isemoji v1.0.0 h1:W3O4+qwtXeT8PUDzcQ1UjxiupQWgc/oJHpqwrllx3xM=
 github.com/makeworld-the-better-one/go-isemoji v1.0.0/go.mod h1:FBjkPl9rr0G4vlZCc+Mr+QcnOfGCTbGWYW8/1sp06I0=
 github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20200710151429-125743e22b4f h1:YEUlTs5gb35UlBLTgqrub9axWTYB3d7/8TxrkJDZpRI=

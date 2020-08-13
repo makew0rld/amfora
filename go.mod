@@ -6,7 +6,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gdamore/tcell v1.3.1-0.20200608133353-cb1e5d6fa606
-	github.com/makeworld-the-better-one/go-gemini v0.8.2
+	github.com/makeworld-the-better-one/go-gemini v0.8.3
 	github.com/makeworld-the-better-one/go-isemoji v1.0.0
 	github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20200710151429-125743e22b4f
 	github.com/mitchellh/go-homedir v1.1.0

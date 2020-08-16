@@ -39,7 +39,7 @@ func main() {
 	}
 	err = feeds.Init()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Config error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "feeds.json error: %v\n", err)
 		os.Exit(1)
 	}
 

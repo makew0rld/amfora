@@ -47,8 +47,8 @@ func textWidth() int {
 
 // queryEscape is the same as url.PathEscape, but it also replaces the +.
 // This is because Gemini requires percent-escaping for queries.
-func queryEscape(path string) string {
-	return strings.ReplaceAll(url.PathEscape(path), "+", "%2B")
+func queryEscape(query string) string {
+	return strings.ReplaceAll(url.PathEscape(query), "+", "%2B")
 }
 
 // resolveRelLink returns an absolute link for the given absolute link and relative one.

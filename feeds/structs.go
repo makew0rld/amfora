@@ -82,26 +82,19 @@ type PageEntry struct {
 // PageEntries is new-to-old list of Entry structs, used to create a feed page.
 // It should always be assumed to be sorted when used in other packages.
 type PageEntries struct {
-	sync.RWMutex
 	Entries []*PageEntry
 }
 
 // Implement sort.Interface
 
 func (e *PageEntries) Len() int {
-	e.RLock()
-	defer e.RUnlock()
 	return len(e.Entries)
 }
 
 func (e *PageEntries) Less(i, j int) bool {
-	e.RLock()
-	defer e.RUnlock()
 	return e.Entries[i].Published.Before(e.Entries[j].Published)
 }
 
 func (e *PageEntries) Swap(i, j int) {
-	e.Lock()
 	e.Entries[i], e.Entries[j] = e.Entries[j], e.Entries[i]
-	e.Unlock()
 }

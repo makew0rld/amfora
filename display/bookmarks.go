@@ -106,18 +106,19 @@ func openBkmkModal(name string, exists bool) (string, int) {
 	return bkmkModalText, action
 }
 
+var bkmkPageRaw = "# Bookmarks\r\n\r\n"
+
 // Bookmarks displays the bookmarks page on the current tab.
 func Bookmarks(t *tab) {
 	// Gather bookmarks
-	rawContent := "# Bookmarks\r\n\r\n"
 	m, keys := bookmarks.All()
 	for i := range keys {
-		rawContent += fmt.Sprintf("=> %s %s\r\n", keys[i], m[keys[i]])
+		bkmkPageRaw += fmt.Sprintf("=> %s %s\r\n", keys[i], m[keys[i]])
 	}
 	// Render and display
-	content, links := renderer.RenderGemini(rawContent, textWidth(), leftMargin())
+	content, links := renderer.RenderGemini(bkmkPageRaw, textWidth(), leftMargin())
 	page := structs.Page{
-		Raw:       rawContent,
+		Raw:       bkmkPageRaw,
 		Content:   content,
 		Links:     links,
 		Url:       "about:bookmarks",

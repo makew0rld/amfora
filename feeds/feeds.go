@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"mime"
+	urlPkg "net/url"
 	"os"
 	"path"
 	"sort"
@@ -40,9 +41,9 @@ func Init() error {
 	if err != nil && err != io.EOF {
 		return fmt.Errorf("feeds json is corrupted: %v", err)
 	}
-	return nil
 
-	// TODO: Start pulling all feeds in another thread
+	go updateAll()
+	return nil
 }
 
 // IsTracked returns true if the feed/page URL is already being tracked.
@@ -111,7 +112,6 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 		panic("feed is nil")
 	}
 
-	sort.Sort(feed)
 	// Remove any content to save memory and disk space
 	for _, item := range feed.Items {
 		item.Content = ""
@@ -262,7 +262,6 @@ func updateAll() {
 		pageKeys[i] = k
 		i++
 	}
-
 	data.RUnlock()
 
 	for j := 0; j < numJobs; j++ {
@@ -275,4 +274,52 @@ func updateAll() {
 	}
 
 	wg.Wait()
+}
+
+// GetPageEntries returns the current list of PageEntries
+// for use in rendering a page.
+// The contents of the entries will never change, and this
+// function should be called again to get updates.
+func GetPageEntries() *PageEntries {
+	var pe PageEntries
+
+	data.RLock()
+
+	for _, feed := range data.Feeds {
+		for _, item := range feed.Items {
+
+			var pub time.Time
+
+			if !item.UpdatedParsed.IsZero() {
+				pub = *item.UpdatedParsed
+			} else if !item.PublishedParsed.IsZero() {
+				pub = *item.PublishedParsed
+			} else {
+				// No time on the post
+				pub = time.Now()
+			}
+
+			pe.Entries = append(pe.Entries, &PageEntry{
+				Author:    feed.Author.Name,
+				Title:     item.Title,
+				URL:       item.Link,
+				Published: pub,
+			})
+		}
+	}
+
+	for url, page := range data.Pages {
+		parsed, _ := urlPkg.Parse(url)
+		pe.Entries = append(pe.Entries, &PageEntry{
+			Author:    parsed.Host,            // Domain is author
+			Title:     path.Base(parsed.Path), // Filename is title
+			URL:       url,
+			Published: page.Changed,
+		})
+	}
+
+	data.RUnlock()
+
+	sort.Sort(&pe)
+	return &pe
 }

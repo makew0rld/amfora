@@ -17,11 +17,11 @@ Example JSON.
 	"pages": {
 		"url1": {
 			"hash": <hash>,
-			"updated": <time>
+			"changed": <time>
 		},
 		"url2": {
 			"hash": <hash>,
-			"updated": <time>
+			"changed": <time>
 		}
 	}
 }
@@ -39,9 +39,33 @@ type jsonData struct {
 	Pages  map[string]*pageJson    `json:"pages,omitempty"`
 }
 
+// Lock locks both feed and page mutexes.
+func (j *jsonData) Lock() {
+	j.feedMu.Lock()
+	j.pageMu.Lock()
+}
+
+// Unlock unlocks both feed and page mutexes.
+func (j *jsonData) Unlock() {
+	j.feedMu.Unlock()
+	j.pageMu.Unlock()
+}
+
+// RLock read-locks both feed and page mutexes.
+func (j *jsonData) RLock() {
+	j.feedMu.RLock()
+	j.pageMu.RLock()
+}
+
+// RUnlock read-unlocks both feed and page mutexes.
+func (j *jsonData) RUnlock() {
+	j.feedMu.RUnlock()
+	j.pageMu.RUnlock()
+}
+
 type pageJson struct {
 	Hash    string    `json:"hash"`
-	Updated time.Time `json:"updated"`
+	Changed time.Time `json:"changed"` // When the latest change happened
 }
 
 var data jsonData // Global instance of jsonData - loaded from JSON and used

@@ -20,6 +20,9 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
+// TODO: Test for deadlocks and whether there should be more
+// goroutines for file writing or other things.
+
 var (
 	ErrSaving     = errors.New("couldn't save JSON to disk")
 	ErrNotSuccess = errors.New("status 20 not returned")
@@ -93,11 +96,9 @@ func writeJson() error {
 	enc.SetEscapeHTML(false)
 	enc.SetIndent("", "  ")
 
-	data.feedMu.Lock()
-	data.pageMu.Lock()
+	data.Lock()
 	err = enc.Encode(&data)
-	data.feedMu.Unlock()
-	data.pageMu.Unlock()
+	data.Unlock()
 
 	return err
 }
@@ -191,10 +192,15 @@ func updatePage(url string) error {
 	if _, err := io.Copy(h, res.Body); err != nil {
 		return err
 	}
+	newHash := fmt.Sprintf("%x", h.Sum(nil))
+
 	data.pageMu.Lock()
-	data.Pages[url] = &pageJson{
-		Hash:    fmt.Sprintf("%x", h.Sum(nil)),
-		Updated: time.Now().UTC(),
+	if data.Pages[url].Hash != newHash {
+		// Page content is different
+		data.Pages[url] = &pageJson{
+			Hash:    newHash,
+			Changed: time.Now().UTC(),
+		}
 	}
 	data.pageMu.Unlock()
 
@@ -211,7 +217,62 @@ func updatePage(url string) error {
 }
 
 // updateAll updates all feeds and pages.
-// It should run in goroutine at a regular interval.
 func updateAll() {
+	// TODO: Is two goroutines the right amount?
 
+	worker := func(jobs <-chan [2]string, wg *sync.WaitGroup) {
+		// Each job is: []string{<type>, "url"}
+		// where <type> is "feed" or "page"
+
+		defer wg.Done()
+		for j := range jobs {
+			if j[0] == "feed" {
+				updateFeed(j[1])
+			}
+			if j[0] == "page" {
+				updatePage(j[1])
+			}
+		}
+	}
+
+	var wg sync.WaitGroup
+
+	data.RLock()
+	numJobs := len(data.Feeds) + len(data.Pages)
+	jobs := make(chan [2]string, numJobs)
+
+	// Start 2 workers, waiting for jobs
+	for w := 0; w < 2; w++ {
+		wg.Add(1)
+		go worker(jobs, &wg)
+	}
+
+	// Get map keys in a slice
+
+	feedKeys := make([]string, len(data.Feeds))
+	i := 0
+	for k := range data.Feeds {
+		feedKeys[i] = k
+		i++
+	}
+
+	pageKeys := make([]string, len(data.Pages))
+	i = 0
+	for k := range data.Pages {
+		pageKeys[i] = k
+		i++
+	}
+
+	data.RUnlock()
+
+	for j := 0; j < numJobs; j++ {
+		if j < len(feedKeys) {
+			jobs <- [2]string{"feed", feedKeys[j]}
+		} else {
+			// In the Pages
+			jobs <- [2]string{"page", pageKeys[j-len(feedKeys)]}
+		}
+	}
+
+	wg.Wait()
 }

@@ -3,7 +3,6 @@ package display
 import (
 	"fmt"
 	"net/url"
-	"path"
 	"strconv"
 	"strings"
 
@@ -127,27 +126,19 @@ func Init() {
 				reset()
 				return
 			}
-			if query == ".." && tabs[tab].hasContent() {
-				// Go up a directory
-				parsed, err := url.Parse(tabs[tab].page.Url)
+			if query[0] == '.' && tabs[tab].hasContent() {
+				// Relative url
+				current, err := url.Parse(tabs[tab].page.Url)
 				if err != nil {
 					// This shouldn't occur
 					return
 				}
-				if parsed.Path == "/" {
-					// Can't go up further
-					reset()
+				target, err := current.Parse(query)
+				if err != nil {
+					// Invalid relative url
 					return
 				}
-
-				// Ex: /test/foo/ -> /test/foo//.. -> /test -> /test/
-				parsed.Path = path.Clean(parsed.Path+"/..") + "/"
-				if parsed.Path == "//" {
-					// Fix double slash that occurs at domain root
-					parsed.Path = "/"
-				}
-				parsed.RawQuery = "" // Remove query
-				URL(parsed.String())
+				URL(target.String())
 				return
 			}
 

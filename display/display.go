@@ -126,7 +126,8 @@ func Init() {
 				reset()
 				return
 			}
-			if query[0] == '.' && tabs[tab].hasContent() { // relative url
+			if query[0] == '.' && tabs[tab].hasContent() {
+				// Relative url
 				current, err := url.Parse(tabs[tab].page.Url)
 				if err != nil {
 					// This shouldn't occur
@@ -134,8 +135,7 @@ func Init() {
 				}
 				target, err := current.Parse(query)
 				if err != nil {
-					// invalid relative url
-					reset()
+					// Invalid relative url
 					return
 				}
 				URL(target.String())

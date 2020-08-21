@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Resolving any relative path (starting with a `.`) in the bottom bar is supported, not just `..` (#71)
 
 ### Changed
+- Update to [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) v0.8.4
 
 ### Fixed
 - Two digit (and higher) link texts are now in line with one digit ones (#60)

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dustin/go-humanize"
+	humanize "github.com/dustin/go-humanize"
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/spf13/viper"
@@ -154,10 +154,13 @@ func modalInit() {
 
 // Error displays an error on the screen in a modal.
 func Error(title, text string) {
-	// Capitalize and add period if necessary - because most errors don't do that
-	text = strings.ToUpper(string([]rune(text)[0])) + text[1:]
-	if !strings.HasSuffix(text, ".") && !strings.HasSuffix(text, "!") && !strings.HasSuffix(text, "?") {
-		text += "."
+	if text == "" {
+		text = "No additional information."
+	} else {
+		text = strings.ToUpper(string([]rune(text)[0])) + text[1:]
+		if !strings.HasSuffix(text, ".") && !strings.HasSuffix(text, "!") && !strings.HasSuffix(text, "?") {
+			text += "."
+		}
 	}
 	// Add spaces to title for aesthetic reasons
 	title = " " + strings.TrimSpace(title) + " "

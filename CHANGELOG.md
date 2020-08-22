@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Two digit (and higher) link texts are now in line with one digit ones (#60)
 - Race condition when reloading pages, could have caused the cache to still be used
+- Prevent panic (crash) when the server sends an error with an empty meta string (#73)
 
 
 ## [1.4.0] - 2020-07-28

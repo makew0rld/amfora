@@ -1,8 +1,8 @@
 language: go
 
 go:
-  - "1.11"  # Debian Stable golang version
-  - "1.12"
+  #- "1.11"  # Debian Stable golang version, fails - see below
+  #- "1.12"  # Also fails due to progressbar Millisecond requirement
   - "1.13"
   - "1.14"
   - "1.15"
@@ -10,5 +10,8 @@ go:
 script:
   - go test ./...
   - go build
+
+env:
+  GO111MODULE=on
 
 # TODO: GitHub Releases deploy

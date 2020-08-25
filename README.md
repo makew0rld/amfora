@@ -57,7 +57,7 @@ brew upgrade amfora
 ```
 
 ### From Source
-This section is for programmers who want to install from source.
+This section is for programmers who want to install from source. Make sure you're using Go 1.13 at least, as earlier versions will fail to build.
 
 Install latest release:
 ```

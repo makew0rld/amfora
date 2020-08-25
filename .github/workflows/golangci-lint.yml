@@ -13,7 +13,7 @@ jobs:
           version: v1.30
 
           # Optional: golangci-lint command line arguments.
-          args: --issues-exit-code=0 --exclude-use-default --enable-all -D asciicheck -D depguard -D dogsled -D funlen -D gci -D gochecknoglobals -D gochecknoinits -D gocognit -D gocyclo -D godot -D godox -D goheader -D gomodguard -D nlreturn -D noctx -D bodyclose -D rowserrcheck -D sqlclosecheck -D stylecheck -D testpackage -D wsl
+          args: --exclude-use-default --enable-all -D asciicheck -D depguard -D dogsled -D funlen -D gci -D gochecknoglobals -D gochecknoinits -D gocognit -D gocyclo -D godot -D godox -D goheader -D gomodguard -D nlreturn -D noctx -D bodyclose -D rowserrcheck -D sqlclosecheck -D stylecheck -D testpackage -D wsl
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           only-new-issues: true

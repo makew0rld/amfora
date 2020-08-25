@@ -70,15 +70,18 @@ func reformatPage(p *structs.Page) {
 		return
 	}
 
+	// TODO: Setup a renderer.RenderFromMediatype func so this isn't needed
+
 	var rendered string
-	if p.Mediatype == structs.TextGemini {
+	switch p.Mediatype {
+	case structs.TextGemini:
 		// Links are not recorded because they won't change
 		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin())
-	} else if p.Mediatype == structs.TextPlain {
+	case structs.TextPlain:
 		rendered = renderer.RenderPlainText(p.Raw, leftMargin())
-	} else if p.Mediatype == structs.TextAnsi {
+	case structs.TextAnsi:
 		rendered = renderer.RenderANSI(p.Raw, leftMargin())
-	} else {
+	default:
 		// Rendering this type is not implemented
 		return
 	}

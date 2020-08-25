@@ -142,7 +142,7 @@ func downloadURL(u string, resp *gemini.Response) {
 		progressbar.OptionShowCount(),
 		progressbar.OptionSpinnerType(14),
 	)
-	bar.RenderBlank()
+	bar.RenderBlank() //nolint:errcheck
 
 	savePath, err := downloadNameFromURL(u, "")
 	if err != nil {

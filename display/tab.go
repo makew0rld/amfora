@@ -68,7 +68,7 @@ func makeNewTab() *tab {
 			return
 		}
 
-		if len(tabs[tab].page.Links) <= 0 {
+		if len(tabs[tab].page.Links) == 0 {
 			// No links on page
 			return
 		}
@@ -85,7 +85,7 @@ func makeNewTab() *tab {
 			followLink(tabs[tab], tabs[tab].page.Url, tabs[tab].page.Links[linkN])
 			return
 		}
-		if len(currentSelection) <= 0 && (key == tcell.KeyEnter || key == tcell.KeyTab) {
+		if len(currentSelection) == 0 && (key == tcell.KeyEnter || key == tcell.KeyTab) {
 			// They've started link highlighting
 			tabs[tab].page.Mode = structs.ModeLinkSelect
 
@@ -102,7 +102,7 @@ func makeNewTab() *tab {
 			// There's still a selection, but a different key was pressed, not Enter
 
 			index, _ := strconv.Atoi(currentSelection[0])
-			if key == tcell.KeyTab {
+			if key == tcell.KeyTab { //nolint:gocritic
 				index = (index + 1) % numSelections
 			} else if key == tcell.KeyBacktab {
 				index = (index - 1 + numSelections) % numSelections

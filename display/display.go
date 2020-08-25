@@ -529,7 +529,7 @@ func Reload() {
 func URL(u string) {
 	// Some code is copied in followLink()
 
-	if u == "about:bookmarks" {
+	if u == "about:bookmarks" { //nolint:goconst
 		Bookmarks(tabs[curTab])
 		tabs[curTab].addToHistory("about:bookmarks")
 		return

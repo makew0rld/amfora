@@ -19,7 +19,7 @@ func bkmkKey(url string) string {
 
 func Set(url, name string) {
 	bkmkStore.Set(bkmkKey(url), name)
-	bkmkStore.WriteConfig()
+	bkmkStore.WriteConfig() //nolint:errcheck
 }
 
 // Get returns the NAME of the bookmark, given the URL.
@@ -33,7 +33,7 @@ func Remove(url string) {
 	// XXX: Viper can't actually delete keys, which means the bookmarks file might get clouded
 	// with non-entries over time.
 	bkmkStore.Set(bkmkKey(url), "")
-	bkmkStore.WriteConfig()
+	bkmkStore.WriteConfig() //nolint:errcheck
 }
 
 // All returns all the bookmarks in a map of URLs to names.
@@ -48,9 +48,9 @@ func All() (map[string]string, []string) {
 		return bkmks, []string{}
 	}
 
-	inverted := make(map[string]string) // Holds inverted map, name->URL
-	var names []string                  // Holds bookmark names, for sorting
-	var keys []string                   // Final sorted keys (URLs), for returning at the end
+	inverted := make(map[string]string)       // Holds inverted map, name->URL
+	names := make([]string, 0, len(bkmksMap)) // Holds bookmark names, for sorting
+	keys := make([]string, 0, len(bkmksMap))  // Final sorted keys (URLs), for returning at the end
 
 	for b32Url, name := range bkmksMap {
 		if n, ok := name.(string); n == "" || !ok {

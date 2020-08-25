@@ -1,0 +1,14 @@
+language: go
+
+go:
+  - "1.11"  # Debian Stable golang version
+  - "1.12"
+  - "1.13"
+  - "1.14"
+  - "1.15"
+
+script:
+  - go test ./...
+  - go build
+
+# TODO: GitHub Releases deploy

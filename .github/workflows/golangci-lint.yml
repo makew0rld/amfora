@@ -13,6 +13,6 @@ jobs:
           version: v1.30
 
           # Optional: golangci-lint command line arguments.
-          args: --exclude-use-default --disable-all -E deadcode -E errcheck -E gosimple -E govet -E ineffassign -E staticcheck -E structcheck -E typecheck -E unused -E varcheck -E dupl -E exhaustive -E exportloopref -E goconst -E gocritic -E goerr113 -E gofmt -E goimports -E golint -E gomnd -E goprintffuncname -E gosec -E interfacer -E lll -E maligned -E misspell -E nakedret -E nestif -E nolintlint -E prealloc -E scopelint -E unconvert -E unparam
+          args: --max-issues-per-linter 0 --exclude-use-default --disable-all -E deadcode -E errcheck -E gosimple -E govet -E ineffassign -E staticcheck -E structcheck -E typecheck -E unused -E varcheck -E dupl -E exhaustive -E exportloopref -E goconst -E gocritic -E goerr113 -E gofmt -E goimports -E golint -E gomnd -E goprintffuncname -E gosec -E interfacer -E lll -E maligned -E misspell -E nakedret -E nestif -E nolintlint -E prealloc -E scopelint -E unconvert -E unparam
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           only-new-issues: true

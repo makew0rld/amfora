@@ -128,7 +128,7 @@ func Init() {
 			}
 			if query[0] == '.' && tabs[tab].hasContent() {
 				// Relative url
-				current, err := url.Parse(tabs[tab].page.Url)
+				current, err := url.Parse(tabs[tab].page.URL)
 				if err != nil {
 					// This shouldn't occur
 					return
@@ -156,7 +156,7 @@ func Init() {
 						oldTab := tab
 						NewTab()
 						// Resolve and follow link manually
-						prevParsed, _ := url.Parse(tabs[oldTab].page.Url)
+						prevParsed, _ := url.Parse(tabs[oldTab].page.URL)
 						nextParsed, err := url.Parse(tabs[oldTab].page.Links[i-1])
 						if err != nil {
 							Error("URL Error", "link URL could not be parsed")
@@ -183,7 +183,7 @@ func Init() {
 			}
 			if i <= len(tabs[tab].page.Links) && i > 0 {
 				// It's a valid link number
-				followLink(tabs[tab], tabs[tab].page.Url, tabs[tab].page.Links[i-1])
+				followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[i-1])
 				return
 			}
 			// Invalid link number, don't do anything
@@ -204,7 +204,7 @@ func Init() {
 		Raw:       newTabContent,
 		Content:   renderedNewTabContent,
 		Links:     newTabLinks,
-		Url:       "about:newtab",
+		URL:       "about:newtab",
 		Width:     -1, // Force reformatting on first display
 		Mediatype: structs.TextGemini,
 	}
@@ -312,7 +312,7 @@ func Init() {
 					}
 					if i <= len(tabs[curTab].page.Links) && i > 0 {
 						// It's a valid link number
-						followLink(tabs[curTab], tabs[curTab].page.Url, tabs[curTab].page.Links[i-1])
+						followLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Links[i-1])
 						return nil
 					}
 				}
@@ -323,7 +323,7 @@ func Init() {
 		switch event.Key() {
 		case tcell.KeyCtrlT:
 			if tabs[curTab].page.Mode == structs.ModeLinkSelect {
-				next, err := resolveRelLink(tabs[curTab], tabs[curTab].page.Url, tabs[curTab].page.Selected)
+				next, err := resolveRelLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Selected)
 				if err != nil {
 					Error("URL Error", err.Error())
 					return nil
@@ -512,11 +512,11 @@ func Reload() {
 		return
 	}
 
-	parsed, _ := url.Parse(tabs[curTab].page.Url)
+	parsed, _ := url.Parse(tabs[curTab].page.URL)
 	go func(t *tab) {
-		cache.RemovePage(tabs[curTab].page.Url)
+		cache.RemovePage(tabs[curTab].page.URL)
 		cache.RemoveFavicon(parsed.Host)
-		handleURL(t, t.page.Url) // goURL is not used bc history shouldn't be added to
+		handleURL(t, t.page.URL) // goURL is not used bc history shouldn't be added to
 		if t == tabs[curTab] {
 			// Display the bottomBar state that handleURL set
 			t.applyBottomBar()

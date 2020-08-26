@@ -120,7 +120,7 @@ func setPage(t *tab, p *structs.Page) {
 	t.page = p
 
 	go func() {
-		parsed, _ := url.Parse(p.Url)
+		parsed, _ := url.Parse(p.URL)
 		handleFavicon(t, parsed.Host, oldFav)
 	}()
 
@@ -134,7 +134,7 @@ func setPage(t *tab, p *structs.Page) {
 
 	// Save bottom bar for the tab - other funcs will apply/display it
 	t.barLabel = ""
-	t.barText = p.Url
+	t.barText = p.URL
 }
 
 // handleHTTP is used by handleURL.

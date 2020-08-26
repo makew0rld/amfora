@@ -62,7 +62,7 @@ func makeNewTab() *tab {
 		if key == tcell.KeyEsc {
 			// Stop highlighting
 			bottomBar.SetLabel("")
-			bottomBar.SetText(tabs[tab].page.Url)
+			bottomBar.SetText(tabs[tab].page.URL)
 			tabs[tab].clearSelected()
 			tabs[tab].saveBottomBar()
 			return
@@ -82,7 +82,7 @@ func makeNewTab() *tab {
 			linkN, _ := strconv.Atoi(currentSelection[0])
 			tabs[tab].page.Selected = tabs[tab].page.Links[linkN]
 			tabs[tab].page.SelectedID = currentSelection[0]
-			followLink(tabs[tab], tabs[tab].page.Url, tabs[tab].page.Links[linkN])
+			followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[linkN])
 			return
 		}
 		if len(currentSelection) == 0 && (key == tcell.KeyEnter || key == tcell.KeyTab) {
@@ -153,10 +153,10 @@ func (t *tab) hasContent() bool {
 	if t.page == nil || t.view == nil {
 		return false
 	}
-	if t.page.Url == "" {
+	if t.page.URL == "" {
 		return false
 	}
-	if strings.HasPrefix(t.page.Url, "about:") {
+	if strings.HasPrefix(t.page.URL, "about:") {
 		return false
 	}
 	if t.page.Content == "" {

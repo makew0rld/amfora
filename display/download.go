@@ -200,9 +200,9 @@ func downloadPage(p *structs.Page) (string, error) {
 	var err error
 
 	if p.Mediatype == structs.TextGemini {
-		savePath, err = downloadNameFromURL(p.Url, ".gmi")
+		savePath, err = downloadNameFromURL(p.URL, ".gmi")
 	} else {
-		savePath, err = downloadNameFromURL(p.Url, ".txt")
+		savePath, err = downloadNameFromURL(p.URL, ".txt")
 	}
 	if err != nil {
 		return "", err

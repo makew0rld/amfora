@@ -120,7 +120,7 @@ func Bookmarks(t *tab) {
 		Raw:       rawContent,
 		Content:   content,
 		Links:     links,
-		Url:       "about:bookmarks",
+		URL:       "about:bookmarks",
 		Width:     termW,
 		Mediatype: structs.TextGemini,
 	}
@@ -132,20 +132,20 @@ func Bookmarks(t *tab) {
 // It is the high-level way of doing it. It should be called in a goroutine.
 // It can also be called to edit an existing bookmark.
 func addBookmark() {
-	if !strings.HasPrefix(tabs[curTab].page.Url, "gemini://") {
+	if !strings.HasPrefix(tabs[curTab].page.URL, "gemini://") {
 		// Can't make bookmarks for other kinds of URLs
 		return
 	}
 
-	name, exists := bookmarks.Get(tabs[curTab].page.Url)
+	name, exists := bookmarks.Get(tabs[curTab].page.URL)
 	// Open a bookmark modal with the current name of the bookmark, if it exists
 	newName, action := openBkmkModal(name, exists)
 	switch action {
 	case 1:
 		// Add/change the bookmark
-		bookmarks.Set(tabs[curTab].page.Url, newName)
+		bookmarks.Set(tabs[curTab].page.URL, newName)
 	case -1:
-		bookmarks.Remove(tabs[curTab].page.Url)
+		bookmarks.Remove(tabs[curTab].page.URL)
 	}
 	// Other case is action = 0, meaning "Cancel", so nothing needs to happen
 }

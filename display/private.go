@@ -242,7 +242,7 @@ func handleFavicon(t *tab, host, old string) {
 //
 // It should be called in a goroutine.
 func goURL(t *tab, u string) {
-	final, displayed := handleURL(t, u)
+	final, displayed := handleURL(t, u, 0)
 	if displayed {
 		t.addToHistory(final)
 	}
@@ -264,7 +264,10 @@ func goURL(t *tab, u string) {
 //
 // The bottomBar is not actually changed in this func, except during loading.
 // The func that calls this one should apply the bottomBar values if necessary.
-func handleURL(t *tab, u string) (string, bool) {
+//
+// numRedirects is the number of redirects that resulted in the provided URL.
+// It should typically be 0.
+func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	defer App.Draw() // Just in case
 
 	// Save for resetting on error
@@ -397,7 +400,7 @@ func handleURL(t *tab, u string) (string, bool) {
 				Error("Input Error", "URL for that input would be too long.")
 				return ret("", false)
 			}
-			return ret(handleURL(t, parsed.String()))
+			return ret(handleURL(t, parsed.String(), 0))
 		}
 		return ret("", false)
 	case 30:
@@ -407,11 +410,22 @@ func handleURL(t *tab, u string) (string, bool) {
 			return ret("", false)
 		}
 		redir := parsed.ResolveReference(parsedMeta).String()
-		if YesNo("Follow redirect?\n" + redir) {
+		// Prompt before redirecting to non-Gemini protocol
+		redirect := false
+		if !strings.HasPrefix(redir, "gemini") {
+			if YesNo("Follow redirect to non-Gemini URL?\n" + redir) {
+				redirect = true
+			} else {
+				return ret("", false)
+			}
+		}
+		// Prompt before redirecting
+		autoRedirect := viper.GetBool("a-general.auto_redirect")
+		if redirect || (autoRedirect && numRedirects < 5) || YesNo("Follow redirect?\n" + redir) {
 			if res.Status == gemini.StatusRedirectPermanent {
 				go cache.AddRedir(u, redir)
 			}
-			return ret(handleURL(t, redir))
+			return ret(handleURL(t, redir, numRedirects + 1))
 		}
 		return ret("", false)
 	case 40:

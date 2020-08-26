@@ -114,13 +114,13 @@ func Init() error {
 	if err != nil {
 		return err
 	}
-	os.OpenFile(tofuDBPath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
+	os.OpenFile(tofuDBPath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666) //nolint:errcheck
 	// Bookmarks
 	err = os.MkdirAll(bkmkDir, 0755)
 	if err != nil {
 		return err
 	}
-	os.OpenFile(bkmkPath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
+	os.OpenFile(bkmkPath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666) //nolint:errcheck
 
 	// Setup vipers
 

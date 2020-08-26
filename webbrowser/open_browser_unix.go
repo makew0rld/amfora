@@ -1,5 +1,5 @@
 // +build linux freebsd netbsd openbsd
-
+//nolint:goerr113
 package webbrowser
 
 import (

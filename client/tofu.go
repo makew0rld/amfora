@@ -39,19 +39,20 @@ func expiryKey(domain string, port string) string {
 
 func loadTofuEntry(domain string, port string) (string, time.Time, error) {
 	id := tofuStore.GetString(idKey(domain, port)) // Fingerprint
-	if len(id) != 64 {
+	if len(id) != sha256.Size*2 {
 		// Not set, or invalid
-		return "", time.Time{}, errors.New("not found")
+		return "", time.Time{}, errors.New("not found") //nolint:goerr113
 	}
 
 	expiry := tofuStore.GetTime(expiryKey(domain, port))
 	if expiry.IsZero() {
 		// Not set
-		return id, time.Time{}, errors.New("not found")
+		return id, time.Time{}, errors.New("not found") //nolint:goerr113
 	}
 	return id, expiry, nil
 }
 
+//nolint:errcheck
 // certID returns a generic string representing a cert or domain.
 func certID(cert *x509.Certificate) string {
 	h := sha256.New()
@@ -62,14 +63,14 @@ func certID(cert *x509.Certificate) string {
 // origCertID uses cert.Raw, which was used in v1.0.0 of the app.
 func origCertID(cert *x509.Certificate) string {
 	h := sha256.New()
-	h.Write(cert.Raw)
+	h.Write(cert.Raw) //nolint:errcheck
 	return fmt.Sprintf("%X", h.Sum(nil))
 }
 
 func saveTofuEntry(domain, port string, cert *x509.Certificate) {
 	tofuStore.Set(idKey(domain, port), certID(cert))
 	tofuStore.Set(expiryKey(domain, port), cert.NotAfter.UTC())
-	tofuStore.WriteConfig()
+	tofuStore.WriteConfig() //nolint:errcheck // Not an issue if it's not saved, only cached data
 }
 
 // handleTofu is the abstracted interface for taking care of TOFU.
@@ -90,7 +91,7 @@ func handleTofu(domain, port string, cert *x509.Certificate) bool {
 
 		// Store expiry again in case it changed
 		tofuStore.Set(expiryKey(domain, port), cert.NotAfter.UTC())
-		tofuStore.WriteConfig()
+		tofuStore.WriteConfig() //nolint:errcheck
 
 		return true
 	}

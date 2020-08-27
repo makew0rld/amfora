@@ -421,11 +421,11 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		}
 		// Prompt before redirecting
 		autoRedirect := viper.GetBool("a-general.auto_redirect")
-		if redirect || (autoRedirect && numRedirects < 5) || YesNo("Follow redirect?\n" + redir) {
+		if redirect || (autoRedirect && numRedirects < 5) || YesNo("Follow redirect?\n"+redir) {
 			if res.Status == gemini.StatusRedirectPermanent {
 				go cache.AddRedir(u, redir)
 			}
-			return ret(handleURL(t, redir, numRedirects + 1))
+			return ret(handleURL(t, redir, numRedirects+1))
 		}
 		return ret("", false)
 	case 40:

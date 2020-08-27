@@ -392,8 +392,7 @@ func handleURL(t *tab, u string) (string, bool) {
 			// Make another request with the query string added
 			// + chars are replaced because PathEscape doesn't do that
 			parsed.RawQuery = queryEscape(userInput)
-			if len(parsed.String()) > 1024 {
-				// 1024 is the max size for URLs in the spec
+			if len(parsed.String()) > gemini.URLMaxLength {
 				Error("Input Error", "URL for that input would be too long.")
 				return ret("", false)
 			}

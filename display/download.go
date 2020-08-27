@@ -261,13 +261,12 @@ func getSafeDownloadName(name string, lastDot bool, n int) (string, error) {
 		if lastDot {
 			ext := filepath.Ext(name)
 			return strings.TrimSuffix(name, ext) + "(" + strconv.Itoa(n) + ")" + ext
-		} else {
-			idx := strings.Index(name, ".")
-			if idx == -1 {
-				return name + "(" + strconv.Itoa(n) + ")"
-			}
-			return name[:idx] + "(" + strconv.Itoa(n) + ")" + name[idx:]
 		}
+		idx := strings.Index(name, ".")
+		if idx == -1 {
+			return name + "(" + strconv.Itoa(n) + ")"
+		}
+		return name[:idx] + "(" + strconv.Itoa(n) + ")" + name[idx:]
 	}
 
 	d, err := os.Open(config.DownloadsDir)

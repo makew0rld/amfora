@@ -23,20 +23,21 @@ var tofuDBDir string
 var tofuDBPath string
 
 // Bookmarks
+
 var BkmkStore = viper.New()
 var bkmkDir string
 var bkmkPath string
 
-// For other pkgs to use
 var DownloadsDir string
 
+//nolint:golint,goerr113
 func Init() error {
 	home, err := homedir.Dir()
 	if err != nil {
 		return err
 	}
 	// Store AppData path
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" { //nolint:goconst
 		appdata, ok := os.LookupEnv("APPDATA")
 		if ok {
 			amforaAppData = filepath.Join(appdata, "amfora")
@@ -179,7 +180,7 @@ func Init() error {
 		// Validate path
 		dDir := viper.GetString("a-general.downloads")
 		di, err := os.Stat(dDir)
-		if err == nil {
+		if err == nil { //nolint:gocritic
 			if !di.IsDir() {
 				return fmt.Errorf("downloads path specified is not a directory: %s", dDir)
 			}

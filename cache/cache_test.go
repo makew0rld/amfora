@@ -9,7 +9,6 @@ import (
 
 var p = structs.Page{URL: "example.com"}
 var p2 = structs.Page{URL: "example.org"}
-var queryPage = structs.Page{URL: "gemini://example.com/test?query"}
 
 func reset() {
 	ClearPages()

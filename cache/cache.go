@@ -33,7 +33,7 @@ func removeIndex(s []string, i int) []string {
 	return s[:len(s)-1]
 }
 
-func removeUrl(url string) {
+func removeURL(url string) {
 	for i := range urls {
 		if urls[i] == url {
 			urls = removeIndex(urls, i)
@@ -73,7 +73,7 @@ func AddPage(p *structs.Page) {
 	defer lock.Unlock()
 	pages[p.URL] = p
 	// Remove the URL if it was already there, then add it to the end
-	removeUrl(p.URL)
+	removeURL(p.URL)
 	urls = append(urls, p.URL)
 }
 
@@ -83,7 +83,7 @@ func RemovePage(url string) {
 	lock.Lock()
 	defer lock.Unlock()
 	delete(pages, url)
-	removeUrl(url)
+	removeURL(url)
 }
 
 // ClearPages removes all pages from the cache.

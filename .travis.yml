@@ -14,4 +14,9 @@ script:
 env:
   GO111MODULE=on
 
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $GOPATH/pkg/mod
+
 # TODO: GitHub Releases deploy

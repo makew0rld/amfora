@@ -20,5 +20,5 @@ func KeyToNum(key rune) (int, error) {
 			return i + 1, nil
 		}
 	}
-	return -1, errors.New("provided key is invalid")
+	return -1, errors.New("provided key is invalid") //nolint:goerr113
 }

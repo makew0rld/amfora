@@ -114,6 +114,7 @@ func Init() {
 			App.SetFocus(tabs[tab].view)
 		}
 
+		//nolint:exhaustive
 		switch key {
 		case tcell.KeyEnter:
 			// Figure out whether it's a URL, link number, or search
@@ -169,7 +170,8 @@ func Init() {
 				} else {
 					// It's a full URL or search term
 					// Detect if it's a search or URL
-					if strings.Contains(query, " ") || (!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
+					if strings.Contains(query, " ") ||
+						(!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
 						u := viper.GetString("a-general.search") + "?" + queryEscape(query)
 						cache.RemovePage(u) // Don't use the cached version of the search
 						URL(u)
@@ -245,6 +247,7 @@ func Init() {
 				}
 			}
 
+			//nolint:exhaustive
 			switch event.Key() {
 			case tcell.KeyCtrlR:
 				Reload()
@@ -318,8 +321,10 @@ func Init() {
 				}
 			}
 		}
+
 		// All the keys and operations that can work while a tab IS loading
 
+		//nolint:exhaustive
 		switch event.Key() {
 		case tcell.KeyCtrlT:
 			if tabs[curTab].page.Mode == structs.ModeLinkSelect {

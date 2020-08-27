@@ -156,6 +156,7 @@ func Init() error {
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.emoji_favicons", false)
 	viper.SetDefault("keybindings.shift_numbers", "!@#$%^&*()")
+	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
 

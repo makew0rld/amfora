@@ -162,6 +162,30 @@ func handleHTTP(u string, showInfo bool) {
 	App.Draw()
 }
 
+// handleOther is used by handleURL.
+// It opens links other than Gemini and HTTP and displays Error modals.
+func handleOther(u string) {
+	// The URL should have a scheme due to a previous call to normalizeURL
+	parsed, _ := url.Parse(u)
+	// Search for a handler for the URL scheme
+	handler := strings.TrimSpace(viper.GetString("url-handlers." + parsed.Scheme))
+	if len(handler) == 0 {
+		handler = strings.TrimSpace(viper.GetString("url-handlers.other"))
+	}
+	switch handler {
+	case "", "off":
+		Error("URL Error", "Opening " + parsed.Scheme + " URLs is turned off.")
+	default:
+		// The config has a custom command to execute for URLs
+		fields := strings.Fields(handler)
+		err := exec.Command(fields[0], append(fields[1:], u)...).Start()
+		if err != nil {
+			Error("URL Error", "Error executing custom command: " + err.Error())
+		}
+	}
+	App.Draw()
+}
+
 // handleFavicon handles getting and displaying a favicon.
 // `old` is the previous favicon for the tab.
 func handleFavicon(t *tab, host, old string) {
@@ -308,7 +332,7 @@ func handleURL(t *tab, u string) (string, bool) {
 		return ret("", false)
 	}
 	if !strings.HasPrefix(u, "gemini") {
-		Error("Protocol Error", "Only gemini and HTTP are supported. URL was "+u)
+		handleOther(u)
 		return ret("", false)
 	}
 	// Gemini URL

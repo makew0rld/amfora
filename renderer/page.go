@@ -18,6 +18,7 @@ var ErrTooLarge = errors.New("page content would be too large")
 var ErrTimedOut = errors.New("page download timed out")
 var ErrCantDisplay = errors.New("invalid content for a page")
 var ErrBadEncoding = errors.New("unsupported encoding")
+var ErrBadMediatype = errors.New("displayable mediatype is not handled in the code, implementation error")
 
 // isUTF8 returns true for charsets that are compatible with UTF-8 and don't need to be decoded.
 func isUTF8(charset string) bool {
@@ -131,5 +132,5 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 		}, nil
 	}
 
-	return nil, errors.New("displayable mediatype is not handled in the code, implementation error")
+	return nil, ErrBadMediatype
 }

@@ -62,7 +62,7 @@ func resolveRelLink(t *tab, prev, next string) (string, error) {
 	prevParsed, _ := url.Parse(prev)
 	nextParsed, err := url.Parse(next)
 	if err != nil {
-		return "", errors.New("link URL could not be parsed")
+		return "", errors.New("link URL could not be parsed") //nolint:goerr113
 	}
 	return prevParsed.ResolveReference(nextParsed).String(), nil
 }

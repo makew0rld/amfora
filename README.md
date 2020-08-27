@@ -5,7 +5,7 @@
 <h6>Image modified from: amphora by Alvaro Cabrera from the Noun Project</h6>
 </center>
 
-
+[![travis build status](https://img.shields.io/travis/com/makeworld-the-better-one/amfora)](https://https://travis-ci.com/github/makeworld-the-better-one/amfora)
 [![go reportcard](https://goreportcard.com/badge/github.com/makeworld-the-better-one/amfora)](https://goreportcard.com/report/github.com/makeworld-the-better-one/amfora)
 [![license GPLv3](https://img.shields.io/github/license/makeworld-the-better-one/amfora)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
@@ -61,12 +61,12 @@ This section is for programmers who want to install from source. Make sure you'r
 
 Install latest release:
 ```
-GO111MODULE=on go get -u github.com/makeworld-the-better-one/amfora
+GO111MODULE=on go get github.com/makeworld-the-better-one/amfora
 ```
 
 Install latest commit:
 ```
-GO111MODULE=on go get -u github.com/makeworld-the-better-one/amfora@master
+GO111MODULE=on go get github.com/makeworld-the-better-one/amfora@master
 ```
 
 ## Usage

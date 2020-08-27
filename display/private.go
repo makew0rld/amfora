@@ -2,6 +2,7 @@ package display
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -331,7 +332,7 @@ func handleURL(t *tab, u string) (string, bool) {
 		return ret("", false)
 	}
 
-	if err == client.ErrTofu {
+	if errors.Is(err, client.ErrTofu) {
 		if Tofu(parsed.Host, client.GetExpiry(parsed.Hostname(), parsed.Port())) {
 			// They want to continue anyway
 			client.ResetTofuEntry(parsed.Hostname(), parsed.Port(), res.Cert)
@@ -351,20 +352,20 @@ func handleURL(t *tab, u string) (string, bool) {
 			return ret("", false)
 		}
 
-		if err == renderer.ErrTooLarge {
+		if errors.Is(err, renderer.ErrTooLarge) {
 			// Make new request for downloading purposes
 			res, clientErr := client.Fetch(u)
-			if clientErr != nil && clientErr != client.ErrTofu {
+			if clientErr != nil && !errors.Is(clientErr, client.ErrTofu) {
 				Error("URL Fetch Error", err.Error())
 				return ret("", false)
 			}
 			go dlChoice("That page is too large. What would you like to do?", u, res)
 			return ret("", false)
 		}
-		if err == renderer.ErrTimedOut {
+		if errors.Is(err, renderer.ErrTimedOut) {
 			// Make new request for downloading purposes
 			res, clientErr := client.Fetch(u)
-			if clientErr != nil && clientErr != client.ErrTofu {
+			if clientErr != nil && !errors.Is(clientErr, client.ErrTofu) {
 				Error("URL Fetch Error", err.Error())
 				return ret("", false)
 			}

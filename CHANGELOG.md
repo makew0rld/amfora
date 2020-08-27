@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - <kbd>F1</kbd> and <kbd>F2</kbd> keys for navigating to the previous and next tabs (#64)
 - Resolving any relative path (starting with a `.`) in the bottom bar is supported, not just `..` (#71)
 - Set programs in config to open other schemes like `gopher://` or `magnet:` (#74)
+- Auto-redirecting can be enabled - redirect within Gemini up to 5 times automatically (#75) 
 
 ### Changed
 - Update to [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) v0.8.4

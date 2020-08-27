@@ -99,6 +99,7 @@ Features in *italics* are in the master branch, but not in the latest release.
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
 - [ ] Subscribe to RSS and Atom feeds and display them
   - Subscribing to page changes, similar to how Spacewalk works, will also be supported
+  - *In progress on `feeds` branch*
 - [ ] Stream support
 - [ ] Full client certificate UX within the client
   - Create transient and permanent certs within the client, per domain

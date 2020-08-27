@@ -174,13 +174,13 @@ func handleOther(u string) {
 	}
 	switch handler {
 	case "", "off":
-		Error("URL Error", "Opening " + parsed.Scheme + " URLs is turned off.")
+		Error("URL Error", "Opening "+parsed.Scheme+" URLs is turned off.")
 	default:
 		// The config has a custom command to execute for URLs
 		fields := strings.Fields(handler)
 		err := exec.Command(fields[0], append(fields[1:], u)...).Start()
 		if err != nil {
-			Error("URL Error", "Error executing custom command: " + err.Error())
+			Error("URL Error", "Error executing custom command: "+err.Error())
 		}
 	}
 	App.Draw()

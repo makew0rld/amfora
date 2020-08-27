@@ -1,0 +1,38 @@
+linters:
+  fast: false
+  disable-all: true
+  enable:
+    - deadcode
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unused
+    - varcheck
+    - dupl
+    - exhaustive
+    - exportloopref
+    - goconst
+    - gocritic
+    - goerr113
+    - gofmt
+    - goimports
+    - golint
+    - goprintffuncname
+    - interfacer
+    - lll
+    - maligned
+    - misspell
+    - nakedret
+    - nolintlint
+    - prealloc
+    - scopelint
+    - unconvert
+    - unparam
+
+issues:
+  exclude-use-default: true
+  max-issues-per-linter: 0

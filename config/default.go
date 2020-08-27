@@ -16,6 +16,11 @@ var defaultConf = []byte(`# This is the default config file.
 # Press Ctrl-H to access it
 home = "gemini://gemini.circumlunar.space"
 
+# Follow up to 5 Gemini redirects without prompting.
+# A prompt is always shown after the 5th redirect and for redirects to protocols other than Gemini.
+# If set to false, a prompt will be shown before following redirects.
+auto_redirect = false
+
 # What command to run to open a HTTP URL. Set to "default" to try to guess the browser,
 # or set to "off" to not open HTTP URLs.
 # If a command is set, than the URL will be added (in quotes) to the end of the command.

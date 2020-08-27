@@ -145,6 +145,7 @@ func Init() error {
 	}
 
 	viper.SetDefault("a-general.home", "gemini.circumlunar.space")
+	viper.SetDefault("a-general.auto_redirect", false)
 	viper.SetDefault("a-general.http", "default")
 	viper.SetDefault("a-general.search", "gus.guru/search")
 	viper.SetDefault("a-general.color", true)

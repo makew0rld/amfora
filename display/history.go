@@ -2,7 +2,7 @@ package display
 
 // applyHist is a history.go internal function, to load a URL in the history.
 func applyHist(t *tab) {
-	handleURL(t, t.history.urls[t.history.pos]) // Load that position in history
+	handleURL(t, t.history.urls[t.history.pos], 0) // Load that position in history
 	t.applyAll()
 }
 

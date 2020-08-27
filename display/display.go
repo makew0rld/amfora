@@ -549,6 +549,10 @@ func URL(u string) {
 		return
 	}
 
+	if !strings.HasPrefix(u, "//") && !strings.HasPrefix(u, "gemini://") && !strings.Contains(u, "://") {
+		// Assume it's a Gemini URL
+		u = "gemini://" + u
+	}
 	go goURL(tabs[curTab], u)
 }
 

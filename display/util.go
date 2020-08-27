@@ -83,13 +83,6 @@ func normalizeURL(u string) string {
 		return u
 	}
 
-	if !strings.Contains(u, "://") && !strings.HasPrefix(u, "//") {
-		// No scheme at all in the URL
-		parsed, err = url.Parse("gemini://" + u)
-		if err != nil {
-			return u
-		}
-	}
 	if parsed.Scheme == "" {
 		// Always add scheme
 		parsed.Scheme = "gemini"

@@ -11,6 +11,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
+	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
@@ -172,7 +173,7 @@ func Init() {
 					// Detect if it's a search or URL
 					if strings.Contains(query, " ") ||
 						(!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
-						u := viper.GetString("a-general.search") + "?" + queryEscape(query)
+						u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
 						cache.RemovePage(u) // Don't use the cached version of the search
 						URL(u)
 					} else {

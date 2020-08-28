@@ -36,3 +36,8 @@ linters:
 issues:
   exclude-use-default: true
   max-issues-per-linter: 0
+
+linters-settings:
+  gocritic:
+    disabled-checks:
+      - ifElseChain

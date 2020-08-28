@@ -34,12 +34,12 @@ var writeMu = sync.Mutex{}
 
 // Init should be called after config.Init.
 func Init() error {
-	defer config.FeedJson.Close()
+	defer config.FeedJSON.Close()
 
-	dec := json.NewDecoder(config.FeedJson)
+	dec := json.NewDecoder(config.FeedJSON)
 	err := dec.Decode(&data)
 	if err != nil && err != io.EOF {
-		return fmt.Errorf("feeds json is corrupted: %v", err)
+		return fmt.Errorf("feeds json is corrupted: %v", err) //nolint:goerr113
 	}
 
 	go updateAll()
@@ -84,7 +84,7 @@ func GetFeed(mediatype, filename string, r io.Reader) (*gofeed.Feed, bool) {
 	return feed, err == nil
 }
 
-func writeJson() error {
+func writeJSON() error {
 	writeMu.Lock()
 	defer writeMu.Unlock()
 
@@ -121,7 +121,7 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 	data.Feeds[url] = feed
 	data.feedMu.Unlock()
 
-	err := writeJson()
+	err := writeJSON()
 	if err != nil {
 		// Don't use in-memory if it couldn't be saved
 		data.feedMu.Lock()
@@ -136,10 +136,10 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 // Do not use it to update a page, as it only resets the hash.
 func AddPage(url string) error {
 	data.pageMu.Lock()
-	data.Pages[url] = &pageJson{} // No hash yet
+	data.Pages[url] = &pageJSON{} // No hash yet
 	data.pageMu.Unlock()
 
-	err := writeJson()
+	err := writeJSON()
 	if err != nil {
 		// Don't use in-memory if it couldn't be saved
 		data.pageMu.Lock()
@@ -197,14 +197,14 @@ func updatePage(url string) error {
 	data.pageMu.Lock()
 	if data.Pages[url].Hash != newHash {
 		// Page content is different
-		data.Pages[url] = &pageJson{
+		data.Pages[url] = &pageJSON{
 			Hash:    newHash,
 			Changed: time.Now().UTC(),
 		}
 	}
 	data.pageMu.Unlock()
 
-	err = writeJson()
+	err = writeJSON()
 	if err != nil {
 		// Don't use in-memory if it couldn't be saved
 		data.pageMu.Lock()
@@ -227,10 +227,10 @@ func updateAll() {
 		defer wg.Done()
 		for j := range jobs {
 			if j[0] == "feed" {
-				updateFeed(j[1])
+				updateFeed(j[1]) //nolint:errcheck
 			}
 			if j[0] == "page" {
-				updatePage(j[1])
+				updatePage(j[1]) //nolint:errcheck
 			}
 		}
 	}

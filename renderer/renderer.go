@@ -101,11 +101,11 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 	for i := range lines {
 		lines[i] = strings.TrimRight(lines[i], " \r\t\n")
 
-		if strings.HasPrefix(lines[i], "#") { //nolint:gocritic
+		if strings.HasPrefix(lines[i], "#") {
 			// Headings
 			var tag string
 			if viper.GetBool("a-general.color") {
-				if strings.HasPrefix(lines[i], "###") { //nolint:gocritic
+				if strings.HasPrefix(lines[i], "###") {
 					tag = fmt.Sprintf("[%s::b]", config.GetColorString("hdg_3"))
 				} else if strings.HasPrefix(lines[i], "##") {
 					tag = fmt.Sprintf("[%s::b]", config.GetColorString("hdg_2"))

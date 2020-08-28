@@ -36,7 +36,7 @@ type jsonData struct {
 	feedMu sync.RWMutex
 	pageMu sync.RWMutex
 	Feeds  map[string]*gofeed.Feed `json:"feeds,omitempty"`
-	Pages  map[string]*pageJson    `json:"pages,omitempty"`
+	Pages  map[string]*pageJSON    `json:"pages,omitempty"`
 }
 
 // Lock locks both feed and page mutexes.
@@ -63,7 +63,7 @@ func (j *jsonData) RUnlock() {
 	j.pageMu.RUnlock()
 }
 
-type pageJson struct {
+type pageJSON struct {
 	Hash    string    `json:"hash"`
 	Changed time.Time `json:"changed"` // When the latest change happened
 }

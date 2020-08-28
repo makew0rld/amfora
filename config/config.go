@@ -35,7 +35,8 @@ var bkmkPath string
 var DownloadsDir string
 
 // Feeds
-var FeedJson io.ReadCloser
+
+var FeedJSON io.ReadCloser
 var feedDir string
 var FeedPath string
 
@@ -162,7 +163,7 @@ func Init() error {
 		return err
 	}
 	f, _ = os.OpenFile(FeedPath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
-	FeedJson = f
+	FeedJSON = f
 
 	// *** Downloads paths, setup, and creation ***
 

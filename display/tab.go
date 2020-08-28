@@ -102,7 +102,7 @@ func makeNewTab() *tab {
 			// There's still a selection, but a different key was pressed, not Enter
 
 			index, _ := strconv.Atoi(currentSelection[0])
-			if key == tcell.KeyTab { //nolint:gocritic
+			if key == tcell.KeyTab {
 				index = (index + 1) % numSelections
 			} else if key == tcell.KeyBacktab {
 				index = (index - 1 + numSelections) % numSelections

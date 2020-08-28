@@ -2,6 +2,7 @@ package display
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -70,15 +71,18 @@ func reformatPage(p *structs.Page) {
 		return
 	}
 
+	// TODO: Setup a renderer.RenderFromMediatype func so this isn't needed
+
 	var rendered string
-	if p.Mediatype == structs.TextGemini {
+	switch p.Mediatype {
+	case structs.TextGemini:
 		// Links are not recorded because they won't change
 		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin())
-	} else if p.Mediatype == structs.TextPlain {
+	case structs.TextPlain:
 		rendered = renderer.RenderPlainText(p.Raw, leftMargin())
-	} else if p.Mediatype == structs.TextAnsi {
+	case structs.TextAnsi:
 		rendered = renderer.RenderANSI(p.Raw, leftMargin())
-	} else {
+	default:
 		// Rendering this type is not implemented
 		return
 	}
@@ -117,7 +121,7 @@ func setPage(t *tab, p *structs.Page) {
 	t.page = p
 
 	go func() {
-		parsed, _ := url.Parse(p.Url)
+		parsed, _ := url.Parse(p.URL)
 		handleFavicon(t, parsed.Host, oldFav)
 	}()
 
@@ -131,7 +135,7 @@ func setPage(t *tab, p *structs.Page) {
 
 	// Save bottom bar for the tab - other funcs will apply/display it
 	t.barLabel = ""
-	t.barText = p.Url
+	t.barText = p.URL
 }
 
 // handleHTTP is used by handleURL.
@@ -153,6 +157,30 @@ func handleHTTP(u string, showInfo bool) {
 		err := exec.Command(fields[0], append(fields[1:], u)...).Start()
 		if err != nil {
 			Error("HTTP Error", "Error executing custom browser command: "+err.Error())
+		}
+	}
+	App.Draw()
+}
+
+// handleOther is used by handleURL.
+// It opens links other than Gemini and HTTP and displays Error modals.
+func handleOther(u string) {
+	// The URL should have a scheme due to a previous call to normalizeURL
+	parsed, _ := url.Parse(u)
+	// Search for a handler for the URL scheme
+	handler := strings.TrimSpace(viper.GetString("url-handlers." + parsed.Scheme))
+	if len(handler) == 0 {
+		handler = strings.TrimSpace(viper.GetString("url-handlers.other"))
+	}
+	switch handler {
+	case "", "off":
+		Error("URL Error", "Opening "+parsed.Scheme+" URLs is turned off.")
+	default:
+		// The config has a custom command to execute for URLs
+		fields := strings.Fields(handler)
+		err := exec.Command(fields[0], append(fields[1:], u)...).Start()
+		if err != nil {
+			Error("URL Error", "Error executing custom command: "+err.Error())
 		}
 	}
 	App.Draw()
@@ -239,7 +267,7 @@ func handleFavicon(t *tab, host, old string) {
 //
 // It should be called in a goroutine.
 func goURL(t *tab, u string) {
-	final, displayed := handleURL(t, u)
+	final, displayed := handleURL(t, u, 0)
 	if displayed {
 		t.addToHistory(final)
 	}
@@ -261,7 +289,10 @@ func goURL(t *tab, u string) {
 //
 // The bottomBar is not actually changed in this func, except during loading.
 // The func that calls this one should apply the bottomBar values if necessary.
-func handleURL(t *tab, u string) (string, bool) {
+//
+// numRedirects is the number of redirects that resulted in the provided URL.
+// It should typically be 0.
+func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	defer App.Draw() // Just in case
 
 	// Save for resetting on error
@@ -304,7 +335,7 @@ func handleURL(t *tab, u string) (string, bool) {
 		return ret("", false)
 	}
 	if !strings.HasPrefix(u, "gemini") {
-		Error("Protocol Error", "Only gemini and HTTP are supported. URL was "+u)
+		handleOther(u)
 		return ret("", false)
 	}
 	// Gemini URL
@@ -328,7 +359,7 @@ func handleURL(t *tab, u string) (string, bool) {
 		return ret("", false)
 	}
 
-	if err == client.ErrTofu {
+	if errors.Is(err, client.ErrTofu) {
 		if Tofu(parsed.Host, client.GetExpiry(parsed.Hostname(), parsed.Port())) {
 			// They want to continue anyway
 			client.ResetTofuEntry(parsed.Hostname(), parsed.Port(), res.Cert)
@@ -348,20 +379,20 @@ func handleURL(t *tab, u string) (string, bool) {
 			return ret("", false)
 		}
 
-		if err == renderer.ErrTooLarge {
+		if errors.Is(err, renderer.ErrTooLarge) {
 			// Make new request for downloading purposes
 			res, clientErr := client.Fetch(u)
-			if clientErr != nil && clientErr != client.ErrTofu {
+			if clientErr != nil && !errors.Is(clientErr, client.ErrTofu) {
 				Error("URL Fetch Error", err.Error())
 				return ret("", false)
 			}
 			go dlChoice("That page is too large. What would you like to do?", u, res)
 			return ret("", false)
 		}
-		if err == renderer.ErrTimedOut {
+		if errors.Is(err, renderer.ErrTimedOut) {
 			// Make new request for downloading purposes
 			res, clientErr := client.Fetch(u)
-			if clientErr != nil && clientErr != client.ErrTofu {
+			if clientErr != nil && !errors.Is(clientErr, client.ErrTofu) {
 				Error("URL Fetch Error", err.Error())
 				return ret("", false)
 			}
@@ -388,13 +419,12 @@ func handleURL(t *tab, u string) (string, bool) {
 		if ok {
 			// Make another request with the query string added
 			// + chars are replaced because PathEscape doesn't do that
-			parsed.RawQuery = queryEscape(userInput)
-			if len(parsed.String()) > 1024 {
-				// 1024 is the max size for URLs in the spec
+			parsed.RawQuery = gemini.QueryEscape(userInput)
+			if len(parsed.String()) > gemini.URLMaxLength {
 				Error("Input Error", "URL for that input would be too long.")
 				return ret("", false)
 			}
-			return ret(handleURL(t, parsed.String()))
+			return ret(handleURL(t, parsed.String(), 0))
 		}
 		return ret("", false)
 	case 30:
@@ -404,11 +434,22 @@ func handleURL(t *tab, u string) (string, bool) {
 			return ret("", false)
 		}
 		redir := parsed.ResolveReference(parsedMeta).String()
-		if YesNo("Follow redirect?\n" + redir) {
+		// Prompt before redirecting to non-Gemini protocol
+		redirect := false
+		if !strings.HasPrefix(redir, "gemini") {
+			if YesNo("Follow redirect to non-Gemini URL?\n" + redir) {
+				redirect = true
+			} else {
+				return ret("", false)
+			}
+		}
+		// Prompt before redirecting
+		autoRedirect := viper.GetBool("a-general.auto_redirect")
+		if redirect || (autoRedirect && numRedirects < 5) || YesNo("Follow redirect?\n"+redir) {
 			if res.Status == gemini.StatusRedirectPermanent {
 				go cache.AddRedir(u, redir)
 			}
-			return ret(handleURL(t, redir))
+			return ret(handleURL(t, redir, numRedirects+1))
 		}
 		return ret("", false)
 	case 40:

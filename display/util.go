@@ -3,7 +3,6 @@ package display
 import (
 	"errors"
 	"net/url"
-	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -45,12 +44,6 @@ func textWidth() int {
 	return viper.GetInt("a-general.max_width")
 }
 
-// queryEscape is the same as url.PathEscape, but it also replaces the +.
-// This is because Gemini requires percent-escaping for queries.
-func queryEscape(query string) string {
-	return strings.ReplaceAll(url.PathEscape(query), "+", "%2B")
-}
-
 // resolveRelLink returns an absolute link for the given absolute link and relative one.
 // It also returns an error if it could not resolve the links, which should be displayed
 // to the user.
@@ -62,7 +55,7 @@ func resolveRelLink(t *tab, prev, next string) (string, error) {
 	prevParsed, _ := url.Parse(prev)
 	nextParsed, err := url.Parse(next)
 	if err != nil {
-		return "", errors.New("link URL could not be parsed")
+		return "", errors.New("link URL could not be parsed") //nolint:goerr113
 	}
 	return prevParsed.ResolveReference(nextParsed).String(), nil
 }
@@ -83,13 +76,6 @@ func normalizeURL(u string) string {
 		return u
 	}
 
-	if !strings.Contains(u, "://") && !strings.HasPrefix(u, "//") {
-		// No scheme at all in the URL
-		parsed, err = url.Parse("gemini://" + u)
-		if err != nil {
-			return u
-		}
-	}
 	if parsed.Scheme == "" {
 		// Always add scheme
 		parsed.Scheme = "gemini"

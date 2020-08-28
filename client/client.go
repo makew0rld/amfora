@@ -5,12 +5,20 @@ import (
 	"net/url"
 
 	"github.com/makeworld-the-better-one/go-gemini"
+	"github.com/spf13/viper"
 )
 
 // Fetch returns response data and an error.
 // The error text is human friendly and should be displayed.
 func Fetch(u string) (*gemini.Response, error) {
-	res, err := gemini.Fetch(u)
+	var res *gemini.Response
+	var err error
+
+	if viper.GetString("a-general.proxy") == "" {
+		res, err = gemini.Fetch(u)
+	} else {
+		res, err = gemini.FetchWithHost(viper.GetString("a-general.proxy"), u)
+	}
 	if err != nil {
 		return nil, err
 	}

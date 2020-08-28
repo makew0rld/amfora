@@ -33,7 +33,7 @@ func removeIndex(s []string, i int) []string {
 	return s[:len(s)-1]
 }
 
-func removeUrl(url string) {
+func removeURL(url string) {
 	for i := range urls {
 		if urls[i] == url {
 			urls = removeIndex(urls, i)
@@ -48,7 +48,7 @@ func removeUrl(url string) {
 // If your page is larger than the max cache size, the provided page
 // will silently not be added to the cache.
 func AddPage(p *structs.Page) {
-	if p.Url == "" || strings.HasPrefix(p.Url, "about:") {
+	if p.URL == "" || strings.HasPrefix(p.URL, "about:") {
 		// Just in case, these pages shouldn't be cached
 		return
 	}
@@ -71,10 +71,10 @@ func AddPage(p *structs.Page) {
 
 	lock.Lock()
 	defer lock.Unlock()
-	pages[p.Url] = p
+	pages[p.URL] = p
 	// Remove the URL if it was already there, then add it to the end
-	removeUrl(p.Url)
-	urls = append(urls, p.Url)
+	removeURL(p.URL)
+	urls = append(urls, p.URL)
 }
 
 // RemovePage will remove a page from the cache.
@@ -83,7 +83,7 @@ func RemovePage(url string) {
 	lock.Lock()
 	defer lock.Unlock()
 	delete(pages, url)
-	removeUrl(url)
+	removeURL(url)
 }
 
 // ClearPages removes all pages from the cache.

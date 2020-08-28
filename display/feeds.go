@@ -38,7 +38,7 @@ func Feeds(t *tab) {
 		Raw:       feedPageRaw,
 		Content:   content,
 		Links:     links,
-		Url:       "about:feeds",
+		URL:       "about:feeds",
 		Width:     termW,
 		Mediatype: structs.TextGemini,
 	}

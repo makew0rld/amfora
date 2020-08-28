@@ -5,7 +5,7 @@
 <h6>Image modified from: amphora by Alvaro Cabrera from the Noun Project</h6>
 </center>
 
-
+[![travis build status](https://img.shields.io/travis/com/makeworld-the-better-one/amfora)](https://https://travis-ci.com/github/makeworld-the-better-one/amfora)
 [![go reportcard](https://goreportcard.com/badge/github.com/makeworld-the-better-one/amfora)](https://goreportcard.com/report/github.com/makeworld-the-better-one/amfora)
 [![license GPLv3](https://img.shields.io/github/license/makeworld-the-better-one/amfora)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
@@ -19,7 +19,7 @@
 
 Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that.
 
-It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Maybe use Powershell (comes with Windows) or [Cmder](https://cmder.net/) instead. Note that some of the application colors will not display correctly on most Windows terminals, but all functionality will still work.
+It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Use [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701) instead. Note that some of the application colors might not display correctly on Windows, but all functionality will still work.
 
 It fully passes Sean Conman's client torture test, including the new Unicode tests. It mostly passes the Egsam test.
 
@@ -57,16 +57,16 @@ brew upgrade amfora
 ```
 
 ### From Source
-This section is for programmers who want to install from source.
+This section is for programmers who want to install from source. Make sure you're using Go 1.13 at least, as earlier versions will fail to build.
 
 Install latest release:
 ```
-GO111MODULE=on go get -u github.com/makeworld-the-better-one/amfora
+GO111MODULE=on go get github.com/makeworld-the-better-one/amfora
 ```
 
 Install latest commit:
 ```
-GO111MODULE=on go get -u github.com/makeworld-the-better-one/amfora@master
+GO111MODULE=on go get github.com/makeworld-the-better-one/amfora@master
 ```
 
 ## Usage
@@ -99,15 +99,18 @@ Features in *italics* are in the master branch, but not in the latest release.
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
 - [x] *Subscribe to RSS and Atom feeds and display them*
   - Subscribing to page changes, similar to how Spacewalk works, is also supported
-- [ ] Stream support
+- [x] *Proxying*
+  - All requests can optionally be sent through another server
+  - A gemini proxy server implementation currently does not exist, but Amfora will support it when it does!
+- [ ] Support Markdown rendering
+- [ ] Search in pages with <kbd>Ctrl-F</kbd>
 - [ ] Full client certificate UX within the client
   - Create transient and permanent certs within the client, per domain
   - Manage and browse them
   - Similar to [Kristall](https://github.com/MasterQ32/kristall)
   - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
+- [ ] Stream support
 - [ ] Table of contents for pages
-- [ ] Search in pages with <kbd>Ctrl-F</kbd>
-- [ ] Support Markdown rendering
 - [ ] History browser
 
 ## Configuration

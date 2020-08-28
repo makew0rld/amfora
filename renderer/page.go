@@ -16,6 +16,9 @@ import (
 
 var ErrTooLarge = errors.New("page content would be too large")
 var ErrTimedOut = errors.New("page download timed out")
+var ErrCantDisplay = errors.New("invalid content for a page")
+var ErrBadEncoding = errors.New("unsupported encoding")
+var ErrBadMediatype = errors.New("displayable mediatype is not handled in the code, implementation error")
 
 // isUTF8 returns true for charsets that are compatible with UTF-8 and don't need to be decoded.
 func isUTF8(charset string) bool {
@@ -56,7 +59,7 @@ func CanDisplay(res *gemini.Response) bool {
 // You must set the Page.Width value yourself.
 func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs.Page, error) {
 	if !CanDisplay(res) {
-		return nil, errors.New("not valid content for a Page")
+		return nil, ErrCantDisplay
 	}
 
 	buf := new(bytes.Buffer)
@@ -90,7 +93,7 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 		encoding, err := ianaindex.MIME.Encoding(params["charset"])
 		if encoding == nil || err != nil {
 			// Some encoding doesn't exist and wasn't caught in CanDisplay()
-			return nil, errors.New("unsupported encoding")
+			return nil, ErrBadEncoding
 		}
 		utfText, err = encoding.NewDecoder().String(buf.String())
 		if err != nil {
@@ -102,7 +105,7 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 		rendered, links := RenderGemini(utfText, width, leftMargin)
 		return &structs.Page{
 			Mediatype: structs.TextGemini,
-			Url:       url,
+			URL:       url,
 			Raw:       utfText,
 			Content:   rendered,
 			Links:     links,
@@ -112,22 +115,22 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 			// ANSI
 			return &structs.Page{
 				Mediatype: structs.TextAnsi,
-				Url:       url,
+				URL:       url,
 				Raw:       utfText,
 				Content:   RenderANSI(utfText, leftMargin),
 				Links:     []string{},
 			}, nil
-		} else {
-			// Treated as plaintext
-			return &structs.Page{
-				Mediatype: structs.TextPlain,
-				Url:       url,
-				Raw:       utfText,
-				Content:   RenderPlainText(utfText, leftMargin),
-				Links:     []string{},
-			}, nil
 		}
+
+		// Treated as plaintext
+		return &structs.Page{
+			Mediatype: structs.TextPlain,
+			URL:       url,
+			Raw:       utfText,
+			Content:   RenderPlainText(utfText, leftMargin),
+			Links:     []string{},
+		}, nil
 	}
 
-	return nil, errors.New("displayable mediatype is not handled in the code, implementation error")
+	return nil, ErrBadMediatype
 }

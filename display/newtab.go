@@ -1,3 +1,4 @@
+//nolint
 package display
 
 var newTabContent = `# New Tab

@@ -27,11 +27,11 @@ var tofuDBDir string
 var tofuDBPath string
 
 // Bookmarks
+
 var BkmkStore = viper.New()
 var bkmkDir string
 var bkmkPath string
 
-// For other pkgs to use
 var DownloadsDir string
 
 // Feeds
@@ -39,6 +39,7 @@ var FeedJson io.ReadCloser
 var feedDir string
 var FeedPath string
 
+//nolint:golint,goerr113
 func Init() error {
 
 	// *** Set paths ***
@@ -48,7 +49,7 @@ func Init() error {
 		return err
 	}
 	// Store AppData path
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" { //nolint:goconst
 		appdata, ok := os.LookupEnv("APPDATA")
 		if ok {
 			amforaAppData = filepath.Join(appdata, "amfora")
@@ -220,6 +221,7 @@ func Init() error {
 	// Setup main config
 
 	viper.SetDefault("a-general.home", "gemini.circumlunar.space")
+	viper.SetDefault("a-general.auto_redirect", false)
 	viper.SetDefault("a-general.http", "default")
 	viper.SetDefault("a-general.search", "gus.guru/search")
 	viper.SetDefault("a-general.color", true)
@@ -231,6 +233,7 @@ func Init() error {
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.emoji_favicons", false)
 	viper.SetDefault("keybindings.shift_numbers", "!@#$%^&*()")
+	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
 

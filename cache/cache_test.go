@@ -7,9 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var p = structs.Page{Url: "example.com"}
-var p2 = structs.Page{Url: "example.org"}
-var queryPage = structs.Page{Url: "gemini://example.com/test?query"}
+var p = structs.Page{URL: "example.com"}
+var p2 = structs.Page{URL: "example.org"}
 
 func reset() {
 	ClearPages()
@@ -33,13 +32,13 @@ func TestMaxSize(t *testing.T) {
 	assert.Equal(1, NumPages(), "one page should be added")
 	AddPage(&p2)
 	assert.Equal(1, NumPages(), "there should still be just one page due to cache size limits")
-	assert.Equal(p2.Url, urls[0], "the only page url should be the second page one")
+	assert.Equal(p2.URL, urls[0], "the only page url should be the second page one")
 }
 
 func TestRemove(t *testing.T) {
 	reset()
 	AddPage(&p)
-	RemovePage(p.Url)
+	RemovePage(p.URL)
 	assert.Equal(t, 0, NumPages(), "there shouldn't be any pages after the removal")
 }
 
@@ -62,11 +61,11 @@ func TestGet(t *testing.T) {
 	reset()
 	AddPage(&p)
 	AddPage(&p2)
-	page, ok := GetPage(p.Url)
+	page, ok := GetPage(p.URL)
 	if !ok {
 		t.Fatal("Get should say that the page was found")
 	}
-	if page.Url != p.Url {
+	if page.URL != p.URL {
 		t.Error("page urls don't match")
 	}
 }

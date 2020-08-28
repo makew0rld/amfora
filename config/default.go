@@ -16,6 +16,11 @@ var defaultConf = []byte(`# This is the default config file.
 # Press Ctrl-H to access it
 home = "gemini://gemini.circumlunar.space"
 
+# Follow up to 5 Gemini redirects without prompting.
+# A prompt is always shown after the 5th redirect and for redirects to protocols other than Gemini.
+# If set to false, a prompt will be shown before following redirects.
+auto_redirect = false
+
 # What command to run to open a HTTP URL. Set to "default" to try to guess the browser,
 # or set to "off" to not open HTTP URLs.
 # If a command is set, than the URL will be added (in quotes) to the end of the command.
@@ -50,12 +55,33 @@ page_max_time = 10
 # Whether to replace tab numbers with emoji favicons, which are cached.
 emoji_favicons = false
 
+# Proxy server, through which all requests would be sent.
+# String should be a host: a domain/IP with an optional port. Port 1965 is assumed otherwise.
+# The proxy server needs to be a Gemini server that supports proxying.
+# By default it is empty, which disables the proxy.
+proxy = ""
+
+
 [keybindings]
 # In the future there will be more settings here.
 
 # Hold down shift and press the numbers on your keyboard (1,2,3,4,5,6,7,8,9,0) to set this up.
 # It is default set to be accurate for US keyboards.
 shift_numbers = "!@#$%^&*()"
+
+
+[url-handlers]
+# Allows setting the commands to run for various URL schemes.
+# E.g. to open FTP URLs with FileZilla set the following key:
+#   ftp = "filezilla"
+# You can set any scheme to "off" to disable handling it.
+#
+# DO NOT use this for setting the HTTP command.
+# Use the http setting in the "a-general" section above
+
+# This is a special key that defines the handler for all URL schemes for which
+# no handler is defined.
+other = "off"
 
 
 [cache]
@@ -135,4 +161,5 @@ max_pages = 30 # The maximum number of pages the cache will store
 # bkmk_modal_text
 # bkmk_modal_label
 # bkmk_modal_field_bg
-# bkmk_modal_field_text`)
+# bkmk_modal_field_text
+`)

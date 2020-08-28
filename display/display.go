@@ -3,7 +3,6 @@ package display
 import (
 	"fmt"
 	"net/url"
-	"path"
 	"strconv"
 	"strings"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
+	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
@@ -115,6 +115,7 @@ func Init() {
 			App.SetFocus(tabs[tab].view)
 		}
 
+		//nolint:exhaustive
 		switch key {
 		case tcell.KeyEnter:
 			// Figure out whether it's a URL, link number, or search
@@ -127,27 +128,19 @@ func Init() {
 				reset()
 				return
 			}
-			if query == ".." && tabs[tab].hasContent() {
-				// Go up a directory
-				parsed, err := url.Parse(tabs[tab].page.Url)
+			if query[0] == '.' && tabs[tab].hasContent() {
+				// Relative url
+				current, err := url.Parse(tabs[tab].page.URL)
 				if err != nil {
 					// This shouldn't occur
 					return
 				}
-				if parsed.Path == "/" {
-					// Can't go up further
-					reset()
+				target, err := current.Parse(query)
+				if err != nil {
+					// Invalid relative url
 					return
 				}
-
-				// Ex: /test/foo/ -> /test/foo//.. -> /test -> /test/
-				parsed.Path = path.Clean(parsed.Path+"/..") + "/"
-				if parsed.Path == "//" {
-					// Fix double slash that occurs at domain root
-					parsed.Path = "/"
-				}
-				parsed.RawQuery = "" // Remove query
-				URL(parsed.String())
+				URL(target.String())
 				return
 			}
 
@@ -165,7 +158,7 @@ func Init() {
 						oldTab := tab
 						NewTab()
 						// Resolve and follow link manually
-						prevParsed, _ := url.Parse(tabs[oldTab].page.Url)
+						prevParsed, _ := url.Parse(tabs[oldTab].page.URL)
 						nextParsed, err := url.Parse(tabs[oldTab].page.Links[i-1])
 						if err != nil {
 							Error("URL Error", "link URL could not be parsed")
@@ -178,8 +171,9 @@ func Init() {
 				} else {
 					// It's a full URL or search term
 					// Detect if it's a search or URL
-					if strings.Contains(query, " ") || (!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
-						u := viper.GetString("a-general.search") + "?" + queryEscape(query)
+					if strings.Contains(query, " ") ||
+						(!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
+						u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
 						cache.RemovePage(u) // Don't use the cached version of the search
 						URL(u)
 					} else {
@@ -192,7 +186,7 @@ func Init() {
 			}
 			if i <= len(tabs[tab].page.Links) && i > 0 {
 				// It's a valid link number
-				followLink(tabs[tab], tabs[tab].page.Url, tabs[tab].page.Links[i-1])
+				followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[i-1])
 				return
 			}
 			// Invalid link number, don't do anything
@@ -213,7 +207,7 @@ func Init() {
 		Raw:       newTabContent,
 		Content:   renderedNewTabContent,
 		Links:     newTabLinks,
-		Url:       "about:newtab",
+		URL:       "about:newtab",
 		Width:     -1, // Force reformatting on first display
 		Mediatype: structs.TextGemini,
 	}
@@ -254,6 +248,7 @@ func Init() {
 				}
 			}
 
+			//nolint:exhaustive
 			switch event.Key() {
 			case tcell.KeyCtrlR:
 				Reload()
@@ -321,18 +316,20 @@ func Init() {
 					}
 					if i <= len(tabs[curTab].page.Links) && i > 0 {
 						// It's a valid link number
-						followLink(tabs[curTab], tabs[curTab].page.Url, tabs[curTab].page.Links[i-1])
+						followLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Links[i-1])
 						return nil
 					}
 				}
 			}
 		}
+
 		// All the keys and operations that can work while a tab IS loading
 
+		//nolint:exhaustive
 		switch event.Key() {
 		case tcell.KeyCtrlT:
 			if tabs[curTab].page.Mode == structs.ModeLinkSelect {
-				next, err := resolveRelLink(tabs[curTab], tabs[curTab].page.Url, tabs[curTab].page.Selected)
+				next, err := resolveRelLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Selected)
 				if err != nil {
 					Error("URL Error", err.Error())
 					return nil
@@ -521,11 +518,11 @@ func Reload() {
 		return
 	}
 
-	parsed, _ := url.Parse(tabs[curTab].page.Url)
+	parsed, _ := url.Parse(tabs[curTab].page.URL)
 	go func(t *tab) {
-		cache.RemovePage(tabs[curTab].page.Url)
+		cache.RemovePage(tabs[curTab].page.URL)
 		cache.RemoveFavicon(parsed.Host)
-		handleURL(t, t.page.Url) // goURL is not used bc history shouldn't be added to
+		handleURL(t, t.page.URL, 0) // goURL is not used bc history shouldn't be added to
 		if t == tabs[curTab] {
 			// Display the bottomBar state that handleURL set
 			t.applyBottomBar()
@@ -538,7 +535,7 @@ func Reload() {
 func URL(u string) {
 	// Some code is copied in followLink()
 
-	if u == "about:bookmarks" {
+	if u == "about:bookmarks" { //nolint:goconst
 		Bookmarks(tabs[curTab])
 		tabs[curTab].addToHistory("about:bookmarks")
 		return
@@ -553,6 +550,10 @@ func URL(u string) {
 		return
 	}
 
+	if !strings.HasPrefix(u, "//") && !strings.HasPrefix(u, "gemini://") && !strings.Contains(u, "://") {
+		// Assume it's a Gemini URL
+		u = "gemini://" + u
+	}
 	go goURL(tabs[curTab], u)
 }
 

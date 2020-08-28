@@ -9,14 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Feed & page subscription** (#61)
 - **Emoji favicons** can now be seen if `emoji_favicons` is enabled in the config (#62)
+- **Proxy support** - specify a proxy in the config for all requests to go through it (#66)
 - The `shift_numbers` key in the config was added, so that non US keyboard users can navigate tabs (#64)
 - <kbd>F1</kbd> and <kbd>F2</kbd> keys for navigating to the previous and next tabs (#64)
+- Resolving any relative path (starting with a `.`) in the bottom bar is supported, not just `..` (#71)
+- Set programs in config to open other schemes like `gopher://` or `magnet:` (#74)
+- Auto-redirecting can be enabled - redirect within Gemini up to 5 times automatically (#75) 
 
 ### Changed
+- Update to [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) v0.8.4
 
 ### Fixed
 - Two digit (and higher) link texts are now in line with one digit ones (#60)
 - Race condition when reloading pages, could have caused the cache to still be used
+- Prevent panic (crash) when the server sends an error with an empty meta string (#73)
+- URLs with with colon-only schemes (like `mailto:`) are properly recognized
 
 
 ## [1.4.0] - 2020-07-28

@@ -55,6 +55,13 @@ page_max_time = 10
 # Whether to replace tab numbers with emoji favicons, which are cached.
 emoji_favicons = false
 
+# Proxy server, through which all requests would be sent.
+# String should be a host: a domain/IP with an optional port. Port 1965 is assumed otherwise.
+# The proxy server needs to be a Gemini server that supports proxying.
+# By default it is empty, which disables the proxy.
+proxy = ""
+
+
 [keybindings]
 # In the future there will be more settings here.
 
@@ -154,4 +161,5 @@ max_pages = 30 # The maximum number of pages the cache will store
 # bkmk_modal_text
 # bkmk_modal_label
 # bkmk_modal_field_bg
-# bkmk_modal_field_text`)
+# bkmk_modal_field_text
+`)

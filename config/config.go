@@ -182,7 +182,7 @@ func Init() error {
 		// Validate path
 		dDir := viper.GetString("a-general.downloads")
 		di, err := os.Stat(dDir)
-		if err == nil { //nolint:gocritic
+		if err == nil {
 			if !di.IsDir() {
 				return fmt.Errorf("downloads path specified is not a directory: %s", dDir)
 			}

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Proxy support** - specify a proxy in the config for all requests to go through it (#66)
 - Emoji favicons can now be seen if `emoji_favicons` is enabled in the config (#62)
 - The `shift_numbers` key in the config was added, so that non US keyboard users can navigate tabs (#64)
 - <kbd>F1</kbd> and <kbd>F2</kbd> keys for navigating to the previous and next tabs (#64)

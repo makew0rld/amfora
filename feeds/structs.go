@@ -81,6 +81,7 @@ type PageEntry struct {
 
 // PageEntries is new-to-old list of Entry structs, used to create a feed page.
 // It should always be assumed to be sorted when used in other packages.
+// Sorted by post time, from newest to oldest.
 type PageEntries struct {
 	Entries []*PageEntry
 }
@@ -92,7 +93,7 @@ func (e *PageEntries) Len() int {
 }
 
 func (e *PageEntries) Less(i, j int) bool {
-	return e.Entries[i].Published.Before(e.Entries[j].Published)
+	return e.Entries[i].Published.After(e.Entries[j].Published)
 }
 
 func (e *PageEntries) Swap(i, j int) {

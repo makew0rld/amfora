@@ -30,7 +30,11 @@ var (
 	ErrNotFeed    = errors.New("not a valid feed")
 )
 
-var writeMu = sync.Mutex{}
+var writeMu = sync.Mutex{} // Prevent concurrent writes to feeds.json file
+
+// LastUpdated is the time when the in-memory data was last updated.
+// It can be used to know if the feed page should be regenerated.
+var LastUpdated time.Time
 
 // Init should be called after config.Init.
 func Init() error {
@@ -41,6 +45,8 @@ func Init() error {
 	if err != nil && err != io.EOF {
 		return fmt.Errorf("feeds json is corrupted: %v", err) //nolint:goerr113
 	}
+
+	LastUpdated = time.Now()
 
 	go updateAll()
 	return nil
@@ -70,6 +76,10 @@ func IsTracked(url string) bool {
 // GetFeed returns a Feed object and a bool indicating whether the passed
 // content was actually recognized as a feed.
 func GetFeed(mediatype, filename string, r io.Reader) (*gofeed.Feed, bool) {
+	if r == nil {
+		return nil, false
+	}
+
 	// Check mediatype and filename
 	if mediatype != "application/atom+xml" && mediatype != "application/rss+xml" &&
 		filename != "atom.xml" && filename != "feed.xml" &&
@@ -119,34 +129,53 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 
 	data.feedMu.Lock()
 	data.Feeds[url] = feed
-	data.feedMu.Unlock()
-
 	err := writeJSON()
 	if err != nil {
 		// Don't use in-memory if it couldn't be saved
-		data.feedMu.Lock()
 		delete(data.Feeds, url)
 		data.feedMu.Unlock()
 		return ErrSaving
 	}
+	data.feedMu.Unlock()
+
+	LastUpdated = time.Now()
 	return nil
 }
 
-// AddPage stores a page URL to track for changes.
-// Do not use it to update a page, as it only resets the hash.
-func AddPage(url string) error {
+// AddPage stores a page to track for changes.
+// It can be used to update the page as well, although the package
+// will handle that on its own.
+func AddPage(url string, r io.Reader) error {
+	if r == nil {
+		return nil
+	}
+
+	h := sha256.New()
+	if _, err := io.Copy(h, r); err != nil {
+		return err
+	}
+	newHash := fmt.Sprintf("%x", h.Sum(nil))
+
 	data.pageMu.Lock()
-	data.Pages[url] = &pageJSON{} // No hash yet
-	data.pageMu.Unlock()
+	_, ok := data.Pages[url]
+	if !ok || data.Pages[url].Hash != newHash {
+		// Page content is different, or it didn't exist
+		data.Pages[url] = &pageJSON{
+			Hash:    newHash,
+			Changed: time.Now().UTC(),
+		}
+	}
 
 	err := writeJSON()
 	if err != nil {
 		// Don't use in-memory if it couldn't be saved
-		data.pageMu.Lock()
 		delete(data.Pages, url)
 		data.pageMu.Unlock()
-		return ErrSaving
+		return err
 	}
+	data.pageMu.Unlock()
+
+	LastUpdated = time.Now()
 	return nil
 }
 
@@ -188,32 +217,8 @@ func updatePage(url string) error {
 	if res.Status != gemini.StatusSuccess {
 		return ErrNotSuccess
 	}
-	h := sha256.New()
-	if _, err := io.Copy(h, res.Body); err != nil {
-		return err
-	}
-	newHash := fmt.Sprintf("%x", h.Sum(nil))
 
-	data.pageMu.Lock()
-	if data.Pages[url].Hash != newHash {
-		// Page content is different
-		data.Pages[url] = &pageJSON{
-			Hash:    newHash,
-			Changed: time.Now().UTC(),
-		}
-	}
-	data.pageMu.Unlock()
-
-	err = writeJSON()
-	if err != nil {
-		// Don't use in-memory if it couldn't be saved
-		data.pageMu.Lock()
-		delete(data.Pages, url)
-		data.pageMu.Unlock()
-		return err
-	}
-
-	return nil
+	return AddPage(url, res.Body)
 }
 
 // updateAll updates all feeds and pages.
@@ -221,15 +226,14 @@ func updateAll() {
 	// TODO: Is two goroutines the right amount?
 
 	worker := func(jobs <-chan [2]string, wg *sync.WaitGroup) {
-		// Each job is: []string{<type>, "url"}
+		// Each job is: [2]string{<type>, "url"}
 		// where <type> is "feed" or "page"
 
 		defer wg.Done()
 		for j := range jobs {
 			if j[0] == "feed" {
 				updateFeed(j[1]) //nolint:errcheck
-			}
-			if j[0] == "page" {
+			} else if j[0] == "page" {
 				updatePage(j[1]) //nolint:errcheck
 			}
 		}
@@ -278,8 +282,9 @@ func updateAll() {
 
 // GetPageEntries returns the current list of PageEntries
 // for use in rendering a page.
-// The contents of the entries will never change, and this
-// function should be called again to get updates.
+// The contents of the returned entries will never change,
+// so this function needs to be called again to get updates.
+// It always returns sorted entries - by post time, from newest to oldest.
 func GetPageEntries() *PageEntries {
 	var pe PageEntries
 
@@ -289,6 +294,8 @@ func GetPageEntries() *PageEntries {
 		for _, item := range feed.Items {
 
 			var pub time.Time
+
+			// Try to use updated time first, then published
 
 			if !item.UpdatedParsed.IsZero() {
 				pub = *item.UpdatedParsed
@@ -321,5 +328,6 @@ func GetPageEntries() *PageEntries {
 	data.RUnlock()
 
 	sort.Sort(&pe)
+
 	return &pe
 }

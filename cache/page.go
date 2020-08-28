@@ -1,6 +1,5 @@
 // Package cache provides an interface for a cache of strings, aka text/gemini pages, and redirects.
 // It is fully thread safe.
-// The redirect cache is not limited.
 package cache
 
 import (
@@ -22,7 +21,7 @@ func SetMaxPages(max int) {
 	maxPages = max
 }
 
-// SetMaxSize sets the max size the cache can be, in bytes.
+// SetMaxSize sets the max size the page cache can be, in bytes.
 // A value <= 0 means infinite size.
 func SetMaxSize(max int) {
 	maxSize = max

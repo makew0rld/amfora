@@ -20,3 +20,8 @@ cache:
     - $GOPATH/pkg/mod
 
 # TODO: GitHub Releases deploy
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always

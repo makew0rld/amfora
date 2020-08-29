@@ -61,12 +61,14 @@ This section is for programmers who want to install from source. Make sure you'r
 
 Install latest release:
 ```
-GO111MODULE=on go get github.com/makeworld-the-better-one/amfora
+go env -w GO111MODULE=on
+go get github.com/makeworld-the-better-one/amfora
 ```
 
 Install latest commit:
 ```
-GO111MODULE=on go get github.com/makeworld-the-better-one/amfora@master
+go env -w GO111MODULE=on
+go get github.com/makeworld-the-better-one/amfora@master
 ```
 
 ## Usage

@@ -121,6 +121,13 @@ The config file is written in the intuitive [TOML](https://github.com/toml-lang/
 
 On Windows, the file is in `%APPDATA%\amfora\config.toml`, which usually expands to `C:\Users\<username>\AppData\Roaming\amfora\config.toml`.
 
+## Known Bugs
+
+- Pasting on Windows is truncated, the full paste content won't be added. See [#43](https://github.com/makeworld-the-better-one/amfora/issues/43) for details.
+
+You can also check out [all the issues with the bug label](https://github.com/makeworld-the-better-one/amfora/issues?q=is%3Aopen+is%3Aissue+label%3Abug).
+
+
 ## Libraries
 Amfora ❤️ open source!
 

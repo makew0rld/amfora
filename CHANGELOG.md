@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Resolving any relative path (starting with a `.`) in the bottom bar is supported, not just `..` (#71)
 - You can now set programs in the config to open other schemes like `gopher://` or `magnet:` (#74)
 - Auto-redirecting can be enabled - redirect within Gemini up to 5 times automatically (#75) 
-- Help page documents <kbd>d</kbd> and <kbd>u</kbd>, as well as <kbd>Page Up</kbd> and <kbd>Page Down</kbd> (#78)
+- Help page documents paging keys (#78)
 
 ### Changed
 - Update to [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) v0.8.4

@@ -12,12 +12,14 @@ var helpCells = strings.TrimSpace(`
 ?|Bring up this help. You can scroll!
 Esc|Leave the help
 Arrow keys, h/j/k/l|Scroll and move a page.
+PgUp, u|Go up a page in document
+PgDn, d|Go down a page in document
+g|Go to top of document
+G|Go to bottom of document
 Tab|Navigate to the next item in a popup.
 Shift-Tab|Navigate to the previous item in a popup.
 b, Alt-Left|Go back in the history
 f, Alt-Right|Go forward in the history
-g|Go to top of document
-G|Go to bottom of document
 spacebar|Open bar at the bottom - type a URL, link number, search term.
 |You can also type two dots (..) to go up a directory in the URL.
 |Typing new:N will open link number N in a new tab
@@ -60,7 +62,7 @@ func Help() {
 func helpInit() {
 	// Populate help table
 	helpTable.SetDoneFunc(func(key tcell.Key) {
-		if key == tcell.KeyEsc {
+		if key == tcell.KeyEsc || key == tcell.KeyEnter {
 			tabPages.SwitchToPage(strconv.Itoa(curTab))
 			App.SetFocus(tabs[curTab].view)
 			App.Draw()

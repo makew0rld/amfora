@@ -14,31 +14,37 @@ import (
 var feedPageRaw = "# Feeds & Pages\n\nUpdates" + strings.Repeat(" ", 80-25) + "[Newest -> Oldest]\n" +
 	strings.Repeat("-", 80) + "\n\n"
 
-var timeDay = 24 * time.Hour
-
 var feedPageUpdated time.Time
+
+// toLocalDay truncates the provided time to a date only,
+// but converts to the local time first.
+func toLocalDay(t time.Time) time.Time {
+	t = t.Local()
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+}
 
 // Feeds displays the feeds page on the current tab.
 func Feeds(t *tab) {
 	// Retrieve cached version if there hasn't been updates
 	p, ok := cache.GetPage("about:feeds")
-	if feedPageUpdated == feeds.LastUpdated && ok {
+	if feedPageUpdated.After(feeds.LastUpdated) && ok {
 		setPage(t, p)
 		t.applyBottomBar()
 		return
 	}
 
-	pe := feeds.GetPageEntries()
-
 	// curDay represents what day of posts the loop is on.
 	// It only goes backwards in time.
 	// It's initial setting means:
-	// only display posts older than a day in the future.
-	curDay := time.Now().Round(timeDay).Add(timeDay)
+	// Only display posts older than 6 hours in the future,
+	// nothing further in the future.
+	curDay := toLocalDay(time.Now()).Add(6 * time.Hour)
+
+	pe := feeds.GetPageEntries()
 
 	for _, entry := range pe.Entries { // From new to old
 		// Convert to local time, remove sub-day info
-		pub := entry.Published.In(time.Local).Round(timeDay)
+		pub := toLocalDay(entry.Published)
 
 		if pub.Before(curDay) {
 			// This post is on a new day, add a day header
@@ -57,7 +63,7 @@ func Feeds(t *tab) {
 		Width:     termW,
 		Mediatype: structs.TextGemini,
 	}
-	cache.AddPage(&page)
+	go cache.AddPage(&page)
 	setPage(t, &page)
 	t.applyBottomBar()
 

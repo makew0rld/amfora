@@ -123,7 +123,8 @@ On Windows, the file is in `%APPDATA%\amfora\config.toml`, which usually expands
 
 ## Known Bugs
 
-- Pasting on Windows is truncated, the full paste content won't be added. See [#43](https://github.com/makeworld-the-better-one/amfora/issues/43) for details.
+- Pasting on Windows is truncated, the full paste content won't be added. ([#43](https://github.com/makeworld-the-better-one/amfora/issues/43))
+- ANSI codes aren't displaying properly ([#59](https://github.com/makeworld-the-better-one/amfora/issues/59))
 
 You can also check out [all the issues with the bug label](https://github.com/makeworld-the-better-one/amfora/issues?q=is%3Aopen+is%3Aissue+label%3Abug).
 

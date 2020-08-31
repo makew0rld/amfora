@@ -202,6 +202,7 @@ func Init() {
 	})
 
 	// Render the default new tab content ONCE and store it for later
+	newTabContent := getNewTabContent()
 	renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
 	newTabPage = structs.Page{
 		Raw:       newTabContent,

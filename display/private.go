@@ -78,7 +78,11 @@ func reformatPage(p *structs.Page) {
 	switch p.Mediatype {
 	case structs.TextGemini:
 		// Links are not recorded because they won't change
-		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin())
+		proxied := true
+		if strings.HasPrefix(p.URL, "gemini") || strings.HasPrefix(p.URL, "about") {
+			proxied = false
+		}
+		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin(), proxied)
 	case structs.TextPlain:
 		rendered = renderer.RenderPlainText(p.Raw, leftMargin())
 	case structs.TextAnsi:
@@ -413,7 +417,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		return ret("", false)
 	}
 	if renderer.CanDisplay(res) {
-		page, err := renderer.MakePage(u, res, textWidth(), leftMargin())
+		page, err := renderer.MakePage(u, res, textWidth(), leftMargin(), usingProxy)
 		// Rendering may have taken a while, make sure tab is still valid
 		if !isValidTab(t) {
 			return ret("", false)

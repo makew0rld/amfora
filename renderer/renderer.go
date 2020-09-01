@@ -87,13 +87,17 @@ func tagLines(s, start, end string) string {
 
 // convertRegularGemini converts non-preformatted blocks of text/gemini
 // into a cview-compatible format.
+// Since this only works on non-preformatted blocks, RenderGemini
+// should always be used instead.
+//
 // It also returns a slice of link URLs.
 // numLinks is the number of links that exist so far.
 // width is the number of columns to wrap to.
 //
-// Since this only works on non-preformatted blocks, RenderGemini
-// should always be used instead.
-func convertRegularGemini(s string, numLinks, width int) (string, []string) {
+//
+// proxied is whether the request is through the gemini:// scheme.
+// If it's not a gemini:// page, set this to true.
+func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, []string) {
 	links := make([]string, 0)
 	lines := strings.Split(s, "\n")
 	wrappedLines := make([]string, 0) // Final result
@@ -175,7 +179,8 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 
 			if viper.GetBool("a-general.color") {
 				pU, err := urlPkg.Parse(url)
-				if err == nil && (pU.Scheme == "" || pU.Scheme == "gemini" || pU.Scheme == "about") {
+				if !proxied && err == nil &&
+					(pU.Scheme == "" || pU.Scheme == "gemini" || pU.Scheme == "about") {
 					// A gemini link
 					// Add the link text in blue (in a region), and a gray link number to the left of it
 					// Those are the default colors, anyway
@@ -267,7 +272,10 @@ func convertRegularGemini(s string, numLinks, width int) (string, []string) {
 //
 // width is the number of columns to wrap to.
 // leftMargin is the number of blank spaces to prepend to each line.
-func RenderGemini(s string, width, leftMargin int) (string, []string) {
+//
+// proxied is whether the request is through the gemini:// scheme.
+// If it's not a gemini:// page, set this to true.
+func RenderGemini(s string, width, leftMargin int, proxied bool) (string, []string) {
 	s = cview.Escape(s)
 	if viper.GetBool("a-general.color") {
 		s = cview.TranslateANSI(s)
@@ -292,7 +300,7 @@ func RenderGemini(s string, width, leftMargin int) (string, []string) {
 				)
 			} else {
 				// Not preformatted, regular text
-				ren, lks := convertRegularGemini(buf, len(links), width)
+				ren, lks := convertRegularGemini(buf, len(links), width, proxied)
 				links = append(links, lks...)
 				rendered += ren
 			}
@@ -310,7 +318,7 @@ func RenderGemini(s string, width, leftMargin int) (string, []string) {
 	} else {
 		// Not preformatted, regular text
 		// Same code as in the loop above
-		ren, lks := convertRegularGemini(buf, len(links), width)
+		ren, lks := convertRegularGemini(buf, len(links), width, proxied)
 		links = append(links, lks...)
 		rendered += ren
 	}

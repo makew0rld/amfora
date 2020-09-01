@@ -201,7 +201,7 @@ func Init() {
 
 	// Render the default new tab content ONCE and store it for later
 	newTabContent := getNewTabContent()
-	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
+	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin(), false)
 	newTabPage = structs.Page{
 		Raw:       newTabContent,
 		Content:   renderedNewTabContent,
@@ -522,7 +522,7 @@ func Reload() {
 		// Re-render new tab, similar to Init()
 		newTabContent := getNewTabContent()
 		tmpTermW := termW
-		renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
+		renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin(), false)
 		newTabPage = structs.Page{
 			Raw:       newTabContent,
 			Content:   renderedNewTabContent,

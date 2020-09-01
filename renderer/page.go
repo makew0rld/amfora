@@ -57,7 +57,7 @@ func CanDisplay(res *gemini.Response) bool {
 
 // MakePage creates a formatted, rendered Page from the given network response and params.
 // You must set the Page.Width value yourself.
-func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs.Page, error) {
+func MakePage(url string, res *gemini.Response, width, leftMargin int, proxied bool) (*structs.Page, error) {
 	if !CanDisplay(res) {
 		return nil, ErrCantDisplay
 	}
@@ -102,7 +102,7 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int) (*structs
 	}
 
 	if mediatype == "text/gemini" {
-		rendered, links := RenderGemini(utfText, width, leftMargin)
+		rendered, links := RenderGemini(utfText, width, leftMargin, proxied)
 		return &structs.Page{
 			Mediatype: structs.TextGemini,
 			URL:       url,

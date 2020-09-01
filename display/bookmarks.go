@@ -115,7 +115,7 @@ func Bookmarks(t *tab) {
 		rawContent += fmt.Sprintf("=> %s %s\r\n", keys[i], m[keys[i]])
 	}
 	// Render and display
-	content, links := renderer.RenderGemini(rawContent, textWidth(), leftMargin())
+	content, links := renderer.RenderGemini(rawContent, textWidth(), leftMargin(), false)
 	page := structs.Page{
 		Raw:       rawContent,
 		Content:   content,

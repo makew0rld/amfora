@@ -34,7 +34,7 @@ var bkmkPath string
 
 var DownloadsDir string
 
-var Proxy *url.URL
+var GemProxy *url.URL
 
 //nolint:golint,goerr113
 func Init() error {
@@ -169,7 +169,6 @@ func Init() error {
 	viper.SetDefault("a-general.page_max_size", 2097152)
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.emoji_favicons", false)
-	viper.SetDefault("a-general.proxy", "")
 	viper.SetDefault("keybindings.shift_numbers", "!@#$%^&*()")
 	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)
@@ -182,7 +181,9 @@ func Init() error {
 		return err
 	}
 
-	Proxy, _ = url.Parse(viper.GetString("a-general.proxy"))
+	if viper.GetString("proxies.gemini") != "" {
+		GemProxy, _ = url.Parse(viper.GetString("proxies.gemini"))
+	}
 
 	// Setup downloads dir
 	if viper.GetString("a-general.downloads") == "" {

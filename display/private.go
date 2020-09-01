@@ -163,10 +163,11 @@ func handleHTTP(u string, showInfo bool) {
 }
 
 // handleOther is used by handleURL.
-// It opens links other than Gemini and HTTP and displays Error modals.
+// It opens or proxies links other than Gemini and HTTP and displays Error modals.
 func handleOther(u string) {
 	// The URL should have a scheme due to a previous call to normalizeURL
 	parsed, _ := url.Parse(u)
+
 	// Search for a handler for the URL scheme
 	handler := strings.TrimSpace(viper.GetString("url-handlers." + parsed.Scheme))
 	if len(handler) == 0 {
@@ -360,7 +361,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	}
 
 	if errors.Is(err, client.ErrTofu) {
-		if config.Proxy == nil {
+		if config.GemProxy == nil {
 			if Tofu(parsed.Host, client.GetExpiry(parsed.Hostname(), parsed.Port())) {
 				// They want to continue anyway
 				client.ResetTofuEntry(parsed.Hostname(), parsed.Port(), res.Cert)
@@ -371,9 +372,9 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			}
 		} else {
 			// They are using a proxy
-			if Tofu(config.Proxy.Host, client.GetExpiry(config.Proxy.Hostname(), config.Proxy.Port())) {
+			if Tofu(config.GemProxy.Host, client.GetExpiry(config.GemProxy.Hostname(), config.GemProxy.Port())) {
 				// They want to continue anyway
-				client.ResetTofuEntry(config.Proxy.Hostname(), config.Proxy.Port(), res.Cert)
+				client.ResetTofuEntry(config.GemProxy.Hostname(), config.GemProxy.Port(), res.Cert)
 				// Response can be used further down, no need to reload
 			} else {
 				// They don't want to continue

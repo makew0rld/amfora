@@ -100,8 +100,7 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] *Emoji favicons*
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
 - [x] *Proxying*
-  - All requests can optionally be sent through another server
-  - A gemini proxy server implementation currently does not exist, but Amfora will support it when it does!
+  - Schemes like Gopher or HTTP can be proxied through a Gemini server
 - [ ] Subscribe to RSS and Atom feeds and display them
   - Subscribing to page changes, similar to how Spacewalk works, will also be supported
   - *In progress on `feeds` branch*

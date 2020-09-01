@@ -15,10 +15,10 @@ func Fetch(u string) (*gemini.Response, error) {
 	var res *gemini.Response
 	var err error
 
-	if config.Proxy == nil {
+	if config.GemProxy == nil {
 		res, err = gemini.Fetch(u)
 	} else {
-		res, err = gemini.FetchWithHost(viper.GetString("a-general.proxy"), u)
+		res, err = gemini.FetchWithHost(viper.GetString("proxies.gemini"), u)
 	}
 	if err != nil {
 		return nil, err

@@ -18,8 +18,8 @@ home = "gemini://gemini.circumlunar.space"
 # If set to false, a prompt will be shown before following redirects.
 auto_redirect = false
 
-# What command to run to open a HTTP URL. Set to "default" to try to guess the browser,
-# or set to "off" to not open HTTP URLs.
+# What command to run to open a HTTP(S) URL. Set to "default" to try to guess the browser,
+# or set to "off" to not open HTTP(S) URLs.
 # If a command is set, than the URL will be added (in quotes) to the end of the command.
 # A space will be prepended if necessary.
 http = "default"
@@ -52,12 +52,6 @@ page_max_time = 10
 # Whether to replace tab numbers with emoji favicons, which are cached.
 emoji_favicons = false
 
-# Proxy server, through which all requests would be sent.
-# String should be a host: a domain/IP with an optional port. Port 1965 is assumed otherwise.
-# The proxy server needs to be a Gemini server that supports proxying.
-# By default it is empty, which disables the proxy.
-proxy = ""
-
 
 [keybindings]
 # In the future there will be more settings here.
@@ -71,10 +65,13 @@ shift_numbers = "!@#$%^&*()"
 # Allows setting the commands to run for various URL schemes.
 # E.g. to open FTP URLs with FileZilla set the following key:
 #   ftp = "filezilla"
-# You can set any scheme to "off" to disable handling it.
+# You can set any scheme to "off" or "" to disable handling it, or
+# just leave the key unset.
 #
 # DO NOT use this for setting the HTTP command.
-# Use the http setting in the "a-general" section above
+# Use the http setting in the "a-general" section above.
+#
+# NOTE: These settings are override by the ones in the proxies section.
 
 # This is a special key that defines the handler for all URL schemes for which
 # no handler is defined.
@@ -88,6 +85,20 @@ other = "off"
 # Zero values mean there is no limit
 max_size = 0  # Size in bytes
 max_pages = 30 # The maximum number of pages the cache will store
+
+
+[proxies]
+# Allows setting a Gemini proxy for different schemes.
+# The settings are similar to the url-handlers section above.
+# E.g. to open a gopher page by connecting to a Gemini proxy server:
+#   gopher = "example.com:123"
+#
+# Port 1965 is assumed if no port is specified.
+#
+# NOTE: These settings override any external handlers specified in
+# the url-handlers section.
+#
+# Note that HTTP and HTTPS are treated as separate protocols here.
 
 
 [theme]

@@ -3,7 +3,6 @@ package display
 
 import (
 	"io/ioutil"
-	"path/filepath"
 
 	"github.com/makeworld-the-better-one/amfora/config"
 )
@@ -26,8 +25,7 @@ Happy browsing!
 
 // Read the new tab content from a file if it exists or fallback to a default page.
 func getNewTabContent() string {
-	newTabFile := filepath.Join(config.ConfigDir, "newtab.gmi")
-	data, err := ioutil.ReadFile(newTabFile)
+	data, err := ioutil.ReadFile(config.NewTabPath)
 	if err == nil {
 		return string(data)
 	}

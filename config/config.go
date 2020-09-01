@@ -15,8 +15,10 @@ import (
 )
 
 var amforaAppData string // Where amfora files are stored on Windows - cached here
-var ConfigDir string
+var configDir string
 var configPath string
+
+var NewTabPath string
 
 var TofuStore = viper.New()
 var tofuDBDir string
@@ -48,18 +50,21 @@ func Init() error {
 
 	// Store config directory and file paths
 	if runtime.GOOS == "windows" {
-		ConfigDir = amforaAppData
+		configDir = amforaAppData
 	} else {
 		// Unix / POSIX system
 		xdg_config, ok := os.LookupEnv("XDG_CONFIG_HOME")
 		if ok && strings.TrimSpace(xdg_config) != "" {
-			ConfigDir = filepath.Join(xdg_config, "amfora")
+			configDir = filepath.Join(xdg_config, "amfora")
 		} else {
 			// Default to ~/.config/amfora
-			ConfigDir = filepath.Join(home, ".config", "amfora")
+			configDir = filepath.Join(home, ".config", "amfora")
 		}
 	}
-	configPath = filepath.Join(ConfigDir, "config.toml")
+	configPath = filepath.Join(configDir, "config.toml")
+
+	// Search for a custom new tab
+	NewTabPath = filepath.Join(configDir, "newtab.gmi")
 
 	// Store TOFU db directory and file paths
 	if runtime.GOOS == "windows" {
@@ -96,7 +101,7 @@ func Init() error {
 	// Create necessary files and folders
 
 	// Config
-	err = os.MkdirAll(ConfigDir, 0755)
+	err = os.MkdirAll(configDir, 0755)
 	if err != nil {
 		return err
 	}

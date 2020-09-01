@@ -14,11 +14,7 @@ You've opened a new tab. Use the bar at the bottom to browse around. You can sta
 
 Press the ? key at any time to bring up the help, and see other keybindings. Most are what you expect.
 
-You can customize this page by creating the Gemtext file
-
-` + "```" + `
-$XDG_CONFIG_HOME/amfora/newtab.gmi
-` + "```" + `
+You can customize this page by creating a gemtext file called newtab.gmi, in Amfora's configuration folder.
 
 Happy browsing!
 

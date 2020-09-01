@@ -97,9 +97,9 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Bookmarks
 - [x] Download pages and arbitrary data
 - [x] Theming
-- [x] *Emoji favicons*
+- [x] Emoji favicons
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
-- [x] *Proxying*
+- [x] Proxying
   - Schemes like Gopher or HTTP can be proxied through a Gemini server
 - [ ] Subscribe to RSS and Atom feeds and display them
   - Subscribing to page changes, similar to how Spacewalk works, will also be supported

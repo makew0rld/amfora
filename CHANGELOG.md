@@ -4,17 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
 ## [Unreleased]
+
+
+## [v1.5.0] - 2020-09-01
 ### Added
 - **Proxy support** - see the `[proxies]` section in the config (#66, #80)
 - **Emoji favicons** can now be seen if `emoji_favicons` is enabled in the config (#62)
-- The `shift_numbers` key in the config was added, so that non US keyboard users can navigate tabs (#64)
+- `shift_numbers` key in the config was added, so that non US keyboard users can navigate tabs (#64)
 - <kbd>F1</kbd> and <kbd>F2</kbd> keys for navigating to the previous and next tabs (#64)
-- Resolving any relative path (starting with a `.`) in the bottom bar is supported, not just `..` (#71)
-- You can now set programs in the config to open other schemes like `gopher://` or `magnet:` (#74)
+- Resolving any relative path (starts with a `.`) in the bottom bar is supported, not just `..` (#71)
+- You can now set external programs in the config to open other schemes, like `gopher://` or `magnet:` (#74)
 - Auto-redirecting can be enabled - redirect within Gemini up to 5 times automatically (#75) 
-- Help page documents paging keys (#78)
+- Help page now documents paging keys (#78)
 - The new tab page can be customized by creating a gemtext file called `newtab.gmi` in the config directory (#67, #83)
 
 ### Changed
@@ -22,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Two digit (and higher) link texts are now in line with one digit ones (#60)
-- Race condition when reloading pages, could have caused the cache to still be used
+- Race condition when reloading pages that could have caused the cache to still be used
 - Prevent panic (crash) when the server sends an error with an empty meta string (#73)
 - URLs with with colon-only schemes (like `mailto:`) are properly recognized
 - You can no longer navigate through the history when the help page is open (#55, #78)

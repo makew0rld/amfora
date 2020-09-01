@@ -8,7 +8,11 @@ import (
 	"github.com/makeworld-the-better-one/amfora/display"
 )
 
-var version = "1.5.0-unreleased"
+var (
+	version = "1.5.0"
+	commit  = "unknown"
+	builtBy = "unknown"
+)
 
 func main() {
 	// err := logger.Init()
@@ -18,7 +22,9 @@ func main() {
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--version" || os.Args[1] == "-v" {
-			fmt.Println("amfora v" + version)
+			fmt.Println("Amfora", version)
+			fmt.Println("Commit:", commit)
+			fmt.Println("Built by:", builtBy)
 			return
 		}
 		if os.Args[1] == "--help" || os.Args[1] == "-h" {

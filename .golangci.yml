@@ -41,3 +41,6 @@ linters-settings:
   gocritic:
     disabled-checks:
       - ifElseChain
+  goconst:
+    # minimal length of string constant, 3 by default
+    min-len: 5

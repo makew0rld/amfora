@@ -347,9 +347,8 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			// No proxy available
 			handleHTTP(u, true)
 			return ret("", false)
-		} else {
-			usingProxy = true
 		}
+		usingProxy = true
 	}
 
 	if !strings.HasPrefix(u, "http") && !strings.HasPrefix(u, "gemini") {
@@ -358,9 +357,8 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			// No proxy available
 			handleOther(u)
 			return ret("", false)
-		} else {
-			usingProxy = true
 		}
+		usingProxy = true
 	}
 
 	// Gemini URL, or one with a Gemini proxy available

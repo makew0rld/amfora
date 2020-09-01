@@ -518,7 +518,7 @@ func SwitchTab(tab int) {
 }
 
 func Reload() {
-	if tabs[curTab].page.URL == "about:newtab" {
+	if tabs[curTab].page.URL == "about:newtab" && config.CustomNewTab {
 		// Re-render new tab, similar to Init()
 		newTabContent := getNewTabContent()
 		tmpTermW := termW

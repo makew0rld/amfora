@@ -19,6 +19,7 @@ var configDir string
 var configPath string
 
 var NewTabPath string
+var CustomNewTab bool
 
 var TofuStore = viper.New()
 var tofuDBDir string
@@ -65,6 +66,10 @@ func Init() error {
 
 	// Search for a custom new tab
 	NewTabPath = filepath.Join(configDir, "newtab.gmi")
+	CustomNewTab = false
+	if _, err := os.Stat(NewTabPath); err == nil {
+		CustomNewTab = true
+	}
 
 	// Store TOFU db directory and file paths
 	if runtime.GOOS == "windows" {

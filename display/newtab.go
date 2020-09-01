@@ -30,7 +30,6 @@ func getNewTabContent() string {
 	data, err := ioutil.ReadFile(newTabFile)
 	if err == nil {
 		return string(data)
-	} else {
-		return defaultNewTabContent
 	}
+	return defaultNewTabContent
 }

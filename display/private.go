@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/url"
 	"os/exec"
 	"strconv"
@@ -163,7 +164,7 @@ func handleHTTP(u string, showInfo bool) {
 }
 
 // handleOther is used by handleURL.
-// It opens or proxies links other than Gemini and HTTP and displays Error modals.
+// It opens links other than Gemini and HTTP and displays Error modals.
 func handleOther(u string) {
 	// The URL should have a scheme due to a previous call to normalizeURL
 	parsed, _ := url.Parse(u)
@@ -331,15 +332,38 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		return ret("", false)
 	}
 
+	proxy := strings.TrimSpace(viper.GetString("proxies." + parsed.Scheme))
+	usingProxy := false
+
+	proxyHostname, proxyPort, err := net.SplitHostPort(proxy)
+	if err != nil {
+		// Error likely means there's no port in the host
+		proxyHostname = proxy
+		proxyPort = "1965"
+	}
+
 	if strings.HasPrefix(u, "http") {
-		handleHTTP(u, true)
-		return ret("", false)
+		if proxy == "" || proxy == "off" {
+			// No proxy available
+			handleHTTP(u, true)
+			return ret("", false)
+		} else {
+			usingProxy = true
+		}
 	}
-	if !strings.HasPrefix(u, "gemini") {
-		handleOther(u)
-		return ret("", false)
+
+	if !strings.HasPrefix(u, "http") && !strings.HasPrefix(u, "gemini") {
+		// Not a Gemini URL
+		if proxy == "" || proxy == "off" {
+			// No proxy available
+			handleOther(u)
+			return ret("", false)
+		} else {
+			usingProxy = true
+		}
 	}
-	// Gemini URL
+
+	// Gemini URL, or one with a Gemini proxy available
 
 	// Load page from cache if possible
 	page, ok := cache.GetPage(u)
@@ -353,7 +377,12 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	t.mode = tabModeLoading
 	App.Draw()
 
-	res, err := client.Fetch(u)
+	var res *gemini.Response
+	if usingProxy {
+		res, err = client.FetchWithProxy(proxyHostname, proxyPort, u)
+	} else {
+		res, err = client.Fetch(u)
+	}
 
 	// Loading may have taken a while, make sure tab is still valid
 	if !isValidTab(t) {
@@ -361,20 +390,20 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	}
 
 	if errors.Is(err, client.ErrTofu) {
-		if config.GemProxy == nil {
-			if Tofu(parsed.Host, client.GetExpiry(parsed.Hostname(), parsed.Port())) {
+		if usingProxy {
+			// They are using a proxy
+			if Tofu(proxy, client.GetExpiry(proxyHostname, proxyPort)) {
 				// They want to continue anyway
-				client.ResetTofuEntry(parsed.Hostname(), parsed.Port(), res.Cert)
+				client.ResetTofuEntry(proxyHostname, proxyPort, res.Cert)
 				// Response can be used further down, no need to reload
 			} else {
 				// They don't want to continue
 				return ret("", false)
 			}
 		} else {
-			// They are using a proxy
-			if Tofu(config.GemProxy.Host, client.GetExpiry(config.GemProxy.Hostname(), config.GemProxy.Port())) {
+			if Tofu(parsed.Host, client.GetExpiry(parsed.Hostname(), parsed.Port())) {
 				// They want to continue anyway
-				client.ResetTofuEntry(config.GemProxy.Hostname(), config.GemProxy.Port(), res.Cert)
+				client.ResetTofuEntry(parsed.Hostname(), parsed.Port(), res.Cert)
 				// Response can be used further down, no need to reload
 			} else {
 				// They don't want to continue

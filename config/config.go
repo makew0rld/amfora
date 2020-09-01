@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -33,8 +32,6 @@ var bkmkDir string
 var bkmkPath string
 
 var DownloadsDir string
-
-var GemProxy *url.URL
 
 //nolint:golint,goerr113
 func Init() error {
@@ -179,10 +176,6 @@ func Init() error {
 	err = viper.ReadInConfig()
 	if err != nil {
 		return err
-	}
-
-	if viper.GetString("proxies.gemini") != "" {
-		GemProxy, _ = url.Parse(viper.GetString("proxies.gemini"))
 	}
 
 	// Setup downloads dir

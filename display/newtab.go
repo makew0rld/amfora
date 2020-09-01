@@ -17,7 +17,7 @@ Press the ? key at any time to bring up the help, and see other keybindings. Mos
 You can customize this page by creating the Gemtext file
 
 ` + "```" + `
-$XDG_CONFIG_HOME/amfora/new_tab.gmi
+$XDG_CONFIG_HOME/amfora/newtab.gmi
 ` + "```" + `
 
 Happy browsing!
@@ -30,7 +30,7 @@ Happy browsing!
 
 // Read the new tab content from a file if it exists or fallback to a default page.
 func getNewTabContent() string {
-	newTabFile := filepath.Join(config.ConfigDir, "new_tab.gmi")
+	newTabFile := filepath.Join(config.ConfigDir, "newtab.gmi")
 	data, err := ioutil.ReadFile(newTabFile)
 	if err == nil {
 		return string(data)

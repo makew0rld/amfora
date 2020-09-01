@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - You can now set programs in the config to open other schemes like `gopher://` or `magnet:` (#74)
 - Auto-redirecting can be enabled - redirect within Gemini up to 5 times automatically (#75) 
 - Help page documents paging keys (#78)
+- The new tab page can be customized by creating a gemtext file called `newtab.gmi` in the config directory (#67, #83)
 
 ### Changed
 - Update to [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) v0.8.4
@@ -24,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Race condition when reloading pages, could have caused the cache to still be used
 - Prevent panic (crash) when the server sends an error with an empty meta string (#73)
 - URLs with with colon-only schemes (like `mailto:`) are properly recognized
-- You can no longer navigate through the history when the help page is open (#78)
+- You can no longer navigate through the history when the help page is open (#55, #78)
 
 
 ## [1.4.0] - 2020-07-28

@@ -51,8 +51,6 @@ var tabRow = cview.NewTextView().
 var layout = cview.NewFlex().
 	SetDirection(cview.FlexRow)
 
-var renderedNewTabContent string
-var newTabLinks []string
 var newTabPage structs.Page
 
 var App = cview.NewApplication().
@@ -203,7 +201,7 @@ func Init() {
 
 	// Render the default new tab content ONCE and store it for later
 	newTabContent := getNewTabContent()
-	renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
+	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
 	newTabPage = structs.Page{
 		Raw:       newTabContent,
 		Content:   renderedNewTabContent,
@@ -524,7 +522,7 @@ func Reload() {
 		// Re-render new tab, similar to Init()
 		newTabContent := getNewTabContent()
 		tmpTermW := termW
-		renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
+		renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
 		newTabPage = structs.Page{
 			Raw:       newTabContent,
 			Content:   renderedNewTabContent,

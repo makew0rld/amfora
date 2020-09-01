@@ -1,4 +1,3 @@
-//nolint
 package display
 
 import (
@@ -7,6 +6,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/config"
 )
 
+//nolint
 var defaultNewTabContent = `# New Tab
 
 You've opened a new tab. Use the bar at the bottom to browse around. You can start typing in it by pressing the space key.

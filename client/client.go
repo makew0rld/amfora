@@ -4,6 +4,7 @@ package client
 import (
 	"net/url"
 
+	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/spf13/viper"
 )
@@ -14,7 +15,7 @@ func Fetch(u string) (*gemini.Response, error) {
 	var res *gemini.Response
 	var err error
 
-	if viper.GetString("a-general.proxy") == "" {
+	if config.Proxy == nil {
 		res, err = gemini.Fetch(u)
 	} else {
 		res, err = gemini.FetchWithHost(viper.GetString("a-general.proxy"), u)

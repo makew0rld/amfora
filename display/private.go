@@ -360,13 +360,25 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	}
 
 	if errors.Is(err, client.ErrTofu) {
-		if Tofu(parsed.Host, client.GetExpiry(parsed.Hostname(), parsed.Port())) {
-			// They want to continue anyway
-			client.ResetTofuEntry(parsed.Hostname(), parsed.Port(), res.Cert)
-			// Response can be used further down, no need to reload
+		if config.Proxy == nil {
+			if Tofu(parsed.Host, client.GetExpiry(parsed.Hostname(), parsed.Port())) {
+				// They want to continue anyway
+				client.ResetTofuEntry(parsed.Hostname(), parsed.Port(), res.Cert)
+				// Response can be used further down, no need to reload
+			} else {
+				// They don't want to continue
+				return ret("", false)
+			}
 		} else {
-			// They don't want to continue
-			return ret("", false)
+			// They are using a proxy
+			if Tofu(config.Proxy.Host, client.GetExpiry(config.Proxy.Hostname(), config.Proxy.Port())) {
+				// They want to continue anyway
+				client.ResetTofuEntry(config.Proxy.Hostname(), config.Proxy.Port(), res.Cert)
+				// Response can be used further down, no need to reload
+			} else {
+				// They don't want to continue
+				return ret("", false)
+			}
 		}
 	} else if err != nil {
 		Error("URL Fetch Error", err.Error())

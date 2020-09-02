@@ -61,14 +61,14 @@ This section is for programmers who want to install from source. Make sure you'r
 
 The recommended way of installing Amfora fom source is using the Makefile. Note that this requires GNU Make, so use the `gmake` (not `make`) command on macOS. You may have to install it with `brew install make`. On Windows, you can install [Chocolatey](https://chocolatey.org/install) and run `choco install make`.
 
-This is not designed to work on Windows.
+Note that the Makefile currently assumes that git is available, and that it is inside a git repository.
 
 ```
 git clone https://github.com/makeworld-the-better-one/amfora
 cd amfora
 make
 sudo make install # Not for Windows!
-sudo make desktop # Optional, installs .desktop file
+sudo make desktop # Optional, installs .desktop file. Not for Windows or macOS
 ```
 
 Because you installed with the Makefile, running `amfora -v` will tell you exactly what commit the binary was built from.

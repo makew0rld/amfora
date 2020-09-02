@@ -1,7 +1,8 @@
 # Binaries
 amfora
 amfora-*
-build/
+build
+dist
 
 # Recording
 rec.yml

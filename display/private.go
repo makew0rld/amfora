@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/url"
 	"os/exec"
 	"strconv"
@@ -77,7 +78,11 @@ func reformatPage(p *structs.Page) {
 	switch p.Mediatype {
 	case structs.TextGemini:
 		// Links are not recorded because they won't change
-		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin())
+		proxied := true
+		if strings.HasPrefix(p.URL, "gemini") || strings.HasPrefix(p.URL, "about") {
+			proxied = false
+		}
+		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin(), proxied)
 	case structs.TextPlain:
 		rendered = renderer.RenderPlainText(p.Raw, leftMargin())
 	case structs.TextAnsi:
@@ -167,6 +172,7 @@ func handleHTTP(u string, showInfo bool) {
 func handleOther(u string) {
 	// The URL should have a scheme due to a previous call to normalizeURL
 	parsed, _ := url.Parse(u)
+
 	// Search for a handler for the URL scheme
 	handler := strings.TrimSpace(viper.GetString("url-handlers." + parsed.Scheme))
 	if len(handler) == 0 {
@@ -330,15 +336,36 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		return ret("", false)
 	}
 
+	proxy := strings.TrimSpace(viper.GetString("proxies." + parsed.Scheme))
+	usingProxy := false
+
+	proxyHostname, proxyPort, err := net.SplitHostPort(proxy)
+	if err != nil {
+		// Error likely means there's no port in the host
+		proxyHostname = proxy
+		proxyPort = "1965"
+	}
+
 	if strings.HasPrefix(u, "http") {
-		handleHTTP(u, true)
-		return ret("", false)
+		if proxy == "" || proxy == "off" {
+			// No proxy available
+			handleHTTP(u, true)
+			return ret("", false)
+		}
+		usingProxy = true
 	}
-	if !strings.HasPrefix(u, "gemini") {
-		handleOther(u)
-		return ret("", false)
+
+	if !strings.HasPrefix(u, "http") && !strings.HasPrefix(u, "gemini") {
+		// Not a Gemini URL
+		if proxy == "" || proxy == "off" {
+			// No proxy available
+			handleOther(u)
+			return ret("", false)
+		}
+		usingProxy = true
 	}
-	// Gemini URL
+
+	// Gemini URL, or one with a Gemini proxy available
 
 	// Load page from cache if possible
 	page, ok := cache.GetPage(u)
@@ -352,7 +379,12 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	t.mode = tabModeLoading
 	App.Draw()
 
-	res, err := client.Fetch(u)
+	var res *gemini.Response
+	if usingProxy {
+		res, err = client.FetchWithProxy(proxyHostname, proxyPort, u)
+	} else {
+		res, err = client.Fetch(u)
+	}
 
 	// Loading may have taken a while, make sure tab is still valid
 	if !isValidTab(t) {
@@ -360,20 +392,32 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	}
 
 	if errors.Is(err, client.ErrTofu) {
-		if Tofu(parsed.Host, client.GetExpiry(parsed.Hostname(), parsed.Port())) {
-			// They want to continue anyway
-			client.ResetTofuEntry(parsed.Hostname(), parsed.Port(), res.Cert)
-			// Response can be used further down, no need to reload
+		if usingProxy {
+			// They are using a proxy
+			if Tofu(proxy, client.GetExpiry(proxyHostname, proxyPort)) {
+				// They want to continue anyway
+				client.ResetTofuEntry(proxyHostname, proxyPort, res.Cert)
+				// Response can be used further down, no need to reload
+			} else {
+				// They don't want to continue
+				return ret("", false)
+			}
 		} else {
-			// They don't want to continue
-			return ret("", false)
+			if Tofu(parsed.Host, client.GetExpiry(parsed.Hostname(), parsed.Port())) {
+				// They want to continue anyway
+				client.ResetTofuEntry(parsed.Hostname(), parsed.Port(), res.Cert)
+				// Response can be used further down, no need to reload
+			} else {
+				// They don't want to continue
+				return ret("", false)
+			}
 		}
 	} else if err != nil {
 		Error("URL Fetch Error", err.Error())
 		return ret("", false)
 	}
 	if renderer.CanDisplay(res) {
-		page, err := renderer.MakePage(u, res, textWidth(), leftMargin())
+		page, err := renderer.MakePage(u, res, textWidth(), leftMargin(), usingProxy)
 		// Rendering may have taken a while, make sure tab is still valid
 		if !isValidTab(t) {
 			return ret("", false)

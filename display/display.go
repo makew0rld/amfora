@@ -51,8 +51,6 @@ var tabRow = cview.NewTextView().
 var layout = cview.NewFlex().
 	SetDirection(cview.FlexRow)
 
-var renderedNewTabContent string
-var newTabLinks []string
 var newTabPage structs.Page
 
 var App = cview.NewApplication().
@@ -202,7 +200,8 @@ func Init() {
 	})
 
 	// Render the default new tab content ONCE and store it for later
-	renderedNewTabContent, newTabLinks = renderer.RenderGemini(newTabContent, textWidth(), leftMargin())
+	newTabContent := getNewTabContent()
+	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin(), false)
 	newTabPage = structs.Page{
 		Raw:       newTabContent,
 		Content:   renderedNewTabContent,
@@ -230,6 +229,11 @@ func Init() {
 		_, ok = App.GetFocus().(*cview.Modal)
 		if ok {
 			// It's focused on a modal right now, nothing should interrupt
+			return event
+		}
+		_, ok = App.GetFocus().(*cview.Table)
+		if ok {
+			// It's focused on help right now
 			return event
 		}
 
@@ -514,6 +518,24 @@ func SwitchTab(tab int) {
 }
 
 func Reload() {
+	if tabs[curTab].page.URL == "about:newtab" && config.CustomNewTab {
+		// Re-render new tab, similar to Init()
+		newTabContent := getNewTabContent()
+		tmpTermW := termW
+		renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin(), false)
+		newTabPage = structs.Page{
+			Raw:       newTabContent,
+			Content:   renderedNewTabContent,
+			Links:     newTabLinks,
+			URL:       "about:newtab",
+			Width:     tmpTermW,
+			Mediatype: structs.TextGemini,
+		}
+		temp := newTabPage // Copy
+		setPage(tabs[curTab], &temp)
+		return
+	}
+
 	if !tabs[curTab].hasContent() {
 		return
 	}

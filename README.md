@@ -61,12 +61,14 @@ This section is for programmers who want to install from source. Make sure you'r
 
 Install latest release:
 ```
-GO111MODULE=on go get github.com/makeworld-the-better-one/amfora
+go env -w GO111MODULE=on
+go get github.com/makeworld-the-better-one/amfora
 ```
 
 Install latest commit:
 ```
-GO111MODULE=on go get github.com/makeworld-the-better-one/amfora@master
+go env -w GO111MODULE=on
+go get github.com/makeworld-the-better-one/amfora@master
 ```
 
 ## Usage
@@ -95,15 +97,14 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Bookmarks
 - [x] Download pages and arbitrary data
 - [x] Theming
-- [x] *Emoji favicons*
+- [x] Emoji favicons
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
-- [x] *Proxying*
-  - All requests can optionally be sent through another server
-  - A gemini proxy server implementation currently does not exist, but Amfora will support it when it does!
+  - Disabled by default, enable in config
+- [x] Proxying
+  - Schemes like Gopher or HTTP can be proxied through a Gemini server
 - [x] *Subscribe to RSS and Atom feeds and display them*
-  - Subscribing to page changes, similar to how Spacewalk works, is also supported
-- [ ] Support Markdown rendering
-- [ ] Search in pages with <kbd>Ctrl-F</kbd>
+  - Subscribing to page changes, similar to how Spacewalk works, will also be supported
+- [ ] Stream support
 - [ ] Full client certificate UX within the client
   - Create transient and permanent certs within the client, per domain
   - Manage and browse them
@@ -117,6 +118,14 @@ Features in *italics* are in the master branch, but not in the latest release.
 The config file is written in the intuitive [TOML](https://github.com/toml-lang/toml) file format. See [default-config.toml](./default-config.toml) for details. By default this file is available at `~/.config/amfora/config.toml`, or `$XDG_CONFIG_HOME/amfora/config.toml`, if that variable is set.
 
 On Windows, the file is in `%APPDATA%\amfora\config.toml`, which usually expands to `C:\Users\<username>\AppData\Roaming\amfora\config.toml`.
+
+## Known Bugs
+
+- Pasting on Windows is truncated, the full paste content won't be added. ([#43](https://github.com/makeworld-the-better-one/amfora/issues/43))
+- ANSI codes aren't displaying properly ([#59](https://github.com/makeworld-the-better-one/amfora/issues/59))
+
+You can also check out [all the issues with the bug label](https://github.com/makeworld-the-better-one/amfora/issues?q=is%3Aopen+is%3Aissue+label%3Abug).
+
 
 ## Libraries
 Amfora ❤️ open source!

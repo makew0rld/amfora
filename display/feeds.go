@@ -54,7 +54,7 @@ func Feeds(t *tab) {
 		feedPageRaw += fmt.Sprintf("=>%s %s - %s\n", entry.URL, entry.Author, entry.Title)
 	}
 
-	content, links := renderer.RenderGemini(feedPageRaw, textWidth(), leftMargin())
+	content, links := renderer.RenderGemini(feedPageRaw, textWidth(), leftMargin(), false)
 	page := structs.Page{
 		Raw:       feedPageRaw,
 		Content:   content,

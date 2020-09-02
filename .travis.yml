@@ -8,7 +8,7 @@ go:
   - "1.15"
 
 script:
-  - go test ./...
+  - go test -race ./...
   - go build
 
 env:

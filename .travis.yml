@@ -25,7 +25,7 @@ env:
 cache:
   directories:
     - $GOCACHE
-    - $GOMODCACHE
+    - $GOPATH/pkg/mod
 
 # TODO: GitHub Releases deploy
 

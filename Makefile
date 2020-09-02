@@ -12,7 +12,7 @@ ifeq ($(GIT_EXISTS), 0)
 	COMMIT := $(shell git rev-parse --verify HEAD)
 endif
 
-INSTALL := install -o root -g root
+INSTALL := install -o root -g 0
 INSTALL_DIR := /usr/local/bin
 DESKTOP_DIR := /usr/share/applications
 

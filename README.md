@@ -99,6 +99,7 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Theming
 - [x] Emoji favicons
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
+  - Disabled by default, enable in config
 - [x] Proxying
   - Schemes like Gopher or HTTP can be proxied through a Gemini server
 - [ ] Subscribe to RSS and Atom feeds and display them

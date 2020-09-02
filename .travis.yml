@@ -9,7 +9,7 @@ go:
 
 script:
   - go test -race ./...
-  - go build
+  - make
 
 env:
   GO111MODULE=on

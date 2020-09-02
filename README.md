@@ -63,7 +63,7 @@ The recommended way of installing Amfora fom source is using the Makefile. Note 
 
 Note that the Makefile currently assumes that git is available, and that it is inside a git repository.
 
-```
+```shell
 git clone https://github.com/makeworld-the-better-one/amfora
 cd amfora
 make

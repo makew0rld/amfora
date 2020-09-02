@@ -12,6 +12,9 @@ os:
   - osx
   - windows
 
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install make; fi
+
 script:
   - go test -race ./...
   - make
@@ -21,8 +24,8 @@ env:
 
 cache:
   directories:
-    - $HOME/.cache/go-build
-    - $GOPATH/pkg/mod
+    - $GOCACHE
+    - $GOMODCACHE
 
 # TODO: GitHub Releases deploy
 

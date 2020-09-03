@@ -27,7 +27,7 @@ It fully passes Sean Conman's client torture test, including the new Unicode tes
 
 ### Binary
 
-Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you might have to make the file executable with `chmod +x <filename>`. You should also move the binary to `/usr/local/bin/`.
+Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you might have to make the file executable with `chmod +x <filename>`. You can rename the file to just `amfora` for easy access, and move it to `/usr/local/bin/`.
 
 On Windows, make sure you click "Advanced > Run anyway" after double-clicking, or something like that.
 
@@ -59,17 +59,20 @@ brew upgrade amfora
 ### From Source
 This section is for programmers who want to install from source. Make sure you're using Go 1.13 at least, as earlier versions will fail to build.
 
-Install latest release:
-```
-go env -w GO111MODULE=on
-go get github.com/makeworld-the-better-one/amfora
+The recommended way of installing Amfora fom source is using the Makefile. Note that this requires GNU Make, so use the `gmake` (not `make`) command on macOS. You may have to install it with `brew install make`. On Windows, you can install [Chocolatey](https://chocolatey.org/install) and run `choco install make`.
+
+Note that the Makefile currently assumes that git is available, and that it is inside a git repository.
+
+```shell
+git clone https://github.com/makeworld-the-better-one/amfora
+cd amfora
+# git checkout v1.2.3 # Optionally pin to a specific version instead of the latest commit
+make
+sudo make install # Not for Windows!
+sudo make desktop # Optional, installs .desktop file. Not for Windows or macOS
 ```
 
-Install latest commit:
-```
-go env -w GO111MODULE=on
-go get github.com/makeworld-the-better-one/amfora@master
-```
+Because you installed with the Makefile, running `amfora -v` will tell you exactly what commit the binary was built from.
 
 ## Usage
 

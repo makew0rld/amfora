@@ -268,7 +268,7 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 	return strings.Join(wrappedLines, "\r\n"), links
 }
 
-func stripANSI(s string) (string) {
+func stripANSI(s string) string {
 	re := regexp.MustCompile("[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))")
 	return re.ReplaceAllString(s, "")
 }

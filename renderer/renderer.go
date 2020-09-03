@@ -16,12 +16,18 @@ import (
 	"gitlab.com/tslocum/cview"
 )
 
+// Regex for identifying ANSI codes; credit to pkg acarl005/stripansi
+//nolint:lll
+const ansiRegex = "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))"
+
 // RenderANSI renders plain text pages containing ANSI codes.
 // Practically, it is used for the text/x-ansi.
 func RenderANSI(s string, leftMargin int) string {
 	s = cview.Escape(s)
-	if viper.GetBool("a-general.color") {
+	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
 		s = cview.TranslateANSI(s)
+	} else {
+		s = stripANSI(s)
 	}
 	var shifted string
 	lines := strings.Split(s, "\n")
@@ -269,10 +275,7 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 }
 
 func stripANSI(s string) string {
-	ansi := "[\u001B\u009B][[\\]()#;?]*" +
-		"(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|" +
-		"(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))"
-	re := regexp.MustCompile(ansi)
+	re := regexp.MustCompile(ansiRegex)
 	return re.ReplaceAllString(s, "")
 }
 

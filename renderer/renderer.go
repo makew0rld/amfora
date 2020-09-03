@@ -16,9 +16,8 @@ import (
 	"gitlab.com/tslocum/cview"
 )
 
-// Regex for identifying ANSI codes; credit to pkg acarl005/stripansi
-//nolint:lll
-const ansiRegex = "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))"
+// Regex for identifying ANSI color codes
+var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 // RenderANSI renders plain text pages containing ANSI codes.
 // Practically, it is used for the text/x-ansi.
@@ -27,7 +26,7 @@ func RenderANSI(s string, leftMargin int) string {
 	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
 		s = cview.TranslateANSI(s)
 	} else {
-		s = stripANSI(s)
+		s = ansiRegex.ReplaceAllString(s, "")
 	}
 	var shifted string
 	lines := strings.Split(s, "\n")
@@ -274,11 +273,6 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 	return strings.Join(wrappedLines, "\r\n"), links
 }
 
-func stripANSI(s string) string {
-	re := regexp.MustCompile(ansiRegex)
-	return re.ReplaceAllString(s, "")
-}
-
 // RenderGemini converts text/gemini into a cview displayable format.
 // It also returns a slice of link URLs.
 //
@@ -292,7 +286,7 @@ func RenderGemini(s string, width, leftMargin int, proxied bool) (string, []stri
 	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
 		s = cview.TranslateANSI(s)
 	} else {
-		s = stripANSI(s)
+		s = ansiRegex.ReplaceAllString(s, "")
 	}
 
 	lines := strings.Split(s, "\n")

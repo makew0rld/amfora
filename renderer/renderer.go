@@ -7,6 +7,7 @@ package renderer
 import (
 	"fmt"
 	urlPkg "net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -267,6 +268,11 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 	return strings.Join(wrappedLines, "\r\n"), links
 }
 
+func stripANSI(s string) (string) {
+	re := regexp.MustCompile("[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))")
+	return re.ReplaceAllString(s, "")
+}
+
 // RenderGemini converts text/gemini into a cview displayable format.
 // It also returns a slice of link URLs.
 //
@@ -277,9 +283,12 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 // If it's not a gemini:// page, set this to true.
 func RenderGemini(s string, width, leftMargin int, proxied bool) (string, []string) {
 	s = cview.Escape(s)
-	if viper.GetBool("a-general.color") {
+	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
 		s = cview.TranslateANSI(s)
+	} else {
+		s = stripANSI(s)
 	}
+
 	lines := strings.Split(s, "\n")
 
 	links := make([]string, 0)

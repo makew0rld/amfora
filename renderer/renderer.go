@@ -7,6 +7,7 @@ package renderer
 import (
 	"fmt"
 	urlPkg "net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -15,12 +16,17 @@ import (
 	"gitlab.com/tslocum/cview"
 )
 
+// Regex for identifying ANSI color codes
+var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+
 // RenderANSI renders plain text pages containing ANSI codes.
 // Practically, it is used for the text/x-ansi.
 func RenderANSI(s string, leftMargin int) string {
 	s = cview.Escape(s)
-	if viper.GetBool("a-general.color") {
+	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
 		s = cview.TranslateANSI(s)
+	} else {
+		s = ansiRegex.ReplaceAllString(s, "")
 	}
 	var shifted string
 	lines := strings.Split(s, "\n")
@@ -277,9 +283,12 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 // If it's not a gemini:// page, set this to true.
 func RenderGemini(s string, width, leftMargin int, proxied bool) (string, []string) {
 	s = cview.Escape(s)
-	if viper.GetBool("a-general.color") {
+	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
 		s = cview.TranslateANSI(s)
+	} else {
+		s = ansiRegex.ReplaceAllString(s, "")
 	}
+
 	lines := strings.Split(s, "\n")
 
 	links := make([]string, 0)

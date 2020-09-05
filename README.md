@@ -19,7 +19,7 @@
 
 Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that.
 
-It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Use [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701) instead. Note that some of the application colors might not display correctly on Windows, but all functionality will still work.
+It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Use [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701) instead, and make sure it [works with UTF-8](https://akr.am/blog/posts/using-utf-8-in-the-windows-terminal). Note that some of the application colors might not display correctly on Windows, but all functionality will still work.
 
 It fully passes Sean Conman's client torture test, including the new Unicode tests. It mostly passes the Egsam test.
 
@@ -36,6 +36,9 @@ Unix systems can install the desktop entry file to get Amfora to appear when the
 curl -sSL https://raw.githubusercontent.com/makeworld-the-better-one/amfora/master/amfora.desktop -o ~/.local/share/applications/amfora.desktop
 update-desktop-database ~/.local/share/applications
 ```
+
+Make sure to click "Watch" > "Releases only" in the top right to get notified about new releases!
+
 
 ### Arch Linux
 
@@ -59,7 +62,9 @@ brew upgrade amfora
 ### From Source
 This section is for programmers who want to install from source. Make sure you're using Go 1.13 at least, as earlier versions will fail to build.
 
-The recommended way of installing Amfora fom source is using the Makefile. Note that this requires GNU Make, so use the `gmake` (not `make`) command on macOS. You may have to install it with `brew install make`. On Windows, you can install [Chocolatey](https://chocolatey.org/install) and run `choco install make`.
+The recommended way of installing Amfora fom source is using the Makefile. On Windows, you need install make, which can be done with [Chocolatey](https://chocolatey.org/install): `choco install make`.
+
+If you have issues running the `make` command on macOS, try installing GNU Make with `brew install make` and using the `gmake` command instead.
 
 Note that the Makefile currently assumes that git is available, and that it is inside a git repository.
 

@@ -25,6 +25,7 @@ spacebar|Open bar at the bottom - type a URL, link number, search term.
 |Typing new:N will open link number N in a new tab
 |instead of the current one.
 Numbers|Go to links 1-10 respectively.
+e|Edit current URL
 Enter, Tab|On a page this will start link highlighting.
 |Press Tab and Shift-Tab to pick different links.
 |Press Enter again to go to one, or Esc to stop.

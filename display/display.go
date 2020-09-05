@@ -295,6 +295,12 @@ func Init() {
 					// Don't save bottom bar, so that whenever you switch tabs, it's not in that mode
 					App.SetFocus(bottomBar)
 					return nil
+				case "e":
+					// Letter e allows to edit current URL
+					bottomBar.SetLabel("[::b]Edit URL: [::-]")
+					bottomBar.SetText(tabs[curTab].page.URL)
+					App.SetFocus(bottomBar)
+					return nil
 				case "R":
 					Reload()
 					return nil

@@ -56,19 +56,3 @@ milestones:
 
 changelog:
   skip: true
-
-brews:
-  - name: amfora
-
-    homepage: "https://github.com/makeworld-the-better-one/amfora"
-    description: "A fancy terminal browser for the Gemini protocol."
-
-    tap:
-      owner: makeworld-the-better-one
-      name: homebrew-tap
-
-    dependencies:
-      - name: go
-
-    custom_block: |
-      head "https://github.com/makeworld-the-better-one/amfora.git"

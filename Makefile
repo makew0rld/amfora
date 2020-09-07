@@ -12,9 +12,9 @@ ifeq ($(GIT_EXISTS), 0)
 	COMMIT := $(shell git rev-parse --verify HEAD)
 endif
 
-INSTALL := install -o root -g 0
+ROOT_INSTALL := install -o root -g 0
 INSTALL_DIR := /usr/local/bin
-DESKTOP_DIR := /usr/share/applications
+DESKTOP_DIR := ~/.local/share/applications/
 
 .PHONY: all build install desktop clean uninstall fmt
 
@@ -32,11 +32,11 @@ endif
 
 install:
 	@echo "Installing Amfora to $(INSTALL_DIR)"
-	@$(INSTALL) -m 755 amfora $(INSTALL_DIR)
+	@$(ROOT_INSTALL) -m 755 amfora $(INSTALL_DIR)
 
 desktop:
 	@echo "Setting up desktop file"
-	@$(INSTALL) -m 644 amfora.desktop $(DESKTOP_DIR)
+	@install -m 644 amfora.desktop $(DESKTOP_DIR)
 	@update-desktop-database $(DESKTOP_DIR)
 
 clean:

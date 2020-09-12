@@ -74,7 +74,6 @@ cd amfora
 # git checkout v1.2.3 # Optionally pin to a specific version instead of the latest commit
 make
 sudo make install # Not for Windows!
-sudo make desktop # Optional, installs .desktop file. Not for Windows or macOS
 ```
 
 Because you installed with the Makefile, running `amfora -v` will tell you exactly what commit the binary was built from.

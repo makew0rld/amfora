@@ -13,7 +13,7 @@ INSTALL := install
 RM      := rm
 
 amfora: go.mod go.sum $(SRC)
-	go env -w GO111MODULE=on CGO_ENABLED=0 ; $(GO) build -o $@ -ldflags="-s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.builtBy=$(BUILDER)"
+	GO111MODULE=on CGO_ENABLED=0 $(GO) build -o $@ -ldflags="-s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.builtBy=$(BUILDER)"
 
 .PHONY: clean
 clean:

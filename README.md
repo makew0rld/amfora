@@ -62,14 +62,16 @@ brew upgrade amfora
 ### From Source
 This section is for programmers who want to install from source. Make sure you're using Go 1.13 at least, as earlier versions will fail to build.
 
-The recommended way of installing Amfora fom source is using the Makefile. On Windows, you need install make, which can be done with [Chocolatey](https://chocolatey.org/install): `choco install make`.
+The recommended way of installing Amfora fom source is using the Makefile.
+
+On Windows, you need install make, which can be done with [Chocolatey](https://chocolatey.org/install): `choco install make`. Please note the Makefile does not intend to support Windows, and so there may be issues.
 
 ```shell
 git clone https://github.com/makeworld-the-better-one/amfora
 cd amfora
 # git checkout v1.2.3 # Optionally pin to a specific version instead of the latest commit
 make
-sudo make install # Not for Windows!
+sudo make install # If you want to install the binary for all users
 ```
 
 Because you installed with the Makefile, running `amfora -v` will tell you exactly what commit the binary was built from.

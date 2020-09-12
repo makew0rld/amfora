@@ -1,54 +1,35 @@
-GIT_EXISTS := $(shell git status > /dev/null 2>&1 ; echo $$?)
+GITV != git describe --tags
+GITC != git rev-parse --verify HEAD
+SRC  != find -type f -name '*.go' ! -name '*_test.go'
+TEST != find -type f -name '*_test.go'
 
-ifeq ($(GIT_EXISTS), 0)
-	ifeq ($(shell git tag --points-at HEAD),)
-		# Not currently on a tag
-		VERSION := $(shell git describe --tags | sed 's/^v//; s/-.*/-next/') # 1.2.3-next
-	else
-		# On a tag
-		VERSION := $(shell git tag --points-at HEAD)
-	endif
+PREFIX  ?= /usr/local
+VERSION ?= $(GITV)
+COMMIT  ?= $(GITC)
+BUILDER ?= Makefile
 
-	COMMIT := $(shell git rev-parse --verify HEAD)
-endif
+GO      := go
+INSTALL := install
+RM      := rm
 
-ROOT_INSTALL := install -o root -g 0
-INSTALL_DIR := /usr/local/bin
-DESKTOP_DIR := ~/.local/share/applications/
+amfora: go.mod go.sum $(SRC)
+	go env -w GO111MODULE=on CGO_ENABLED=0 ; $(GO) build -o $@ -ldflags="-s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.builtBy=$(BUILDER)"
 
-.PHONY: all build install desktop clean uninstall fmt
-
-all: build
-
-build:
-ifneq ($(GIT_EXISTS), 0)
-	# No Git repo
-	$(error No Git repo was found, which is needed to compile the commit and version)
-endif
-	@echo "Downloading dependencies"
-	@go env -w GO111MODULE=on ; go mod download
-	@echo "Building binary"
-	@go env -w GO111MODULE=on CGO_ENABLED=0 ; go build -ldflags="-s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.builtBy=Makefile"
-
-install:
-	@echo "Installing Amfora to $(INSTALL_DIR)"
-	@$(ROOT_INSTALL) -m 755 amfora $(INSTALL_DIR)
-
-desktop:
-	@echo "Setting up desktop file"
-	@install -m 644 amfora.desktop $(DESKTOP_DIR)
-	@update-desktop-database $(DESKTOP_DIR)
-
+.PHONY: clean
 clean:
-	@echo "Removing Amfora binary in local directory"
-	@$(RM) amfora
+	$(RM) -f amfora
 
+.PHONY: install
+install: amfora amfora.desktop
+	install -Dm 755 amfora $(PREFIX)/bin/amfora
+	install -Dm 644 amfora.desktop $(PREFIX)/share/applications/amfora.desktop
+
+.PHONY: uninstall
 uninstall:
-	@echo "Removing Amfora from $(INSTALL_DIR)"
-	@$(RM) $(INSTALL_DIR)/amfora
-	@echo "Removing desktop file"
-	-@$(RM) $(DESKTOP_DIR)/amfora.desktop
-	-@update-desktop-database $(DESKTOP_DIR)
+	$(RM) -f $(PREFIX)/bin/amfora
+	$(RM) -f $(PREFIX)/share/applications/amfora.desktop
 
+# Development helpers
+.PHONY: fmt
 fmt:
 	go fmt ./...

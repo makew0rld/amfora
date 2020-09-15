@@ -50,9 +50,10 @@ yay -S amfora
 
 ### Homebrew
 
-If you use [Homebrew](https://brew.sh/), you can install the package maintained by @Jackymancs4.
+If you use [Homebrew](https://brew.sh/), you can install Amfora through the official tap.
 ```
-brew install jackymancs4/tap/amfora
+brew tap makeworld-the-better-one/tap
+brew install amfora
 ```
 You can update it with:
 ```

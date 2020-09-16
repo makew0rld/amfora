@@ -46,7 +46,6 @@ builds:
 
 archives:
   - format: binary
-
     replacements:
       darwin: macOS
       386: 32-bit

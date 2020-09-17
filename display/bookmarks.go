@@ -2,13 +2,11 @@ package display
 
 import (
 	"fmt"
-	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
-	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
@@ -114,16 +112,7 @@ func Bookmarks(t *tab) {
 	rawContent := "# Bookmarks\r\n\r\n"
 	m, keys := bookmarks.All()
 	for i := range keys {
-		if viper.GetBool("a-general.emoji_favicons") {
-			parsed, _ := url.Parse(keys[i])
-			favIcon := cache.GetFavicon(parsed.Host)
-			if favIcon == "no" {
-				favIcon = ""
-			}
-			rawContent += fmt.Sprintf("=> %s %s %s\r\n", keys[i], favIcon, m[keys[i]])
-		} else {
-			rawContent += fmt.Sprintf("=> %s %s\r\n", keys[i], m[keys[i]])
-		}
+		rawContent += fmt.Sprintf("=> %s %s\r\n", keys[i], m[keys[i]])
 	}
 	// Render and display
 	content, links := renderer.RenderGemini(rawContent, textWidth(), leftMargin(), false)

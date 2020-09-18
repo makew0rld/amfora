@@ -86,7 +86,7 @@ func openBkmkModal(name string, exists bool, favicon string) (string, int) {
 
 	// Remove and re-add input field - to clear the old text
 	bkmkModal.GetForm().Clear(false)
-	if favicon != "" {
+	if favicon != "" && !exists {
 		name = favicon + " " + name
 	}
 	bkmkModalText = ""

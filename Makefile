@@ -1,7 +1,7 @@
 GITV != git describe --tags
 GITC != git rev-parse --verify HEAD
-SRC  != find -type f -name '*.go' ! -name '*_test.go'
-TEST != find -type f -name '*_test.go'
+SRC  != find . -type f -name '*.go' ! -name '*_test.go'
+TEST != find . -type f -name '*_test.go'
 
 PREFIX  ?= /usr/local
 VERSION ?= $(GITV)

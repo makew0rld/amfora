@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `ansi` config setting, to disable ANSI colors in pages (#79, #86)
 - Edit current URL with <kbd>e</kbd> (#87)
+- If `emoji_favicons` is enabled, new bookmarks will have the domain's favicon prepended (#69, #90)
 
 ### Changed
 - Disabling the `color` config setting also disables ANSI colors in pages (#79, #86)

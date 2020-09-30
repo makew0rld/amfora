@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Disabling the `color` config setting also disables ANSI colors in pages (#79, #86)
+- Updated [go-isemoji](https://github.com/makeworld-the-better-one/go-isemoji) to v1.1.0 to support Emoji 13.1 for favicons
 
 
 ## [v1.5.0] - 2020-09-01

@@ -30,9 +30,14 @@ func Open(url string) (string, error) {
 	switch {
 	case xorgDisplay == "" && waylandDisplay == "":
 		return "", fmt.Errorf("no display server was found")
-	case xdgOpenNotFoundErr == nil || envBrowser != "":
+	case xdgOpenNotFoundErr == nil: // Prefer xdg-open over $BROWSER
 		// Use start rather than run or output in order
 		// to make browser running in background.
+		if err := exec.Command(xdgOpenPath, url).Start(); err != nil {
+			return "", err
+		}
+		return "Opened in system default web browser", nil
+	case envBrowser != "":
 		if err := exec.Command(xdgOpenPath, url).Start(); err != nil {
 			return "", err
 		}

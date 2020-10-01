@@ -38,7 +38,7 @@ func Open(url string) (string, error) {
 		}
 		return "Opened in system default web browser", nil
 	case envBrowser != "":
-		if err := exec.Command(xdgOpenPath, url).Start(); err != nil {
+		if err := exec.Command(envBrowser, url).Start(); err != nil {
 			return "", err
 		}
 		return "Opened in system default web browser", nil

@@ -9,10 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ansi` config setting, to disable ANSI colors in pages (#79, #86)
 - Edit current URL with <kbd>e</kbd> (#87)
 - If `emoji_favicons` is enabled, new bookmarks will have the domain's favicon prepended (#69, #90)
+- The `BROWSER` env. var. is now also checked when opening web links on Unix (#93)
 
 ### Changed
 - Disabling the `color` config setting also disables ANSI colors in pages (#79, #86)
 - Updated [go-isemoji](https://github.com/makeworld-the-better-one/go-isemoji) to v1.1.0 to support Emoji 13.1 for favicons
+- The web browser code doesn't check for Xorg anymore, just display variables (#93)
 
 
 ## [v1.5.0] - 2020-09-01

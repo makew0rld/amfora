@@ -29,7 +29,7 @@ func Open(url string) (string, error) {
 	)
 	switch {
 	case xorgDisplay == "" && waylandDisplay == "":
-		return "", fmt.Errorf("no gui is available")
+		return "", fmt.Errorf("no display server was found")
 	case xdgOpenNotFoundErr == nil || envBrowser != "":
 		// Use start rather than run or output in order
 		// to make browser running in background.

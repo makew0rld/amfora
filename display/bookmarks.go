@@ -3,7 +3,6 @@ package display
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
@@ -135,10 +134,6 @@ func Bookmarks(t *tab) {
 // It is the high-level way of doing it. It should be called in a goroutine.
 // It can also be called to edit an existing bookmark.
 func addBookmark() {
-	if !strings.HasPrefix(tabs[curTab].page.URL, "gemini://") {
-		// Can't make bookmarks for other kinds of URLs
-		return
-	}
 	curPage := tabs[curTab].page
 	name, exists := bookmarks.Get(curPage.URL)
 	// Open a bookmark modal with the current name of the bookmark, if it exists

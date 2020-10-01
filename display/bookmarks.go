@@ -134,16 +134,22 @@ func Bookmarks(t *tab) {
 // It is the high-level way of doing it. It should be called in a goroutine.
 // It can also be called to edit an existing bookmark.
 func addBookmark() {
-	curPage := tabs[curTab].page
-	name, exists := bookmarks.Get(curPage.URL)
+	t := tabs[curTab]
+	p := t.page
+
+	if !t.hasContent() {
+		// It's an about: page, or a malformed one
+		return
+	}
+	name, exists := bookmarks.Get(p.URL)
 	// Open a bookmark modal with the current name of the bookmark, if it exists
-	newName, action := openBkmkModal(name, exists, curPage.Favicon)
+	newName, action := openBkmkModal(name, exists, p.Favicon)
 	switch action {
 	case 1:
 		// Add/change the bookmark
-		bookmarks.Set(tabs[curTab].page.URL, newName)
+		bookmarks.Set(p.URL, newName)
 	case -1:
-		bookmarks.Remove(tabs[curTab].page.URL)
+		bookmarks.Remove(p.URL)
 	}
 	// Other case is action = 0, meaning "Cancel", so nothing needs to happen
 }

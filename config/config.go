@@ -153,7 +153,13 @@ func Init() error {
 	if viper.GetString("a-general.downloads") == "" {
 		// Find default Downloads dir
 		var stdout bytes.Buffer
-		cmd := exec.Command("sh", "-c", `test -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs && source ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs && echo ${XDG_DOWNLOAD_DIR:-$HOME/Downloads}`)
+		cmd := exec.Command(
+			"sh",
+			"-c",
+			`test -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs &&
+			source ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs &&
+			echo ${XDG_DOWNLOAD_DIR:-$HOME/Downloads}`,
+		)
 		cmd.Stdout = &stdout
 		if err := cmd.Run(); err == nil {
 			DownloadsDir = filepath.Join(strings.TrimSpace(stdout.String()))

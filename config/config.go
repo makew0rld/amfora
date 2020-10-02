@@ -4,10 +4,10 @@
 package config
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
-	"bytes"
 	"path/filepath"
 	"runtime"
 	"strings"

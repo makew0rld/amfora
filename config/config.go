@@ -6,8 +6,8 @@ package config
 import (
 	"fmt"
 	"os"
-  "os/exec"
-  "bytes"
+	"os/exec"
+	"bytes"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -152,15 +152,15 @@ func Init() error {
 	// Setup downloads dir
 	if viper.GetString("a-general.downloads") == "" {
 		// Find default Downloads dir
-    var stdout bytes.Buffer
-    cmd := exec.Command("sh", "-c", `test -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs && source ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs && echo ${XDG_DOWNLOAD_DIR:-$HOME/Downloads}`)
-    cmd.Stdout = &stdout
-    if err := cmd.Run(); err == nil {
-      DownloadsDir = filepath.Join(strings.TrimSpace(stdout.String()))
-    } else {
-		  // This seems to work for all OSes?
-		  DownloadsDir = filepath.Join(home, "Downloads")
-    }
+		var stdout bytes.Buffer
+		cmd := exec.Command("sh", "-c", `test -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs && source ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs && echo ${XDG_DOWNLOAD_DIR:-$HOME/Downloads}`)
+		cmd.Stdout = &stdout
+		if err := cmd.Run(); err == nil {
+			DownloadsDir = filepath.Join(strings.TrimSpace(stdout.String()))
+		} else {
+			// This seems to work for all OSes?
+			DownloadsDir = filepath.Join(home, "Downloads")
+		}
 		// Create it just in case
 		err = os.MkdirAll(DownloadsDir, 0755)
 		if err != nil {

@@ -10,11 +10,11 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/rkoesters/xdg/userdirs"
-	"github.com/rkoesters/xdg/basedir"
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/rkoesters/xdg/basedir"
+	"github.com/rkoesters/xdg/userdirs"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
@@ -84,12 +84,11 @@ func Init() error {
 		tofuDBDir = amforaAppData
 	} else {
 		// XDG cache dir on POSIX systems
-		xdg_cache, ok := os.LookupEnv("XDG_CACHE_HOME")
-		if ok && strings.TrimSpace(xdg_cache) != "" {
-			tofuDBDir = filepath.Join(xdg_cache, "amfora")
-		} else {
+		if basedir.CacheHome == "" {
 			// Default to ~/.cache/amfora
 			tofuDBDir = filepath.Join(home, ".cache", "amfora")
+		} else {
+			tofuDBDir = filepath.Join(basedir.CacheHome, "amfora")
 		}
 	}
 	tofuDBPath = filepath.Join(tofuDBDir, "tofu.toml")
@@ -100,12 +99,11 @@ func Init() error {
 		bkmkDir = amforaAppData
 	} else {
 		// XDG data dir on POSIX systems
-		xdg_data, ok := os.LookupEnv("XDG_DATA_HOME")
-		if ok && strings.TrimSpace(xdg_data) != "" {
-			bkmkDir = filepath.Join(xdg_data, "amfora")
-		} else {
+		if basedir.DataHome == "" {
 			// Default to ~/.local/share/amfora
 			bkmkDir = filepath.Join(home, ".local", "share", "amfora")
+		} else {
+			bkmkDir = filepath.Join(basedir.DataHome, "amfora")
 		}
 	}
 	bkmkPath = filepath.Join(bkmkDir, "bookmarks.toml")

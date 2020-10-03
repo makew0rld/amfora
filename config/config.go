@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"strings"
 
+  "github.com/rkoesters/xdg/userdirs"
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
@@ -151,7 +152,11 @@ func Init() error {
 	if viper.GetString("a-general.downloads") == "" {
 		// Find default Downloads dir
 		// This seems to work for all OSes?
-		DownloadsDir = filepath.Join(home, "Downloads")
+    downloadPath := userdirs.Download
+    if downloadPath == "" {
+		  downloadPath = filepath.Join(home, "Downloads")
+    }
+    DownloadsDir = downloadPath
 		// Create it just in case
 		err = os.MkdirAll(DownloadsDir, 0755)
 		if err != nil {

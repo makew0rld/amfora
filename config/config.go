@@ -62,11 +62,11 @@ func Init() error {
 		configDir = amforaAppData
 	} else {
 		// Unix / POSIX system
-		if basedir.ConfigHome != "" {
-			configDir = filepath.Join(basedir.ConfigHome, "amfora")
-		} else {
+		if basedir.ConfigHome == "" {
 			// Default to ~/.config/amfora
 			configDir = filepath.Join(home, ".config", "amfora")
+		} else {
+			configDir = filepath.Join(basedir.ConfigHome, "amfora")
 		}
 	}
 	configPath = filepath.Join(configDir, "config.toml")

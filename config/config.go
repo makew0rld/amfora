@@ -152,11 +152,11 @@ func Init() error {
 	if viper.GetString("a-general.downloads") == "" {
 		// Find default Downloads dir
 		// This seems to work for all OSes?
-		downloadPath := userdirs.Download
-		if downloadPath == "" {
-			downloadPath = filepath.Join(home, "Downloads")
+		if userdirs.Download == "" {
+			DownloadsDir = filepath.Join(home, "Downloads")
+		} else {
+			DownloadsDir = userdirs.Download
 		}
-		DownloadsDir = downloadPath
 		// Create it just in case
 		err = os.MkdirAll(DownloadsDir, 0755)
 		if err != nil {

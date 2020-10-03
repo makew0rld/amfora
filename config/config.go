@@ -11,6 +11,7 @@ import (
 	"strings"
 
   "github.com/rkoesters/xdg/userdirs"
+  "github.com/rkoesters/xdg/basedir"
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
@@ -61,9 +62,8 @@ func Init() error {
 		configDir = amforaAppData
 	} else {
 		// Unix / POSIX system
-		xdg_config, ok := os.LookupEnv("XDG_CONFIG_HOME")
-		if ok && strings.TrimSpace(xdg_config) != "" {
-			configDir = filepath.Join(xdg_config, "amfora")
+		if basedir.ConfigHome != "" {
+			configDir = filepath.Join(basedir.ConfigHome, "amfora")
 		} else {
 			// Default to ~/.config/amfora
 			configDir = filepath.Join(home, ".config", "amfora")

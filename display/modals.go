@@ -7,7 +7,7 @@ import (
 	"time"
 
 	humanize "github.com/dustin/go-humanize"
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"

@@ -132,8 +132,8 @@ github.com/magiconair/properties v1.8.1 h1:ZC2Vc7/ZFkGmsVC9KvOjumD+G5lXy2RtTKyzR
 github.com/magiconair/properties v1.8.1/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/makeworld-the-better-one/go-gemini v0.8.4 h1:ntsQ9HnlJCmC9PDqXp/f1SCALjBMwh69BbT4BhFRFaw=
 github.com/makeworld-the-better-one/go-gemini v0.8.4/go.mod h1:P7/FbZ+IEIbA/d+A0Y3w2GNgD8SA2AcNv7aDGJbaWG4=
-github.com/makeworld-the-better-one/go-isemoji v1.0.0 h1:W3O4+qwtXeT8PUDzcQ1UjxiupQWgc/oJHpqwrllx3xM=
-github.com/makeworld-the-better-one/go-isemoji v1.0.0/go.mod h1:FBjkPl9rr0G4vlZCc+Mr+QcnOfGCTbGWYW8/1sp06I0=
+github.com/makeworld-the-better-one/go-isemoji v1.1.0 h1:wZBHOKB5zAIgaU2vaWnXFDDhatebB8TySrNVxjVV84g=
+github.com/makeworld-the-better-one/go-isemoji v1.1.0/go.mod h1:FBjkPl9rr0G4vlZCc+Mr+QcnOfGCTbGWYW8/1sp06I0=
 github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20200710151429-125743e22b4f h1:YEUlTs5gb35UlBLTgqrub9axWTYB3d7/8TxrkJDZpRI=
 github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20200710151429-125743e22b4f/go.mod h1:X6sxWNi9PBgQybpR4fpXPVD5fm7svLqZTQ5DJuERIoM=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
@@ -186,6 +186,8 @@ github.com/prometheus/procfs v0.0.0-20190507164030-5867b95ac084/go.mod h1:TjEm7z
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
 github.com/rivo/uniseg v0.1.0 h1:+2KBaVoUmb9XzDsrx/Ct0W/EYOSFf/nWTauy++DprtY=
 github.com/rivo/uniseg v0.1.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
+github.com/rkoesters/xdg v0.0.0-20181125232953-edd15b846f9b h1:8NiY6v9/IlFU8osj1L7kqzRbrG6e3izRQQjGze1Q1R0=
+github.com/rkoesters/xdg v0.0.0-20181125232953-edd15b846f9b/go.mod h1:T1HolqzmdHnJIH6p7A9LDuvYGQgEHx9ijX3vKgDKU60=
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=

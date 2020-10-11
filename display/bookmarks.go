@@ -3,7 +3,6 @@ package display
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
@@ -71,7 +70,7 @@ func bkmkInit() {
 // It also accepts a bool indicating whether this page already has a bookmark.
 // It returns the bookmark name and the bookmark action:
 // 1, 0, -1 for add/update, cancel, and remove
-func openBkmkModal(name string, exists bool) (string, int) {
+func openBkmkModal(name string, exists bool, favicon string) (string, int) {
 	// Basically a copy of Input()
 
 	// Reset buttons before input field, to make sure the input is in focus
@@ -86,6 +85,9 @@ func openBkmkModal(name string, exists bool) (string, int) {
 
 	// Remove and re-add input field - to clear the old text
 	bkmkModal.GetForm().Clear(false)
+	if favicon != "" && !exists {
+		name = favicon + " " + name
+	}
 	bkmkModalText = ""
 	bkmkModal.GetForm().AddInputField("Name: ", name, 0, nil,
 		func(text string) {
@@ -133,20 +135,22 @@ func Bookmarks(t *tab) {
 // It is the high-level way of doing it. It should be called in a goroutine.
 // It can also be called to edit an existing bookmark.
 func addBookmark() {
-	if !strings.HasPrefix(tabs[curTab].page.URL, "gemini://") {
-		// Can't make bookmarks for other kinds of URLs
+	t := tabs[curTab]
+	p := t.page
+
+	if !t.hasContent() {
+		// It's an about: page, or a malformed one
 		return
 	}
-
-	name, exists := bookmarks.Get(tabs[curTab].page.URL)
+	name, exists := bookmarks.Get(p.URL)
 	// Open a bookmark modal with the current name of the bookmark, if it exists
-	newName, action := openBkmkModal(name, exists)
+	newName, action := openBkmkModal(name, exists, p.Favicon)
 	switch action {
 	case 1:
 		// Add/change the bookmark
-		bookmarks.Set(tabs[curTab].page.URL, newName)
+		bookmarks.Set(p.URL, newName)
 	case -1:
-		bookmarks.Remove(tabs[curTab].page.URL)
+		bookmarks.Remove(p.URL)
 	}
 	// Other case is action = 0, meaning "Cancel", so nothing needs to happen
 }

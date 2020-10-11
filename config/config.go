@@ -14,6 +14,8 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/rkoesters/xdg/basedir"
+	"github.com/rkoesters/xdg/userdirs"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
@@ -67,12 +69,11 @@ func Init() error {
 		configDir = amforaAppData
 	} else {
 		// Unix / POSIX system
-		xdg_config, ok := os.LookupEnv("XDG_CONFIG_HOME")
-		if ok && strings.TrimSpace(xdg_config) != "" {
-			configDir = filepath.Join(xdg_config, "amfora")
-		} else {
+		if basedir.ConfigHome == "" {
 			// Default to ~/.config/amfora
 			configDir = filepath.Join(home, ".config", "amfora")
+		} else {
+			configDir = filepath.Join(basedir.ConfigHome, "amfora")
 		}
 	}
 	configPath = filepath.Join(configDir, "config.toml")
@@ -90,12 +91,11 @@ func Init() error {
 		tofuDBDir = amforaAppData
 	} else {
 		// XDG cache dir on POSIX systems
-		xdg_cache, ok := os.LookupEnv("XDG_CACHE_HOME")
-		if ok && strings.TrimSpace(xdg_cache) != "" {
-			tofuDBDir = filepath.Join(xdg_cache, "amfora")
-		} else {
+		if basedir.CacheHome == "" {
 			// Default to ~/.cache/amfora
 			tofuDBDir = filepath.Join(home, ".cache", "amfora")
+		} else {
+			tofuDBDir = filepath.Join(basedir.CacheHome, "amfora")
 		}
 	}
 	tofuDBPath = filepath.Join(tofuDBDir, "tofu.toml")
@@ -106,12 +106,11 @@ func Init() error {
 		bkmkDir = amforaAppData
 	} else {
 		// XDG data dir on POSIX systems
-		xdg_data, ok := os.LookupEnv("XDG_DATA_HOME")
-		if ok && strings.TrimSpace(xdg_data) != "" {
-			bkmkDir = filepath.Join(xdg_data, "amfora")
-		} else {
+		if basedir.DataHome == "" {
 			// Default to ~/.local/share/amfora
 			bkmkDir = filepath.Join(home, ".local", "share", "amfora")
+		} else {
+			bkmkDir = filepath.Join(basedir.DataHome, "amfora")
 		}
 	}
 	bkmkPath = filepath.Join(bkmkDir, "bookmarks.toml")
@@ -181,7 +180,11 @@ func Init() error {
 	if viper.GetString("a-general.downloads") == "" {
 		// Find default Downloads dir
 		// This seems to work for all OSes?
-		DownloadsDir = filepath.Join(home, "Downloads")
+		if userdirs.Download == "" {
+			DownloadsDir = filepath.Join(home, "Downloads")
+		} else {
+			DownloadsDir = userdirs.Download
+		}
 		// Create it just in case
 		err = os.MkdirAll(DownloadsDir, 0755)
 		if err != nil {

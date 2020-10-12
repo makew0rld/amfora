@@ -5,7 +5,6 @@
 
 
 ## Regressions
-- WordWrap uses `[]byte` now, filed [issue 40](https://gitlab.com/tslocum/cview/-/issues/40)
 
 
 ## Upstream Bugs

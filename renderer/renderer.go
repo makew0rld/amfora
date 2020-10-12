@@ -68,16 +68,14 @@ func wrapLine(line string, width int, prefix, suffix string, includeFirst bool) 
 			}
 		}()
 
-		wrapped := cview.WordWrap([]byte(line), width)
+		wrapped := cview.WordWrap(line, width)
 		for i := range wrapped {
 			if !includeFirst && i == 0 {
 				continue
 			}
-			wrapped[i] = append(append([]byte(prefix), wrapped[i]...), []byte(suffix)...)
+			wrapped[i] = prefix + wrapped[i] + suffix
 		}
-		for i := range wrapped {
-			ret = append(ret, string(wrapped[i]))
-		}
+		ret = wrapped
 	}()
 	return ret
 }

@@ -3,17 +3,14 @@ package display
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"net"
 	"net/url"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/client"
-	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/webbrowser"
@@ -198,7 +195,7 @@ func handleFavicon(t *tab, host, old string) {
 	defer func() {
 		// Update display if needed
 		if t.page.Favicon != old && isValidTab(t) {
-			rewriteTabRow()
+			// TODO update browser tab label
 		}
 	}()
 
@@ -220,7 +217,7 @@ func handleFavicon(t *tab, host, old string) {
 	}
 	if fav != "" {
 		t.page.Favicon = fav
-		rewriteTabRow()
+		// TODO update browser tab label
 		return
 	}
 
@@ -509,33 +506,4 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	// Status code 20, but not a document that can be displayed
 	go dlChoice("That file could not be displayed. What would you like to do?", u, res)
 	return ret("", false)
-}
-
-// rewriteTabRow clears the tabRow and writes all the tabs number/favicons into it.
-func rewriteTabRow() {
-	tabRow.Clear()
-	if viper.GetBool("a-general.color") {
-		for i := 0; i < NumTabs(); i++ {
-			char := strconv.Itoa(i + 1)
-			if tabs[i].page.Favicon != "" {
-				char = tabs[i].page.Favicon
-			}
-			fmt.Fprintf(tabRow, `["%d"][%s]  %s  [%s][""]|`,
-				i,
-				config.GetColorString("tab_num"),
-				char,
-				config.GetColorString("tab_divider"),
-			)
-		}
-	} else {
-		for i := 0; i < NumTabs(); i++ {
-			char := strconv.Itoa(i + 1)
-			if tabs[i].page.Favicon != "" {
-				char = tabs[i].page.Favicon
-			}
-			fmt.Fprintf(tabRow, `["%d"]  %s  [""]|`, i, char)
-		}
-	}
-	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
-	App.Draw()
 }

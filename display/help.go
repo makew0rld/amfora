@@ -7,7 +7,6 @@ import (
 	"text/tabwriter"
 
 	"github.com/makeworld-the-better-one/amfora/config"
-
 	"github.com/gdamore/tcell/v2"
 	"gitlab.com/tslocum/cview"
 )

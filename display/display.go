@@ -26,37 +26,27 @@ var termH int
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField()
 
-// Viewer for the tab primitives
-// Pages are named as strings of tab numbers - so the textview for the first tab
-// is held in the page named "0".
-// The only pages that don't confine to this scheme are those named after modals,
-// which are used to draw modals on top the current tab.
+// Viewer for primitives
+// This contains the browser and any modals modals drawn on top of it.
 // Ex: "info", "error", "input", "yesno"
-var tabPages = cview.NewPages()
+var panels = cview.NewPanels()
 
-// The tabs at the top with titles
-var tabRow = cview.NewTextView().
-	SetDynamicColors(true).
-	SetRegions(true).
-	SetScrollable(true).
-	SetWrap(false).
-	SetHighlightedFunc(func(added, removed, remaining []string) {
-		// There will always only be one string in added - never multiple highlights
-		// Remaining should always be empty
-		i, _ := strconv.Atoi(added[0])
-		tabPages.SwitchToPage(strconv.Itoa(i)) // Tab names are just numbers, zero-indexed
-	})
+// Tabbed viewer for primitives
+// Panels are named as strings of tab numbers - so the textview for the first tab
+// is held in the page named "0".
+var browser = cview.NewTabbedPanels()
 
 // Root layout
-var layout = cview.NewFlex().
-	SetDirection(cview.FlexRow)
+var layout = cview.NewFlex()
 
 var newTabPage structs.Page
 
-var App = cview.NewApplication().
-	EnableMouse(false).
-	SetRoot(layout, true).
-	SetAfterResizeFunc(func(width int, height int) {
+var App = cview.NewApplication()
+
+func Init() {
+	App.EnableMouse(false)
+	App.SetRoot(layout, true)
+	App.SetAfterResizeFunc(func(width int, height int) {
 		// Store for calculations
 		termW = width
 		termH = height
@@ -70,35 +60,26 @@ var App = cview.NewApplication().
 		}(tabs[curTab])
 	})
 
-func Init() {
-	tabRow.SetChangedFunc(func() {
-		App.Draw()
-	})
+	panels.AddPanel("browser", browser, true, true)
 
 	helpInit()
 
-	layout.
-		AddItem(tabRow, 1, 1, false).
-		AddItem(nil, 1, 1, false). // One line of empty space above the page
-		AddItem(tabPages, 0, 1, true).
-		AddItem(nil, 1, 1, false). // One line of empty space before bottomBar
-		AddItem(bottomBar, 1, 1, false)
+	layout.SetDirection(cview.FlexRow)
+	layout.AddItem(panels, 0, 1, true)
+	layout.AddItem(bottomBar, 1, 1, false)
 
 	if viper.GetBool("a-general.color") {
 		layout.SetBackgroundColor(config.GetColor("bg"))
-		tabRow.SetBackgroundColor(config.GetColor("bg"))
 
 		bottomBar.SetBackgroundColor(config.GetColor("bottombar_bg"))
-		bottomBar.
-			SetLabelColor(config.GetColor("bottombar_label")).
-			SetFieldBackgroundColor(config.GetColor("bottombar_bg")).
-			SetFieldTextColor(config.GetColor("bottombar_text"))
+		bottomBar.SetLabelColor(config.GetColor("bottombar_label"))
+		bottomBar.SetFieldBackgroundColor(config.GetColor("bottombar_bg"))
+		bottomBar.SetFieldTextColor(config.GetColor("bottombar_text"))
 	} else {
 		bottomBar.SetBackgroundColor(tcell.ColorWhite)
-		bottomBar.
-			SetLabelColor(tcell.ColorBlack).
-			SetFieldBackgroundColor(tcell.ColorWhite).
-			SetFieldTextColor(tcell.ColorBlack)
+		bottomBar.SetLabelColor(tcell.ColorBlack)
+		bottomBar.SetFieldBackgroundColor(tcell.ColorWhite)
+		bottomBar.SetFieldTextColor(tcell.ColorBlack)
 	}
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
 		tab := curTab
@@ -429,22 +410,9 @@ func NewTab() {
 	// The first page will be the next one the user goes to.
 	tabs[curTab].history.pos = -1
 
-	tabPages.AddAndSwitchToPage(strconv.Itoa(curTab), tabs[curTab].view, true)
+	browser.AddTab(strconv.Itoa(curTab), strconv.Itoa(curTab+1), tabs[curTab].view)
+	browser.SetCurrentTab(strconv.Itoa(curTab))
 	App.SetFocus(tabs[curTab].view)
-
-	// Add tab number to the actual place where tabs are show on the screen
-	// Tab regions are 0-indexed but text displayed on the screen starts at 1
-	if viper.GetBool("a-general.color") {
-		fmt.Fprintf(tabRow, `["%d"][%s]  %d  [%s][""]|`,
-			curTab,
-			config.GetColorString("tab_num"),
-			curTab+1,
-			config.GetColorString("tab_divider"),
-		)
-	} else {
-		fmt.Fprintf(tabRow, `["%d"]  %d  [""]|`, curTab, curTab+1)
-	}
-	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
 
 	bottomBar.SetLabel("")
 	bottomBar.SetText("")
@@ -472,7 +440,7 @@ func CloseTab() {
 	}
 
 	tabs = tabs[:len(tabs)-1]
-	tabPages.RemovePage(strconv.Itoa(curTab))
+	browser.RemoveTab(strconv.Itoa(curTab))
 
 	if curTab <= 0 {
 		curTab = NumTabs() - 1
@@ -480,8 +448,7 @@ func CloseTab() {
 		curTab--
 	}
 
-	tabPages.SwitchToPage(strconv.Itoa(curTab)) // Go to previous page
-	rewriteTabRow()
+	browser.SetCurrentTab(strconv.Itoa(curTab)) // Go to previous page
 	// Restore previous tab's state
 	tabs[curTab].applyAll()
 
@@ -513,8 +480,7 @@ func SwitchTab(tab int) {
 
 	// Display tab
 	reformatPageAndSetView(tabs[curTab], tabs[curTab].page)
-	tabPages.SwitchToPage(strconv.Itoa(curTab))
-	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
+	browser.SetCurrentTab(strconv.Itoa(curTab))
 	tabs[curTab].applyAll()
 
 	App.SetFocus(tabs[curTab].view)

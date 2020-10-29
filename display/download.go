@@ -22,8 +22,7 @@ import (
 )
 
 // For choosing between download and the portal - copy of YesNo basically
-var dlChoiceModal = cview.NewModal().
-	AddButtons([]string{"Download", "Open in portal", "Cancel"})
+var dlChoiceModal = cview.NewModal()
 
 // Channel to indicate what choice they made using the button text
 var dlChoiceCh = make(chan string)
@@ -31,52 +30,55 @@ var dlChoiceCh = make(chan string)
 var dlModal = cview.NewModal()
 
 func dlInit() {
+	dlm := dlModal
+	chm := dlChoiceModal
 	if viper.GetBool("a-general.color") {
-		dlChoiceModal.SetButtonBackgroundColor(config.GetColor("btn_bg")).
-			SetButtonTextColor(config.GetColor("btn_text")).
-			SetBackgroundColor(config.GetColor("dl_choice_modal_bg")).
-			SetTextColor(config.GetColor("dl_choice_modal_text"))
-		dlChoiceModal.GetFrame().
-			SetBorderColor(config.GetColor("dl_choice_modal_text")).
-			SetTitleColor(config.GetColor("dl_choice_modal_text"))
+		chm.SetButtonBackgroundColor(config.GetColor("btn_bg"))
+		chm.SetButtonTextColor(config.GetColor("btn_text"))
+		chm.SetBackgroundColor(config.GetColor("dl_choice_modal_bg"))
+		chm.SetTextColor(config.GetColor("dl_choice_modal_text"))
+		frame := chm.GetFrame()
+		frame.SetBorderColor(config.GetColor("dl_choice_modal_text"))
+		frame.SetTitleColor(config.GetColor("dl_choice_modal_text"))
 
-		dlModal.SetButtonBackgroundColor(config.GetColor("btn_bg")).
-			SetButtonTextColor(config.GetColor("btn_text")).
-			SetBackgroundColor(config.GetColor("dl_modal_bg")).
-			SetTextColor(config.GetColor("dl_modal_text"))
-		dlModal.GetFrame().
-			SetBorderColor(config.GetColor("dl_modal_text")).
-			SetTitleColor(config.GetColor("dl_modal_text"))
+		dlm.SetButtonBackgroundColor(config.GetColor("btn_bg"))
+		dlm.SetButtonTextColor(config.GetColor("btn_text"))
+		dlm.SetBackgroundColor(config.GetColor("dl_modal_bg"))
+		dlm.SetTextColor(config.GetColor("dl_modal_text"))
+		frame = dlm.GetFrame()
+		frame.SetBorderColor(config.GetColor("dl_modal_text"))
+		frame.SetTitleColor(config.GetColor("dl_modal_text"))
 	} else {
-		dlChoiceModal.SetButtonBackgroundColor(tcell.ColorWhite).
-			SetButtonTextColor(tcell.ColorBlack).
-			SetBackgroundColor(tcell.ColorBlack).
-			SetTextColor(tcell.ColorWhite)
+		chm.SetButtonBackgroundColor(tcell.ColorWhite)
+		chm.SetButtonTextColor(tcell.ColorBlack)
+		chm.SetBackgroundColor(tcell.ColorBlack)
+		chm.SetTextColor(tcell.ColorWhite)
 		dlChoiceModal.SetBorderColor(tcell.ColorWhite)
 		dlChoiceModal.GetFrame().SetTitleColor(tcell.ColorWhite)
 
-		dlModal.SetButtonBackgroundColor(tcell.ColorWhite).
-			SetButtonTextColor(tcell.ColorBlack).
-			SetBackgroundColor(tcell.ColorBlack).
-			SetTextColor(tcell.ColorWhite)
-		dlModal.GetFrame().
-			SetBorderColor(tcell.ColorWhite).
-			SetTitleColor(tcell.ColorWhite)
+		dlm.SetButtonBackgroundColor(tcell.ColorWhite)
+		dlm.SetButtonTextColor(tcell.ColorBlack)
+		dlm.SetBackgroundColor(tcell.ColorBlack)
+		dlm.SetTextColor(tcell.ColorWhite)
+		frame := dlm.GetFrame()
+		frame.SetBorderColor(tcell.ColorWhite)
+		frame.SetTitleColor(tcell.ColorWhite)
 	}
 
-	dlChoiceModal.SetBorder(true)
-	dlChoiceModal.GetFrame().SetTitleAlign(cview.AlignCenter)
-	dlChoiceModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+	chm.AddButtons([]string{"Download", "Open in portal", "Cancel"})
+	chm.SetBorder(true)
+	chm.GetFrame().SetTitleAlign(cview.AlignCenter)
+	chm.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		dlChoiceCh <- buttonLabel
 	})
 
-	dlModal.SetBorder(true)
-	dlModal.GetFrame().
-		SetTitleAlign(cview.AlignCenter).
-		SetTitle(" Download ")
-	dlModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+	dlm.SetBorder(true)
+	frame := dlm.GetFrame()
+	frame.SetTitleAlign(cview.AlignCenter)
+	frame.SetTitle(" Download ")
+	dlm.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		if buttonLabel == "Ok" {
-			tabPages.SwitchToPage(strconv.Itoa(curTab))
+			browser.SetCurrentTab(strconv.Itoa(curTab))
 			App.SetFocus(tabs[curTab].view)
 			App.Draw()
 		}
@@ -95,14 +97,13 @@ func dlChoice(text, u string, resp *gemini.Response) {
 	}
 
 	dlChoiceModal.SetText(text)
-	tabPages.ShowPage("dlChoice")
-	tabPages.SendToFront("dlChoice")
+	panels.ShowPanel("dlChoice")
 	App.SetFocus(dlChoiceModal)
 	App.Draw()
 
 	choice := <-dlChoiceCh
 	if choice == "Download" {
-		tabPages.HidePage("dlChoice")
+		panels.HidePanel("dlChoice")
 		App.Draw()
 		downloadURL(u, resp)
 		return
@@ -118,12 +119,12 @@ func dlChoice(text, u string, resp *gemini.Response) {
 		}
 		portalURL = strings.TrimPrefix(portalURL, "gemini://") + "?raw=1"
 		handleHTTP("https://portal.mozz.us/gemini/"+portalURL, false)
-		tabPages.SwitchToPage(strconv.Itoa(curTab))
+		browser.SetCurrentTab(strconv.Itoa(curTab))
 		App.SetFocus(tabs[curTab].view)
 		App.Draw()
 		return
 	}
-	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	browser.SetCurrentTab(strconv.Itoa(curTab))
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 }
@@ -170,15 +171,14 @@ func downloadURL(u string, resp *gemini.Response) {
 	// Display
 	dlModal.ClearButtons()
 	dlModal.AddButtons([]string{"Downloading..."})
-	tabPages.ShowPage("dl")
-	tabPages.SendToFront("dl")
+	panels.ShowPanel("dl")
 	App.SetFocus(dlModal)
 	App.Draw()
 
 	_, err = io.Copy(io.MultiWriter(f, bar), resp.Body)
 	done = true
 	if err != nil {
-		tabPages.HidePage("dl")
+		panels.HidePanel("dl")
 		Error("Download Error", err.Error())
 		f.Close()
 		os.Remove(savePath) // Remove partial file

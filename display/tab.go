@@ -36,19 +36,19 @@ type tab struct {
 // makeNewTab initializes an tab struct with no content.
 func makeNewTab() *tab {
 	t := tab{
-		page: &structs.Page{Mode: structs.ModeOff},
-		view: cview.NewTextView().
-			SetDynamicColors(true).
-			SetRegions(true).
-			SetScrollable(true).
-			SetWrap(false).
-			SetChangedFunc(func() {
-				App.Draw()
-			}),
+		page:       &structs.Page{Mode: structs.ModeOff},
+		view:       cview.NewTextView(),
 		history:    &tabHistory{},
 		reformatMu: &sync.Mutex{},
 		mode:       tabModeDone,
 	}
+	t.view.SetDynamicColors(true)
+	t.view.SetRegions(true)
+	t.view.SetScrollable(true)
+	t.view.SetWrap(false)
+	t.view.SetChangedFunc(func() {
+		App.Draw()
+	})
 	t.view.SetDoneFunc(func(key tcell.Key) {
 		// Altered from: https://gitlab.com/tslocum/cview/-/blob/master/demos/textview/main.go
 		// Handles being able to select and "click" links with the enter and tab keys
@@ -89,7 +89,8 @@ func makeNewTab() *tab {
 			// They've started link highlighting
 			tabs[tab].page.Mode = structs.ModeLinkSelect
 
-			tabs[tab].view.Highlight("0").ScrollToHighlight()
+			tabs[tab].view.Highlight("0")
+			tabs[tab].view.ScrollToHighlight()
 			// Display link URL in bottomBar
 			bottomBar.SetLabel("[::b]Link: [::-]")
 			bottomBar.SetText(tabs[tab].page.Links[0])
@@ -109,7 +110,8 @@ func makeNewTab() *tab {
 			} else {
 				return
 			}
-			tabs[tab].view.Highlight(strconv.Itoa(index)).ScrollToHighlight()
+			tabs[tab].view.Highlight(strconv.Itoa(index))
+			tabs[tab].view.ScrollToHighlight()
 			// Display link URL in bottomBar
 			bottomBar.SetLabel("[::b]Link: [::-]")
 			bottomBar.SetText(tabs[tab].page.Links[index])

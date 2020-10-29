@@ -21,37 +21,38 @@ var bkmkCh = make(chan int) // 1, 0, -1 for add/update, cancel, and remove
 var bkmkModalText string    // The current text of the input field in the modal
 
 func bkmkInit() {
+	m := bkmkModal
 	if viper.GetBool("a-general.color") {
-		bkmkModal.SetBackgroundColor(config.GetColor("bkmk_modal_bg")).
-			SetButtonBackgroundColor(config.GetColor("btn_bg")).
-			SetButtonTextColor(config.GetColor("btn_text")).
-			SetTextColor(config.GetColor("bkmk_modal_text"))
-		bkmkModal.GetForm().
-			SetLabelColor(config.GetColor("bkmk_modal_label")).
-			SetFieldBackgroundColor(config.GetColor("bkmk_modal_field_bg")).
-			SetFieldTextColor(config.GetColor("bkmk_modal_field_text"))
-		bkmkModal.GetFrame().
-			SetBorderColor(config.GetColor("bkmk_modal_text")).
-			SetTitleColor(config.GetColor("bkmk_modal_text"))
+		m.SetBackgroundColor(config.GetColor("bkmk_modal_bg"))
+		m.SetButtonBackgroundColor(config.GetColor("btn_bg"))
+		m.SetButtonTextColor(config.GetColor("btn_text"))
+		m.SetTextColor(config.GetColor("bkmk_modal_text"))
+		form := m.GetForm()
+		form.SetLabelColor(config.GetColor("bkmk_modal_label"))
+		form.SetFieldBackgroundColor(config.GetColor("bkmk_modal_field_bg"))
+		form.SetFieldTextColor(config.GetColor("bkmk_modal_field_text"))
+		frame := m.GetFrame()
+		frame.SetBorderColor(config.GetColor("bkmk_modal_text"))
+		frame.SetTitleColor(config.GetColor("bkmk_modal_text"))
 	} else {
-		bkmkModal.SetBackgroundColor(tcell.ColorBlack).
-			SetButtonBackgroundColor(tcell.ColorWhite).
-			SetButtonTextColor(tcell.ColorBlack).
-			SetTextColor(tcell.ColorWhite)
-		bkmkModal.GetForm().
-			SetLabelColor(tcell.ColorWhite).
-			SetFieldBackgroundColor(tcell.ColorWhite).
-			SetFieldTextColor(tcell.ColorBlack)
-		bkmkModal.GetFrame().
-			SetBorderColor(tcell.ColorWhite).
-			SetTitleColor(tcell.ColorWhite)
+		m.SetBackgroundColor(tcell.ColorBlack)
+		m.SetButtonBackgroundColor(tcell.ColorWhite)
+		m.SetButtonTextColor(tcell.ColorBlack)
+		m.SetTextColor(tcell.ColorWhite)
+		form := m.GetForm()
+		form.SetLabelColor(tcell.ColorWhite)
+		form.SetFieldBackgroundColor(tcell.ColorWhite)
+		form.SetFieldTextColor(tcell.ColorBlack)
+		frame := m.GetFrame()
+		frame.SetBorderColor(tcell.ColorWhite)
+		frame.SetTitleColor(tcell.ColorWhite)
 	}
 
-	bkmkModal.SetBorder(true)
-	bkmkModal.GetFrame().
-		SetTitleAlign(cview.AlignCenter).
-		SetTitle(" Add Bookmark ")
-	bkmkModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+	m.SetBorder(true)
+	frame := m.GetFrame()
+	frame.SetTitleAlign(cview.AlignCenter)
+	frame.SetTitle(" Add Bookmark ")
+	m.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		switch buttonLabel {
 		case "Add":
 			bkmkCh <- 1
@@ -95,13 +96,12 @@ func openBkmkModal(name string, exists bool, favicon string) (string, int) {
 			bkmkModalText = text
 		})
 
-	tabPages.ShowPage("bkmk")
-	tabPages.SendToFront("bkmk")
+	panels.ShowPanel("bkmk")
 	App.SetFocus(bkmkModal)
 	App.Draw()
 
 	action := <-bkmkCh
-	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	browser.SetCurrentTab(strconv.Itoa(curTab))
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 

@@ -1,10 +1,13 @@
 package display
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/makeworld-the-better-one/amfora/config"
 	"gitlab.com/tslocum/cview"
 )
 
@@ -47,56 +50,39 @@ Ctrl-C|Hard quit. This can be used when in the middle of downloading,
 |for example.
 `)
 
-var helpTable = cview.NewTable().
-	SetSelectable(false, false).
-	SetBorders(false).
-	SetScrollBarVisibility(cview.ScrollBarNever)
+var helpTable = cview.NewTextView()
 
 // Help displays the help and keybindings.
 func Help() {
 	helpTable.ScrollToBeginning()
-	tabPages.SwitchToPage("help")
+	if !browser.HasTab("help") {
+		browser.AddTab("help", "Help", helpTable)
+	}
+	browser.SetCurrentTab("help")
 	App.SetFocus(helpTable)
 	App.Draw()
 }
 
 func helpInit() {
 	// Populate help table
+	helpTable.SetBackgroundColor(config.GetColor("bg"))
+	helpTable.SetPadding(0, 0, 1, 1)
 	helpTable.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEsc || key == tcell.KeyEnter {
-			tabPages.SwitchToPage(strconv.Itoa(curTab))
+			browser.SetCurrentTab(strconv.Itoa(curTab))
 			App.SetFocus(tabs[curTab].view)
 			App.Draw()
 		}
 	})
-	rows := strings.Count(helpCells, "\n") + 1
-	cells := strings.Split(
-		strings.ReplaceAll(helpCells, "\n", "|"),
-		"|")
-	cell := 0
-	extraRows := 0 // Rows continued from the previous, without spacing
-	for r := 0; r < rows; r++ {
-		for c := 0; c < 2; c++ {
-			var tableCell *cview.TableCell
-			if c == 0 {
-				// First column, the keybinding
-				tableCell = cview.NewTableCell(" " + cells[cell]).
-					SetAttributes(tcell.AttrBold).
-					SetAlign(cview.AlignLeft)
-			} else {
-				tableCell = cview.NewTableCell(" " + cells[cell])
-			}
-			if c == 0 && cells[cell] == "" || (cell > 0 && cells[cell-1] == "" && c == 1) {
-				// The keybinding column for this row was blank, meaning the explanation
-				// column is continued from the previous row.
-				// The row should be added without any spacing rows
-				helpTable.SetCell(((2*r)-extraRows/2)-1, c, tableCell)
-				extraRows++
-			} else {
-				helpTable.SetCell((2*r)-extraRows/2, c, tableCell) // Every other row, for readability
-			}
-			cell++
+	lines := strings.Split(helpCells, "\n")
+	w := tabwriter.NewWriter(helpTable, 0, 8, 2, ' ', 0)
+	for i, line := range lines {
+		cells := strings.Split(line, "|")
+		if i > 0 && len(cells[0]) > 0 {
+			fmt.Fprintln(w, "\t")
 		}
+		fmt.Fprintf(w, "%s\t%s\n", cells[0], cells[1])
 	}
-	tabPages.AddPage("help", helpTable, true, false)
+	w.Flush()
+	browser.AddTab("help", "Help", helpTable)
 }

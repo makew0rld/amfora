@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - XDG user dir file is parsed instead of looking for XDG env vars (#97, #100)
+- More reliable start, no more flash of unindented text, or text that stays unindented (#107)
 
 
 ## [v1.5.0] - 2020-09-01

@@ -43,14 +43,19 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Initalize lower-level cview app
+	if err = display.App.Init(); err != nil {
+		panic(err)
+	}
+
+	// Initialize Amfora's settings
 	display.Init()
 	display.NewTab()
-	display.NewTab() // Open extra tab and close it to fully initialize the app and wrapping
-	display.CloseTab()
 	if len(os.Args[1:]) > 0 {
 		display.URL(os.Args[1])
 	}
 
+	// Start
 	if err = display.App.Run(); err != nil {
 		panic(err)
 	}

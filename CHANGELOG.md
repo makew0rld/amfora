@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated [go-isemoji](https://github.com/makeworld-the-better-one/go-isemoji) to v1.1.0 to support Emoji 13.1 for favicons
 - The web browser code doesn't check for Xorg anymore, just display variables (#93)
 - Bookmarks can be made to non-gemini URLs (#94)
+- Remove pointless directory fallbacks (#101)
 
 ### Fixed
 - XDG user dir file is parsed instead of looking for XDG env vars (#97, #100)

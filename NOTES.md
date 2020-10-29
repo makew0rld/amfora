@@ -10,13 +10,8 @@
 ## Upstream Bugs
 - Wrapping messes up on brackets
   - Filed [issue 23](https://gitlab.com/tslocum/cview/-/issues/23)
-- Wrapping panics on strings with brackets and Asian characters
-  - Filed cview [issue 27](https://gitlab.com/tslocum/cview/-/issues/27)
-  - The panicking was reported and fixed in Amfora [issue 20](https://github.com/makeworld-the-better-one/amfora/issues/20), but the lines are now just not wrapped
-  - **Issue fixed, the not-wrapping fix should be disabled and tested**
 - Text background not reset on ANSI pages
   - Filed [issue 25](https://gitlab.com/tslocum/cview/-/issues/25)
-  - **Could not be replicated, test**
 - Modal styling messed up when wrapped - example occurence is the error modal for a long unsupported scheme URL
   - Filed [issue 26](https://gitlab.com/tslocum/cview/-/issues/26)
   - Add some bold back into modal text after this is fixed

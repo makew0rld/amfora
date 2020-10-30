@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The web browser code doesn't check for Xorg anymore, just display variables (#93)
 - Bookmarks can be made to non-gemini URLs (#94)
 - Remove pointless directory fallbacks (#101)
+- Update cview to `36671ba7d31c2287748e22966a92c5e94ff850cc` for large perf and feature updates (#107)
+- Update to tcell v2 (depencency of cview)
 
 ### Fixed
 - XDG user dir file is parsed instead of looking for XDG env vars (#97, #100)

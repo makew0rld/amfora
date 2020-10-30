@@ -1,9 +1,6 @@
 # Amfora
 
-<center>  <!-- I know, that's not how you usually do it :) -->
-<img src="logo.png" alt="amphora logo" width="30%">
-<h6>Image modified from: amphora by Alvaro Cabrera from the Noun Project</h6>
-</center>
+![Amfora logo](img/amfora_256x256.png)
 
 [![travis build status](https://img.shields.io/travis/com/makeworld-the-better-one/amfora/master?label=master)](https://travis-ci.com/github/makeworld-the-better-one/amfora)
 [![go reportcard](https://goreportcard.com/badge/github.com/makeworld-the-better-one/amfora)](https://goreportcard.com/report/github.com/makeworld-the-better-one/amfora)

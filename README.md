@@ -42,10 +42,10 @@ Make sure to click "Watch" > "Releases only" in the top right to get notified ab
 
 ### Arch Linux
 
-Arch Linux users can install Amfora from AUR. It has the package name `amfora`, and is maintained by @pboyd.
+Arch Linux users can install Amfora using pacman.
 
 ```
-yay -S amfora
+sudo pacman -S amfora
 ```
 
 ### Homebrew

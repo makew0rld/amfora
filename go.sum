@@ -218,8 +218,8 @@ github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 gitlab.com/tslocum/cbind v0.1.3 h1:FT/fTQ4Yj3eo5021lB3IbkIt8eVtYGhrw/xur+cjvUU=
 gitlab.com/tslocum/cbind v0.1.3/go.mod h1:RvwYE3auSjBNlCmWeGspzn+jdLUVQ8C2QGC+0nP9ChI=
-gitlab.com/tslocum/cview v1.5.1-0.20201026174147-36671ba7d31c h1:yjyZ6CMJodKSylKTyIHbCsMNNuSE26hW7PMl6TWaM4M=
-gitlab.com/tslocum/cview v1.5.1-0.20201026174147-36671ba7d31c/go.mod h1:IEfcfqcDG4Tm28XM+H8TEtbrqjpieAewfcJvQ9SgcRM=
+gitlab.com/tslocum/cview v1.5.1-0.20201103192513-888dcd2560e2 h1:HUyS++/abHKJeUPdadPkQsb6o2z+5+EnYnQgHvBwWeU=
+gitlab.com/tslocum/cview v1.5.1-0.20201103192513-888dcd2560e2/go.mod h1:IEfcfqcDG4Tm28XM+H8TEtbrqjpieAewfcJvQ9SgcRM=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=

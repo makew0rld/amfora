@@ -56,6 +56,18 @@ page_max_time = 10
 emoji_favicons = false
 
 
+[auth]
+# Authentication settings
+
+[auth.certs]
+# Client certificates
+# "example.com" = "mycert.crt"
+
+[auth.keys]
+# Client certificate keys
+# "example.com" = "mycert.key"
+
+
 [keybindings]
 # In the future there will be more settings here.
 

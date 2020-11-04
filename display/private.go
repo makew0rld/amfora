@@ -146,24 +146,33 @@ func setPage(t *tab, p *structs.Page) {
 // handleHTTP is used by handleURL.
 // It opens HTTP links and displays Info and Error modals.
 func handleHTTP(u string, showInfo bool) {
-	switch strings.TrimSpace(viper.GetString("a-general.http")) {
-	case "", "off":
-		Error("HTTP Error", "Opening HTTP URLs is turned off.")
-	case "default":
-		s, err := webbrowser.Open(u)
-		if err != nil {
-			Error("Webbrowser Error", err.Error())
-		} else if showInfo {
-			Info(s)
+	if len(config.HttpCommand) == 1 {
+		// Possibly a non-command
+
+		switch strings.TrimSpace(config.HttpCommand[0]) {
+		case "", "off":
+			Error("HTTP Error", "Opening HTTP URLs is turned off.")
+		case "default":
+			s, err := webbrowser.Open(u)
+			if err != nil {
+				Error("Webbrowser Error", err.Error())
+			} else if showInfo {
+				Info(s)
+			}
 		}
-	default:
-		// The config has a custom command to execute for HTTP URLs
-		fields := strings.Fields(viper.GetString("a-general.http"))
-		err := exec.Command(fields[0], append(fields[1:], u)...).Start()
+	} else {
+		// Custom command
+		var err error = nil
+		if len(config.HttpCommand) > 1 {
+			err = exec.Command(config.HttpCommand[0], append(config.HttpCommand[1:], u)...).Start()
+		} else {
+			err = exec.Command(config.HttpCommand[0], u).Start()
+		}
 		if err != nil {
 			Error("HTTP Error", "Error executing custom browser command: "+err.Error())
 		}
 	}
+
 	App.Draw()
 }
 

@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - XDG user dir file is parsed instead of looking for XDG env vars (#97, #100)
+- Support paths in HTTP(S) browser config setting (#77)
 
 
 ## [v1.5.0] - 2020-09-01

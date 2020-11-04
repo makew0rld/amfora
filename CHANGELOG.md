@@ -6,11 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Support client certificates** through config (#112)
 - `ansi` config setting, to disable ANSI colors in pages (#79, #86)
 - Edit current URL with <kbd>e</kbd> (#87)
 - If `emoji_favicons` is enabled, new bookmarks will have the domain's favicon prepended (#69, #90)
 - The `BROWSER` env var is now also checked when opening web links on Unix (#93)
-- Support client certificates through config (#112)
 
 ### Changed
 - Disabling the `color` config setting also disables ANSI colors in pages (#79, #86)
@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - XDG user dir file is parsed instead of looking for XDG env vars (#97, #100)
-- Support paths in HTTP(S) browser config setting (#77)
+- Support paths with spaces in HTTP browser config setting (#77)
 
 
 ## [v1.5.0] - 2020-09-01

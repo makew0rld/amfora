@@ -121,15 +121,16 @@ Features in *italics* are in the master branch, but not in the latest release.
   - Disabled by default, enable in config
 - [x] Proxying
   - Schemes like Gopher or HTTP can be proxied through a Gemini server
+- [x] *Client certificate support*
+  - [ ] Full client certificate UX within the client
+    - Create transient and permanent certs within the client, per domain
+    - Manage and browse them
+    - Similar to [Kristall](https://github.com/MasterQ32/kristall)
+    - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
 - [ ] Subscribe to RSS and Atom feeds and display them
   - Subscribing to page changes, similar to how Spacewalk works, will also be supported
   - *In progress on `feeds` branch*
 - [ ] Stream support
-- [ ] Full client certificate UX within the client
-  - Create transient and permanent certs within the client, per domain
-  - Manage and browse them
-  - Similar to [Kristall](https://github.com/MasterQ32/kristall)
-  - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
 - [ ] Table of contents for pages
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>
 - [ ] Support Markdown rendering

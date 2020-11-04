@@ -64,10 +64,12 @@ emoji_favicons = false
 
 [auth.certs]
 # Client certificates
+# Set domain name equal to path to client cert
 # "example.com" = "mycert.crt"
 
 [auth.keys]
 # Client certificate keys
+# Set domain name equal to path to key for the client cert above
 # "example.com" = "mycert.key"
 
 

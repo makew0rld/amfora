@@ -18,7 +18,7 @@ func clientCert(host string) ([]byte, []byte) {
 		return cert[0], cert[1]
 	}
 
-	// Expand paths staring with ~/
+	// Expand paths starting with ~/
 	certPath, err := homedir.Expand(viper.GetString("auth.certs." + host))
 	if err != nil {
 		certPath = viper.GetString("auth.certs." + host)

@@ -39,7 +39,7 @@ var bkmkPath string
 var DownloadsDir string
 
 // Command for opening HTTP(S) URLs in the browser, from "a-general.http" in config.
-var HttpCommand []string
+var HTTPCommand []string
 
 //nolint:golint,goerr113
 func Init() error {
@@ -241,12 +241,12 @@ func Init() error {
 	} // Otherwise it's black by default
 
 	// Parse HTTP command
-	HttpCommand = viper.GetStringSlice("a-general.http")
-	if len(HttpCommand) == 0 {
+	HTTPCommand = viper.GetStringSlice("a-general.http")
+	if len(HTTPCommand) == 0 {
 		// Not a string array, interpret as a string instead
 		// Split on spaces to maintain compatibility with old versions
 		// The new better way to is to just define a string array in config
-		HttpCommand = strings.Fields(viper.GetString("a-general.http"))
+		HTTPCommand = strings.Fields(viper.GetString("a-general.http"))
 	}
 
 	return nil

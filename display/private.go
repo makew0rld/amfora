@@ -383,11 +383,14 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 
 	// Gemini URL, or one with a Gemini proxy available
 
-	// Load page from cache if possible
-	page, ok := cache.GetPage(u)
-	if ok {
-		setPage(t, page)
-		return ret(u, true)
+	// Load page from cache if it exists,
+	// and this isn't a page that was redirected to by the server (indicates dynamic content)
+	if numRedirects == 0 {
+		page, ok := cache.GetPage(u)
+		if ok {
+			setPage(t, page)
+			return ret(u, true)
+		}
 	}
 	// Otherwise download it
 	bottomBar.SetText("Loading...")

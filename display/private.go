@@ -458,7 +458,11 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		}
 
 		page.Width = termW
-		go cache.AddPage(page)
+
+		if !client.HasClientCert(parsed.Hostname()) {
+			go cache.AddPage(page)
+		}
+
 		setPage(t, page)
 		return ret(u, true)
 	}

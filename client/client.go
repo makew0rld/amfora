@@ -57,7 +57,7 @@ func HasClientCert(host string) bool {
 // The error text is human friendly and should be displayed.
 func Fetch(u string) (*gemini.Response, error) {
 	parsed, _ := url.Parse(u)
-	cert, key := clientCert(parsed.Host)
+	cert, key := clientCert(parsed.Hostname())
 
 	var res *gemini.Response
 	var err error

@@ -1,6 +1,7 @@
 // Package config initializes all files required for Amfora, even those used by
 // other packages. It also reads in the config file and initializes a Viper and
 // the theme
+//nolint:golint,goerr113
 package config
 
 import (
@@ -41,7 +42,6 @@ var DownloadsDir string
 // Command for opening HTTP(S) URLs in the browser, from "a-general.http" in config.
 var HTTPCommand []string
 
-//nolint:golint,goerr113
 func Init() error {
 
 	// *** Set paths ***

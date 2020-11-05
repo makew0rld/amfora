@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - XDG user dir file is parsed instead of looking for XDG env vars (#97, #100)
 - Support paths with spaces in HTTP browser config setting (#77)
 - Clicking "Change" on an existing bookmark without changing the text no longer removes it (#91)
+- Display HTTP Error if "Open In Portal" fails (#81)
 
 
 ## [v1.5.0] - 2020-09-01

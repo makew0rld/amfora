@@ -145,35 +145,42 @@ func setPage(t *tab, p *structs.Page) {
 
 // handleHTTP is used by handleURL.
 // It opens HTTP links and displays Info and Error modals.
-func handleHTTP(u string, showInfo bool) {
+// Returns false if there was an error.
+func handleHTTP(u string, showInfo bool) bool {
 	if len(config.HTTPCommand) == 1 {
 		// Possibly a non-command
 
 		switch strings.TrimSpace(config.HTTPCommand[0]) {
 		case "", "off":
 			Error("HTTP Error", "Opening HTTP URLs is turned off.")
+			return false
 		case "default":
 			s, err := webbrowser.Open(u)
 			if err != nil {
 				Error("Webbrowser Error", err.Error())
-			} else if showInfo {
+				return false
+			}
+			if showInfo {
 				Info(s)
 			}
-		}
-	} else {
-		// Custom command
-		var err error = nil
-		if len(config.HTTPCommand) > 1 {
-			err = exec.Command(config.HTTPCommand[0], append(config.HTTPCommand[1:], u)...).Start()
-		} else {
-			err = exec.Command(config.HTTPCommand[0], u).Start()
-		}
-		if err != nil {
-			Error("HTTP Error", "Error executing custom browser command: "+err.Error())
+			return true
 		}
 	}
 
+	// Custom command
+	var err error = nil
+	if len(config.HTTPCommand) > 1 {
+		err = exec.Command(config.HTTPCommand[0], append(config.HTTPCommand[1:], u)...).Start()
+	} else {
+		err = exec.Command(config.HTTPCommand[0], u).Start()
+	}
+	if err != nil {
+		Error("HTTP Error", "Error executing custom browser command: "+err.Error())
+		return false
+	}
+
 	App.Draw()
+	return true
 }
 
 // handleOther is used by handleURL.

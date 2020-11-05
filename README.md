@@ -143,10 +143,10 @@ On Windows, the file is in `%APPDATA%\amfora\config.toml`, which usually expands
 
 ## Client Certificates
 
-Amfora has early support for client certs. Eventually Amfora will be able to generate them itself, but for you can do it by using OpenSSL (not Windows friendly):
+Amfora has early support for client certs. Eventually Amfora will be able to generate them itself, but for you can do it by using OpenSSL:
 
 ```shell
-openssl req -new -subj "/CN=username" -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -out cert.pem -keyout key.pem
+openssl req -new -subj "/CN=username" -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -days 1825 -nodes -out cert.pem -keyout key.pem
 ```
 
 This will create a certificate and key file, that can be renamed and moved as you like. See the configuration section above for how to edit your config file to tell Amfora about them.

@@ -118,10 +118,12 @@ func dlChoice(text, u string, resp *gemini.Response) {
 			portalURL = parsed.String() + "%3F" + query
 		}
 		portalURL = strings.TrimPrefix(portalURL, "gemini://") + "?raw=1"
-		handleHTTP("https://portal.mozz.us/gemini/"+portalURL, false)
-		browser.SetCurrentTab(strconv.Itoa(curTab))
-		App.SetFocus(tabs[curTab].view)
-		App.Draw()
+		ok := handleHTTP("https://portal.mozz.us/gemini/"+portalURL, false)
+		if ok {
+			browser.SetCurrentTab(strconv.Itoa(curTab))
+			App.SetFocus(tabs[curTab].view)
+			App.Draw()
+		}
 		return
 	}
 	browser.SetCurrentTab(strconv.Itoa(curTab))

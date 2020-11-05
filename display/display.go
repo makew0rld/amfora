@@ -114,6 +114,13 @@ func Init() {
 					// This shouldn't occur
 					return
 				}
+
+				if query == ".." && tabs[tab].page.URL[len(tabs[tab].page.URL)-1] != '/' {
+					// Support what ".." used to work like
+					// If on /dir/doc.gmi, got to /dir/
+					query = "./"
+				}
+
 				target, err := current.Parse(query)
 				if err != nil {
 					// Invalid relative url

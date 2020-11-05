@@ -121,15 +121,16 @@ Features in *italics* are in the master branch, but not in the latest release.
   - Disabled by default, enable in config
 - [x] Proxying
   - Schemes like Gopher or HTTP can be proxied through a Gemini server
+- [x] Client certificate support
+  - [ ] Full client certificate UX within the client
+    - Create transient and permanent certs within the client, per domain
+    - Manage and browse them
+    - Similar to [Kristall](https://github.com/MasterQ32/kristall)
+    - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
 - [ ] Subscribe to RSS and Atom feeds and display them
   - Subscribing to page changes, similar to how Spacewalk works, will also be supported
   - *In progress on `feeds` branch*
 - [ ] Stream support
-- [ ] Full client certificate UX within the client
-  - Create transient and permanent certs within the client, per domain
-  - Manage and browse them
-  - Similar to [Kristall](https://github.com/MasterQ32/kristall)
-  - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
 - [ ] Table of contents for pages
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>
 - [ ] Support Markdown rendering
@@ -140,10 +141,19 @@ The config file is written in the intuitive [TOML](https://github.com/toml-lang/
 
 On Windows, the file is in `%APPDATA%\amfora\config.toml`, which usually expands to `C:\Users\<username>\AppData\Roaming\amfora\config.toml`.
 
+## Client Certificates
+
+Amfora has early support for client certs. Eventually Amfora will be able to generate them itself, but for you can do it by using OpenSSL (not Windows friendly):
+
+```shell
+openssl req -new -subj "/CN=username" -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -out cert.pem -keyout key.pem
+```
+
+This will create a certificate and key file, that can be renamed and moved as you like. See the configuration section above for how to edit your config file to tell Amfora about them.
+
 ## Known Bugs
 
 - Pasting on Windows is truncated, the full paste content won't be added. ([#43](https://github.com/makeworld-the-better-one/amfora/issues/43))
-- ANSI codes aren't displaying properly ([#59](https://github.com/makeworld-the-better-one/amfora/issues/59))
 
 You can also check out [all the issues with the bug label](https://github.com/makeworld-the-better-one/amfora/issues?q=is%3Aopen+is%3Aissue+label%3Abug).
 

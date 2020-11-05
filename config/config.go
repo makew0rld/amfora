@@ -1,6 +1,7 @@
 // Package config initializes all files required for Amfora, even those used by
 // other packages. It also reads in the config file and initializes a Viper and
 // the theme
+//nolint:golint,goerr113
 package config
 
 import (
@@ -38,7 +39,9 @@ var bkmkPath string
 
 var DownloadsDir string
 
-//nolint:golint,goerr113
+// Command for opening HTTP(S) URLs in the browser, from "a-general.http" in config.
+var HTTPCommand []string
+
 func Init() error {
 
 	// *** Set paths ***
@@ -236,6 +239,15 @@ func Init() error {
 	if viper.GetBool("a-general.color") {
 		cview.Styles.PrimitiveBackgroundColor = GetColor("bg")
 	} // Otherwise it's black by default
+
+	// Parse HTTP command
+	HTTPCommand = viper.GetStringSlice("a-general.http")
+	if len(HTTPCommand) == 0 {
+		// Not a string array, interpret as a string instead
+		// Split on spaces to maintain compatibility with old versions
+		// The new better way to is to just define a string array in config
+		HTTPCommand = strings.Fields(viper.GetString("a-general.http"))
+	}
 
 	return nil
 }

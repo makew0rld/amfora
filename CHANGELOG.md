@@ -5,11 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Update cview to `36671ba7d31c2287748e22966a92c5e94ff850cc` for large perf and feature updates (#107)
+- Update to tcell v2 (depencency of cview)
+
+### Fixed
+ - More reliable start, no more flash of unindented text, or text that stays unindented (#107)
+
+
+## [v1.6.0] - 2020-11-04
 ### Added
+- **Support client certificates** through config (#112)
 - `ansi` config setting, to disable ANSI colors in pages (#79, #86)
 - Edit current URL with <kbd>e</kbd> (#87)
 - If `emoji_favicons` is enabled, new bookmarks will have the domain's favicon prepended (#69, #90)
 - The `BROWSER` env var is now also checked when opening web links on Unix (#93)
+- More accurate error messages based on server response code
 
 ### Changed
 - Disabling the `color` config setting also disables ANSI colors in pages (#79, #86)
@@ -17,12 +28,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The web browser code doesn't check for Xorg anymore, just display variables (#93)
 - Bookmarks can be made to non-gemini URLs (#94)
 - Remove pointless directory fallbacks (#101)
-- Update cview to `36671ba7d31c2287748e22966a92c5e94ff850cc` for large perf and feature updates (#107)
-- Update to tcell v2 (depencency of cview)
+- Don't load page from cache when redirected to it (#114)
 
 ### Fixed
 - XDG user dir file is parsed instead of looking for XDG env vars (#97, #100)
-- More reliable start, no more flash of unindented text, or text that stays unindented (#107)
+- Support paths with spaces in HTTP browser config setting (#77)
+- Clicking "Change" on an existing bookmark without changing the text no longer removes it (#91)
+- Display HTTP Error if "Open In Portal" fails (#81)
+- Support ANSI color codes again, but only in preformatted blocks (#59)
+- Make the `..` command work lke it used to in v1.4.0
 
 
 ## [v1.5.0] - 2020-09-01

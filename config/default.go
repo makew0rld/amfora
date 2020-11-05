@@ -43,7 +43,7 @@ search = "gemini://gus.guru/search"
 # Whether colors will be used in the terminal
 color = true
 
-# Whether ANSI codes from the page content should be rendered
+# Whether ANSI color codes from the page content should be rendered
 ansi = true
 
 # Whether to replace list asterisks with unicode bullets

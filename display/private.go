@@ -478,8 +478,8 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	// Could be a non 20 (or 21) status code, or a different kind of document
 
 	// Handle each status code
-	switch gemini.SimplifyStatus(res.Status) {
-	case 10:
+	switch res.Status {
+	case 10, 11:
 		userInput, ok := Input(res.Meta)
 		if ok {
 			// Make another request with the query string added
@@ -492,7 +492,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			return ret(handleURL(t, parsed.String(), 0))
 		}
 		return ret("", false)
-	case 30:
+	case 30, 31:
 		parsedMeta, err := url.Parse(res.Meta)
 		if err != nil {
 			Error("Redirect Error", "Invalid URL: "+err.Error())
@@ -520,13 +520,44 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	case 40:
 		Error("Temporary Failure", cview.Escape(res.Meta))
 		return ret("", false)
+	case 41:
+		Error("Server Unavailable", cview.Escape(res.Meta))
+		return ret("", false)
+	case 42:
+		Error("CGI Error", cview.Escape(res.Meta))
+		return ret("", false)
+	case 43:
+		Error("Proxy Failure", cview.Escape(res.Meta))
+		return ret("", false)
+	case 44:
+		Error("Slow Down", "You should wait "+cview.Escape(res.Meta)+" seconds before making another request.")
+		return ret("", false)
 	case 50:
 		Error("Permanent Failure", cview.Escape(res.Meta))
 		return ret("", false)
+	case 51:
+		Error("Not Found", cview.Escape(res.Meta))
+		return ret("", false)
+	case 52:
+		Error("Gone", cview.Escape(res.Meta))
+		return ret("", false)
+	case 53:
+		Error("Proxy Request Refused", cview.Escape(res.Meta))
+		return ret("", false)
+	case 59:
+		Error("Bad Request", cview.Escape(res.Meta))
+		return ret("", false)
 	case 60:
-		Info("The server requested a certificate. Cert handling is coming to Amfora soon!")
+		Error("Client Certificate Required", cview.Escape(res.Meta))
+		return ret("", false)
+	case 61:
+		Error("Certificate Not Authorised", cview.Escape(res.Meta))
+		return ret("", false)
+	case 62:
+		Error("Certificate Not Valid", cview.Escape(res.Meta))
 		return ret("", false)
 	}
+
 	// Status code 20, but not a document that can be displayed
 	go dlChoice("That file could not be displayed. What would you like to do?", u, res)
 	return ret("", false)

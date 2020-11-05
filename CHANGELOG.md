@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Edit current URL with <kbd>e</kbd> (#87)
 - If `emoji_favicons` is enabled, new bookmarks will have the domain's favicon prepended (#69, #90)
 - The `BROWSER` env var is now also checked when opening web links on Unix (#93)
+- More accurate error messages based on server response code
 
 ### Changed
 - Disabling the `color` config setting also disables ANSI colors in pages (#79, #86)

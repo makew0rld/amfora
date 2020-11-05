@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clicking "Change" on an existing bookmark without changing the text no longer removes it (#91)
 - Display HTTP Error if "Open In Portal" fails (#81)
 - Support ANSI color codes again, but only in preformatted blocks (#59)
+- Make the `..` command work lke it used to in v1.4.0
 
 
 ## [v1.5.0] - 2020-09-01

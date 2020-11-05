@@ -20,7 +20,6 @@ import (
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/makeworld-the-better-one/go-isemoji"
 	"github.com/spf13/viper"
-	"gitlab.com/tslocum/cview"
 )
 
 // This file contains the functions that aren't part of the public API.

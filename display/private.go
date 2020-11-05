@@ -521,43 +521,43 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		}
 		return ret("", false)
 	case 40:
-		Error("Temporary Failure", cview.Escape(res.Meta))
+		Error("Temporary Failure", escapeMeta(res.Meta))
 		return ret("", false)
 	case 41:
-		Error("Server Unavailable", cview.Escape(res.Meta))
+		Error("Server Unavailable", escapeMeta(res.Meta))
 		return ret("", false)
 	case 42:
-		Error("CGI Error", cview.Escape(res.Meta))
+		Error("CGI Error", escapeMeta(res.Meta))
 		return ret("", false)
 	case 43:
-		Error("Proxy Failure", cview.Escape(res.Meta))
+		Error("Proxy Failure", escapeMeta(res.Meta))
 		return ret("", false)
 	case 44:
-		Error("Slow Down", "You should wait "+cview.Escape(res.Meta)+" seconds before making another request.")
+		Error("Slow Down", "You should wait "+escapeMeta(res.Meta)+" seconds before making another request.")
 		return ret("", false)
 	case 50:
-		Error("Permanent Failure", cview.Escape(res.Meta))
+		Error("Permanent Failure", escapeMeta(res.Meta))
 		return ret("", false)
 	case 51:
-		Error("Not Found", cview.Escape(res.Meta))
+		Error("Not Found", escapeMeta(res.Meta))
 		return ret("", false)
 	case 52:
-		Error("Gone", cview.Escape(res.Meta))
+		Error("Gone", escapeMeta(res.Meta))
 		return ret("", false)
 	case 53:
-		Error("Proxy Request Refused", cview.Escape(res.Meta))
+		Error("Proxy Request Refused", escapeMeta(res.Meta))
 		return ret("", false)
 	case 59:
-		Error("Bad Request", cview.Escape(res.Meta))
+		Error("Bad Request", escapeMeta(res.Meta))
 		return ret("", false)
 	case 60:
-		Error("Client Certificate Required", cview.Escape(res.Meta))
+		Error("Client Certificate Required", escapeMeta(res.Meta))
 		return ret("", false)
 	case 61:
-		Error("Certificate Not Authorised", cview.Escape(res.Meta))
+		Error("Certificate Not Authorised", escapeMeta(res.Meta))
 		return ret("", false)
 	case 62:
-		Error("Certificate Not Valid", cview.Escape(res.Meta))
+		Error("Certificate Not Valid", escapeMeta(res.Meta))
 		return ret("", false)
 	}
 

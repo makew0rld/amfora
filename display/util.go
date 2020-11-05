@@ -3,11 +3,18 @@ package display
 import (
 	"errors"
 	"net/url"
+	"strings"
 
 	"github.com/spf13/viper"
+	"gitlab.com/tslocum/cview"
 )
 
 // This file contains funcs that are small, self-contained utilities.
+
+// escapeMeta santizes a META string for use within a cview modal.
+func escapeMeta(meta string) string {
+	return cview.Escape(strings.ReplaceAll(meta, "\n", ""))
+}
 
 // isValidTab indicates whether the passed tab is still being used, even if it's not currently displayed.
 func isValidTab(t *tab) bool {

@@ -80,17 +80,6 @@ func wrapLine(line string, width int, prefix, suffix string, includeFirst bool) 
 	return ret
 }
 
-// tagLines splits a string into lines and adds a the given
-// string to the start and another to the end.
-// It is used for adding cview color tags.
-func tagLines(s, start, end string) string {
-	lines := strings.Split(s, "\n")
-	for i := range lines {
-		lines[i] = start + lines[i] + end
-	}
-	return strings.Join(lines, "\n")
-}
-
 // convertRegularGemini converts non-preformatted blocks of text/gemini
 // into a cview-compatible format.
 // Since this only works on non-preformatted blocks, RenderGemini

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net"
 	"net/url"
 	"os/exec"
@@ -370,7 +371,34 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		usingProxy = true
 	}
 
-	if !strings.HasPrefix(u, "http") && !strings.HasPrefix(u, "gemini") {
+	if strings.HasPrefix(u, "file") {
+
+		file := strings.TrimPrefix(u, "file://")
+
+		if !strings.HasSuffix(u, ".gmi") && !strings.HasSuffix(u, ".gemini") {
+			Error("Unsupported filetype", "Try opening a .gmi or .gemini file.")
+			return ret("", false)
+		}
+
+		content, err := ioutil.ReadFile(file)
+		if err != nil {
+			Error("Cannot open local file", err.Error())
+			return ret("", false)
+		}
+		rendered, links := renderer.RenderGemini(string(content), textWidth(), leftMargin(), false)
+		page := &structs.Page{
+			Mediatype: structs.TextGemini,
+			URL:       u,
+			Raw:       string(content),
+			Content:   rendered,
+			Links:     links,
+		}
+
+		setPage(t, page)
+		return ret(u, true)
+	}
+
+	if !strings.HasPrefix(u, "http") && !strings.HasPrefix(u, "gemini") && !strings.HasPrefix(u, "file") {
 		// Not a Gemini URL
 		if proxy == "" || proxy == "off" {
 			// No proxy available

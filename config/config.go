@@ -230,8 +230,9 @@ func Init() error {
 				return fmt.Errorf(`value for "%s" is not a string: %v`, k, v)
 			}
 			color := tcell.GetColor(strings.ToLower(colorStr))
-			if color == tcell.ColorDefault {
+			if color == tcell.ColorDefault && colorStr != "default" {
 				return fmt.Errorf(`invalid color format for "%s": %s`, k, colorStr)
+
 			}
 			SetColor(k, color)
 		}

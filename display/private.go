@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/url"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -195,23 +196,56 @@ func handleFile(u string) (*structs.Page, error) {
 
 	file := strings.TrimPrefix(u, "file://")
 
-	if !strings.HasSuffix(u, ".gmi") && !strings.HasSuffix(u, ".gemini") {
-		Error("Unsupported filetype", "Try opening a .gmi or .gemini file.")
-		return page, errors.New("Unsupported filetype")
-	}
-
-	content, err := ioutil.ReadFile(file)
+	fi, err := os.Stat(file)
 	if err != nil {
 		Error("Cannot open local file", err.Error())
 		return page, err
 	}
-	rendered, links := renderer.RenderGemini(string(content), textWidth(), leftMargin(), false)
-	page = &structs.Page{
-		Mediatype: structs.TextGemini,
-		URL:       u,
-		Raw:       string(content),
-		Content:   rendered,
-		Links:     links,
+
+	switch mode := fi.Mode(); {
+	case mode.IsDir():
+		content := "Index of " + file + "/\n"
+
+		files, err := ioutil.ReadDir(file)
+		if err != nil {
+			Error("Cannot open local directory", err.Error())
+			return page, err
+		}
+
+		for _, f := range files {
+			content += fmt.Sprintf("=> %s %s\n", f.Name(), f.Name())
+		}
+
+		rendered, links := renderer.RenderGemini(string(content), textWidth(), leftMargin(), false)
+		page = &structs.Page{
+			Mediatype: structs.TextGemini,
+			URL:       u,
+			Raw:       string(content),
+			Content:   rendered,
+			Links:     links,
+		}
+
+	case mode.IsRegular():
+
+		if !strings.HasSuffix(u, ".gmi") && !strings.HasSuffix(u, ".gemini") {
+			Error("Unsupported filetype", "Try opening a .gmi or .gemini file.")
+			return page, errors.New("Unsupported filetype")
+		}
+
+		content, err := ioutil.ReadFile(file)
+		if err != nil {
+			Error("Cannot open local file", err.Error())
+			return page, err
+		}
+		rendered, links := renderer.RenderGemini(string(content), textWidth(), leftMargin(), false)
+		page = &structs.Page{
+			Mediatype: structs.TextGemini,
+			URL:       u,
+			Raw:       string(content),
+			Content:   rendered,
+			Links:     links,
+		}
+
 	}
 
 	return page, nil

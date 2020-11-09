@@ -44,10 +44,16 @@ func followLink(t *tab, prev, next string) {
 
 	if t.hasContent() {
 		t.saveScroll() // Likely called later on, it's here just in case
-		nextURL, err := resolveRelLink(t, prev, next)
-		if err != nil {
-			Error("URL Error", err.Error())
-			return
+		var nextURL string
+		if strings.HasPrefix(prev, "file") {
+			nextURL = resolveRelFileLink(t, prev, next)
+		} else {
+			var err error
+			nextURL, err = resolveRelLink(t, prev, next)
+			if err != nil {
+				Error("URL Error", err.Error())
+				return
+			}
 		}
 		go goURL(t, nextURL)
 		return
@@ -181,6 +187,34 @@ func handleHTTP(u string, showInfo bool) bool {
 
 	App.Draw()
 	return true
+}
+
+func handleFile(u string) (*structs.Page, error) {
+
+	page := &structs.Page{}
+
+	file := strings.TrimPrefix(u, "file://")
+
+	if !strings.HasSuffix(u, ".gmi") && !strings.HasSuffix(u, ".gemini") {
+		Error("Unsupported filetype", "Try opening a .gmi or .gemini file.")
+		return page, errors.New("Unsupported filetype")
+	}
+
+	content, err := ioutil.ReadFile(file)
+	if err != nil {
+		Error("Cannot open local file", err.Error())
+		return page, err
+	}
+	rendered, links := renderer.RenderGemini(string(content), textWidth(), leftMargin(), false)
+	page = &structs.Page{
+		Mediatype: structs.TextGemini,
+		URL:       u,
+		Raw:       string(content),
+		Content:   rendered,
+		Links:     links,
+	}
+
+	return page, nil
 }
 
 // handleOther is used by handleURL.
@@ -373,29 +407,13 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 
 	if strings.HasPrefix(u, "file") {
 
-		file := strings.TrimPrefix(u, "file://")
-
-		if !strings.HasSuffix(u, ".gmi") && !strings.HasSuffix(u, ".gemini") {
-			Error("Unsupported filetype", "Try opening a .gmi or .gemini file.")
-			return ret("", false)
-		}
-
-		content, err := ioutil.ReadFile(file)
+		page, err := handleFile(u)
 		if err != nil {
-			Error("Cannot open local file", err.Error())
 			return ret("", false)
+		} else {
+			setPage(t, page)
+			return ret(u, true)
 		}
-		rendered, links := renderer.RenderGemini(string(content), textWidth(), leftMargin(), false)
-		page := &structs.Page{
-			Mediatype: structs.TextGemini,
-			URL:       u,
-			Raw:       string(content),
-			Content:   rendered,
-			Links:     links,
-		}
-
-		setPage(t, page)
-		return ret(u, true)
 	}
 
 	if !strings.HasPrefix(u, "http") && !strings.HasPrefix(u, "gemini") && !strings.HasPrefix(u, "file") {

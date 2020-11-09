@@ -65,6 +65,15 @@ func resolveRelLink(t *tab, prev, next string) (string, error) {
 		return "", errors.New("link URL could not be parsed") //nolint:goerr113
 	}
 	return prevParsed.ResolveReference(nextParsed).String(), nil
+
+}
+
+// TODO: Document
+func resolveRelFileLink(t *tab, prev, next string) string {
+	if !t.hasContent() || strings.Contains(next, "://") {
+		return next
+	}
+	return prev[:strings.LastIndex(prev, "/")] + "/" + next
 }
 
 // normalizeURL attempts to make URLs that are different strings

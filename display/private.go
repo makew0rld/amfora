@@ -190,7 +190,7 @@ func handleHTTP(u string, showInfo bool) bool {
 	return true
 }
 
-func handleFile(u string) (*structs.Page, error) {
+func handleFile(u string) (*structs.Page, bool) {
 
 	page := &structs.Page{}
 
@@ -199,7 +199,7 @@ func handleFile(u string) (*structs.Page, error) {
 	fi, err := os.Stat(file)
 	if err != nil {
 		Error("Cannot open local file", err.Error())
-		return page, err
+		return page, false
 	}
 
 	switch mode := fi.Mode(); {
@@ -209,18 +209,18 @@ func handleFile(u string) (*structs.Page, error) {
 		files, err := ioutil.ReadDir(file)
 		if err != nil {
 			Error("Cannot open local directory", err.Error())
-			return page, err
+			return page, false
 		}
 
 		for _, f := range files {
 			content += fmt.Sprintf("=> %s %s\n", f.Name(), f.Name())
 		}
 
-		rendered, links := renderer.RenderGemini(string(content), textWidth(), leftMargin(), false)
+		rendered, links := renderer.RenderGemini(content, textWidth(), leftMargin(), false)
 		page = &structs.Page{
 			Mediatype: structs.TextGemini,
 			URL:       u,
-			Raw:       string(content),
+			Raw:       content,
 			Content:   rendered,
 			Links:     links,
 		}
@@ -229,13 +229,13 @@ func handleFile(u string) (*structs.Page, error) {
 
 		if !strings.HasSuffix(u, ".gmi") && !strings.HasSuffix(u, ".gemini") {
 			Error("Unsupported filetype", "Try opening a .gmi or .gemini file.")
-			return page, errors.New("Unsupported filetype")
+			return page, false
 		}
 
 		content, err := ioutil.ReadFile(file)
 		if err != nil {
 			Error("Cannot open local file", err.Error())
-			return page, err
+			return page, false
 		}
 		rendered, links := renderer.RenderGemini(string(content), textWidth(), leftMargin(), false)
 		page = &structs.Page{
@@ -245,10 +245,9 @@ func handleFile(u string) (*structs.Page, error) {
 			Content:   rendered,
 			Links:     links,
 		}
-
 	}
 
-	return page, nil
+	return page, true
 }
 
 // handleOther is used by handleURL.
@@ -441,13 +440,13 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 
 	if strings.HasPrefix(u, "file") {
 
-		page, err := handleFile(u)
-		if err != nil {
+		page, ok := handleFile(u)
+		if !ok {
 			return ret("", false)
-		} else {
-			setPage(t, page)
-			return ret(u, true)
 		}
+
+		setPage(t, page)
+		return ret(u, true)
 	}
 
 	if !strings.HasPrefix(u, "http") && !strings.HasPrefix(u, "gemini") && !strings.HasPrefix(u, "file") {

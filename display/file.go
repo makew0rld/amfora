@@ -46,6 +46,10 @@ func handleFile(u string) (*structs.Page, bool) {
 		// Read first bytes, to check if plaintext
 		buf := make([]byte, 32)
 		_, err = file.Read(buf)
+		if err != io.EOF {
+			Error("Error reading file", err.Error())
+			return page, false
+		}
 
 		if !utf8.Valid(buf) {
 			Error("Cannot open local file", "Looks like a binary.")

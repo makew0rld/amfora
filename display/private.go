@@ -84,7 +84,9 @@ func reformatPage(p *structs.Page) {
 	case structs.TextGemini:
 		// Links are not recorded because they won't change
 		proxied := true
-		if strings.HasPrefix(p.URL, "gemini") || strings.HasPrefix(p.URL, "about") {
+		if strings.HasPrefix(p.URL, "gemini") ||
+			strings.HasPrefix(p.URL, "about") ||
+			strings.HasPrefix(p.URL, "file") {
 			proxied = false
 		}
 		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin(), proxied)

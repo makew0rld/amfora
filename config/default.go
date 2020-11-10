@@ -153,6 +153,10 @@ max_pages = 30 # The maximum number of pages the cache will store
 # EXAMPLES:
 # hdg_1 = "green"
 # hdg_2 = "#5f0000"
+# bg = "defaultbg"
+
+# A special value for bg is avaliable: "defaultbg"
+# This is for keeping your default terminal background or transparency.
 
 # Available keys to set:
 

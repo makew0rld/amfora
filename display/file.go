@@ -101,14 +101,14 @@ func createDirectoryListing(u string) (*structs.Page, bool) {
 		Error("Cannot open local directory", err.Error())
 		return page, false
 	}
-	content := "Index of " + filename + "/\n"
-	content += "=> .. ../\n"
+	content := "Index of " + filename + "\n"
+	content += "=> ../ ../\n"
 	for _, f := range files {
 		separator := ""
 		if f.IsDir() {
 			separator = "/"
 		}
-		content += fmt.Sprintf("=> %s %s%s\n", f.Name(), f.Name(), separator)
+		content += fmt.Sprintf("=> %s%s %s%s\n", f.Name(), separator, f.Name(), separator)
 	}
 
 	rendered, links := renderer.RenderGemini(content, textWidth(), leftMargin(), false)

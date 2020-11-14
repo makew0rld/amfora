@@ -22,7 +22,7 @@ func handleFile(u string) (*structs.Page, bool) {
 
 	fi, err := os.Stat(filename)
 	if err != nil {
-		Error("Cannot open local file", err.Error())
+		Error("File Error", "Cannot open local file: "+err.Error())
 		return page, false
 	}
 
@@ -31,13 +31,13 @@ func handleFile(u string) (*structs.Page, bool) {
 		return createDirectoryListing(u)
 	case mode.IsRegular():
 		if fi.Size() > viper.GetInt64("a-general.page_max_size") {
-			Error("Cannot open local file", "Too large.")
+			Error("File Error", "Cannot open local file, exceeds page max size")
 			return page, false
 		}
 
 		file, err := os.Open(filename)
 		if err != nil {
-			Error("Cannot open local file", err.Error())
+			Error("File Error", "Cannot open local file: "+err.Error())
 			return page, false
 		}
 		defer file.Close()
@@ -46,12 +46,12 @@ func handleFile(u string) (*structs.Page, bool) {
 		buf := make([]byte, 32)
 		_, err = file.Read(buf)
 		if err != nil && err != io.EOF {
-			Error("Error reading file", err.Error())
+			Error("File Error", "Error reading file: "+err.Error())
 			return page, false
 		}
 
 		if !utf8.Valid(buf) {
-			Error("Cannot open local file", "Looks like a binary.")
+			Error("File Error", "Cannot open local file, looks like a binary.")
 			return page, false
 		}
 
@@ -61,7 +61,7 @@ func handleFile(u string) (*structs.Page, bool) {
 			_, err := file.Read(buf)
 			if err != nil {
 				if err != io.EOF {
-					Error("Error reading file", err.Error())
+					Error("File Error", "Cannot open local file: "+err.Error())
 					return page, false
 				}
 				break
@@ -97,7 +97,7 @@ func createDirectoryListing(u string) (*structs.Page, bool) {
 	filename := filepath.FromSlash(strings.TrimPrefix(u, "file://"))
 	files, err := ioutil.ReadDir(filename)
 	if err != nil {
-		Error("Cannot open local directory", err.Error())
+		Error("Directory error", "Cannot open local directory: "+err.Error())
 		return page, false
 	}
 	content := "Index of " + filename + "\n"

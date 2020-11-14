@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"unicode/utf8"
+	"path/filepath"
 
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
@@ -18,7 +19,7 @@ const maxSize = 1 * 1024 * 1024 // 1 Mb
 func handleFile(u string) (*structs.Page, bool) {
 	page := &structs.Page{}
 
-	filename := strings.TrimPrefix(u, "file://")
+	filename := filepath.FromSlash(strings.TrimPrefix(u, "file://"))
 
 	fi, err := os.Stat(filename)
 	if err != nil {
@@ -95,7 +96,7 @@ func handleFile(u string) (*structs.Page, bool) {
 // that lists all the files as links.
 func createDirectoryListing(u string) (*structs.Page, bool) {
 	page := &structs.Page{}
-	filename := strings.TrimPrefix(u, "file://")
+	filename := filepath.FromSlash(strings.TrimPrefix(u, "file://"))
 	files, err := ioutil.ReadDir(filename)
 	if err != nil {
 		Error("Cannot open local directory", err.Error())

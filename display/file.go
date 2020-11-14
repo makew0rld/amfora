@@ -11,9 +11,8 @@ import (
 
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
+	"github.com/spf13/viper"
 )
-
-const maxSize = 1 * 1024 * 1024 // 1 Mb
 
 // handleFile handles urls using file:// protocol
 func handleFile(u string) (*structs.Page, bool) {
@@ -31,7 +30,7 @@ func handleFile(u string) (*structs.Page, bool) {
 	case mode.IsDir():
 		return createDirectoryListing(u)
 	case mode.IsRegular():
-		if fi.Size() > maxSize {
+		if fi.Size() > viper.GetInt64("a-general.page_max_size") {
 			Error("Cannot open local file", "Too large.")
 			return page, false
 		}

@@ -44,15 +44,11 @@ func followLink(t *tab, prev, next string) {
 	if t.hasContent() {
 		t.saveScroll() // Likely called later on, it's here just in case
 		var nextURL string
-		if strings.HasPrefix(prev, "file") {
-			nextURL = resolveRelFileLink(t, prev, next)
-		} else {
-			var err error
-			nextURL, err = resolveRelLink(t, prev, next)
-			if err != nil {
-				Error("URL Error", err.Error())
-				return
-			}
+		var err error
+		nextURL, err = resolveRelLink(t, prev, next)
+		if err != nil {
+			Error("URL Error", err.Error())
+			return
 		}
 		go goURL(t, nextURL)
 		return

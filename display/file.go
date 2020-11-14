@@ -120,12 +120,3 @@ func createDirectoryListing(u string) (*structs.Page, bool) {
 	}
 	return page, true
 }
-
-// resolveRelFileLink constructs a relative file:// link by matching it against
-// previous url
-func resolveRelFileLink(t *tab, prev, next string) string {
-	if !t.hasContent() || strings.Contains(next, "://") {
-		return next
-	}
-	return prev[:strings.LastIndex(prev, "/")] + "/" + next
-}

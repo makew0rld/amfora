@@ -76,6 +76,7 @@ func handleFile(u string) (*structs.Page, bool) {
 				Raw:       content,
 				Content:   rendered,
 				Links:     links,
+				Width:     termW,
 			}
 		} else {
 			page = &structs.Page{
@@ -84,6 +85,7 @@ func handleFile(u string) (*structs.Page, bool) {
 				Raw:       content,
 				Content:   renderer.RenderPlainText(content, leftMargin()),
 				Links:     []string{},
+				Width:     termW,
 			}
 		}
 	}
@@ -117,6 +119,7 @@ func createDirectoryListing(u string) (*structs.Page, bool) {
 		Raw:       content,
 		Content:   rendered,
 		Links:     links,
+		Width:     termW,
 	}
 	return page, true
 }

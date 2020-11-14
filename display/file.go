@@ -31,7 +31,6 @@ func handleFile(u string) (*structs.Page, bool) {
 	case mode.IsDir():
 		return createDirectoryListing(u)
 	case mode.IsRegular():
-
 		if fi.Size() > maxSize {
 			Error("Cannot open local file", "Too large.")
 			return page, false
@@ -114,7 +113,6 @@ func createDirectoryListing(u string) (*structs.Page, bool) {
 
 	rendered, links := renderer.RenderGemini(content, textWidth(), leftMargin(), false)
 	page = &structs.Page{
-
 		Mediatype: structs.TextGemini,
 		URL:       u,
 		Raw:       content,

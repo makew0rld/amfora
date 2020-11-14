@@ -65,7 +65,6 @@ func resolveRelLink(t *tab, prev, next string) (string, error) {
 		return "", errors.New("link URL could not be parsed") //nolint:goerr113
 	}
 	return prevParsed.ResolveReference(nextParsed).String(), nil
-
 }
 
 // normalizeURL attempts to make URLs that are different strings

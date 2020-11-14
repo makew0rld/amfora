@@ -379,12 +379,10 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	}
 
 	if strings.HasPrefix(u, "file") {
-
 		page, ok := handleFile(u)
 		if !ok {
 			return ret("", false)
 		}
-
 		setPage(t, page)
 		return ret(u, true)
 	}

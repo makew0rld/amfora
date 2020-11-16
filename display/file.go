@@ -16,7 +16,7 @@ import (
 func pathFromURI(u string) string {
 	path := strings.TrimPrefix(u, "file://")
 	path = strings.TrimPrefix(path, "localhost") // localhost is a valid host for file URIs
-	path = strings.TrimPrefix(path, "/") // Valid file URIs contains this additional slash
+	path = strings.TrimPrefix(path, "/")         // Valid file URIs contains this additional slash
 	return filepath.FromSlash(path)
 }
 

@@ -2,12 +2,11 @@ package display
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
+	"mime"
 	"os"
 	"path/filepath"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
@@ -35,45 +34,29 @@ func handleFile(u string) (*structs.Page, bool) {
 			return page, false
 		}
 
-		file, err := os.Open(filename)
+		mimetype := mime.TypeByExtension(filepath.Ext(filename))
+		if strings.HasSuffix(u, ".gmi") || strings.HasSuffix(u, ".gemini") {
+			mimetype = "text/gemini"
+		}
+
+		if !strings.HasPrefix(mimetype, "text/") {
+			Error("File Error", "Cannot open file, unknown mimetype.")
+			return page, false
+		}
+
+		content, err := ioutil.ReadFile(filename)
+
 		if err != nil {
 			Error("File Error", "Cannot open local file: "+err.Error())
 			return page, false
 		}
-		defer file.Close()
 
-		// Read first bytes, to check if plaintext
-		buf := make([]byte, 32)
-		_, err = file.Read(buf)
-		if err != nil && err != io.EOF {
-			Error("File Error", "Error reading file: "+err.Error())
-			return page, false
-		}
-
-		if !utf8.Valid(buf) {
-			Error("File Error", "Cannot open local file, looks like a binary.")
-			return page, false
-		}
-
-		// Looks like plaintext, keep reading
-		content := string(buf)
-		for {
-			_, err := file.Read(buf)
-			if err != nil {
-				if err != io.EOF {
-					Error("File Error", "Cannot open local file: "+err.Error())
-					return page, false
-				}
-				break
-			}
-			content += string(buf)
-		}
-		if strings.HasSuffix(u, ".gmi") || strings.HasSuffix(u, ".gemini") {
-			rendered, links := renderer.RenderGemini(content, textWidth(), leftMargin(), false)
+		if mimetype == "text/gemini" {
+			rendered, links := renderer.RenderGemini(string(content), textWidth(), leftMargin(), false)
 			page = &structs.Page{
 				Mediatype: structs.TextGemini,
 				URL:       u,
-				Raw:       content,
+				Raw:       string(content),
 				Content:   rendered,
 				Links:     links,
 				Width:     termW,
@@ -82,8 +65,8 @@ func handleFile(u string) (*structs.Page, bool) {
 			page = &structs.Page{
 				Mediatype: structs.TextPlain,
 				URL:       u,
-				Raw:       content,
-				Content:   renderer.RenderPlainText(content, leftMargin()),
+				Raw:       string(content),
+				Content:   renderer.RenderPlainText(string(content), leftMargin()),
 				Links:     []string{},
 				Width:     termW,
 			}

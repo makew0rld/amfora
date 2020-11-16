@@ -13,13 +13,18 @@ import (
 	"github.com/spf13/viper"
 )
 
+func pathFromURI(u string) string {
+	path := strings.TrimPrefix(u, "file://")
+	path = strings.TrimPrefix(path, "localhost") // localhost is a valid host for file URIs
+	path = strings.TrimPrefix(path, "/") // Valid file URIs contains this additional slash
+	return filepath.FromSlash(path)
+}
+
 // handleFile handles urls using file:// protocol
 func handleFile(u string) (*structs.Page, bool) {
 	page := &structs.Page{}
-
-	filename := filepath.FromSlash(strings.TrimPrefix(u, "file://"))
-
-	fi, err := os.Stat(filename)
+	path := pathFromURI(u)
+	fi, err := os.Stat(path)
 	if err != nil {
 		Error("File Error", "Cannot open local file: "+err.Error())
 		return page, false
@@ -34,7 +39,7 @@ func handleFile(u string) (*structs.Page, bool) {
 			return page, false
 		}
 
-		mimetype := mime.TypeByExtension(filepath.Ext(filename))
+		mimetype := mime.TypeByExtension(filepath.Ext(path))
 		if strings.HasSuffix(u, ".gmi") || strings.HasSuffix(u, ".gemini") {
 			mimetype = "text/gemini"
 		}
@@ -44,7 +49,7 @@ func handleFile(u string) (*structs.Page, bool) {
 			return page, false
 		}
 
-		content, err := ioutil.ReadFile(filename)
+		content, err := ioutil.ReadFile(path)
 
 		if err != nil {
 			Error("File Error", "Cannot open local file: "+err.Error())
@@ -79,13 +84,13 @@ func handleFile(u string) (*structs.Page, bool) {
 // that lists all the files as links.
 func createDirectoryListing(u string) (*structs.Page, bool) {
 	page := &structs.Page{}
-	filename := filepath.FromSlash(strings.TrimPrefix(u, "file://"))
-	files, err := ioutil.ReadDir(filename)
+	path := pathFromURI(u)
+	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		Error("Directory error", "Cannot open local directory: "+err.Error())
 		return page, false
 	}
-	content := "Index of " + filename + "\n"
+	content := "Index of " + path + "\n"
 	content += "=> ../ ../\n"
 	for _, f := range files {
 		separator := ""

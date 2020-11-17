@@ -21,10 +21,20 @@ home = "gemini://gemini.circumlunar.space"
 # If set to false, a prompt will be shown before following redirects.
 auto_redirect = false
 
-# What command to run to open a HTTP(S) URL. Set to "default" to try to guess the browser,
-# or set to "off" to not open HTTP(S) URLs.
+# What command to run to open a HTTP(S) URL.
+# Set to "default" to try to guess the browser, or set to "off" to not open HTTP(S) URLs.
 # If a command is set, than the URL will be added (in quotes) to the end of the command.
-# A space will be prepended if necessary.
+# A space will be prepended to the URL.
+#
+# The best to define a command is using a string array.
+# Examples:
+# http = ["firefox"]
+# http = ["custom-browser", "--flag", "--option=2"]
+# http = ["/path/with spaces/in it/firefox"]
+#
+# Using just a string will also work, but it is deprecated,
+# and will degrade if you use paths with spaces.
+
 http = "default"
 
 # Any URL that will accept a query string can be put here
@@ -33,7 +43,7 @@ search = "gemini://gus.guru/search"
 # Whether colors will be used in the terminal
 color = true
 
-# Whether ANSI codes from the page content should be rendered
+# Whether ANSI color codes from the page content should be rendered
 ansi = true
 
 # Whether to replace list asterisks with unicode bullets
@@ -57,6 +67,20 @@ page_max_time = 10
 
 # Whether to replace tab numbers with emoji favicons, which are cached.
 emoji_favicons = false
+
+
+[auth]
+# Authentication settings
+
+[auth.certs]
+# Client certificates
+# Set domain name equal to path to client cert
+# "example.com" = "mycert.crt"
+
+[auth.keys]
+# Client certificate keys
+# Set domain name equal to path to key for the client cert above
+# "example.com" = "mycert.key"
 
 
 [keybindings]

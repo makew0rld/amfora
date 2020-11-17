@@ -5,7 +5,7 @@
 <h6>Image modified from: amphora by Alvaro Cabrera from the Noun Project</h6>
 </center>
 
-[![travis build status](https://img.shields.io/travis/com/makeworld-the-better-one/amfora)](https://https://travis-ci.com/github/makeworld-the-better-one/amfora)
+[![travis build status](https://img.shields.io/travis/com/makeworld-the-better-one/amfora/master?label=master)](https://travis-ci.com/github/makeworld-the-better-one/amfora)
 [![go reportcard](https://goreportcard.com/badge/github.com/makeworld-the-better-one/amfora)](https://goreportcard.com/report/github.com/makeworld-the-better-one/amfora)
 [![license GPLv3](https://img.shields.io/github/license/makeworld-the-better-one/amfora)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
@@ -42,10 +42,10 @@ Make sure to click "Watch" > "Releases only" in the top right to get notified ab
 
 ### Arch Linux
 
-Arch Linux users can install Amfora from AUR. It has the package name `amfora`, and is maintained by @pboyd.
+Arch Linux users can install Amfora using pacman.
 
 ```
-yay -S amfora
+sudo pacman -S amfora
 ```
 
 ### Homebrew
@@ -121,14 +121,14 @@ Features in *italics* are in the master branch, but not in the latest release.
   - Disabled by default, enable in config
 - [x] Proxying
   - Schemes like Gopher or HTTP can be proxied through a Gemini server
+- [x] Client certificate support
+  - [ ] Full client certificate UX within the client
+    - Create transient and permanent certs within the client, per domain
+    - Manage and browse them
+    - Similar to [Kristall](https://github.com/MasterQ32/kristall)
+    - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
 - [x] *Subscribe to RSS and Atom feeds and display them*
   - Subscribing to page changes, similar to how Spacewalk works, will also be supported
-- [ ] Stream support
-- [ ] Full client certificate UX within the client
-  - Create transient and permanent certs within the client, per domain
-  - Manage and browse them
-  - Similar to [Kristall](https://github.com/MasterQ32/kristall)
-  - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
 - [ ] Stream support
 - [ ] Table of contents for pages
 - [ ] History browser
@@ -138,10 +138,19 @@ The config file is written in the intuitive [TOML](https://github.com/toml-lang/
 
 On Windows, the file is in `%APPDATA%\amfora\config.toml`, which usually expands to `C:\Users\<username>\AppData\Roaming\amfora\config.toml`.
 
+## Client Certificates
+
+Amfora has early support for client certs. Eventually Amfora will be able to generate them itself, but for you can do it by using OpenSSL:
+
+```shell
+openssl req -new -subj "/CN=username" -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -days 1825 -nodes -out cert.pem -keyout key.pem
+```
+
+This will create a certificate and key file, that can be renamed and moved as you like. See the configuration section above for how to edit your config file to tell Amfora about them.
+
 ## Known Bugs
 
 - Pasting on Windows is truncated, the full paste content won't be added. ([#43](https://github.com/makeworld-the-better-one/amfora/issues/43))
-- ANSI codes aren't displaying properly ([#59](https://github.com/makeworld-the-better-one/amfora/issues/59))
 
 You can also check out [all the issues with the bug label](https://github.com/makeworld-the-better-one/amfora/issues?q=is%3Aopen+is%3Aissue+label%3Abug).
 

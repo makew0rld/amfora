@@ -88,7 +88,7 @@ func openBkmkModal(name string, exists bool, favicon string) (string, int) {
 	if favicon != "" && !exists {
 		name = favicon + " " + name
 	}
-	bkmkModalText = ""
+	bkmkModalText = name
 	bkmkModal.GetForm().AddInputField("Name: ", name, 0, nil,
 		func(text string) {
 			// Store for use later

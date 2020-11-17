@@ -1,6 +1,7 @@
 // Package config initializes all files required for Amfora, even those used by
 // other packages. It also reads in the config file and initializes a Viper and
 // the theme
+//nolint:golint,goerr113
 package config
 
 import (
@@ -40,12 +41,13 @@ var bkmkPath string
 var DownloadsDir string
 
 // Feeds
-
 var FeedJSON io.ReadCloser
 var feedDir string
 var FeedPath string
 
-//nolint:golint,goerr113
+// Command for opening HTTP(S) URLs in the browser, from "a-general.http" in config.
+var HTTPCommand []string
+
 func Init() error {
 
 	// *** Set paths ***
@@ -69,12 +71,7 @@ func Init() error {
 		configDir = amforaAppData
 	} else {
 		// Unix / POSIX system
-		if basedir.ConfigHome == "" {
-			// Default to ~/.config/amfora
-			configDir = filepath.Join(home, ".config", "amfora")
-		} else {
-			configDir = filepath.Join(basedir.ConfigHome, "amfora")
-		}
+		configDir = filepath.Join(basedir.ConfigHome, "amfora")
 	}
 	configPath = filepath.Join(configDir, "config.toml")
 
@@ -91,12 +88,7 @@ func Init() error {
 		tofuDBDir = amforaAppData
 	} else {
 		// XDG cache dir on POSIX systems
-		if basedir.CacheHome == "" {
-			// Default to ~/.cache/amfora
-			tofuDBDir = filepath.Join(home, ".cache", "amfora")
-		} else {
-			tofuDBDir = filepath.Join(basedir.CacheHome, "amfora")
-		}
+		tofuDBDir = filepath.Join(basedir.CacheHome, "amfora")
 	}
 	tofuDBPath = filepath.Join(tofuDBDir, "tofu.toml")
 
@@ -106,12 +98,7 @@ func Init() error {
 		bkmkDir = amforaAppData
 	} else {
 		// XDG data dir on POSIX systems
-		if basedir.DataHome == "" {
-			// Default to ~/.local/share/amfora
-			bkmkDir = filepath.Join(home, ".local", "share", "amfora")
-		} else {
-			bkmkDir = filepath.Join(basedir.DataHome, "amfora")
-		}
+		bkmkDir = filepath.Join(basedir.DataHome, "amfora")
 	}
 	bkmkPath = filepath.Join(bkmkDir, "bookmarks.toml")
 
@@ -281,6 +268,15 @@ func Init() error {
 	if viper.GetBool("a-general.color") {
 		cview.Styles.PrimitiveBackgroundColor = GetColor("bg")
 	} // Otherwise it's black by default
+
+	// Parse HTTP command
+	HTTPCommand = viper.GetStringSlice("a-general.http")
+	if len(HTTPCommand) == 0 {
+		// Not a string array, interpret as a string instead
+		// Split on spaces to maintain compatibility with old versions
+		// The new better way to is to just define a string array in config
+		HTTPCommand = strings.Fields(viper.GetString("a-general.http"))
+	}
 
 	return nil
 }

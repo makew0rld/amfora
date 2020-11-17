@@ -20,7 +20,6 @@ import (
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/makeworld-the-better-one/go-isemoji"
 	"github.com/spf13/viper"
-	"gitlab.com/tslocum/cview"
 )
 
 // This file contains the functions that aren't part of the public API.
@@ -145,26 +144,42 @@ func setPage(t *tab, p *structs.Page) {
 
 // handleHTTP is used by handleURL.
 // It opens HTTP links and displays Info and Error modals.
-func handleHTTP(u string, showInfo bool) {
-	switch strings.TrimSpace(viper.GetString("a-general.http")) {
-	case "", "off":
-		Error("HTTP Error", "Opening HTTP URLs is turned off.")
-	case "default":
-		s, err := webbrowser.Open(u)
-		if err != nil {
-			Error("Webbrowser Error", err.Error())
-		} else if showInfo {
-			Info(s)
-		}
-	default:
-		// The config has a custom command to execute for HTTP URLs
-		fields := strings.Fields(viper.GetString("a-general.http"))
-		err := exec.Command(fields[0], append(fields[1:], u)...).Start()
-		if err != nil {
-			Error("HTTP Error", "Error executing custom browser command: "+err.Error())
+// Returns false if there was an error.
+func handleHTTP(u string, showInfo bool) bool {
+	if len(config.HTTPCommand) == 1 {
+		// Possibly a non-command
+
+		switch strings.TrimSpace(config.HTTPCommand[0]) {
+		case "", "off":
+			Error("HTTP Error", "Opening HTTP URLs is turned off.")
+			return false
+		case "default":
+			s, err := webbrowser.Open(u)
+			if err != nil {
+				Error("Webbrowser Error", err.Error())
+				return false
+			}
+			if showInfo {
+				Info(s)
+			}
+			return true
 		}
 	}
+
+	// Custom command
+	var err error = nil
+	if len(config.HTTPCommand) > 1 {
+		err = exec.Command(config.HTTPCommand[0], append(config.HTTPCommand[1:], u)...).Start()
+	} else {
+		err = exec.Command(config.HTTPCommand[0], u).Start()
+	}
+	if err != nil {
+		Error("HTTP Error", "Error executing custom browser command: "+err.Error())
+		return false
+	}
+
 	App.Draw()
+	return true
 }
 
 // handleOther is used by handleURL.
@@ -367,11 +382,14 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 
 	// Gemini URL, or one with a Gemini proxy available
 
-	// Load page from cache if possible
-	page, ok := cache.GetPage(u)
-	if ok {
-		setPage(t, page)
-		return ret(u, true)
+	// Load page from cache if it exists,
+	// and this isn't a page that was redirected to by the server (indicates dynamic content)
+	if numRedirects == 0 {
+		page, ok := cache.GetPage(u)
+		if ok {
+			setPage(t, page)
+			return ret(u, true)
+		}
 	}
 	// Otherwise download it
 	bottomBar.SetText("Loading...")
@@ -449,7 +467,12 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		}
 
 		page.Width = termW
-		go cache.AddPage(page)
+
+		if !client.HasClientCert(parsed.Host) {
+			// Don't cache pages with client certs
+			go cache.AddPage(page)
+		}
+
 		setPage(t, page)
 		return ret(u, true)
 	}
@@ -457,8 +480,8 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	// Could be a non 20 (or 21) status code, or a different kind of document
 
 	// Handle each status code
-	switch gemini.SimplifyStatus(res.Status) {
-	case 10:
+	switch res.Status {
+	case 10, 11:
 		userInput, ok := Input(res.Meta)
 		if ok {
 			// Make another request with the query string added
@@ -471,7 +494,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			return ret(handleURL(t, parsed.String(), 0))
 		}
 		return ret("", false)
-	case 30:
+	case 30, 31:
 		parsedMeta, err := url.Parse(res.Meta)
 		if err != nil {
 			Error("Redirect Error", "Invalid URL: "+err.Error())
@@ -497,15 +520,46 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		}
 		return ret("", false)
 	case 40:
-		Error("Temporary Failure", cview.Escape(res.Meta))
+		Error("Temporary Failure", escapeMeta(res.Meta))
+		return ret("", false)
+	case 41:
+		Error("Server Unavailable", escapeMeta(res.Meta))
+		return ret("", false)
+	case 42:
+		Error("CGI Error", escapeMeta(res.Meta))
+		return ret("", false)
+	case 43:
+		Error("Proxy Failure", escapeMeta(res.Meta))
+		return ret("", false)
+	case 44:
+		Error("Slow Down", "You should wait "+escapeMeta(res.Meta)+" seconds before making another request.")
 		return ret("", false)
 	case 50:
-		Error("Permanent Failure", cview.Escape(res.Meta))
+		Error("Permanent Failure", escapeMeta(res.Meta))
+		return ret("", false)
+	case 51:
+		Error("Not Found", escapeMeta(res.Meta))
+		return ret("", false)
+	case 52:
+		Error("Gone", escapeMeta(res.Meta))
+		return ret("", false)
+	case 53:
+		Error("Proxy Request Refused", escapeMeta(res.Meta))
+		return ret("", false)
+	case 59:
+		Error("Bad Request", escapeMeta(res.Meta))
 		return ret("", false)
 	case 60:
-		Info("The server requested a certificate. Cert handling is coming to Amfora soon!")
+		Error("Client Certificate Required", escapeMeta(res.Meta))
+		return ret("", false)
+	case 61:
+		Error("Certificate Not Authorised", escapeMeta(res.Meta))
+		return ret("", false)
+	case 62:
+		Error("Certificate Not Valid", escapeMeta(res.Meta))
 		return ret("", false)
 	}
+
 	// Status code 20, but not a document that can be displayed
 	go dlChoice("That file could not be displayed. What would you like to do?", u, res)
 	return ret("", false)

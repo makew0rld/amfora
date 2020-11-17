@@ -5,23 +5,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.9.1 to support CN-only wildcard certs
+- Preformatted text is now grey by default
+
+
+## [1.6.0] - 2020-11-04
 ### Added
+- **Support client certificates** through config (#112)
 - `ansi` config setting, to disable ANSI colors in pages (#79, #86)
 - Edit current URL with <kbd>e</kbd> (#87)
 - If `emoji_favicons` is enabled, new bookmarks will have the domain's favicon prepended (#69, #90)
 - The `BROWSER` env var is now also checked when opening web links on Unix (#93)
+- More accurate error messages based on server response code
 
 ### Changed
 - Disabling the `color` config setting also disables ANSI colors in pages (#79, #86)
 - Updated [go-isemoji](https://github.com/makeworld-the-better-one/go-isemoji) to v1.1.0 to support Emoji 13.1 for favicons
 - The web browser code doesn't check for Xorg anymore, just display variables (#93)
 - Bookmarks can be made to non-gemini URLs (#94)
+- Remove pointless directory fallbacks (#101)
+- Don't load page from cache when redirected to it (#114)
 
 ### Fixed
 - XDG user dir file is parsed instead of looking for XDG env vars (#97, #100)
+- Support paths with spaces in HTTP browser config setting (#77)
+- Clicking "Change" on an existing bookmark without changing the text no longer removes it (#91)
+- Display HTTP Error if "Open In Portal" fails (#81)
+- Support ANSI color codes again, but only in preformatted blocks (#59)
+- Make the `..` command work lke it used to in v1.4.0
 
 
-## [v1.5.0] - 2020-09-01
+## [1.5.0] - 2020-09-01
 ### Added
 - **Proxy support** - see the `[proxies]` section in the config (#66, #80)
 - **Emoji favicons** can now be seen if `emoji_favicons` is enabled in the config (#62)

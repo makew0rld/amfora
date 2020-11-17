@@ -58,7 +58,7 @@ var theme = map[string]tcell.Color{
 	"link_number":       tcell.ColorSilver,
 	"regular_text":      tcell.ColorWhite,
 	"quote_text":        tcell.ColorWhite,
-	"preformatted_text": tcell.ColorWhite,
+	"preformatted_text": tcell.ColorGrey,
 	"list_text":         tcell.ColorWhite,
 }
 

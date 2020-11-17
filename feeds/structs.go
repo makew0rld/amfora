@@ -8,7 +8,8 @@ import (
 )
 
 /*
-Example JSON.
+Example JSON
+
 {
 	"feeds": {
 		"url1": <gofeed.Feed>,

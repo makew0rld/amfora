@@ -81,8 +81,8 @@ func GetFeed(mediatype, filename string, r io.Reader) (*gofeed.Feed, bool) {
 	}
 
 	// Check mediatype and filename
-	if mediatype != "application/atom+xml" && mediatype != "application/rss+xml" &&
-		filename != "atom.xml" && filename != "feed.xml" &&
+	if mediatype != "application/atom+xml" && mediatype != "application/rss+xml" && mediatype != "application/json+feed" &&
+		filename != "atom.xml" && filename != "feed.xml" && filename != "feed.json" &&
 		!strings.HasSuffix(filename, ".atom") && !strings.HasSuffix(filename, ".rss") {
 		// No part of the above is true
 		return nil, false
@@ -221,7 +221,8 @@ func updatePage(url string) error {
 	return AddPage(url, res.Body)
 }
 
-// updateAll updates all feeds and pages.
+// updateAll updates all feeds and pages using workers.
+// It only returns once all the workers are done.
 func updateAll() {
 	// TODO: Is two goroutines the right amount?
 

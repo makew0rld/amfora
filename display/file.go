@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func pathFromURI(u string) string {
+func pathFromFileURI(u string) string {
 	path := strings.TrimPrefix(u, "file://")
 	path = strings.TrimPrefix(path, "localhost") // localhost is a valid host for file URIs
 	path = strings.TrimPrefix(path, "/")         // Valid file URIs contains this additional slash
@@ -23,7 +23,7 @@ func pathFromURI(u string) string {
 // handleFile handles urls using file:// protocol
 func handleFile(u string) (*structs.Page, bool) {
 	page := &structs.Page{}
-	path := pathFromURI(u)
+	path := pathFromFileURI(u)
 	fi, err := os.Stat(path)
 	if err != nil {
 		Error("File Error", "Cannot open local file: "+err.Error())
@@ -84,7 +84,7 @@ func handleFile(u string) (*structs.Page, bool) {
 // that lists all the files as links.
 func createDirectoryListing(u string) (*structs.Page, bool) {
 	page := &structs.Page{}
-	path := pathFromURI(u)
+	path := pathFromFileURI(u)
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		Error("Directory error", "Cannot open local directory: "+err.Error())

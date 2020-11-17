@@ -45,7 +45,7 @@ func handleFile(u string) (*structs.Page, bool) {
 		}
 
 		if !strings.HasPrefix(mimetype, "text/") {
-			Error("File Error", "Cannot open file, unknown mimetype.")
+			Error("File Error", "Cannot open file, not recognized as text.")
 			return page, false
 		}
 

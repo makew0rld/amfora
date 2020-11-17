@@ -43,9 +43,7 @@ func followLink(t *tab, prev, next string) {
 
 	if t.hasContent() {
 		t.saveScroll() // Likely called later on, it's here just in case
-		var nextURL string
-		var err error
-		nextURL, err = resolveRelLink(t, prev, next)
+		nextURL, err := resolveRelLink(t, prev, next)
 		if err != nil {
 			Error("URL Error", err.Error())
 			return

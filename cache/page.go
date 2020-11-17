@@ -3,7 +3,6 @@
 package cache
 
 import (
-	"strings"
 	"sync"
 
 	"github.com/makeworld-the-better-one/amfora/structs"
@@ -47,7 +46,7 @@ func removeURL(url string) {
 // If your page is larger than the max cache size, the provided page
 // will silently not be added to the cache.
 func AddPage(p *structs.Page) {
-	if p.URL == "" || strings.HasPrefix(p.URL, "about:") {
+	if p.URL == "" {
 		// Just in case, these pages shouldn't be cached
 		return
 	}

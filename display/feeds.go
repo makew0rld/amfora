@@ -25,7 +25,7 @@ func toLocalDay(t time.Time) time.Time {
 
 // Feeds displays the feeds page on the current tab.
 func Feeds(t *tab) {
-	// Retrieve cached version if there hasn't been updates
+	// Retrieve cached version if there hasn't been any updates
 	p, ok := cache.GetPage("about:feeds")
 	if feedPageUpdated.After(feeds.LastUpdated) && ok {
 		setPage(t, p)
@@ -35,10 +35,14 @@ func Feeds(t *tab) {
 
 	// curDay represents what day of posts the loop is on.
 	// It only goes backwards in time.
-	// It's initial setting means:
-	// Only display posts older than 6 hours in the future,
-	// nothing further in the future.
-	curDay := toLocalDay(time.Now()).Add(6 * time.Hour)
+	// Its initial setting means:
+	// Only display posts older than 26 hours in the future, nothing further in the future.
+	//
+	// 26 hours was chosen because it is the largest timezone difference
+	// currently in the world. Posts may be dated in the future
+	// due to software bugs, where the local user's date is used, but
+	// the UTC timezone is specified. I believe gemfeed does this.
+	curDay := toLocalDay(time.Now()).Add(26 * time.Hour)
 
 	pe := feeds.GetPageEntries()
 

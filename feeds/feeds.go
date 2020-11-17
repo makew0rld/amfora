@@ -329,6 +329,5 @@ func GetPageEntries() *PageEntries {
 	data.RUnlock()
 
 	sort.Sort(&pe)
-
 	return &pe
 }

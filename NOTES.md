@@ -1,5 +1,13 @@
 # Notes
 
+## Temp
+- Recalculating `about:feeds` adds pages multiple times to the view
+- Only options for feed files is the download modal - there should be a feed modal before that one
+- Auto feed detection fails on `ebc.li/atom.xml`
+
+- TODO: remove all logger lines
+  
+
 ## Issues
 - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
 

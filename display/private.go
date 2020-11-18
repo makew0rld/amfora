@@ -14,6 +14,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
+	"github.com/makeworld-the-better-one/amfora/feeds"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/webbrowser"
@@ -34,6 +35,11 @@ func followLink(t *tab, prev, next string) {
 	if next == "about:bookmarks" {
 		Bookmarks(t)
 		t.addToHistory("about:bookmarks")
+		return
+	}
+	if next == "about:feeds" {
+		Feeds(t)
+		t.addToHistory("about:feeds")
 		return
 	}
 	if strings.HasPrefix(next, "about:") {
@@ -328,6 +334,20 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			t.barText = oldText
 		}
 		t.mode = tabModeDone
+
+		go func(p *structs.Page) {
+			if b && t.hasContent() && !feeds.IsTracked(s) && viper.GetBool("a-general.feed_popup") {
+				// The current page might be an untracked feed, and the user wants
+				// to be notified in such cases.
+
+				feed, isFeed := getFeedFromPage(p)
+				if isFeed && isValidTab(t) && t.page == p {
+					// After parsing and track-checking time, the page is still being displayed
+					addFeedDirect(p.URL, feed, false)
+				}
+			}
+		}(t.page)
+
 		return s, b
 	}
 
@@ -340,6 +360,10 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	if u == "about:bookmarks" {
 		Bookmarks(t)
 		return ret("about:bookmarks", true)
+	}
+	if u == "about:feeds" {
+		Feeds(t)
+		return ret("about:feeds", true)
 	}
 
 	u = normalizeURL(u)

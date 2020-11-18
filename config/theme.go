@@ -38,6 +38,8 @@ var theme = map[string]tcell.Color{
 	"yesno_modal_text":     tcell.ColorWhite,
 	"tofu_modal_bg":        tcell.ColorMaroon,
 	"tofu_modal_text":      tcell.ColorWhite,
+	"feed_modal_bg":        tcell.Color61, // xterm:SlateBlue3, #5f5faf
+	"feed_modal_text":      tcell.ColorWhite,
 
 	"input_modal_bg":         tcell.ColorGreen,
 	"input_modal_text":       tcell.ColorWhite,

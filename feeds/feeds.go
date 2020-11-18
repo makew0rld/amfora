@@ -10,6 +10,7 @@ import (
 	urlPkg "net/url"
 	"os"
 	"path"
+	"reflect"
 	"sort"
 	"strings"
 	"sync"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
+	"github.com/makeworld-the-better-one/amfora/logger"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/mmcdole/gofeed"
 )
@@ -38,22 +40,32 @@ var LastUpdated time.Time
 
 // Init should be called after config.Init.
 func Init() error {
-	defer config.FeedJSON.Close()
+	f, err := os.Open(config.FeedPath)
+	if err == nil {
+		defer f.Close()
 
-	dec := json.NewDecoder(config.FeedJSON)
-	err := dec.Decode(&data)
-	if err != nil && err != io.EOF {
-		return fmt.Errorf("feeds json is corrupted: %v", err) //nolint:goerr113
+		fi, err := f.Stat()
+		if err == nil && fi.Size() > 0 {
+			dec := json.NewDecoder(f)
+			err = dec.Decode(&data)
+			if err != nil && err != io.EOF {
+				return fmt.Errorf("feeds.json is corrupted: %w", err) //nolint:goerr113
+			}
+		}
+	} else if !os.IsNotExist(err) {
+		// There's an error opening the file, but it's not bc is doesn't exist
+		return fmt.Errorf("open feeds.json error: %w", err) //nolint:goerr113
 	}
 
 	LastUpdated = time.Now()
-
 	go updateAll()
 	return nil
 }
 
 // IsTracked returns true if the feed/page URL is already being tracked.
 func IsTracked(url string) bool {
+	logger.Log.Println("feeds.IsTracked called")
+
 	data.feedMu.RLock()
 	for u := range data.Feeds {
 		if url == u {
@@ -76,6 +88,8 @@ func IsTracked(url string) bool {
 // GetFeed returns a Feed object and a bool indicating whether the passed
 // content was actually recognized as a feed.
 func GetFeed(mediatype, filename string, r io.Reader) (*gofeed.Feed, bool) {
+	logger.Log.Println("feeds.GetFeed called")
+
 	if r == nil {
 		return nil, false
 	}
@@ -95,11 +109,14 @@ func GetFeed(mediatype, filename string, r io.Reader) (*gofeed.Feed, bool) {
 }
 
 func writeJSON() error {
+	logger.Log.Println("feeds.writeJSON called")
+
 	writeMu.Lock()
 	defer writeMu.Unlock()
 
 	f, err := os.OpenFile(config.FeedPath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
+		logger.Log.Println("feeds.writeJSON error", err)
 		return err
 	}
 	defer f.Close()
@@ -108,8 +125,13 @@ func writeJSON() error {
 	enc.SetIndent("", "  ")
 
 	data.Lock()
+	logger.Log.Println("feeds.writeJSON acquired data lock")
 	err = enc.Encode(&data)
 	data.Unlock()
+
+	if err != nil {
+		logger.Log.Println("feeds.writeJSON error", err)
+	}
 
 	return err
 }
@@ -118,6 +140,8 @@ func writeJSON() error {
 // It can be used to update a feed for a URL, although the package
 // will handle that on its own.
 func AddFeed(url string, feed *gofeed.Feed) error {
+	logger.Log.Println("feeds.AddFeed called")
+
 	if feed == nil {
 		panic("feed is nil")
 	}
@@ -128,17 +152,20 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 	}
 
 	data.feedMu.Lock()
-	data.Feeds[url] = feed
-	err := writeJSON()
-	if err != nil {
-		// Don't use in-memory if it couldn't be saved
-		delete(data.Feeds, url)
-		data.feedMu.Unlock()
-		return ErrSaving
-	}
-	data.feedMu.Unlock()
+	oldFeed, ok := data.Feeds[url]
+	if !ok || !reflect.DeepEqual(feed, oldFeed) {
+		// Feeds are different, or there was never an old one
 
-	LastUpdated = time.Now()
+		data.Feeds[url] = feed
+		data.feedMu.Unlock()
+		err := writeJSON()
+		if err != nil {
+			return ErrSaving
+		}
+		LastUpdated = time.Now()
+	} else {
+		data.feedMu.Unlock()
+	}
 	return nil
 }
 
@@ -146,6 +173,8 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 // It can be used to update the page as well, although the package
 // will handle that on its own.
 func AddPage(url string, r io.Reader) error {
+	logger.Log.Println("feeds.AddPage called")
+
 	if r == nil {
 		return nil
 	}
@@ -164,22 +193,23 @@ func AddPage(url string, r io.Reader) error {
 			Hash:    newHash,
 			Changed: time.Now().UTC(),
 		}
-	}
 
-	err := writeJSON()
-	if err != nil {
-		// Don't use in-memory if it couldn't be saved
-		delete(data.Pages, url)
 		data.pageMu.Unlock()
-		return err
+		err := writeJSON()
+		if err != nil {
+			return ErrSaving
+		}
+		LastUpdated = time.Now()
+	} else {
+		data.pageMu.Unlock()
 	}
-	data.pageMu.Unlock()
 
-	LastUpdated = time.Now()
 	return nil
 }
 
 func updateFeed(url string) error {
+	logger.Log.Println("feeds.updateFeed called")
+
 	res, err := client.Fetch(url)
 	if err != nil {
 		if res != nil {
@@ -205,6 +235,8 @@ func updateFeed(url string) error {
 }
 
 func updatePage(url string) error {
+	logger.Log.Println("feeds.updatePage called")
+
 	res, err := client.Fetch(url)
 	if err != nil {
 		if res != nil {
@@ -224,6 +256,8 @@ func updatePage(url string) error {
 // updateAll updates all feeds and pages using workers.
 // It only returns once all the workers are done.
 func updateAll() {
+	logger.Log.Println("feeds.updateAll called")
+
 	// TODO: Is two goroutines the right amount?
 
 	worker := func(jobs <-chan [2]string, wg *sync.WaitGroup) {
@@ -246,10 +280,19 @@ func updateAll() {
 	numJobs := len(data.Feeds) + len(data.Pages)
 	jobs := make(chan [2]string, numJobs)
 
+	if numJobs == 0 {
+		data.RUnlock()
+		return
+	}
+
 	// Start 2 workers, waiting for jobs
 	for w := 0; w < 2; w++ {
 		wg.Add(1)
-		go worker(jobs, &wg)
+		go func(i int) {
+			logger.Log.Println("started worker", i)
+			worker(jobs, &wg)
+			logger.Log.Println("ended worker", i)
+		}(w)
 	}
 
 	// Get map keys in a slice
@@ -277,6 +320,7 @@ func updateAll() {
 			jobs <- [2]string{"page", pageKeys[j-len(feedKeys)]}
 		}
 	}
+	close(jobs)
 
 	wg.Wait()
 }
@@ -287,6 +331,8 @@ func updateAll() {
 // so this function needs to be called again to get updates.
 // It always returns sorted entries - by post time, from newest to oldest.
 func GetPageEntries() *PageEntries {
+	logger.Log.Println("feeds.GetPageEntries called")
+
 	var pe PageEntries
 
 	data.RLock()

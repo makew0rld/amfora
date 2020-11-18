@@ -34,8 +34,8 @@ The time is in RFC 3339 format, preferably in the UTC timezone.
 
 // Decoded JSON
 type jsonData struct {
-	feedMu sync.RWMutex
-	pageMu sync.RWMutex
+	feedMu *sync.RWMutex
+	pageMu *sync.RWMutex
 	Feeds  map[string]*gofeed.Feed `json:"feeds,omitempty"`
 	Pages  map[string]*pageJSON    `json:"pages,omitempty"`
 }
@@ -69,7 +69,13 @@ type pageJSON struct {
 	Changed time.Time `json:"changed"` // When the latest change happened
 }
 
-var data jsonData // Global instance of jsonData - loaded from JSON and used
+// Global instance of jsonData - loaded from JSON and used
+var data = jsonData{
+	feedMu: &sync.RWMutex{},
+	pageMu: &sync.RWMutex{},
+	Feeds:  make(map[string]*gofeed.Feed),
+	Pages:  make(map[string]*pageJSON),
+}
 
 // PageEntry is a single item on a feed page.
 // It is used both for tracked feeds and pages.

@@ -207,6 +207,7 @@ func Init() {
 	})
 
 	// Render the default new tab content ONCE and store it for later
+	// This code is repeated in Reload()
 	newTabContent := getNewTabContent()
 	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin(), false)
 	newTabPage = structs.Page{
@@ -291,6 +292,13 @@ func Init() {
 				} else {
 					Info("The current page has no content, so it couldn't be downloaded.")
 				}
+				return nil
+			case tcell.KeyCtrlA:
+				Feeds(tabs[curTab])
+				tabs[curTab].addToHistory("about:feeds")
+				return nil
+			case tcell.KeyCtrlX:
+				go addFeed()
 				return nil
 			case tcell.KeyRune:
 				// Regular key was sent
@@ -573,6 +581,11 @@ func URL(u string) {
 	if u == "about:bookmarks" { //nolint:goconst
 		Bookmarks(tabs[curTab])
 		tabs[curTab].addToHistory("about:bookmarks")
+		return
+	}
+	if u == "about:feeds" { //nolint:goconst
+		Feeds(tabs[curTab])
+		tabs[curTab].addToHistory("about:feeds")
 		return
 	}
 	if u == "about:newtab" {

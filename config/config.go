@@ -6,7 +6,6 @@ package config
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -41,7 +40,6 @@ var bkmkPath string
 var DownloadsDir string
 
 // Feeds
-var FeedJSON io.ReadCloser
 var feedDir string
 var FeedPath string
 
@@ -158,8 +156,6 @@ func Init() error {
 	if err != nil {
 		return err
 	}
-	f, _ = os.OpenFile(FeedPath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
-	FeedJSON = f
 
 	// *** Downloads paths, setup, and creation ***
 
@@ -234,6 +230,7 @@ func Init() error {
 	viper.SetDefault("a-general.page_max_size", 2097152)
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.emoji_favicons", false)
+	viper.SetDefault("a-general.feeds_popup", true)
 	viper.SetDefault("keybindings.shift_numbers", "!@#$%^&*()")
 	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)

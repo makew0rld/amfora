@@ -7,6 +7,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/display"
 	"github.com/makeworld-the-better-one/amfora/feeds"
+	"github.com/makeworld-the-better-one/amfora/logger"
 )
 
 var (
@@ -16,10 +17,10 @@ var (
 )
 
 func main() {
-	// err := logger.Init()
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err := logger.Init()
+	if err != nil {
+		panic(err)
+	}
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--version" || os.Args[1] == "-v" {
@@ -38,7 +39,7 @@ func main() {
 		}
 	}
 
-	err := config.Init()
+	err = config.Init()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Config error: %v\n", err)
 		os.Exit(1)

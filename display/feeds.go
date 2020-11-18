@@ -2,17 +2,25 @@ package display
 
 import (
 	"fmt"
+	"net/url"
+	"path"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
+	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/feeds"
+	"github.com/makeworld-the-better-one/amfora/logger"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
+	"github.com/mmcdole/gofeed"
+	"github.com/spf13/viper"
 )
 
 var feedPageRaw = "# Feeds & Pages\n\nUpdates" + strings.Repeat(" ", 80-25) + "[Newest -> Oldest]\n" +
-	strings.Repeat("-", 80) + "\n\n"
+	strings.Repeat("-", 80) + "\nSee the help (by pressing ?) for details on how to use this page.\n\n"
 
 var feedPageUpdated time.Time
 
@@ -25,6 +33,8 @@ func toLocalDay(t time.Time) time.Time {
 
 // Feeds displays the feeds page on the current tab.
 func Feeds(t *tab) {
+	logger.Log.Println("display.Feeds called")
+
 	// Retrieve cached version if there hasn't been any updates
 	p, ok := cache.GetPage("about:feeds")
 	if feedPageUpdated.After(feeds.LastUpdated) && ok {
@@ -74,6 +84,108 @@ func Feeds(t *tab) {
 	feedPageUpdated = time.Now()
 }
 
-func feedInit() {
-	// TODO
+// openFeedModal displays the "Add feed/page" modal
+// It returns whether the user wanted to add the feed/page.
+// The tracked arg specifies whether this feed/page is already
+// being tracked.
+func openFeedModal(validFeed, tracked bool) bool {
+	logger.Log.Println("display.openFeedModal called")
+	// Reuses yesNoModal
+
+	if viper.GetBool("a-general.color") {
+		yesNoModal.
+			SetBackgroundColor(config.GetColor("feed_modal_bg")).
+			SetTextColor(config.GetColor("feed_modal_text"))
+		yesNoModal.GetFrame().
+			SetBorderColor(config.GetColor("feed_modal_text")).
+			SetTitleColor(config.GetColor("feed_modal_text"))
+	} else {
+		yesNoModal.
+			SetBackgroundColor(tcell.ColorBlack).
+			SetTextColor(tcell.ColorWhite)
+		yesNoModal.GetFrame().
+			SetBorderColor(tcell.ColorWhite).
+			SetTitleColor(tcell.ColorWhite)
+	}
+	if validFeed {
+		yesNoModal.GetFrame().SetTitle("Feed Tracking")
+		if tracked {
+			yesNoModal.SetText("This is already being tracked. Would you like to manually update it?")
+		} else {
+			yesNoModal.SetText("Would you like to start tracking this feed?")
+		}
+	} else {
+		yesNoModal.GetFrame().SetTitle("Page Tracking")
+		if tracked {
+			yesNoModal.SetText("This is already being tracked. Would you like to manually update it?")
+		} else {
+			yesNoModal.SetText("Would you like to start tracking this page?")
+		}
+	}
+
+	tabPages.ShowPage("yesno")
+	tabPages.SendToFront("yesno")
+	App.SetFocus(yesNoModal)
+	App.Draw()
+
+	resp := <-yesNoCh
+	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	App.SetFocus(tabs[curTab].view)
+	App.Draw()
+	return resp
+}
+
+// getFeedFromPage is like feeds.GetFeed but takes a structs.Page as input.
+func getFeedFromPage(p *structs.Page) (*gofeed.Feed, bool) {
+	parsed, _ := url.Parse(p.URL)
+	filename := path.Base(parsed.Path)
+	r := strings.NewReader(p.Raw)
+	return feeds.GetFeed(p.RawMediatype, filename, r)
+}
+
+// addFeedDirect is only for adding feeds, not pages.
+// It's for when you already have a feed and know if it's tracked.
+// Use mainly by handleURL because it already did a lot of the work.
+//
+// Like addFeed, it should be called in a goroutine.
+func addFeedDirect(u string, feed *gofeed.Feed, tracked bool) {
+	logger.Log.Println("display.addFeedDirect called")
+
+	if openFeedModal(true, tracked) {
+		err := feeds.AddFeed(u, feed)
+		if err != nil {
+			Error("Feed Error", err.Error())
+		}
+	}
+}
+
+// addFeed goes through the process of adding a bookmark for the current page.
+// It is the high-level way of doing it. It should be called in a goroutine.
+func addFeed() {
+	logger.Log.Println("display.addFeed called")
+
+	t := tabs[curTab]
+	p := t.page
+
+	if !t.hasContent() {
+		// It's an about: page, or a malformed one
+		return
+	}
+
+	feed, isFeed := getFeedFromPage(p)
+	tracked := feeds.IsTracked(p.URL)
+
+	if openFeedModal(isFeed, tracked) {
+		var err error
+
+		if isFeed {
+			err = feeds.AddFeed(p.URL, feed)
+		} else {
+			err = feeds.AddPage(p.URL, strings.NewReader(p.Raw))
+		}
+
+		if err != nil {
+			Error("Feed/Page Error", err.Error())
+		}
+	}
 }

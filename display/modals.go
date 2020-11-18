@@ -150,7 +150,6 @@ func modalInit() {
 
 	bkmkInit()
 	dlInit()
-	feedInit()
 }
 
 // Error displays an error on the screen in a modal.

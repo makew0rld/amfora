@@ -19,9 +19,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var feedPageRaw = "# Feeds & Pages\n\nUpdates" + strings.Repeat(" ", 80-25) + "[Newest -> Oldest]\n" +
-	strings.Repeat("-", 80) + "\nSee the help (by pressing ?) for details on how to use this page.\n\n"
-
 var feedPageUpdated time.Time
 
 // toLocalDay truncates the provided time to a date only,
@@ -38,10 +35,16 @@ func Feeds(t *tab) {
 	// Retrieve cached version if there hasn't been any updates
 	p, ok := cache.GetPage("about:feeds")
 	if feedPageUpdated.After(feeds.LastUpdated) && ok {
+		logger.Log.Println("using cached feeds page")
 		setPage(t, p)
 		t.applyBottomBar()
 		return
 	}
+
+	logger.Log.Println("started rendering feeds page")
+
+	feedPageRaw := "# Feeds & Pages\n\nUpdates" + strings.Repeat(" ", 80-25) + "[Newest -> Oldest]\n" +
+		strings.Repeat("-", 80) + "\nSee the help (by pressing ?) for details on how to use this page.\n\n"
 
 	// curDay represents what day of posts the loop is on.
 	// It only goes backwards in time.
@@ -62,7 +65,7 @@ func Feeds(t *tab) {
 
 		if pub.Before(curDay) {
 			// This post is on a new day, add a day header
-			curDay := pub
+			curDay = pub
 			feedPageRaw += fmt.Sprintf("\n## %s\n\n", curDay.Format("Jan 02, 2006"))
 		}
 		feedPageRaw += fmt.Sprintf("=>%s %s - %s\n", entry.URL, entry.Author, entry.Title)
@@ -82,6 +85,8 @@ func Feeds(t *tab) {
 	t.applyBottomBar()
 
 	feedPageUpdated = time.Now()
+
+	logger.Log.Println("done rendering feeds page")
 }
 
 // openFeedModal displays the "Add feed/page" modal
@@ -159,7 +164,7 @@ func addFeedDirect(u string, feed *gofeed.Feed, tracked bool) {
 	}
 }
 
-// addFeed goes through the process of adding a bookmark for the current page.
+// addFeed goes through the process of tracking the current page/feed.
 // It is the high-level way of doing it. It should be called in a goroutine.
 func addFeed() {
 	logger.Log.Println("display.addFeed called")

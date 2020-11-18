@@ -42,10 +42,12 @@ var LastUpdated time.Time
 func Init() error {
 	f, err := os.Open(config.FeedPath)
 	if err == nil {
+		// File exists and could be opened
 		defer f.Close()
 
 		fi, err := f.Stat()
 		if err == nil && fi.Size() > 0 {
+			// File is not empty
 			dec := json.NewDecoder(f)
 			err = dec.Decode(&data)
 			if err != nil && err != io.EOF {
@@ -156,13 +158,13 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 	if !ok || !reflect.DeepEqual(feed, oldFeed) {
 		// Feeds are different, or there was never an old one
 
+		LastUpdated = time.Now()
 		data.Feeds[url] = feed
 		data.feedMu.Unlock()
 		err := writeJSON()
 		if err != nil {
 			return ErrSaving
 		}
-		LastUpdated = time.Now()
 	} else {
 		data.feedMu.Unlock()
 	}
@@ -189,6 +191,8 @@ func AddPage(url string, r io.Reader) error {
 	_, ok := data.Pages[url]
 	if !ok || data.Pages[url].Hash != newHash {
 		// Page content is different, or it didn't exist
+
+		LastUpdated = time.Now()
 		data.Pages[url] = &pageJSON{
 			Hash:    newHash,
 			Changed: time.Now().UTC(),
@@ -199,7 +203,6 @@ func AddPage(url string, r io.Reader) error {
 		if err != nil {
 			return ErrSaving
 		}
-		LastUpdated = time.Now()
 	} else {
 		data.pageMu.Unlock()
 	}

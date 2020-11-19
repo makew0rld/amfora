@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/url"
+	"sync"
 
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/mitchellh/go-homedir"
@@ -12,10 +13,14 @@ import (
 )
 
 var certCache = make(map[string][][]byte)
+var certCacheMu = &sync.RWMutex{}
 
 func clientCert(host string) ([]byte, []byte) {
-	if cert := certCache[host]; cert != nil {
-		return cert[0], cert[1]
+	certCacheMu.RLock()
+	pair, ok := certCache[host]
+	certCacheMu.RUnlock()
+	if ok {
+		return pair[0], pair[1]
 	}
 
 	// Expand paths starting with ~/
@@ -28,22 +33,30 @@ func clientCert(host string) ([]byte, []byte) {
 		keyPath = viper.GetString("auth.keys." + host)
 	}
 	if certPath == "" && keyPath == "" {
+		certCacheMu.Lock()
 		certCache[host] = [][]byte{nil, nil}
+		certCacheMu.Unlock()
 		return nil, nil
 	}
 
 	cert, err := ioutil.ReadFile(certPath)
 	if err != nil {
+		certCacheMu.Lock()
 		certCache[host] = [][]byte{nil, nil}
+		certCacheMu.Unlock()
 		return nil, nil
 	}
 	key, err := ioutil.ReadFile(keyPath)
 	if err != nil {
+		certCacheMu.Lock()
 		certCache[host] = [][]byte{nil, nil}
+		certCacheMu.Unlock()
 		return nil, nil
 	}
 
+	certCacheMu.Lock()
 	certCache[host] = [][]byte{cert, key}
+	certCacheMu.Unlock()
 	return cert, key
 }
 

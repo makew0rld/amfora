@@ -43,8 +43,9 @@ func Feeds(t *tab) {
 
 	logger.Log.Println("started rendering feeds page")
 
-	feedPageRaw := "# Feeds & Pages\n\nUpdates" + strings.Repeat(" ", 80-25) + "[Newest -> Oldest]\n" +
-		strings.Repeat("-", 80) + "\nSee the help (by pressing ?) for details on how to use this page.\n\n"
+	feedPageRaw := "# Feeds & Pages\n\n" +
+		"See the help (by pressing ?) for details on how to use this page.\n\n" +
+		"If you just opened Amfora then updates will appear incrementally. Reload the page to see them.\n"
 
 	// curDay represents what day of posts the loop is on.
 	// It only goes backwards in time.

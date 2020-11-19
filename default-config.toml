@@ -65,9 +65,6 @@ page_max_time = 10
 # Whether to replace tab numbers with emoji favicons, which are cached.
 emoji_favicons = false
 
-# Whether a pop-up appears when viewing a potential feed
-feed_popup = true
-
 
 [auth]
 # Authentication settings
@@ -129,6 +126,25 @@ max_pages = 30 # The maximum number of pages the cache will store
 # the url-handlers section.
 #
 # Note that HTTP and HTTPS are treated as separate protocols here.
+
+
+[feeds]
+# For tracking feeds and pages
+
+# Whether a pop-up appears when viewing a potential feed
+popup = true
+
+# How often to check for new feeds and pages in the background, in seconds.
+# Note Amfora will check for updates on browser start anyway.
+# Set it to 0 or below to disable this feature. You can still update individual
+# feeds manually, or just restart the browser to update all of them.
+update_interval = 1800 # 30 mins
+
+# How many pages/feeds can be checked at the same time when updating.
+# If you are tracking many feeds and pages you may want to increase this for
+# faster update times.
+# Any value below 1 will be corrected to 1.
+workers = 3
 
 
 [theme]

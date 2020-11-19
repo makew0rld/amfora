@@ -338,7 +338,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		t.mode = tabModeDone
 
 		go func(p *structs.Page) {
-			if b && t.hasContent() && !feeds.IsTracked(s) && viper.GetBool("a-general.feed_popup") {
+			if b && t.hasContent() && !feeds.IsTracked(s) && viper.GetBool("feeds.popup") {
 				// The current page might be an untracked feed, and the user wants
 				// to be notified in such cases.
 

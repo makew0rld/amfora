@@ -21,6 +21,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/logger"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/mmcdole/gofeed"
+	"github.com/spf13/viper"
 )
 
 // TODO: Test for deadlocks and whether there should be more
@@ -60,7 +61,21 @@ func Init() error {
 	}
 
 	LastUpdated = time.Now()
-	go updateAll()
+
+	if viper.GetInt("feeds.update_interval") > 0 {
+		// Update feeds and pages every so often
+		go func() {
+			for {
+				updateAll()
+				time.Sleep(time.Duration(viper.GetInt("feeds.update_interval")) * time.Second)
+			}
+		}()
+	} else {
+		// User disabled automatic feed/page updates
+		// So just update once at the beginning
+		go updateAll()
+	}
+
 	return nil
 }
 
@@ -288,8 +303,13 @@ func updateAll() {
 		return
 	}
 
-	// Start 2 workers, waiting for jobs
-	for w := 0; w < 2; w++ {
+	numWorkers := viper.GetInt("feed.workers")
+	if numWorkers < 1 {
+		numWorkers = 1
+	}
+
+	// Start workers, waiting for jobs
+	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
 		go func(i int) {
 			logger.Log.Println("started worker", i)

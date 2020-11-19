@@ -116,6 +116,7 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Bookmarks
 - [x] Download pages and arbitrary data
 - [x] Theming
+  - Check out the [user contributed themes](https://github.com/makeworld-the-better-one/amfora/tree/master/contrib/themes)!
 - [x] Emoji favicons
   - See `gemini://mozz.us/files/rfc_gemini_favicon.gmi` for details
   - Disabled by default, enable in config

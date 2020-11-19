@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"net"
 	"net/url"
 	"os/exec"
+	"path"
 	"strconv"
 	"strings"
 
@@ -585,6 +587,17 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	}
 
 	// Status code 20, but not a document that can be displayed
+
+	// First see if it's a feed, and ask the user about adding it if it is
+	filename := path.Base(parsed.Path)
+	mediatype, _, _ := mime.ParseMediaType(res.Meta)
+	feed, ok := feeds.GetFeed(mediatype, filename, res.Body)
+	if ok {
+		go addFeedDirect(u, feed, feeds.IsTracked(u))
+		return ret("", false)
+	}
+
+	// Otherwise offer download choices
 	go dlChoice("That file could not be displayed. What would you like to do?", u, res)
 	return ret("", false)
 }

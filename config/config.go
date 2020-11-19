@@ -230,7 +230,7 @@ func Init() error {
 	viper.SetDefault("a-general.page_max_size", 2097152)
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.emoji_favicons", false)
-	viper.SetDefault("a-general.feeds_popup", true)
+	viper.SetDefault("a-general.feed_popup", true)
 	viper.SetDefault("keybindings.shift_numbers", "!@#$%^&*()")
 	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)

@@ -1,11 +1,8 @@
 # Notes
 
 ## Feeds (temp)
-- Only options for "non-text" feed files is the download modal - there should be a feed modal before that one
-- Auto feed detection fails on `ebc.li/atom.xml` - which is text
 - TODO: remove all logger lines
   
-
 ## Issues
 - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
 

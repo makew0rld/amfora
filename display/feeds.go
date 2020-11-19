@@ -69,7 +69,14 @@ func Feeds(t *tab) {
 			curDay = pub
 			feedPageRaw += fmt.Sprintf("\n## %s\n\n", curDay.Format("Jan 02, 2006"))
 		}
-		feedPageRaw += fmt.Sprintf("=>%s %s - %s\n", entry.URL, entry.Author, entry.Title)
+		if entry.Title == "" || entry.Title == "/" {
+			// Just put author
+			// Mainly used for when you're tracking the root domain of a site
+			feedPageRaw += fmt.Sprintf("=>%s %s\n", entry.URL, entry.Author)
+		} else {
+			// Include title and dash
+			feedPageRaw += fmt.Sprintf("=>%s %s - %s\n", entry.URL, entry.Author, entry.Title)
+		}
 	}
 
 	content, links := renderer.RenderGemini(feedPageRaw, textWidth(), leftMargin(), false)

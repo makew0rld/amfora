@@ -163,9 +163,23 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 		panic("feed is nil")
 	}
 
-	// Remove any content to save memory and disk space
+	// Remove any unused fields to save memory and disk space
+	feed.Image = nil
+	feed.Generator = ""
+	feed.Categories = nil
+	feed.DublinCoreExt = nil
+	feed.ITunesExt = nil
+	feed.Custom = nil
 	for _, item := range feed.Items {
+		item.Description = ""
 		item.Content = ""
+		item.Image = nil
+		item.Categories = nil
+		item.Enclosures = nil
+		item.DublinCoreExt = nil
+		item.ITunesExt = nil
+		item.Extensions = nil
+		item.Custom = nil
 	}
 
 	data.feedMu.Lock()
@@ -376,8 +390,19 @@ func GetPageEntries() *PageEntries {
 				pub = time.Now()
 			}
 
+			var author string
+			if feed.Author == nil {
+				if item.Author == nil {
+					author = "[author unknown]"
+				} else {
+					author = item.Author.Name
+				}
+			} else {
+				author = feed.Author.Name
+			}
+
 			pe.Entries = append(pe.Entries, &PageEntry{
-				Author:    feed.Author.Name,
+				Author:    author,
 				Title:     item.Title,
 				URL:       item.Link,
 				Published: pub,
@@ -387,9 +412,14 @@ func GetPageEntries() *PageEntries {
 
 	for url, page := range data.Pages {
 		parsed, _ := urlPkg.Parse(url)
+
+		// Path is title
+		// "/users/" is removed for aesthetics when tracking hosted users
+		title := strings.TrimPrefix(parsed.Path, "/users/")
+
 		pe.Entries = append(pe.Entries, &PageEntry{
-			Author:    parsed.Host,            // Domain is author
-			Title:     path.Base(parsed.Path), // Filename is title
+			Author:    parsed.Host, // Domain is author
+			Title:     title,
 			URL:       url,
 			Published: page.Changed,
 		})

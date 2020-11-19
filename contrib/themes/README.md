@@ -1,6 +1,6 @@
 # User Contributed Themes
 
-You can use these themes by replacing the `[theme]` section of your config with their contents.
+You can use these themes by replacing the `[theme]` section of your config with their contents. Some themes won't display properly on terminals that do not have truecolor support.
 
 ## Nord
 

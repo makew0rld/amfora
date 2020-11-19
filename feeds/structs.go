@@ -80,7 +80,7 @@ var data = jsonData{
 // PageEntry is a single item on a feed page.
 // It is used both for tracked feeds and pages.
 type PageEntry struct {
-	Author    string
+	Prefix    string // Feed/log title, author, etc - something before the post title
 	Title     string
 	URL       string
 	Published time.Time

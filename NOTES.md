@@ -1,6 +1,7 @@
 # Notes
 
 ## Feeds (temp)
+- Feed page doesn't update automatically if you add a feed by bottom bar URL while already on the feed page
 - TODO: remove all logger lines
   
 ## Issues

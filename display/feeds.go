@@ -70,12 +70,12 @@ func Feeds(t *tab) {
 			feedPageRaw += fmt.Sprintf("\n## %s\n\n", curDay.Format("Jan 02, 2006"))
 		}
 		if entry.Title == "" || entry.Title == "/" {
-			// Just put author
+			// Just put author/title
 			// Mainly used for when you're tracking the root domain of a site
-			feedPageRaw += fmt.Sprintf("=>%s %s\n", entry.URL, entry.Author)
+			feedPageRaw += fmt.Sprintf("=>%s %s\n", entry.URL, entry.Prefix)
 		} else {
 			// Include title and dash
-			feedPageRaw += fmt.Sprintf("=>%s %s - %s\n", entry.URL, entry.Author, entry.Title)
+			feedPageRaw += fmt.Sprintf("=>%s %s - %s\n", entry.URL, entry.Prefix, entry.Title)
 		}
 	}
 

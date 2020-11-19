@@ -317,7 +317,7 @@ func updateAll() {
 		return
 	}
 
-	numWorkers := viper.GetInt("feed.workers")
+	numWorkers := viper.GetInt("feeds.workers")
 	if numWorkers < 1 {
 		numWorkers = 1
 	}
@@ -390,19 +390,39 @@ func GetPageEntries() *PageEntries {
 				pub = time.Now()
 			}
 
-			var author string
-			if feed.Author == nil {
-				if item.Author == nil {
-					author = "[author unknown]"
+			// Prefer using the feed title over anything else.
+			// Many feeds in Gemini only have this due to gemfeed's default settings.
+			prefix := feed.Title
+
+			if prefix == "" {
+				// feed.Title was empty
+				if feed.Author != nil {
+					// Prefer using the feed author over the item author
+					prefix = feed.Author.Name
 				} else {
-					author = item.Author.Name
+					if item.Author != nil {
+						prefix = item.Author.Name
+					} else {
+						prefix = "[author unknown]"
+					}
 				}
 			} else {
-				author = feed.Author.Name
+				// There's already a title, so add the author (if exists) to
+				// the end of the title in parentheses.
+				// Don't add the author if it's the same as the title.
+
+				if feed.Author != nil && feed.Author.Name != prefix {
+					// Prefer using the feed author over the item author
+					prefix += " (" + feed.Author.Name + ")"
+				} else {
+					if item.Author != nil && item.Author.Name != prefix {
+						prefix += " (" + item.Author.Name + ")"
+					}
+				}
 			}
 
 			pe.Entries = append(pe.Entries, &PageEntry{
-				Author:    author,
+				Prefix:    prefix,
 				Title:     item.Title,
 				URL:       item.Link,
 				Published: pub,
@@ -414,11 +434,26 @@ func GetPageEntries() *PageEntries {
 		parsed, _ := urlPkg.Parse(url)
 
 		// Path is title
-		// "/users/" is removed for aesthetics when tracking hosted users
-		title := strings.TrimPrefix(parsed.Path, "/users/")
+		title := parsed.Path
+		if strings.HasPrefix(title, "/~") {
+			// A user dir
+			title = title[2:] // Remove beginning slash and tilde
+			// Remove trailing slash if the root of a user dir is being tracked
+			if strings.Count(title, "/") <= 1 && title[len(title)-1] == '/' {
+				title = title[:len(title)-1]
+			}
+		} else if strings.HasPrefix(title, "/users/") {
+			// "/users/" is removed for aesthetics when tracking hosted users
+			title = strings.TrimPrefix(title, "/users/")
+			title = strings.TrimPrefix(title, "~") // Remove leading tilde
+			// Remove trailing slash if the root of a user dir is being tracked
+			if strings.Count(title, "/") <= 1 && title[len(title)-1] == '/' {
+				title = title[:len(title)-1]
+			}
+		}
 
 		pe.Entries = append(pe.Entries, &PageEntry{
-			Author:    parsed.Host, // Domain is author
+			Prefix:    parsed.Host,
 			Title:     title,
 			URL:       url,
 			Published: page.Changed,

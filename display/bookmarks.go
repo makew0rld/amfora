@@ -108,10 +108,10 @@ func openBkmkModal(name string, exists bool, favicon string) (string, int) {
 	return bkmkModalText, action
 }
 
-var bkmkPageRaw = "# Bookmarks\r\n\r\n"
-
 // Bookmarks displays the bookmarks page on the current tab.
 func Bookmarks(t *tab) {
+	bkmkPageRaw := "# Bookmarks\r\n\r\n"
+
 	// Gather bookmarks
 	m, keys := bookmarks.All()
 	for i := range keys {

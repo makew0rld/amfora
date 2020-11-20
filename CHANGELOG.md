@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.9.1 to support CN-only wildcard certs
 - Preformatted text is now light yellow by default
 
+### Fixed
+- Single quotes are used in the default config for commands and paths so that Windows paths with backslashes will be parsed correctly
+
 
 ## [1.6.0] - 2020-11-04
 ### Added

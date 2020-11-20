@@ -158,10 +158,12 @@ func getFeedFromPage(p *structs.Page) (*gofeed.Feed, bool) {
 
 // addFeedDirect is only for adding feeds, not pages.
 // It's for when you already have a feed and know if it's tracked.
-// Use mainly by handleURL because it already did a lot of the work.
+// Used mainly by handleURL because it already did a lot of the work.
+// It returns a bool indicating whether the user actually wanted to
+// add the feed or not.
 //
 // Like addFeed, it should be called in a goroutine.
-func addFeedDirect(u string, feed *gofeed.Feed, tracked bool) {
+func addFeedDirect(u string, feed *gofeed.Feed, tracked bool) bool {
 	logger.Log.Println("display.addFeedDirect called")
 
 	if openFeedModal(true, tracked) {
@@ -169,7 +171,9 @@ func addFeedDirect(u string, feed *gofeed.Feed, tracked bool) {
 		if err != nil {
 			Error("Feed Error", err.Error())
 		}
+		return true
 	}
+	return false
 }
 
 // addFeed goes through the process of tracking the current page/feed.

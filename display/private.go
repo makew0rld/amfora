@@ -593,7 +593,13 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	mediatype, _, _ := mime.ParseMediaType(res.Meta)
 	feed, ok := feeds.GetFeed(mediatype, filename, res.Body)
 	if ok {
-		go addFeedDirect(u, feed, feeds.IsTracked(u))
+		go func() {
+			added := addFeedDirect(u, feed, feeds.IsTracked(u))
+			if !added {
+				// Otherwise offer download choices
+				go dlChoice("That file could not be displayed. What would you like to do?", u, res)
+			}
+		}()
 		return ret("", false)
 	}
 

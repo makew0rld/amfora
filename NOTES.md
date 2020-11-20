@@ -3,12 +3,9 @@
 ## Feeds (temp)
 - Feed page doesn't update automatically if you add a feed by bottom bar URL while already on the feed page
 - TODO: remove all logger lines
-  
+
 ## Issues
 - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
-
-## Regressions
-
 
 ## Upstream Bugs
 - Wrapping messes up on brackets

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"mime"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,18 +14,16 @@ import (
 	"github.com/spf13/viper"
 )
 
-func pathFromFileURI(u string) string {
-	path := strings.TrimPrefix(u, "file://")
-	path = strings.TrimPrefix(path, "localhost") // localhost is a valid host for file URIs
-	path = strings.TrimPrefix(path, "/")         // Valid file URIs contains this additional slash
-	return filepath.FromSlash(path)
-}
-
 // handleFile handles urls using file:// protocol
 func handleFile(u string) (*structs.Page, bool) {
 	page := &structs.Page{}
-	path := pathFromFileURI(u)
-	fi, err := os.Stat(path)
+
+	uri, err := url.ParseRequestURI(u)
+	if err != nil {
+		Error("File Error", "Cannot parse URI: "+err.Error())
+		return page, false
+	}
+	fi, err := os.Stat(uri.Path)
 	if err != nil {
 		Error("File Error", "Cannot open local file: "+err.Error())
 		return page, false
@@ -39,7 +38,7 @@ func handleFile(u string) (*structs.Page, bool) {
 			return page, false
 		}
 
-		mimetype := mime.TypeByExtension(filepath.Ext(path))
+		mimetype := mime.TypeByExtension(filepath.Ext(uri.Path))
 		if strings.HasSuffix(u, ".gmi") || strings.HasSuffix(u, ".gemini") {
 			mimetype = "text/gemini"
 		}
@@ -49,8 +48,7 @@ func handleFile(u string) (*structs.Page, bool) {
 			return page, false
 		}
 
-		content, err := ioutil.ReadFile(path)
-
+		content, err := ioutil.ReadFile(uri.Path)
 		if err != nil {
 			Error("File Error", "Cannot open local file: "+err.Error())
 			return page, false
@@ -84,13 +82,18 @@ func handleFile(u string) (*structs.Page, bool) {
 // that lists all the files as links.
 func createDirectoryListing(u string) (*structs.Page, bool) {
 	page := &structs.Page{}
-	path := pathFromFileURI(u)
-	files, err := ioutil.ReadDir(path)
+
+	uri, err := url.ParseRequestURI(u)
+	if err != nil {
+		Error("Directory Error", "Cannot parse URI: "+err.Error())
+	}
+
+	files, err := ioutil.ReadDir(uri.Path)
 	if err != nil {
 		Error("Directory error", "Cannot open local directory: "+err.Error())
 		return page, false
 	}
-	content := "Index of " + path + "\n"
+	content := "Index of " + uri.Path + "\n"
 	content += "=> ../ ../\n"
 	for _, f := range files {
 		separator := ""

@@ -63,7 +63,7 @@ func Help() {
 func helpInit() {
 	// Populate help table
 	helpTable.SetDoneFunc(func(key tcell.Key) {
-		if key == tcell.KeyEsc || key == tcell.KeyEnter {
+		if key == tcell.KeyEsc || key == tcell.KeyEnter || key == KeyNumpadEnter {
 			tabPages.SwitchToPage(strconv.Itoa(curTab))
 			App.SetFocus(tabs[curTab].view)
 			App.Draw()

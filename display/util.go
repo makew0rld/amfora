@@ -5,11 +5,14 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/gdamore/tcell"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
 
 // This file contains funcs that are small, self-contained utilities.
+
+const KeyNumpadEnter = tcell.KeyCtrlJ
 
 // escapeMeta santizes a META string for use within a cview modal.
 func escapeMeta(meta string) string {

@@ -115,7 +115,7 @@ func Init() {
 
 		//nolint:exhaustive
 		switch key {
-		case tcell.KeyEnter, KeyNumpadEnter:
+		case tcell.KeyEnter:
 			// Figure out whether it's a URL, link number, or search
 			// And send out a request
 

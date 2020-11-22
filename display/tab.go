@@ -76,7 +76,7 @@ func makeNewTab() *tab {
 		currentSelection := tabs[tab].view.GetHighlights()
 		numSelections := len(tabs[tab].page.Links)
 
-		if (key == tcell.KeyEnter || key == KeyNumpadEnter) && len(currentSelection) > 0 {
+		if key == tcell.KeyEnter && len(currentSelection) > 0 {
 			// A link is selected and enter was pressed: "click" it and load the page it's for
 			bottomBar.SetLabel("")
 			linkN, _ := strconv.Atoi(currentSelection[0])
@@ -85,7 +85,7 @@ func makeNewTab() *tab {
 			followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[linkN])
 			return
 		}
-		if len(currentSelection) == 0 && (key == tcell.KeyEnter || key == KeyNumpadEnter || key == tcell.KeyTab) {
+		if len(currentSelection) == 0 && (key == tcell.KeyEnter || key == tcell.KeyTab) {
 			// They've started link highlighting
 			tabs[tab].page.Mode = structs.ModeLinkSelect
 

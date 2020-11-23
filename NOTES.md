@@ -1,7 +1,8 @@
 # Notes
 
 ## Feeds (temp)
-- Feed page doesn't update automatically if you add a feed by bottom bar URL while already on the feed page
+- Support multiple links in Atom feeds
+  - Display gemini one if it exist, then HTTP(S), then whatever is first
 - TODO: remove all logger lines
 
 ## Issues

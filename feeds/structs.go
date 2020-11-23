@@ -8,7 +8,7 @@ import (
 )
 
 /*
-Example JSON
+Example stored JSON.
 
 {
 	"feeds": {

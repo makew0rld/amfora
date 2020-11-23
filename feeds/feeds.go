@@ -7,11 +7,9 @@ import (
 	"fmt"
 	"io"
 	"mime"
-	urlPkg "net/url"
 	"os"
 	"path"
 	"reflect"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -170,6 +168,8 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 	feed.DublinCoreExt = nil
 	feed.ITunesExt = nil
 	feed.Custom = nil
+	feed.Link = ""
+	feed.Links = nil
 	for _, item := range feed.Items {
 		item.Description = ""
 		item.Content = ""
@@ -180,6 +180,7 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 		item.ITunesExt = nil
 		item.Extensions = nil
 		item.Custom = nil
+		item.Link = "" // Links is used instead
 	}
 
 	data.feedMu.Lock()
@@ -360,108 +361,4 @@ func updateAll() {
 	close(jobs)
 
 	wg.Wait()
-}
-
-// GetPageEntries returns the current list of PageEntries
-// for use in rendering a page.
-// The contents of the returned entries will never change,
-// so this function needs to be called again to get updates.
-// It always returns sorted entries - by post time, from newest to oldest.
-func GetPageEntries() *PageEntries {
-	logger.Log.Println("feeds.GetPageEntries called")
-
-	var pe PageEntries
-
-	data.RLock()
-
-	for _, feed := range data.Feeds {
-		for _, item := range feed.Items {
-
-			var pub time.Time
-
-			// Try to use updated time first, then published
-
-			if !item.UpdatedParsed.IsZero() {
-				pub = *item.UpdatedParsed
-			} else if !item.PublishedParsed.IsZero() {
-				pub = *item.PublishedParsed
-			} else {
-				// No time on the post
-				pub = time.Now()
-			}
-
-			// Prefer using the feed title over anything else.
-			// Many feeds in Gemini only have this due to gemfeed's default settings.
-			prefix := feed.Title
-
-			if prefix == "" {
-				// feed.Title was empty
-				if feed.Author != nil {
-					// Prefer using the feed author over the item author
-					prefix = feed.Author.Name
-				} else {
-					if item.Author != nil {
-						prefix = item.Author.Name
-					} else {
-						prefix = "[author unknown]"
-					}
-				}
-			} else {
-				// There's already a title, so add the author (if exists) to
-				// the end of the title in parentheses.
-				// Don't add the author if it's the same as the title.
-
-				if feed.Author != nil && feed.Author.Name != prefix {
-					// Prefer using the feed author over the item author
-					prefix += " (" + feed.Author.Name + ")"
-				} else {
-					if item.Author != nil && item.Author.Name != prefix {
-						prefix += " (" + item.Author.Name + ")"
-					}
-				}
-			}
-
-			pe.Entries = append(pe.Entries, &PageEntry{
-				Prefix:    prefix,
-				Title:     item.Title,
-				URL:       item.Link,
-				Published: pub,
-			})
-		}
-	}
-
-	for url, page := range data.Pages {
-		parsed, _ := urlPkg.Parse(url)
-
-		// Path is title
-		title := parsed.Path
-		if strings.HasPrefix(title, "/~") {
-			// A user dir
-			title = title[2:] // Remove beginning slash and tilde
-			// Remove trailing slash if the root of a user dir is being tracked
-			if strings.Count(title, "/") <= 1 && title[len(title)-1] == '/' {
-				title = title[:len(title)-1]
-			}
-		} else if strings.HasPrefix(title, "/users/") {
-			// "/users/" is removed for aesthetics when tracking hosted users
-			title = strings.TrimPrefix(title, "/users/")
-			title = strings.TrimPrefix(title, "~") // Remove leading tilde
-			// Remove trailing slash if the root of a user dir is being tracked
-			if strings.Count(title, "/") <= 1 && title[len(title)-1] == '/' {
-				title = title[:len(title)-1]
-			}
-		}
-
-		pe.Entries = append(pe.Entries, &PageEntry{
-			Prefix:    parsed.Host,
-			Title:     title,
-			URL:       url,
-			Published: page.Changed,
-		})
-	}
-
-	data.RUnlock()
-
-	sort.Sort(&pe)
-	return &pe
 }

@@ -69,8 +69,11 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int, proxied b
 		// Content was larger than max size
 		return nil, ErrTooLarge
 	} else if err != io.EOF {
-		if errors.Is(err, os.ErrDeadlineExceeded) {
-			// Timed out
+		if os.IsTimeout(err) {
+			// I would use
+			// errors.Is(err, os.ErrDeadlineExceeded)
+			// but that isn't supported before Go 1.15.
+
 			return nil, ErrTimedOut
 		}
 		// Some other error

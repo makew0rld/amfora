@@ -1,8 +1,6 @@
 # Notes
 
 ## Feeds (temp)
-- Support multiple links in Atom feeds
-  - Display gemini one if it exist, then HTTP(S), then whatever is first
 - TODO: remove all logger lines
 
 ## Issues

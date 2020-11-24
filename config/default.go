@@ -28,14 +28,15 @@ auto_redirect = false
 #
 # The best to define a command is using a string array.
 # Examples:
-# http = ["firefox"]
-# http = ["custom-browser", "--flag", "--option=2"]
-# http = ["/path/with spaces/in it/firefox"]
+# http = ['firefox']
+# http = ['custom-browser', '--flag', '--option=2']
+# http = ['/path/with spaces/in it/firefox']
 #
-# Using just a string will also work, but it is deprecated,
-# and will degrade if you use paths with spaces.
+# Note the use of single quotes, so that backslashes will not be escaped.
+# Using just a string will also work, but it is deprecated, and will degrade if
+# you use paths with spaces.
 
-http = "default"
+http = 'default'
 
 # Any URL that will accept a query string can be put here
 search = "gemini://gus.guru/search"
@@ -58,7 +59,8 @@ max_width = 100
 # 'downloads' is the path to a downloads folder.
 # An empty value means the code will find the default downloads folder for your system.
 # If the path does not exist it will be created.
-downloads = "" 
+# Note the use of single quotes, so that backslashes will not be escaped.
+downloads = ''
 
 # Max size for displayable content in bytes - after that size a download window pops up
 page_max_size = 2097152  # 2 MiB
@@ -71,16 +73,17 @@ emoji_favicons = false
 
 [auth]
 # Authentication settings
+# Note the use of single quotes for values, so that backslashes will not be escaped.
 
 [auth.certs]
 # Client certificates
 # Set domain name equal to path to client cert
-# "example.com" = "mycert.crt"
+# "example.com" = 'mycert.crt'
 
 [auth.keys]
 # Client certificate keys
 # Set domain name equal to path to key for the client cert above
-# "example.com" = "mycert.key"
+# "example.com" = 'mycert.key'
 
 
 [keybindings]
@@ -94,18 +97,19 @@ shift_numbers = "!@#$%^&*()"
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.
 # E.g. to open FTP URLs with FileZilla set the following key:
-#   ftp = "filezilla"
+#   ftp = 'filezilla'
 # You can set any scheme to "off" or "" to disable handling it, or
 # just leave the key unset.
 #
 # DO NOT use this for setting the HTTP command.
 # Use the http setting in the "a-general" section above.
 #
-# NOTE: These settings are override by the ones in the proxies section.
+# NOTE: These settings are overrided by the ones in the proxies section.
+# Note the use of single quotes, so that backslashes will not be escaped.
 
 # This is a special key that defines the handler for all URL schemes for which
 # no handler is defined.
-other = "off"
+other = 'off'
 
 
 [cache]

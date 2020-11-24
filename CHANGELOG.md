@@ -5,9 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Opening local files with `file://` URIs (#103, #117)
+
 ### Changed
-- Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.9.1 to support CN-only wildcard certs
-- Preformatted text is now grey by default
+- Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.9.3
+  - Supports CN-only wildcard certs
+  - Time out when header takes too long
+- Preformatted text is now light yellow by default
+
+### Fixed
+- Single quotes are used in the default config for commands and paths so that Windows paths with backslashes will be parsed correctly
+- Downloading now uses proxies when appropriate
 
 
 ## [1.6.0] - 2020-11-04

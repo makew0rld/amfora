@@ -86,7 +86,9 @@ func reformatPage(p *structs.Page) {
 	case structs.TextGemini:
 		// Links are not recorded because they won't change
 		proxied := true
-		if strings.HasPrefix(p.URL, "gemini") || strings.HasPrefix(p.URL, "about") {
+		if strings.HasPrefix(p.URL, "gemini") ||
+			strings.HasPrefix(p.URL, "about") ||
+			strings.HasPrefix(p.URL, "file") {
 			proxied = false
 		}
 		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin(), proxied)
@@ -396,7 +398,16 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		usingProxy = true
 	}
 
-	if !strings.HasPrefix(u, "http") && !strings.HasPrefix(u, "gemini") {
+	if strings.HasPrefix(u, "file") {
+		page, ok := handleFile(u)
+		if !ok {
+			return ret("", false)
+		}
+		setPage(t, page)
+		return ret(u, true)
+	}
+
+	if !strings.HasPrefix(u, "http") && !strings.HasPrefix(u, "gemini") && !strings.HasPrefix(u, "file") {
 		// Not a Gemini URL
 		if proxy == "" || proxy == "off" {
 			// No proxy available
@@ -467,24 +478,35 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			return ret("", false)
 		}
 
+		var res2 *gemini.Response
+		var dlErr error
+
 		if errors.Is(err, renderer.ErrTooLarge) {
 			// Make new request for downloading purposes
-			res, clientErr := client.Fetch(u)
-			if clientErr != nil && !errors.Is(clientErr, client.ErrTofu) {
+			if usingProxy {
+				res2, dlErr = client.DownloadWithProxy(proxyHostname, proxyPort, u)
+			} else {
+				res2, dlErr = client.Download(u)
+			}
+			if dlErr != nil && !errors.Is(dlErr, client.ErrTofu) {
 				Error("URL Fetch Error", err.Error())
 				return ret("", false)
 			}
-			go dlChoice("That page is too large. What would you like to do?", u, res)
+			go dlChoice("That page is too large. What would you like to do?", u, res2)
 			return ret("", false)
 		}
 		if errors.Is(err, renderer.ErrTimedOut) {
 			// Make new request for downloading purposes
-			res, clientErr := client.Fetch(u)
-			if clientErr != nil && !errors.Is(clientErr, client.ErrTofu) {
+			if usingProxy {
+				res2, dlErr = client.DownloadWithProxy(proxyHostname, proxyPort, u)
+			} else {
+				res2, dlErr = client.Download(u)
+			}
+			if dlErr != nil && !errors.Is(dlErr, client.ErrTofu) {
 				Error("URL Fetch Error", err.Error())
 				return ret("", false)
 			}
-			go dlChoice("Loading that page timed out. What would you like to do?", u, res)
+			go dlChoice("Loading that page timed out. What would you like to do?", u, res2)
 			return ret("", false)
 		}
 		if err != nil {

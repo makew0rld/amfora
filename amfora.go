@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/display"
 	"github.com/makeworld-the-better-one/amfora/feeds"
@@ -49,6 +50,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "feeds.json error: %v\n", err)
 		os.Exit(1)
 	}
+
+	client.Init()
 
 	display.Init()
 	display.NewTab()

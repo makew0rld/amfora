@@ -5,8 +5,8 @@ import (
 	"errors"
 	"io"
 	"mime"
+	"os"
 	"strings"
-	"time"
 
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/go-gemini"
@@ -63,18 +63,13 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int, proxied b
 	}
 
 	buf := new(bytes.Buffer)
-	go func() {
-		time.Sleep(time.Duration(viper.GetInt("a-general.page_max_time")) * time.Second)
-		res.Body.Close()
-	}()
-
 	_, err := io.CopyN(buf, res.Body, viper.GetInt64("a-general.page_max_size")+1)
 	res.Body.Close()
 	if err == nil {
 		// Content was larger than max size
 		return nil, ErrTooLarge
 	} else if err != io.EOF {
-		if strings.HasSuffix(err.Error(), "use of closed network connection") {
+		if errors.Is(err, os.ErrDeadlineExceeded) {
 			// Timed out
 			return nil, ErrTimedOut
 		}

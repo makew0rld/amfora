@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/display"
 )
@@ -42,6 +43,8 @@ func main() {
 		fmt.Printf("Config error: %v\n", err)
 		os.Exit(1)
 	}
+
+	client.Init()
 
 	display.Init()
 	display.NewTab()

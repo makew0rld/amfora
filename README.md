@@ -5,7 +5,6 @@
 <h6>Image modified from: amphora by Alvaro Cabrera from the Noun Project</h6>
 </center>
 
-[![travis build status](https://img.shields.io/travis/com/makeworld-the-better-one/amfora/master?label=master)](https://travis-ci.com/github/makeworld-the-better-one/amfora)
 [![go reportcard](https://goreportcard.com/badge/github.com/makeworld-the-better-one/amfora)](https://goreportcard.com/report/github.com/makeworld-the-better-one/amfora)
 [![license GPLv3](https://img.shields.io/github/license/makeworld-the-better-one/amfora)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 

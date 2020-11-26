@@ -21,6 +21,19 @@ Contributed by **[@crdpa](https://github.com/crdpa)**.
 ![screenshot of dracula theme](https://user-images.githubusercontent.com/61637474/99983210-53d2e900-2d8a-11eb-9ab7-12dc10c2933a.png)
 </details>
 
+## Gruvbox
+
+Contributed by **[@Skraylet](https://github.com/Skraylet)**.
+
+![screenshot of gruvbox theme](https://user-images.githubusercontent.com/26380693/100381730-4768bd80-3022-11eb-83ae-bcd0495f2ae9.png)
+
+<details>
+<summary>Another screenshot</summary>
+
+![screenshot of gruvbox theme](https://user-images.githubusercontent.com/26380693/100381734-4a63ae00-3022-11eb-9531-a635df310052.png)
+</details>
+
+
 ## Yours?
 
 Contribute your own theme by opening a PR.

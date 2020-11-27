@@ -1,4 +1,4 @@
-package feeds
+package subscriptions
 
 import (
 	"sync"
@@ -77,8 +77,8 @@ var data = jsonData{
 	Pages:  make(map[string]*pageJSON),
 }
 
-// PageEntry is a single item on a feed page.
-// It is used both for tracked feeds and pages.
+// PageEntry is a single item on a subscriptions page.
+// It is used for both feeds and pages.
 type PageEntry struct {
 	Prefix    string // Feed/log title, author, etc - something before the post title
 	Title     string
@@ -86,9 +86,10 @@ type PageEntry struct {
 	Published time.Time
 }
 
-// PageEntries is new-to-old list of Entry structs, used to create a feed page.
-// It should always be assumed to be sorted when used in other packages.
-// Sorted by post time, from newest to oldest.
+// PageEntries is new-to-old list of Entry structs, used to create a
+// subscriptions page.
+// It should always be assumed to be sorted when used in other packages,
+// by post time, from newest to oldest.
 type PageEntries struct {
 	Entries []*PageEntry
 }

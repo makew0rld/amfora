@@ -1,4 +1,4 @@
-package feeds
+package subscriptions
 
 import (
 	"crypto/sha256"
@@ -31,15 +31,15 @@ var (
 	ErrNotFeed    = errors.New("not a valid feed")
 )
 
-var writeMu = sync.Mutex{} // Prevent concurrent writes to feeds.json file
+var writeMu = sync.Mutex{} // Prevent concurrent writes to subscriptions.json file
 
 // LastUpdated is the time when the in-memory data was last updated.
-// It can be used to know if the feed page should be regenerated.
+// It can be used to know if the subscriptions page should be regenerated.
 var LastUpdated time.Time
 
 // Init should be called after config.Init.
 func Init() error {
-	f, err := os.Open(config.FeedPath)
+	f, err := os.Open(config.SubscriptionPath)
 	if err == nil {
 		// File exists and could be opened
 		defer f.Close()
@@ -50,26 +50,26 @@ func Init() error {
 			dec := json.NewDecoder(f)
 			err = dec.Decode(&data)
 			if err != nil && err != io.EOF {
-				return fmt.Errorf("feeds.json is corrupted: %w", err) //nolint:goerr113
+				return fmt.Errorf("subscriptions.json is corrupted: %w", err) //nolint:goerr113
 			}
 		}
 	} else if !os.IsNotExist(err) {
 		// There's an error opening the file, but it's not bc is doesn't exist
-		return fmt.Errorf("open feeds.json error: %w", err) //nolint:goerr113
+		return fmt.Errorf("open subscriptions.json error: %w", err) //nolint:goerr113
 	}
 
 	LastUpdated = time.Now()
 
-	if viper.GetInt("feeds.update_interval") > 0 {
-		// Update feeds and pages every so often
+	if viper.GetInt("subscriptions.update_interval") > 0 {
+		// Update subscriptions every so often
 		go func() {
 			for {
 				updateAll()
-				time.Sleep(time.Duration(viper.GetInt("feeds.update_interval")) * time.Second)
+				time.Sleep(time.Duration(viper.GetInt("subscriptions.update_interval")) * time.Second)
 			}
 		}()
 	} else {
-		// User disabled automatic feed/page updates
+		// User disabled automatic updates
 		// So just update once at the beginning
 		go updateAll()
 	}
@@ -77,9 +77,10 @@ func Init() error {
 	return nil
 }
 
-// IsTracked returns true if the feed/page URL is already being tracked.
-func IsTracked(url string) bool {
-	logger.Log.Println("feeds.IsTracked called")
+// IsSubscribed returns true if the URL is already subscribed to,
+// whether a feed or page.
+func IsSubscribed(url string) bool {
+	logger.Log.Println("subscriptions.IsSubscribed called")
 
 	data.feedMu.RLock()
 	for u := range data.Feeds {
@@ -103,7 +104,7 @@ func IsTracked(url string) bool {
 // GetFeed returns a Feed object and a bool indicating whether the passed
 // content was actually recognized as a feed.
 func GetFeed(mediatype, filename string, r io.Reader) (*gofeed.Feed, bool) {
-	logger.Log.Println("feeds.GetFeed called")
+	logger.Log.Println("subscriptions.GetFeed called")
 
 	if r == nil {
 		return nil, false
@@ -124,14 +125,14 @@ func GetFeed(mediatype, filename string, r io.Reader) (*gofeed.Feed, bool) {
 }
 
 func writeJSON() error {
-	logger.Log.Println("feeds.writeJSON called")
+	logger.Log.Println("subscriptions.writeJSON called")
 
 	writeMu.Lock()
 	defer writeMu.Unlock()
 
-	f, err := os.OpenFile(config.FeedPath, os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile(config.SubscriptionPath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
-		logger.Log.Println("feeds.writeJSON error", err)
+		logger.Log.Println("subscriptions.writeJSON error", err)
 		return err
 	}
 	defer f.Close()
@@ -140,12 +141,12 @@ func writeJSON() error {
 	enc.SetIndent("", "  ")
 
 	data.Lock()
-	logger.Log.Println("feeds.writeJSON acquired data lock")
+	logger.Log.Println("subscriptions.writeJSON acquired data lock")
 	err = enc.Encode(&data)
 	data.Unlock()
 
 	if err != nil {
-		logger.Log.Println("feeds.writeJSON error", err)
+		logger.Log.Println("subscriptions.writeJSON error", err)
 	}
 
 	return err
@@ -155,7 +156,7 @@ func writeJSON() error {
 // It can be used to update a feed for a URL, although the package
 // will handle that on its own.
 func AddFeed(url string, feed *gofeed.Feed) error {
-	logger.Log.Println("feeds.AddFeed called")
+	logger.Log.Println("subscriptions.AddFeed called")
 
 	if feed == nil {
 		panic("feed is nil")
@@ -205,7 +206,7 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 // It can be used to update the page as well, although the package
 // will handle that on its own.
 func AddPage(url string, r io.Reader) error {
-	logger.Log.Println("feeds.AddPage called")
+	logger.Log.Println("subscriptions.AddPage called")
 
 	if r == nil {
 		return nil
@@ -241,7 +242,7 @@ func AddPage(url string, r io.Reader) error {
 }
 
 func updateFeed(url string) error {
-	logger.Log.Println("feeds.updateFeed called")
+	logger.Log.Println("subscriptions.updateFeed called")
 
 	res, err := client.Fetch(url)
 	if err != nil {
@@ -268,7 +269,7 @@ func updateFeed(url string) error {
 }
 
 func updatePage(url string) error {
-	logger.Log.Println("feeds.updatePage called")
+	logger.Log.Println("subscriptions.updatePage called")
 
 	res, err := client.Fetch(url)
 	if err != nil {
@@ -286,10 +287,10 @@ func updatePage(url string) error {
 	return AddPage(url, res.Body)
 }
 
-// updateAll updates all feeds and pages using workers.
+// updateAll updates all subscriptions using workers.
 // It only returns once all the workers are done.
 func updateAll() {
-	logger.Log.Println("feeds.updateAll called")
+	logger.Log.Println("subscriptions.updateAll called")
 
 	// TODO: Is two goroutines the right amount?
 
@@ -318,7 +319,7 @@ func updateAll() {
 		return
 	}
 
-	numWorkers := viper.GetInt("feeds.workers")
+	numWorkers := viper.GetInt("subscriptions.workers")
 	if numWorkers < 1 {
 		numWorkers = 1
 	}

@@ -16,9 +16,9 @@ import (
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
-	"github.com/makeworld-the-better-one/amfora/feeds"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
+	"github.com/makeworld-the-better-one/amfora/subscriptions"
 	"github.com/makeworld-the-better-one/amfora/webbrowser"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/makeworld-the-better-one/go-isemoji"
@@ -39,9 +39,9 @@ func followLink(t *tab, prev, next string) {
 		t.addToHistory("about:bookmarks")
 		return
 	}
-	if next == "about:feeds" {
-		Feeds(t)
-		t.addToHistory("about:feeds")
+	if next == "about:subscriptions" {
+		Subscriptions(t)
+		t.addToHistory("about:subscriptions")
 		return
 	}
 	if strings.HasPrefix(next, "about:") {
@@ -340,7 +340,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		t.mode = tabModeDone
 
 		go func(p *structs.Page) {
-			if b && t.hasContent() && !feeds.IsTracked(s) && viper.GetBool("feeds.popup") {
+			if b && t.hasContent() && !subscriptions.IsSubscribed(s) && viper.GetBool("subscriptions.popup") {
 				// The current page might be an untracked feed, and the user wants
 				// to be notified in such cases.
 
@@ -365,9 +365,9 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		Bookmarks(t)
 		return ret("about:bookmarks", true)
 	}
-	if u == "about:feeds" {
-		Feeds(t)
-		return ret("about:feeds", true)
+	if u == "about:subscriptions" {
+		Subscriptions(t)
+		return ret("about:subscriptions", true)
 	}
 
 	u = normalizeURL(u)
@@ -613,10 +613,10 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	// First see if it's a feed, and ask the user about adding it if it is
 	filename := path.Base(parsed.Path)
 	mediatype, _, _ := mime.ParseMediaType(res.Meta)
-	feed, ok := feeds.GetFeed(mediatype, filename, res.Body)
+	feed, ok := subscriptions.GetFeed(mediatype, filename, res.Body)
 	if ok {
 		go func() {
-			added := addFeedDirect(u, feed, feeds.IsTracked(u))
+			added := addFeedDirect(u, feed, subscriptions.IsSubscribed(u))
 			if !added {
 				// Otherwise offer download choices
 				go dlChoice("That file could not be displayed. What would you like to do?", u, res)

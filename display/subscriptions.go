@@ -11,15 +11,15 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
-	"github.com/makeworld-the-better-one/amfora/feeds"
 	"github.com/makeworld-the-better-one/amfora/logger"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
+	"github.com/makeworld-the-better-one/amfora/subscriptions"
 	"github.com/mmcdole/gofeed"
 	"github.com/spf13/viper"
 )
 
-var feedPageUpdated time.Time
+var subscriptionPageUpdated time.Time
 
 // toLocalDay truncates the provided time to a date only,
 // but converts to the local time first.
@@ -29,21 +29,21 @@ func toLocalDay(t time.Time) time.Time {
 }
 
 // Feeds displays the feeds page on the current tab.
-func Feeds(t *tab) {
-	logger.Log.Println("display.Feeds called")
+func Subscriptions(t *tab) {
+	logger.Log.Println("display.Subscriptions called")
 
 	// Retrieve cached version if there hasn't been any updates
-	p, ok := cache.GetPage("about:feeds")
-	if feedPageUpdated.After(feeds.LastUpdated) && ok {
-		logger.Log.Println("using cached feeds page")
+	p, ok := cache.GetPage("about:subscriptions")
+	if subscriptionPageUpdated.After(subscriptions.LastUpdated) && ok {
+		logger.Log.Println("using cached subscriptions page")
 		setPage(t, p)
 		t.applyBottomBar()
 		return
 	}
 
-	logger.Log.Println("started rendering feeds page")
+	logger.Log.Println("started rendering subscriptions page")
 
-	feedPageRaw := "# Feeds & Pages\n\n" +
+	subscriptionPageRaw := "# Subscriptions\n\n" +
 		"See the help (by pressing ?) for details on how to use this page.\n\n" +
 		"If you just opened Amfora then updates will appear incrementally. Reload the page to see them.\n"
 
@@ -58,7 +58,7 @@ func Feeds(t *tab) {
 	// the UTC timezone is specified. I believe gemfeed does this.
 	curDay := toLocalDay(time.Now()).Add(26 * time.Hour)
 
-	pe := feeds.GetPageEntries()
+	pe := subscriptions.GetPageEntries()
 
 	for _, entry := range pe.Entries { // From new to old
 		// Convert to local time, remove sub-day info
@@ -67,24 +67,24 @@ func Feeds(t *tab) {
 		if pub.Before(curDay) {
 			// This post is on a new day, add a day header
 			curDay = pub
-			feedPageRaw += fmt.Sprintf("\n## %s\n\n", curDay.Format("Jan 02, 2006"))
+			subscriptionPageRaw += fmt.Sprintf("\n## %s\n\n", curDay.Format("Jan 02, 2006"))
 		}
 		if entry.Title == "" || entry.Title == "/" {
 			// Just put author/title
 			// Mainly used for when you're tracking the root domain of a site
-			feedPageRaw += fmt.Sprintf("=>%s %s\n", entry.URL, entry.Prefix)
+			subscriptionPageRaw += fmt.Sprintf("=>%s %s\n", entry.URL, entry.Prefix)
 		} else {
 			// Include title and dash
-			feedPageRaw += fmt.Sprintf("=>%s %s - %s\n", entry.URL, entry.Prefix, entry.Title)
+			subscriptionPageRaw += fmt.Sprintf("=>%s %s - %s\n", entry.URL, entry.Prefix, entry.Title)
 		}
 	}
 
-	content, links := renderer.RenderGemini(feedPageRaw, textWidth(), leftMargin(), false)
+	content, links := renderer.RenderGemini(subscriptionPageRaw, textWidth(), leftMargin(), false)
 	page := structs.Page{
-		Raw:       feedPageRaw,
+		Raw:       subscriptionPageRaw,
 		Content:   content,
 		Links:     links,
-		URL:       "about:feeds",
+		URL:       "about:subscriptions",
 		Width:     termW,
 		Mediatype: structs.TextGemini,
 	}
@@ -92,26 +92,26 @@ func Feeds(t *tab) {
 	setPage(t, &page)
 	t.applyBottomBar()
 
-	feedPageUpdated = time.Now()
+	subscriptionPageUpdated = time.Now()
 
-	logger.Log.Println("done rendering feeds page")
+	logger.Log.Println("done rendering subscriptions page")
 }
 
-// openFeedModal displays the "Add feed/page" modal
-// It returns whether the user wanted to add the feed/page.
-// The tracked arg specifies whether this feed/page is already
-// being tracked.
-func openFeedModal(validFeed, tracked bool) bool {
+// openSubscriptionModal displays the "Add subscription" modal
+// It returns whether the user wanted to subscribe to feed/page.
+// The subscribed arg specifies whether this feed/page is already
+// subscribed to.
+func openSubscriptionModal(validFeed, subscribed bool) bool {
 	logger.Log.Println("display.openFeedModal called")
 	// Reuses yesNoModal
 
 	if viper.GetBool("a-general.color") {
 		yesNoModal.
-			SetBackgroundColor(config.GetColor("feed_modal_bg")).
-			SetTextColor(config.GetColor("feed_modal_text"))
+			SetBackgroundColor(config.GetColor("subscription_modal_bg")).
+			SetTextColor(config.GetColor("subscription_modal_text"))
 		yesNoModal.GetFrame().
-			SetBorderColor(config.GetColor("feed_modal_text")).
-			SetTitleColor(config.GetColor("feed_modal_text"))
+			SetBorderColor(config.GetColor("subscription_modal_text")).
+			SetTitleColor(config.GetColor("subscription_modal_text"))
 	} else {
 		yesNoModal.
 			SetBackgroundColor(tcell.ColorBlack).
@@ -121,18 +121,18 @@ func openFeedModal(validFeed, tracked bool) bool {
 			SetTitleColor(tcell.ColorWhite)
 	}
 	if validFeed {
-		yesNoModal.GetFrame().SetTitle("Feed Tracking")
-		if tracked {
-			yesNoModal.SetText("This is already being tracked. Would you like to manually update it?")
+		yesNoModal.GetFrame().SetTitle("Feed Subscription")
+		if subscribed {
+			yesNoModal.SetText("You are already subscribed to this feed. Would you like to manually update it?")
 		} else {
-			yesNoModal.SetText("Would you like to start tracking this feed?")
+			yesNoModal.SetText("Would you like to subscribe to this feed?")
 		}
 	} else {
-		yesNoModal.GetFrame().SetTitle("Page Tracking")
-		if tracked {
-			yesNoModal.SetText("This is already being tracked. Would you like to manually update it?")
+		yesNoModal.GetFrame().SetTitle("Page Subscription")
+		if subscribed {
+			yesNoModal.SetText("You are already subscribed to this page. Would you like to manually update it?")
 		} else {
-			yesNoModal.SetText("Would you like to start tracking this page?")
+			yesNoModal.SetText("Would you like to subscribe to this page?")
 		}
 	}
 
@@ -148,12 +148,12 @@ func openFeedModal(validFeed, tracked bool) bool {
 	return resp
 }
 
-// getFeedFromPage is like feeds.GetFeed but takes a structs.Page as input.
+// getFeedFromPage is like subscriptions.GetFeed but takes a structs.Page as input.
 func getFeedFromPage(p *structs.Page) (*gofeed.Feed, bool) {
 	parsed, _ := url.Parse(p.URL)
 	filename := path.Base(parsed.Path)
 	r := strings.NewReader(p.Raw)
-	return feeds.GetFeed(p.RawMediatype, filename, r)
+	return subscriptions.GetFeed(p.RawMediatype, filename, r)
 }
 
 // addFeedDirect is only for adding feeds, not pages.
@@ -166,8 +166,8 @@ func getFeedFromPage(p *structs.Page) (*gofeed.Feed, bool) {
 func addFeedDirect(u string, feed *gofeed.Feed, tracked bool) bool {
 	logger.Log.Println("display.addFeedDirect called")
 
-	if openFeedModal(true, tracked) {
-		err := feeds.AddFeed(u, feed)
+	if openSubscriptionModal(true, tracked) {
+		err := subscriptions.AddFeed(u, feed)
 		if err != nil {
 			Error("Feed Error", err.Error())
 		}
@@ -176,10 +176,10 @@ func addFeedDirect(u string, feed *gofeed.Feed, tracked bool) bool {
 	return false
 }
 
-// addFeed goes through the process of tracking the current page/feed.
+// addFeed goes through the process of subscribing to the current page/feed.
 // It is the high-level way of doing it. It should be called in a goroutine.
-func addFeed() {
-	logger.Log.Println("display.addFeed called")
+func addSubscription() {
+	logger.Log.Println("display.addSubscription called")
 
 	t := tabs[curTab]
 	p := t.page
@@ -190,15 +190,15 @@ func addFeed() {
 	}
 
 	feed, isFeed := getFeedFromPage(p)
-	tracked := feeds.IsTracked(p.URL)
+	tracked := subscriptions.IsSubscribed(p.URL)
 
-	if openFeedModal(isFeed, tracked) {
+	if openSubscriptionModal(isFeed, tracked) {
 		var err error
 
 		if isFeed {
-			err = feeds.AddFeed(p.URL, feed)
+			err = subscriptions.AddFeed(p.URL, feed)
 		} else {
-			err = feeds.AddPage(p.URL, strings.NewReader(p.Raw))
+			err = subscriptions.AddPage(p.URL, strings.NewReader(p.Raw))
 		}
 
 		if err != nil {

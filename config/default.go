@@ -135,22 +135,22 @@ max_pages = 30 # The maximum number of pages the cache will store
 # Note that HTTP and HTTPS are treated as separate protocols here.
 
 
-[feeds]
+[subscriptions]
 # For tracking feeds and pages
 
 # Whether a pop-up appears when viewing a potential feed
 popup = true
 
-# How often to check for new feeds and pages in the background, in seconds.
-# Note Amfora will check for updates on browser start anyway.
-# Set it to 0 or below to disable this feature. You can still update individual
-# feeds manually, or just restart the browser to update all of them.
+# How often to check for updates to subscriptions in the background, in seconds.
+# Set it to 0 to disable this feature. You can still update individual feeds
+# manually, or restart the browser.
+#
+# Note Amfora will check for updates on browser start no matter what this setting is.
 update_interval = 1800 # 30 mins
 
-# How many pages/feeds can be checked at the same time when updating.
-# If you are tracking many feeds and pages you may want to increase this for
-# faster update times.
-# Any value below 1 will be corrected to 1.
+# How many subscriptions can be checked at the same time when updating.
+# If you have many subscriptions you may want to increase this for faster
+# update times. Any value below 1 will be corrected to 1.
 workers = 3
 
 
@@ -212,8 +212,8 @@ workers = 3
 # yesno_modal_text
 # tofu_modal_bg
 # tofu_modal_text
-# feed_modal_bg
-# feed_modal_text
+# subscription_modal_bg
+# subscription_modal_text
 
 # input_modal_bg
 # input_modal_text

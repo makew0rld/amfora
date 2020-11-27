@@ -39,9 +39,9 @@ var bkmkPath string
 
 var DownloadsDir string
 
-// Feeds
-var feedDir string
-var FeedPath string
+// Subscriptions
+var subscriptionDir string
+var SubscriptionPath string
 
 // Command for opening HTTP(S) URLs in the browser, from "a-general.http" in config.
 var HTTPCommand []string
@@ -103,18 +103,18 @@ func Init() error {
 	// Feeds dir and path
 	if runtime.GOOS == "windows" {
 		// In APPDATA beside other Amfora files
-		feedDir = amforaAppData
+		subscriptionDir = amforaAppData
 	} else {
 		// XDG data dir on POSIX systems
 		xdg_data, ok := os.LookupEnv("XDG_DATA_HOME")
 		if ok && strings.TrimSpace(xdg_data) != "" {
-			feedDir = filepath.Join(xdg_data, "amfora")
+			subscriptionDir = filepath.Join(xdg_data, "amfora")
 		} else {
 			// Default to ~/.local/share/amfora
-			feedDir = filepath.Join(home, ".local", "share", "amfora")
+			subscriptionDir = filepath.Join(home, ".local", "share", "amfora")
 		}
 	}
-	FeedPath = filepath.Join(feedDir, "feeds.json")
+	SubscriptionPath = filepath.Join(subscriptionDir, "subscriptions.json")
 
 	// *** Create necessary files and folders ***
 
@@ -152,7 +152,7 @@ func Init() error {
 		f.Close()
 	}
 	// Feeds
-	err = os.MkdirAll(feedDir, 0755)
+	err = os.MkdirAll(subscriptionDir, 0755)
 	if err != nil {
 		return err
 	}
@@ -234,9 +234,9 @@ func Init() error {
 	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
-	viper.SetDefault("feeds.popup", true)
-	viper.SetDefault("feeds.update_interval", 1800)
-	viper.SetDefault("feeds.workers", 3)
+	viper.SetDefault("subscriptions.popup", true)
+	viper.SetDefault("subscriptions.update_interval", 1800)
+	viper.SetDefault("subscriptions.workers", 3)
 
 	viper.SetConfigFile(configPath)
 	viper.SetConfigType("toml")

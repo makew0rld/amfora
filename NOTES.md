@@ -1,6 +1,6 @@
 # Notes
 
-## Feeds (temp)
+## Subscriptions (temp)
 - TODO: remove all logger lines
 
 ## Issues

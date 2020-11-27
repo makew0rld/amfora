@@ -18,7 +18,7 @@ You can customize this page by creating a gemtext file called newtab.gmi, in Amf
 Happy browsing!
 
 => about:bookmarks Bookmarks
-=> about:feeds Feed and Page Tracking
+=> about:subscriptions Feed and Page Tracking
 
 => //gemini.circumlunar.space Project Gemini
 => https://github.com/makeworld-the-better-one/amfora Amfora homepage [HTTPS]

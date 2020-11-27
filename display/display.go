@@ -294,11 +294,11 @@ func Init() {
 				}
 				return nil
 			case tcell.KeyCtrlA:
-				Feeds(tabs[curTab])
-				tabs[curTab].addToHistory("about:feeds")
+				Subscriptions(tabs[curTab])
+				tabs[curTab].addToHistory("about:subscriptions")
 				return nil
 			case tcell.KeyCtrlX:
-				go addFeed()
+				go addSubscription()
 				return nil
 			case tcell.KeyRune:
 				// Regular key was sent
@@ -583,9 +583,9 @@ func URL(u string) {
 		tabs[curTab].addToHistory("about:bookmarks")
 		return
 	}
-	if u == "about:feeds" { //nolint:goconst
-		Feeds(tabs[curTab])
-		tabs[curTab].addToHistory("about:feeds")
+	if u == "about:subscriptions" { //nolint:goconst
+		Subscriptions(tabs[curTab])
+		tabs[curTab].addToHistory("about:subscriptions")
 		return
 	}
 	if u == "about:newtab" {

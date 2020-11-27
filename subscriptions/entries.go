@@ -1,4 +1,4 @@
-package feeds
+package subscriptions
 
 import (
 	"net/url"
@@ -10,7 +10,7 @@ import (
 )
 
 // This file contains funcs for creating PageEntries, which
-// are consumed by display/feeds.go
+// are consumed by display/subscriptions.go
 
 // getURL returns a URL to be used in a PageEntry, from a
 // list of URLs for that item. It prefers gemini URLs, then
@@ -42,7 +42,7 @@ func getURL(urls []string) string {
 // so this function needs to be called again to get updates.
 // It always returns sorted entries - by post time, from newest to oldest.
 func GetPageEntries() *PageEntries {
-	logger.Log.Println("feeds.GetPageEntries called")
+	logger.Log.Println("subscriptions.GetPageEntries called")
 
 	var pe PageEntries
 

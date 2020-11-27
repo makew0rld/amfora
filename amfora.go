@@ -7,8 +7,8 @@ import (
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/display"
-	"github.com/makeworld-the-better-one/amfora/feeds"
 	"github.com/makeworld-the-better-one/amfora/logger"
+	"github.com/makeworld-the-better-one/amfora/subscriptions"
 )
 
 var (
@@ -45,9 +45,9 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Config error: %v\n", err)
 		os.Exit(1)
 	}
-	err = feeds.Init()
+	err = subscriptions.Init()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "feeds.json error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "subscriptions.json error: %v\n", err)
 		os.Exit(1)
 	}
 

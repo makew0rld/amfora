@@ -61,12 +61,12 @@ func GetPageEntries() *PageEntries {
 
 			// Try to use updated time first, then published
 
-			if !item.UpdatedParsed.IsZero() {
+			if item.UpdatedParsed != nil && !item.UpdatedParsed.IsZero() {
 				pub = *item.UpdatedParsed
-			} else if !item.PublishedParsed.IsZero() {
+			} else if item.PublishedParsed != nil && !item.PublishedParsed.IsZero() {
 				pub = *item.PublishedParsed
 			} else {
-				// No time on the post
+				// No time on the post, use now
 				pub = time.Now()
 			}
 

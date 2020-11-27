@@ -576,25 +576,8 @@ func Reload() {
 // URL loads and handles the provided URL for the current tab.
 // It should be an absolute URL.
 func URL(u string) {
-	// Some code is copied in followLink()
-
-	if u == "about:bookmarks" { //nolint:goconst
-		Bookmarks(tabs[curTab])
-		tabs[curTab].addToHistory("about:bookmarks")
-		return
-	}
-	if u == "about:subscriptions" { //nolint:goconst
-		Subscriptions(tabs[curTab])
-		tabs[curTab].addToHistory("about:subscriptions")
-		return
-	}
-	if u == "about:newtab" {
-		temp := newTabPage // Copy
-		setPage(tabs[curTab], &temp)
-		return
-	}
-	if strings.HasPrefix(u, "about:") {
-		Error("Error", "Not a valid 'about:' URL.")
+	if u[:6] == "about:" {
+		handleAbout(tabs[curTab], u)
 		return
 	}
 

@@ -163,6 +163,35 @@ func handleFavicon(t *tab, host, old string) {
 	cache.AddFavicon(host, emoji)
 }
 
+// handleAbout can be called to deal with any URLs that start with
+// 'about:'. It will display errors if the URL is not recognized,
+// but not display anything if an 'about:' URL is not passed.
+//
+// It returns a bool indicating if the provided URL could be handled.
+func handleAbout(t *tab, u string) bool {
+	if u[:6] != "about:" {
+		return false
+	}
+
+	switch u {
+	case "about:bookmarks":
+		Bookmarks(t)
+		t.addToHistory("about:bookmarks")
+		return true
+	case "about:subscriptions":
+		Subscriptions(t)
+		t.addToHistory("about:subscriptions")
+		return true
+	case "about:newtab":
+		temp := newTabPage // Copy
+		setPage(t, &temp)
+		return true
+	}
+
+	Error("Error", "Not a valid 'about:' URL.")
+	return false
+}
+
 // handleURL displays whatever action is needed for the provided URL,
 // and applies it to the current tab.
 // It loads documents, handles errors, brings up a download prompt, etc.
@@ -215,14 +244,8 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 
 	App.SetFocus(t.view)
 
-	// To allow linking to the bookmarks page, and history browsing
-	if u == "about:bookmarks" {
-		Bookmarks(t)
-		return ret("about:bookmarks", true)
-	}
-	if u == "about:subscriptions" {
-		Subscriptions(t)
-		return ret("about:subscriptions", true)
+	if u[:6] == "about:" {
+		return ret(u, handleAbout(t, u))
 	}
 
 	u = normalizeURL(u)

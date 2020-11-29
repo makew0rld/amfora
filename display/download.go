@@ -85,18 +85,55 @@ func dlInit() {
 	})
 }
 
+func getMediaConf(resp *gemini.Response) map[string]interface{} {
+	def := map[string]interface{}{
+		"command": nil,
+		"action": "prompt",
+	}
+
+	// TODO: currently we are ignoring the mediatype params.
+	mediatype, _, err := mime.ParseMediaType(resp.Meta)
+	if err != nil {
+		return def
+	}
+	splitMime := strings.Split(mediatype, "/")
+	confKey := ("mime-handlers." + mediatype)
+	if !viper.IsSet(confKey) {
+		// Try with a wildcard subtype
+		confKey = ("mime-handlers." + splitMime[0] + "/*")
+	}
+	if !viper.IsSet(confKey) {
+		// Try with wildcard type and subtype
+		confKey = ("mime-handlers.*/*")
+	}
+	if viper.IsSet(confKey) {
+		return viper.GetStringMap(confKey)
+	}
+	return def
+}
+
 // dlChoice displays the download choice modal and acts on the user's choice.
 // It should run in a goroutine.
 func dlChoice(text, u string, resp *gemini.Response) {
 	defer resp.Body.Close()
 
-	dlChoiceModal.SetText(text)
-	tabPages.ShowPage("dlChoice")
-	tabPages.SendToFront("dlChoice")
-	App.SetFocus(dlChoiceModal)
-	App.Draw()
+	mediaConf := getMediaConf(resp)
+	var choice string
 
-	choice := <-dlChoiceCh
+	switch mediaConf["action"] {
+	case "download":
+		choice = "Download"
+	case "open":
+		choice = "Open"
+	default:
+		dlChoiceModal.SetText(text)
+		tabPages.ShowPage("dlChoice")
+		tabPages.SendToFront("dlChoice")
+		App.SetFocus(dlChoiceModal)
+		App.Draw()
+		choice = <-dlChoiceCh
+	}
+
 	if choice == "Download" {
 		tabPages.HidePage("dlChoice")
 		App.Draw()
@@ -118,42 +155,24 @@ func dlChoice(text, u string, resp *gemini.Response) {
 // If there is no system viewer configured for the particular mime type, it opens it
 // with the normal http handler using portal.mozz.us.
 func openInSystem(u string, resp *gemini.Response) {
-	// TODO: currently we are ignoring the mediatype params.
-	mediatype, _, err := mime.ParseMediaType(resp.Meta)
-	if err != nil {
+	mediaConf := getMediaConf(resp)
+	var cmd []string
+	switch mediaConf["command"].(type) {
+	case []string:
+		cmd = mediaConf["command"].([]string)
+	default: // Including nil
 		openInProxy(u)
 		return
 	}
-	splitMime := strings.Split(mediatype, "/")
-	confKey := ("mime-handlers." + mediatype)
-	if !viper.IsSet(confKey) {
-		// Try with a wildcard subtype
-		confKey = ("mime-handlers." + splitMime[0] + "/*")
-	}
-	if !viper.IsSet(confKey) {
-		// Try with wildcard type and subtype
-		confKey = ("mime-handlers.*/*")
-	}
-	if viper.IsSet(confKey) {
-		mediaConf := viper.GetStringMap(confKey)
-		cmd := mediaConf["command"].([]string)
-		if (cmd == nil) {
-			openInProxy(u)
-			return
-		}
-		path := downloadURL(config.TempDownloadsDir, u, resp)
-		if (path == "") {
-			return
-		}
-		err := exec.Command(cmd[0], append(cmd[1:], path)...).Start()
-		if err != nil {
-			Error("System Viewer Error", "Error executing custom command: "+err.Error())
-			return
-		}
+	path := downloadURL(config.TempDownloadsDir, u, resp)
+	if (path == "") {
 		return
 	}
-	// Fallback to opening in proxy
-	openInProxy(u)
+	err := exec.Command(cmd[0], append(cmd[1:], path)...).Start()
+	if err != nil {
+		Error("System Viewer Error", "Error executing custom command: "+err.Error())
+		return
+	}
 }
 
 // openInProxy opens the url using the nomal http handler using portal.mozz.us

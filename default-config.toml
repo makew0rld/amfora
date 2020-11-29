@@ -123,8 +123,14 @@ other = 'off'
 #
 # If command is "" or [] the file will be opened using the mozz.us http portal
 # and a-general.http
+#
+# Mime type handlers may also have an action field containing one of the following:
+# "prompt"   - Ask user every time which action to take.
+# "download" - Always download the file without prompting
+# "open"     - Always open the file using the below command without prompting
 [mime-handlers."*/*"]
 command = []
+action = "prompt"
 
 
 [cache]

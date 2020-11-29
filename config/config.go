@@ -281,7 +281,7 @@ func Init() error {
 		HTTPCommand = strings.Fields(viper.GetString("a-general.http"))
 	}
 
-	// Make sure MIME commands are all in array form
+	// Make sure MIME commands are all in array form and have valid actions
 	for mime := range viper.GetStringMap("mime-handlers") {
 		key := "mime-handlers." + mime + ".command"
 		if viper.IsSet(key) {
@@ -293,6 +293,21 @@ func Init() error {
 				cmd = nil
 			}
 			viper.Set(key, cmd)
+		}
+
+		key = "mime-handlers." + mime + ".action"
+		if viper.IsSet(key) {
+			action := strings.ToLower(viper.GetString(key))
+			switch (action) {
+			case "prompt":
+			case "download":
+			case "open":
+			case "":
+				action = "prompt"
+			default:
+				return fmt.Errorf(`invalid value for "%s": %s`, key, action)
+			}
+			viper.Set(key, action)
 		}
 	}
 

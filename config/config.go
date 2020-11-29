@@ -38,6 +38,7 @@ var bkmkDir string
 var bkmkPath string
 
 var DownloadsDir string
+var TempDownloadsDir string
 
 // Command for opening HTTP(S) URLs in the browser, from "a-general.http" in config.
 var HTTPCommand []string
@@ -169,6 +170,36 @@ func Init() error {
 		DownloadsDir = dDir
 	}
 
+	// Setup temporary downloads dir
+	if viper.GetString("a-general.temp_downloads") == "" {
+		TempDownloadsDir = filepath.Join(os.TempDir(), "amfora-downloads")
+
+		// Make sure it exists
+		err = os.MkdirAll(TempDownloadsDir, 0755)
+		if err != nil {
+			return fmt.Errorf("downloads path could not be created: %s", DownloadsDir)
+		}
+	} else {
+		// Validate path
+		dDir := viper.GetString("a-general.temp_downloads")
+		di, err := os.Stat(dDir)
+		if err == nil {
+			if !di.IsDir() {
+				return fmt.Errorf("temp downloads path specified is not a directory: %s", dDir)
+			}
+		} else if os.IsNotExist(err) {
+			// Try to create path
+			err = os.MkdirAll(dDir, 0755)
+			if err != nil {
+				return fmt.Errorf("temp downloads path could not be created: %s", dDir)
+			}
+		} else {
+			// Some other error
+			return fmt.Errorf("couldn't access temp downloads directory: %s", dDir)
+		}
+		TempDownloadsDir = dDir
+	}
+
 	// *** Setup vipers ***
 
 	TofuStore.SetConfigFile(tofuDBPath)
@@ -202,6 +233,7 @@ func Init() error {
 	viper.SetDefault("a-general.left_margin", 0.15)
 	viper.SetDefault("a-general.max_width", 100)
 	viper.SetDefault("a-general.downloads", "")
+	viper.SetDefault("a-general.temp_downloads", "")
 	viper.SetDefault("a-general.page_max_size", 2097152)
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.emoji_favicons", false)

@@ -109,6 +109,13 @@ shift_numbers = "!@#$%^&*()"
 other = 'off'
 
 
+[mime-handlers]
+# Allows setting the commands to run for various mime types.
+# E.g. to open png files with the imagemagic display command:
+#   [mime-handlers."image/png"]
+#   command = "display"
+
+
 [cache]
 # Options for page cache - which is only for text/gemini pages
 # Increase the cache size to speed up browsing at the expense of memory

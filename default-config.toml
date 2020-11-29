@@ -114,6 +114,17 @@ other = 'off'
 # E.g. to open png files with the imagemagic display command:
 #   [mime-handlers."image/png"]
 #   command = ["display"]
+#
+# The subtype may be a * to open all files of a set type E.g:
+#   [mime-handlers."image/*"]
+#   command = ["display"]
+#
+# Both the type and subtype may be */* to specify the default handler.
+#
+# If command is "" or [] the file will be opened using the mozz.us http portal
+# and a-general.http
+[mime-handlers."*/*"]
+command = []
 
 
 [cache]

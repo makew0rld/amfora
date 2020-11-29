@@ -124,7 +124,16 @@ func openInSystem(u string, resp *gemini.Response) {
 		openInProxy(u)
 		return
 	}
+	splitMime := strings.Split(mediatype, "/")
 	confKey := ("mime-handlers." + mediatype)
+	if !viper.IsSet(confKey) {
+		// Try with a wildcard subtype
+		confKey = ("mime-handlers." + splitMime[0] + "/*")
+	}
+	if !viper.IsSet(confKey) {
+		// Try with wildcard type and subtype
+		confKey = ("mime-handlers.*/*")
+	}
 	if viper.IsSet(confKey) {
 		mediaConf := viper.GetStringMap(confKey)
 		cmd := mediaConf["command"].([]string)

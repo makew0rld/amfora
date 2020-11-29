@@ -126,18 +126,17 @@ func openInSystem(u string, resp *gemini.Response) {
 	}
 	confKey := ("mime-handlers." + mediatype)
 	if viper.IsSet(confKey) {
-		mediaConf := viper.GetStringMapString(confKey)
-		cmd := mediaConf["command"]
-		if (cmd == "") {
+		mediaConf := viper.GetStringMap(confKey)
+		cmd := mediaConf["command"].([]string)
+		if (cmd == nil) {
 			openInProxy(u)
 			return
 		}
-		fields := strings.Fields(cmd)
 		path := downloadURL(config.TempDownloadsDir, u, resp)
 		if (path == "") {
 			return
 		}
-		err := exec.Command(fields[0], append(fields[1:], path)...).Start()
+		err := exec.Command(cmd[0], append(cmd[1:], path)...).Start()
 		if err != nil {
 			Error("System Viewer Error", "Error executing custom command: "+err.Error())
 			return

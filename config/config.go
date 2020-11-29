@@ -281,5 +281,20 @@ func Init() error {
 		HTTPCommand = strings.Fields(viper.GetString("a-general.http"))
 	}
 
+	// Make sure MIME commands are all in array form
+	for mime := range viper.GetStringMap("mime-handlers") {
+		key := "mime-handlers." + mime + ".command"
+		if viper.IsSet(key) {
+			cmd := viper.GetStringSlice(key)
+			if len(cmd) == 0 {
+				cmd = strings.Fields(viper.GetString(key))
+			}
+			if len(cmd) == 0 {
+				cmd = nil
+			}
+			viper.Set(key, cmd)
+		}
+	}
+
 	return nil
 }

@@ -113,7 +113,7 @@ other = 'off'
 # Allows setting the commands to run for various mime types.
 # E.g. to open png files with the imagemagic display command:
 #   [mime-handlers."image/png"]
-#   command = "display"
+#   command = ["display"]
 
 
 [cache]

@@ -121,6 +121,8 @@ Features in *italics* are in the master branch, but not in the latest release.
   - Disabled by default, enable in config
 - [x] Proxying
   - Schemes like Gopher or HTTP can be proxied through a Gemini server
+- [x] Configure applications to open particular mediatypes
+    - [ ] Allow piping/streaming content instead of downloading it first.
 - [x] Client certificate support
   - [ ] Full client certificate UX within the client
     - Create transient and permanent certs within the client, per domain

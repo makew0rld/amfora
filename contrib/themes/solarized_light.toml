@@ -1,0 +1,102 @@
+[theme]
+# This section is for changing the COLORS used in Amfora.
+# These colors only apply if 'color' is enabled above.
+# Colors can be set using a W3C color name, or a hex value such as "#ffffff".
+
+# Note that not all colors will work on terminals that do not have truecolor support.
+# If you want to stick to the standard 16 or 256 colors, you can get
+# a list of those here: https://jonasjacek.github.io/colors/
+# DO NOT use the names from that site, just the hex codes.
+
+# Definitions:
+#   bg = background
+#   fg = foreground
+#   dl = download
+#   btn = button
+#   hdg = heading
+#   bkmk = bookmark
+#   modal = a popup window/box in the middle of the screen
+
+# EXAMPLES:
+# hdg_1 = "green"
+# hdg_2 = "#5f0000"
+
+# Available keys to set:
+
+# bg: background for pages, tab row, app in general
+# tab_num: The number/highlight of the tabs at the top
+# tab_divider: The color of the divider character between tab numbers: |
+# bottombar_label: The color of the prompt that appears when you press space
+# bottombar_text: The color of the text you type
+# bottombar_bg
+
+bg =            "#FCF6E3"
+fg =            "#5A6E75"
+tab_num =       "#3889D2"
+tab_divider =       "#EDE8D5"
+bottombar_bg =      "#EDE8D5"
+bottombar_text =    "#5A6E75"
+bottombar_label =   "#3ea197"
+
+# hdg_1
+# hdg_2
+# hdg_3
+# amfora_link: A link that Amfora supports viewing. For now this is only gemini://
+# foreign_link: HTTP(S), Gopher, etc
+# link_number: The silver number that appears to the left of a link
+# regular_text: Normal gemini text, and plaintext documents
+# quote_text
+# preformatted_text
+# list_text
+
+hdg_1 =         "#3EA197"
+hdg_2 =         "#3889D2"
+hdg_3 =         "#6D6EC4"
+amfora_link =       "#5A6E75"
+foreign_link =      "#677B83"
+link_number =       "#CC3283"
+regular_text =      "#0F3642"
+quote_text =        "#0F3642"
+preformatted_text = "#0F3642"
+list_text =     "#0F3642"
+
+# btn_bg: The bg color for all modal buttons
+# btn_text: The text color for all modal buttons
+
+btn_bg =        "#3889D2"
+btn_text =      "#FCF6E3"
+
+dl_choice_modal_bg =    "#EDE8D5"
+dl_choice_modal_text =  "#0F3642"
+dl_modal_bg =       "#EDE8D5"
+dl_modal_text =     "#0F3642"
+info_modal_bg =     "#EDE8D5"
+info_modal_text =   "#0F3642"
+error_modal_bg =    "#EDE8D5"
+error_modal_text =  "#D53234"
+yesno_modal_bg =    "#EDE8D5"
+yesno_modal_text =  "#0F3642"
+tofu_modal_bg =     "#EDE8D5"
+tofu_modal_text =   "#0F3642"
+
+# input_modal_bg
+# input_modal_text
+# input_modal_field_bg: The bg of the input field, where you type the text
+# input_modal_field_text: The color of the text you type
+
+input_modal_bg =    "#EDE8D5"
+input_modal_text =  "#0F3642"
+input_modal_field_bg =  "#FCF6E3"
+input_modal_field_text ="#0F3642"
+
+# bkmk_modal_bg
+# bkmk_modal_text
+# bkmk_modal_label
+# bkmk_modal_field_bg
+# bkmk_modal_field_text
+
+bkmk_modal_bg =     "#EDE8D5"
+bkmk_modal_text =   "#0F3642"
+bkmk_modal_label =  "#3ea197"
+bkmk_modal_field_bg =   "#FCF6E3"
+bkmk_modal_field_text = "#0F3642"

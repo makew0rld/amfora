@@ -134,8 +134,8 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 				// There is link text
 				url = lines[i][:delim]
 				linkText = strings.Trim(lines[i][delim:], " \t")
-				if viper.GetBool("a-general.show_link"){
-					linkText = linkText + " (" + url +")"
+				if viper.GetBool("a-general.show_link") {
+					linkText = linkText + " (" + url + ")"
 				}
 			}
 

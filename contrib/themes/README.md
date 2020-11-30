@@ -33,6 +33,30 @@ Contributed by **[@Skraylet](https://github.com/Skraylet)**.
 ![screenshot of gruvbox theme](https://user-images.githubusercontent.com/26380693/100381734-4a63ae00-3022-11eb-9531-a635df310052.png)
 </details>
 
+## Solarized
+
+Contributed by **[@bnthor](https://github.com/bnthor)**.
+
+### Dark
+
+![screenshot of solarized dark theme](https://user-images.githubusercontent.com/798657/100597218-77071680-32fd-11eb-8e0d-593ff95b7129.png)
+
+<details>
+<summary>Another screenshot</summary>
+
+![screenshot of solarized dark theme](https://user-images.githubusercontent.com/798657/100597236-7b333400-32fd-11eb-8844-b92601da52c7.png)
+</details>
+
+### Light
+
+![screenshot of solarized light theme](https://user-images.githubusercontent.com/798657/100597327-9aca5c80-32fd-11eb-8c91-fe3e324d8959.png)
+
+<details>
+<summary>Another screenshot</summary>
+
+![screenshot of solarized light theme](https://user-images.githubusercontent.com/798657/100597349-a453c480-32fd-11eb-866e-10b0587228f6.png)
+</details>
+
 
 ## Yours?
 

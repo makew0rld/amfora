@@ -50,6 +50,9 @@ ansi = true
 # Whether to replace list asterisks with unicode bullets
 bullets = true
 
+# Whether to show link after link text
+show_link = false
+
 # A number from 0 to 1, indicating what percentage of the terminal width the left margin should take up.
 left_margin = 0.15
 

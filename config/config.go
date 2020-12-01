@@ -298,7 +298,7 @@ func Init() error {
 		key = "mime-handlers." + mime + ".action"
 		if viper.IsSet(key) {
 			action := strings.ToLower(viper.GetString(key))
-			switch (action) {
+			switch action {
 			case "prompt":
 			case "download":
 			case "open":

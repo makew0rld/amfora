@@ -88,7 +88,7 @@ func dlInit() {
 func getMediaConf(resp *gemini.Response) map[string]interface{} {
 	def := map[string]interface{}{
 		"command": nil,
-		"action": "prompt",
+		"action":  "prompt",
 	}
 
 	// TODO: currently we are ignoring the mediatype params.
@@ -157,15 +157,15 @@ func dlChoice(text, u string, resp *gemini.Response) {
 func openInSystem(u string, resp *gemini.Response) {
 	mediaConf := getMediaConf(resp)
 	var cmd []string
-	switch mediaConf["command"].(type) {
+	switch v := mediaConf["command"].(type) {
 	case []string:
-		cmd = mediaConf["command"].([]string)
+		cmd = v
 	default: // Including nil
 		openInProxy(u)
 		return
 	}
 	path := downloadURL(config.TempDownloadsDir, u, resp)
-	if (path == "") {
+	if path == "" {
 		return
 	}
 	err := exec.Command(cmd[0], append(cmd[1:], path)...).Start()

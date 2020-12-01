@@ -17,6 +17,7 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/structs"
+	"github.com/makeworld-the-better-one/amfora/webbrowser"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/makeworld-the-better-one/progressbar/v3"
 	"github.com/spf13/viper"
@@ -85,30 +86,30 @@ func dlInit() {
 	})
 }
 
-func getMediaConf(resp *gemini.Response) map[string]interface{} {
-	def := map[string]interface{}{
-		"command": nil,
-		"action":  "prompt",
+func getMediaHandler(resp *gemini.Response) config.MediaHandler {
+	def := config.MediaHandler{
+		Cmd:      nil,
+		NoPrompt: false,
 	}
 
-	// TODO: currently we are ignoring the mediatype params.
 	mediatype, _, err := mime.ParseMediaType(resp.Meta)
 	if err != nil {
 		return def
 	}
-	splitMime := strings.Split(mediatype, "/")
-	confKey := ("mime-handlers." + mediatype)
-	if !viper.IsSet(confKey) {
-		// Try with a wildcard subtype
-		confKey = ("mime-handlers." + splitMime[0] + "/*")
+
+	if ret, ok := config.MediaHandlers[mediatype]; ok {
+		return ret
 	}
-	if !viper.IsSet(confKey) {
-		// Try with wildcard type and subtype
-		confKey = ("mime-handlers.*/*")
+
+	splitType := strings.Split(mediatype, "/")
+	if ret, ok := config.MediaHandlers[splitType[0]]; ok {
+		return ret
 	}
-	if viper.IsSet(confKey) {
-		return viper.GetStringMap(confKey)
+
+	if ret, ok := config.MediaHandlers["*"]; ok {
+		return ret
 	}
+
 	return def
 }
 
@@ -117,15 +118,12 @@ func getMediaConf(resp *gemini.Response) map[string]interface{} {
 func dlChoice(text, u string, resp *gemini.Response) {
 	defer resp.Body.Close()
 
-	mediaConf := getMediaConf(resp)
+	mediaHandler := getMediaHandler(resp)
 	var choice string
 
-	switch mediaConf["action"] {
-	case "download":
-		choice = "Download"
-	case "open":
+	if mediaHandler.NoPrompt {
 		choice = "Open"
-	default:
+	} else {
 		dlChoiceModal.SetText(text)
 		tabPages.ShowPage("dlChoice")
 		tabPages.SendToFront("dlChoice")
@@ -143,7 +141,7 @@ func dlChoice(text, u string, resp *gemini.Response) {
 	if choice == "Open" {
 		tabPages.HidePage("dlChoice")
 		App.Draw()
-		openInSystem(u, resp)
+		downloadAndOpen(u, resp)
 		return
 	}
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
@@ -151,53 +149,34 @@ func dlChoice(text, u string, resp *gemini.Response) {
 	App.Draw()
 }
 
-// openInSystem performs the same actions as downloadURL except it also opens the file.
-// If there is no system viewer configured for the particular mime type, it opens it
-// with the normal http handler using portal.mozz.us.
-func openInSystem(u string, resp *gemini.Response) {
-	mediaConf := getMediaConf(resp)
-	var cmd []string
-	switch v := mediaConf["command"].(type) {
-	case []string:
-		cmd = v
-	default: // Including nil
-		openInProxy(u)
-		return
-	}
+// downloadAndOpen performs the same actions as downloadURL except it also opens the file.
+// If there is no system viewer configured for the particular mediatype, it opens it
+// with the default system viewer.
+func downloadAndOpen(u string, resp *gemini.Response) {
+	mediaHandler := getMediaHandler(resp)
 	path := downloadURL(config.TempDownloadsDir, u, resp)
 	if path == "" {
 		return
 	}
-	err := exec.Command(cmd[0], append(cmd[1:], path)...).Start()
-	if err != nil {
-		Error("System Viewer Error", "Error executing custom command: "+err.Error())
-		return
+	if mediaHandler.Cmd == nil {
+		// Open with system default viewer
+		_, err := webbrowser.Open(path)
+		if err != nil {
+			Error("System Viewer Error", err.Error())
+			return
+		}
+		dlModal.SetText("Opened in system default viewer")
+	} else {
+		cmd := mediaHandler.Cmd
+		err := exec.Command(cmd[0], append(cmd[1:], path)...).Start()
+		if err != nil {
+			Error("System Viewer Error", "Error executing custom command: "+err.Error())
+			return
+		}
+		dlModal.SetText("Opened in system viewer")
 	}
-}
-
-// openInProxy opens the url using the nomal http handler using portal.mozz.us
-func openInProxy(u string) {
-	// Open in mozz's proxy
-	parsed, err := url.Parse(u)
-	if err != nil {
-		Error("URL Error", err.Error())
-		return
-	}
-	portalURL := u
-
-	if parsed.RawQuery != "" {
-		// Remove query and add encoded version on the end
-		query := parsed.RawQuery
-		parsed.RawQuery = ""
-		portalURL = parsed.String() + "%3F" + query
-	}
-	portalURL = strings.TrimPrefix(portalURL, "gemini://") + "?raw=1"
-	ok := handleHTTP("https://portal.mozz.us/gemini/"+portalURL, false)
-	if ok {
-		tabPages.SwitchToPage(strconv.Itoa(curTab))
-		App.SetFocus(tabs[curTab].view)
-		App.Draw()
-	}
+	App.SetFocus(dlModal)
+	App.Draw()
 }
 
 // downloadURL pulls up a modal to show download progress and saves the URL content.

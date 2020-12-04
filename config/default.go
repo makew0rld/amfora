@@ -90,12 +90,52 @@ emoji_favicons = false
 
 
 [keybindings]
-# In the future there will be more settings here.
+# If you have a non-US keyboard, use bind_tab1 through bind_tab0 to
+# setup the shift-Number bindings to match:
+#bind_tab1 = "Rune:!"
+#bind_tab2 = "Rune:@"
+#bind_tab3 = "Rune:#"
+#bind_tab4 = "Rune:$"
+#bind_tab5 = "Rune:%"
+#bind_tab6 = "Rune:^"
+#bind_tab7 = "Rune:&"
+#bind_tab8 = "Rune:*"
+#bind_tab9 = "Rune:("
+#bind_tab0 = "Rune:)"
 
-# Hold down shift and press the numbers on your keyboard (1,2,3,4,5,6,7,8,9,0) to set this up.
-# It is default set to be accurate for US keyboards.
-shift_numbers = "!@#$%^&*()"
+# Note: extra whitespace is not allowed in any of the keybindings!
+# This is in-part to allow a binding of "Rune: " to mean "spacebar".
+# Multiple keys can be bound to one command, just use , to delimit
+# the different keys.
 
+# And the rest of the default keybindings
+#bind_reload = "Rune:R,Ctrl-R"
+#bind_home = "Backspace"
+#bind_bookmarks = "Ctrl-B"
+#bind_add_bookmark = "Ctrl-D"
+#bind_save = "Ctrl-S"
+#bind_pgup = "PgUp,Rune:u"
+#bind_pgdn = "PgDn,Rune:d"
+#bind_bottom = "Rune: "
+#bind_edit = "Rune:e"
+#bind_back = "Rune:b,Alt:Left"
+#bind_forward = "Rune:f,Alt:Right"
+#bind_new_tab = "Ctrl-T"
+#bind_close_tab = "Ctrl-W"
+#bind_next_tab = "F2"
+#bind_prev_tab = "F1"
+#bind_quit = "Ctrl-C,Ctrl-Q,Rune:q"
+#bind_help = "Rune:?"
+#bind_link1 = "Rune:1"
+#bind_link2 = "Rune:2"
+#bind_link3 = "Rune:3"
+#bind_link4 = "Rune:4"
+#bind_link5 = "Rune:5"
+#bind_link6 = "Rune:6"
+#bind_link7 = "Rune:7"
+#bind_link8 = "Rune:8"
+#bind_link9 = "Rune:9"
+#bind_link0 = "Rune:0"
 
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.

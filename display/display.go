@@ -302,7 +302,7 @@ func Init() {
 			}
 
 			// Number key: 1-9, 0, LINK1-LINK10
-			if (cmd >= config.CmdLink1 && cmd <= config.CmdLink0) {
+			if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
 				if cmd <= len(tabs[curTab].page.Links) {
 					// It's a valid link number
 					followLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Links[cmd-1])
@@ -346,7 +346,7 @@ func Init() {
 			return nil
 		}
 
-		if (cmd >= config.CmdTab1 && cmd <= config.CmdTab0) {
+		if cmd >= config.CmdTab1 && cmd <= config.CmdTab0 {
 			if cmd == config.CmdTab0 {
 				// Zero key goes to the last tab
 				SwitchTab(NumTabs() - 1)

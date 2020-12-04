@@ -74,10 +74,7 @@ func parseBinding(cmd int, binding string) {
 	} else {
 		var ok bool
 		k, ok = tcellKeys[bslice[0]]
-		if !ok { return } // Bad keybinding!
-		if k < 32 { // XXX: tcell quirk, possibly brittle code
-			r = rune(k)
-		}
+		if !ok { return } // Bad keybinding!  Quietly ignore...
 		if strings.HasPrefix(bslice[0], "Ctrl") {
 			m += tcell.ModCtrl
 		}
@@ -142,7 +139,14 @@ func KeyInit() {
 }
 
 func TranslateKeyEvent(e *tcell.EventKey) int {
-	cmd, ok := bindings[KeyBinding{e.Key(), e.Modifiers(), e.Rune()}]
+	var ok bool
+	var cmd int
+	k := e.Key()
+	if (k == tcell.KeyRune) {
+		cmd, ok = bindings[KeyBinding{k, e.Modifiers(), e.Rune()}]
+	} else { // Sometimes tcell sets e.Rune() on non-KeyRune events.
+		cmd, ok = bindings[KeyBinding{k, e.Modifiers(), 0}]
+	}
 	if (ok) {
 		return cmd
 	}

@@ -58,6 +58,12 @@ Contributed by **[@bnthor](https://github.com/bnthor)**.
 </details>
 
 
+### One Dark
+
+Contributed by **[@sergetymo](https://github.com/sergetymo)**.
+
+> TODO: Add screenshot 
+
 ## Yours?
 
 Contribute your own theme by opening a PR.

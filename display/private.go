@@ -19,8 +19,10 @@ import (
 // Not when a URL is opened on a new tab for the first time.
 // It will handle setting the bottomBar.
 func followLink(t *tab, prev, next string) {
-	if next[:6] == "about:" {
-		handleAbout(t, next)
+	if strings.HasPrefix(next, "about:") {
+		if ok := handleAbout(t, next); ok {
+			t.addToHistory(next)
+		}
 		return
 	}
 

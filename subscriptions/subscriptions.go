@@ -6,10 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime"
 	"os"
 	"path"
 	"reflect"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -42,20 +44,29 @@ func Init() error {
 	f, err := os.Open(config.SubscriptionPath)
 	if err == nil {
 		// File exists and could be opened
-		defer f.Close()
 
 		fi, err := f.Stat()
 		if err == nil && fi.Size() > 0 {
 			// File is not empty
-			dec := json.NewDecoder(f)
-			err = dec.Decode(&data)
-			if err != nil && err != io.EOF {
+
+			jsonBytes, err := ioutil.ReadAll(f)
+			f.Close()
+			if err != nil {
+				return fmt.Errorf("read subscriptions.json error: %w", err)
+			}
+			err = json.Unmarshal(jsonBytes, &data)
+			if err != nil {
 				return fmt.Errorf("subscriptions.json is corrupted: %w", err) //nolint:goerr113
 			}
 		}
+		f.Close()
 	} else if !os.IsNotExist(err) {
 		// There's an error opening the file, but it's not bc is doesn't exist
 		return fmt.Errorf("open subscriptions.json error: %w", err) //nolint:goerr113
+	} else {
+		// File does not exist, initialize maps
+		data.Feeds = make(map[string]*gofeed.Feed)
+		data.Pages = make(map[string]*pageJSON)
 	}
 
 	LastUpdated = time.Now()
@@ -130,26 +141,21 @@ func writeJSON() error {
 	writeMu.Lock()
 	defer writeMu.Unlock()
 
-	f, err := os.OpenFile(config.SubscriptionPath, os.O_WRONLY|os.O_CREATE, 0666)
+	data.Lock()
+	logger.Log.Println("subscriptions.writeJSON acquired data lock")
+	jsonBytes, err := json.MarshalIndent(&data, "", "  ")
+	data.Unlock()
 	if err != nil {
 		logger.Log.Println("subscriptions.writeJSON error", err)
 		return err
 	}
-	defer f.Close()
-	enc := json.NewEncoder(f)
-	enc.SetEscapeHTML(false)
-	enc.SetIndent("", "  ")
-
-	data.Lock()
-	logger.Log.Println("subscriptions.writeJSON acquired data lock")
-	err = enc.Encode(&data)
-	data.Unlock()
-
+	err = ioutil.WriteFile(config.SubscriptionPath, jsonBytes, 0666)
 	if err != nil {
 		logger.Log.Println("subscriptions.writeJSON error", err)
+		return err
 	}
 
-	return err
+	return nil
 }
 
 // AddFeed stores a feed.
@@ -362,4 +368,38 @@ func updateAll() {
 	close(jobs)
 
 	wg.Wait()
+}
+
+// AllURLs returns all the subscribed-to URLS, sorted alphabetically.
+func AllURLS() []string {
+	data.RLock()
+	defer data.RUnlock()
+
+	urls := make([]string, len(data.Feeds)+len(data.Pages))
+	i := 0
+	for k := range data.Feeds {
+		urls[i] = k
+		i++
+	}
+	for k := range data.Pages {
+		urls[i] = k
+		i++
+	}
+
+	sort.Strings(urls)
+	return urls
+}
+
+// Remove removes a subscription from memory and from the disk.
+// The URL must be provided. It will do nothing if the URL is
+// not an actual subscription.
+//
+// It returns any errors that occured when saving to disk.
+func Remove(u string) error {
+	data.Lock()
+	// Just delete from both instead of using a loop to find it
+	delete(data.Feeds, u)
+	delete(data.Pages, u)
+	data.Unlock()
+	return writeJSON()
 }

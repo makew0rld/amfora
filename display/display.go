@@ -576,8 +576,11 @@ func Reload() {
 // URL loads and handles the provided URL for the current tab.
 // It should be an absolute URL.
 func URL(u string) {
-	if u[:6] == "about:" {
-		handleAbout(tabs[curTab], u)
+	t := tabs[curTab]
+	if strings.HasPrefix(u, "about:") {
+		if ok := handleAbout(t, u); ok {
+			t.addToHistory(u)
+		}
 		return
 	}
 
@@ -585,7 +588,7 @@ func URL(u string) {
 		// Assume it's a Gemini URL
 		u = "gemini://" + u
 	}
-	go goURL(tabs[curTab], u)
+	go goURL(t, u)
 }
 
 func NumTabs() int {

@@ -73,8 +73,7 @@ type pageJSON struct {
 var data = jsonData{
 	feedMu: &sync.RWMutex{},
 	pageMu: &sync.RWMutex{},
-	Feeds:  make(map[string]*gofeed.Feed),
-	Pages:  make(map[string]*pageJSON),
+	// Maps are created in Init()
 }
 
 // PageEntry is a single item on a subscriptions page.

@@ -15,6 +15,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
+	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/mmcdole/gofeed"
 	"github.com/spf13/viper"
 )
@@ -28,7 +29,7 @@ func toLocalDay(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 }
 
-// Feeds displays the feeds page on the current tab.
+// Subscriptions displays the subscriptions page on the current tab.
 func Subscriptions(t *tab) {
 	logger.Log.Println("display.Subscriptions called")
 
@@ -43,9 +44,10 @@ func Subscriptions(t *tab) {
 
 	logger.Log.Println("started rendering subscriptions page")
 
-	subscriptionPageRaw := "# Subscriptions\n\n" +
+	rawPage := "# Subscriptions\n\n" +
 		"See the help (by pressing ?) for details on how to use this page.\n\n" +
-		"If you just opened Amfora then updates will appear incrementally. Reload the page to see them.\n"
+		"If you just opened Amfora then updates will appear incrementally. Reload the page to see them.\n\n" +
+		"=> about:manage-subscriptions Manage subscriptions\n"
 
 	// curDay represents what day of posts the loop is on.
 	// It only goes backwards in time.
@@ -67,21 +69,21 @@ func Subscriptions(t *tab) {
 		if pub.Before(curDay) {
 			// This post is on a new day, add a day header
 			curDay = pub
-			subscriptionPageRaw += fmt.Sprintf("\n## %s\n\n", curDay.Format("Jan 02, 2006"))
+			rawPage += fmt.Sprintf("\n## %s\n\n", curDay.Format("Jan 02, 2006"))
 		}
 		if entry.Title == "" || entry.Title == "/" {
 			// Just put author/title
 			// Mainly used for when you're tracking the root domain of a site
-			subscriptionPageRaw += fmt.Sprintf("=>%s %s\n", entry.URL, entry.Prefix)
+			rawPage += fmt.Sprintf("=>%s %s\n", entry.URL, entry.Prefix)
 		} else {
 			// Include title and dash
-			subscriptionPageRaw += fmt.Sprintf("=>%s %s - %s\n", entry.URL, entry.Prefix, entry.Title)
+			rawPage += fmt.Sprintf("=>%s %s - %s\n", entry.URL, entry.Prefix, entry.Title)
 		}
 	}
 
-	content, links := renderer.RenderGemini(subscriptionPageRaw, textWidth(), leftMargin(), false)
+	content, links := renderer.RenderGemini(rawPage, textWidth(), leftMargin(), false)
 	page := structs.Page{
-		Raw:       subscriptionPageRaw,
+		Raw:       rawPage,
 		Content:   content,
 		Links:     links,
 		URL:       "about:subscriptions",
@@ -95,6 +97,57 @@ func Subscriptions(t *tab) {
 	subscriptionPageUpdated = time.Now()
 
 	logger.Log.Println("done rendering subscriptions page")
+}
+
+// ManageSubscriptions displays the subscription managing page in
+// the current tab. `u` is the URL entered by the user.
+func ManageSubscriptions(t *tab, u string) {
+	if len(u) > 27 && u[:27] == "about:manage-subscriptions?" {
+		// There's a query string, aka a URL to unsubscribe from
+		manageSubscriptionQuery(t, u)
+		return
+	}
+
+	rawPage := "# Manage Subscriptions\n\n" +
+		"Below is list of URLs, both feeds and pages. Navigate to the link to unsubscribe from that feed or page.\n\n"
+
+	for _, u2 := range subscriptions.AllURLS() {
+		rawPage += fmt.Sprintf(
+			"=>%s %s\n",
+			"about:manage-subscriptions?"+gemini.QueryEscape(u2),
+			u2,
+		)
+	}
+
+	content, links := renderer.RenderGemini(rawPage, textWidth(), leftMargin(), false)
+	page := structs.Page{
+		Raw:       rawPage,
+		Content:   content,
+		Links:     links,
+		URL:       "about:manage-subscriptions",
+		Width:     termW,
+		Mediatype: structs.TextGemini,
+	}
+	go cache.AddPage(&page)
+	setPage(t, &page)
+	t.applyBottomBar()
+}
+
+func manageSubscriptionQuery(t *tab, u string) {
+	sub, err := gemini.QueryUnescape(u[27:])
+	if err != nil {
+		Error("URL Error", "Invalid query string: "+err.Error())
+		return
+	}
+
+	err = subscriptions.Remove(sub)
+	if err != nil {
+		ManageSubscriptions(t, "about:manage-subscriptions") // Reload
+		Error("Save Error", "Error saving the unsubscription to disk: "+err.Error())
+		return
+	}
+	ManageSubscriptions(t, "about:manage-subscriptions") // Reload
+	Info("Unsubscribed from " + sub)
 }
 
 // openSubscriptionModal displays the "Add subscription" modal

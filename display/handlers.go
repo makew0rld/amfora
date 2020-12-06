@@ -167,25 +167,32 @@ func handleFavicon(t *tab, host, old string) {
 // 'about:'. It will display errors if the URL is not recognized,
 // but not display anything if an 'about:' URL is not passed.
 //
+// It does not add the displayed page to history.
+//
 // It returns a bool indicating if the provided URL could be handled.
 func handleAbout(t *tab, u string) bool {
-	if u[:6] != "about:" {
+	if !strings.HasPrefix(u, "about:") {
 		return false
 	}
 
 	switch u {
 	case "about:bookmarks":
 		Bookmarks(t)
-		t.addToHistory("about:bookmarks")
 		return true
 	case "about:subscriptions":
 		Subscriptions(t)
-		t.addToHistory("about:subscriptions")
 		return true
 	case "about:newtab":
 		temp := newTabPage // Copy
 		setPage(t, &temp)
+		t.applyBottomBar()
 		return true
+	}
+
+	if u == "about:manage-subscriptions" || (len(u) > 27 && u[:27] == "about:manage-subscriptions?") {
+		ManageSubscriptions(t, u)
+		// Don't count remove command in history
+		return u == "about:manage-subscriptions"
 	}
 
 	Error("Error", "Not a valid 'about:' URL.")
@@ -244,7 +251,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 
 	App.SetFocus(t.view)
 
-	if u[:6] == "about:" {
+	if strings.HasPrefix(u, "about:") {
 		return ret(u, handleAbout(t, u))
 	}
 

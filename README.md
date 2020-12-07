@@ -130,7 +130,7 @@ Features in *italics* are in the master branch, but not in the latest release.
     - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
 - [x] Subscriptions
   - RSS, Atom, and [JSON Feeds](https://jsonfeed.org/) are all supported
-  - So is tracking any page to be notified when it changes
+  - So is tracking a page, to know when its content changes
 - [ ] Stream support
 - [ ] Table of contents for pages
 - [ ] History browser

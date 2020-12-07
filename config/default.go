@@ -153,6 +153,9 @@ update_interval = 1800 # 30 mins
 # update times. Any value below 1 will be corrected to 1.
 workers = 3
 
+# The number of subscription updates displayed per page.
+entries_per_page = 20
+
 
 [theme]
 # This section is for changing the COLORS used in Amfora.

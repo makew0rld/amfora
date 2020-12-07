@@ -11,7 +11,6 @@ import (
 	"os"
 	"path"
 	"reflect"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -370,7 +369,7 @@ func updateAll() {
 	wg.Wait()
 }
 
-// AllURLs returns all the subscribed-to URLS, sorted alphabetically.
+// AllURLs returns all the subscribed-to URLS.
 func AllURLS() []string {
 	data.RLock()
 	defer data.RUnlock()
@@ -386,7 +385,6 @@ func AllURLS() []string {
 		i++
 	}
 
-	sort.Strings(urls)
 	return urls
 }
 
@@ -394,7 +392,7 @@ func AllURLS() []string {
 // The URL must be provided. It will do nothing if the URL is
 // not an actual subscription.
 //
-// It returns any errors that occured when saving to disk.
+// It returns any errors that occurred when saving to disk.
 func Remove(u string) error {
 	data.Lock()
 	// Just delete from both instead of using a loop to find it

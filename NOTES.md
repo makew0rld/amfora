@@ -1,6 +1,6 @@
 # Notes
 
-## Subscriptions (temp)
+## Subscriptions
 - TODO: remove all logger lines
 
 ## Issues

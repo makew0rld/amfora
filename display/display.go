@@ -294,7 +294,7 @@ func Init() {
 				}
 				return nil
 			case tcell.KeyCtrlA:
-				Subscriptions(tabs[curTab])
+				Subscriptions(tabs[curTab], "about:subscriptions")
 				tabs[curTab].addToHistory("about:subscriptions")
 				return nil
 			case tcell.KeyCtrlX:
@@ -578,8 +578,8 @@ func Reload() {
 func URL(u string) {
 	t := tabs[curTab]
 	if strings.HasPrefix(u, "about:") {
-		if ok := handleAbout(t, u); ok {
-			t.addToHistory(u)
+		if final, ok := handleAbout(t, u); ok {
+			t.addToHistory(final)
 		}
 		return
 	}

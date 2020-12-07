@@ -20,8 +20,8 @@ import (
 // It will handle setting the bottomBar.
 func followLink(t *tab, prev, next string) {
 	if strings.HasPrefix(next, "about:") {
-		if ok := handleAbout(t, next); ok {
-			t.addToHistory(next)
+		if final, ok := handleAbout(t, next); ok {
+			t.addToHistory(final)
 		}
 		return
 	}

@@ -169,34 +169,40 @@ func handleFavicon(t *tab, host, old string) {
 //
 // It does not add the displayed page to history.
 //
-// It returns a bool indicating if the provided URL could be handled.
-func handleAbout(t *tab, u string) bool {
+// It returns the URL displayed, and a bool indicating if the provided
+// URL could be handled. The string returned will always be empty
+// if the bool is false.
+func handleAbout(t *tab, u string) (string, bool) {
 	if !strings.HasPrefix(u, "about:") {
-		return false
+		return "", false
 	}
 
 	switch u {
 	case "about:bookmarks":
 		Bookmarks(t)
-		return true
-	case "about:subscriptions":
-		Subscriptions(t)
-		return true
+		return u, true
 	case "about:newtab":
 		temp := newTabPage // Copy
 		setPage(t, &temp)
 		t.applyBottomBar()
-		return true
+		return u, true
 	}
 
+	if u == "about:subscriptions" || (len(u) > 20 && u[:20] == "about:subscriptions?") {
+		// about:subscriptions?2 views page 2
+		return Subscriptions(t, u), true
+	}
 	if u == "about:manage-subscriptions" || (len(u) > 27 && u[:27] == "about:manage-subscriptions?") {
 		ManageSubscriptions(t, u)
 		// Don't count remove command in history
-		return u == "about:manage-subscriptions"
+		if u == "about:manage-subscriptions" {
+			return u, true
+		}
+		return "", false
 	}
 
 	Error("Error", "Not a valid 'about:' URL.")
-	return false
+	return "", false
 }
 
 // handleURL displays whatever action is needed for the provided URL,
@@ -252,7 +258,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	App.SetFocus(t.view)
 
 	if strings.HasPrefix(u, "about:") {
-		return ret(u, handleAbout(t, u))
+		return ret(handleAbout(t, u))
 	}
 
 	u = normalizeURL(u)

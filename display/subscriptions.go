@@ -12,7 +12,6 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
-	"github.com/makeworld-the-better-one/amfora/logger"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
@@ -34,8 +33,6 @@ func toLocalDay(t time.Time) time.Time {
 
 // Subscriptions displays the subscriptions page on the current tab.
 func Subscriptions(t *tab, u string) string {
-	logger.Log.Println("display.Subscriptions called")
-
 	pageN := 0 // Pages are zero-indexed internally
 
 	// Correct URL if query string exists
@@ -69,13 +66,10 @@ func Subscriptions(t *tab, u string) string {
 	// Retrieve cached version if there hasn't been any updates
 	p, ok := cache.GetPage(u)
 	if subscriptionPageUpdated[pageN].After(subscriptions.LastUpdated) && ok {
-		logger.Log.Println("using cached subscriptions page")
 		setPage(t, p)
 		t.applyBottomBar()
 		return u
 	}
-
-	logger.Log.Println("started rendering subscriptions page")
 
 	pe := subscriptions.GetPageEntries()
 
@@ -170,8 +164,6 @@ func Subscriptions(t *tab, u string) string {
 
 	subscriptionPageUpdated[pageN] = time.Now()
 
-	logger.Log.Println("done rendering subscriptions page")
-
 	return u
 }
 
@@ -235,7 +227,6 @@ func manageSubscriptionQuery(t *tab, u string) {
 // The subscribed arg specifies whether this feed/page is already
 // subscribed to.
 func openSubscriptionModal(validFeed, subscribed bool) bool {
-	logger.Log.Println("display.openFeedModal called")
 	// Reuses yesNoModal
 
 	if viper.GetBool("a-general.color") {
@@ -297,8 +288,6 @@ func getFeedFromPage(p *structs.Page) (*gofeed.Feed, bool) {
 //
 // Like addFeed, it should be called in a goroutine.
 func addFeedDirect(u string, feed *gofeed.Feed, tracked bool) bool {
-	logger.Log.Println("display.addFeedDirect called")
-
 	if openSubscriptionModal(true, tracked) {
 		err := subscriptions.AddFeed(u, feed)
 		if err != nil {
@@ -312,8 +301,6 @@ func addFeedDirect(u string, feed *gofeed.Feed, tracked bool) bool {
 // addFeed goes through the process of subscribing to the current page/feed.
 // It is the high-level way of doing it. It should be called in a goroutine.
 func addSubscription() {
-	logger.Log.Println("display.addSubscription called")
-
 	t := tabs[curTab]
 	p := t.page
 

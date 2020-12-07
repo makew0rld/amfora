@@ -17,7 +17,6 @@ import (
 
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
-	"github.com/makeworld-the-better-one/amfora/logger"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/mmcdole/gofeed"
 	"github.com/spf13/viper"
@@ -90,8 +89,6 @@ func Init() error {
 // IsSubscribed returns true if the URL is already subscribed to,
 // whether a feed or page.
 func IsSubscribed(url string) bool {
-	logger.Log.Println("subscriptions.IsSubscribed called")
-
 	data.feedMu.RLock()
 	for u := range data.Feeds {
 		if url == u {
@@ -114,8 +111,6 @@ func IsSubscribed(url string) bool {
 // GetFeed returns a Feed object and a bool indicating whether the passed
 // content was actually recognized as a feed.
 func GetFeed(mediatype, filename string, r io.Reader) (*gofeed.Feed, bool) {
-	logger.Log.Println("subscriptions.GetFeed called")
-
 	if r == nil {
 		return nil, false
 	}
@@ -135,22 +130,17 @@ func GetFeed(mediatype, filename string, r io.Reader) (*gofeed.Feed, bool) {
 }
 
 func writeJSON() error {
-	logger.Log.Println("subscriptions.writeJSON called")
-
 	writeMu.Lock()
 	defer writeMu.Unlock()
 
 	data.Lock()
-	logger.Log.Println("subscriptions.writeJSON acquired data lock")
 	jsonBytes, err := json.MarshalIndent(&data, "", "  ")
 	data.Unlock()
 	if err != nil {
-		logger.Log.Println("subscriptions.writeJSON error", err)
 		return err
 	}
 	err = ioutil.WriteFile(config.SubscriptionPath, jsonBytes, 0666)
 	if err != nil {
-		logger.Log.Println("subscriptions.writeJSON error", err)
 		return err
 	}
 
@@ -161,8 +151,6 @@ func writeJSON() error {
 // It can be used to update a feed for a URL, although the package
 // will handle that on its own.
 func AddFeed(url string, feed *gofeed.Feed) error {
-	logger.Log.Println("subscriptions.AddFeed called")
-
 	if feed == nil {
 		panic("feed is nil")
 	}
@@ -211,8 +199,6 @@ func AddFeed(url string, feed *gofeed.Feed) error {
 // It can be used to update the page as well, although the package
 // will handle that on its own.
 func AddPage(url string, r io.Reader) error {
-	logger.Log.Println("subscriptions.AddPage called")
-
 	if r == nil {
 		return nil
 	}
@@ -247,8 +233,6 @@ func AddPage(url string, r io.Reader) error {
 }
 
 func updateFeed(url string) error {
-	logger.Log.Println("subscriptions.updateFeed called")
-
 	res, err := client.Fetch(url)
 	if err != nil {
 		if res != nil {
@@ -274,8 +258,6 @@ func updateFeed(url string) error {
 }
 
 func updatePage(url string) error {
-	logger.Log.Println("subscriptions.updatePage called")
-
 	res, err := client.Fetch(url)
 	if err != nil {
 		if res != nil {
@@ -295,8 +277,6 @@ func updatePage(url string) error {
 // updateAll updates all subscriptions using workers.
 // It only returns once all the workers are done.
 func updateAll() {
-	logger.Log.Println("subscriptions.updateAll called")
-
 	// TODO: Is two goroutines the right amount?
 
 	worker := func(jobs <-chan [2]string, wg *sync.WaitGroup) {
@@ -333,9 +313,7 @@ func updateAll() {
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
 		go func(i int) {
-			logger.Log.Println("started worker", i)
 			worker(jobs, &wg)
-			logger.Log.Println("ended worker", i)
 		}(w)
 	}
 

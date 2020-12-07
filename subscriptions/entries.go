@@ -5,8 +5,6 @@ import (
 	"sort"
 	"strings"
 	"time"
-
-	"github.com/makeworld-the-better-one/amfora/logger"
 )
 
 // This file contains funcs for creating PageEntries, which
@@ -42,8 +40,6 @@ func getURL(urls []string) string {
 // so this function needs to be called again to get updates.
 // It always returns sorted entries - by post time, from newest to oldest.
 func GetPageEntries() *PageEntries {
-	logger.Log.Println("subscriptions.GetPageEntries called")
-
 	var pe PageEntries
 
 	data.RLock()

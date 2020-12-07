@@ -1,8 +1,5 @@
 # Notes
 
-## Subscriptions
-- TODO: remove all logger lines
-
 ## Issues
 - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
 

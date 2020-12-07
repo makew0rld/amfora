@@ -12,6 +12,7 @@ require (
 	github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20200710151429-125743e22b4f
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
+	github.com/mmcdole/gofeed v1.1.0
 	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/rkoesters/xdg v0.0.0-20181125232953-edd15b846f9b
 	github.com/spf13/afero v1.2.2 // indirect
@@ -26,3 +27,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/ini.v1 v1.57.0 // indirect
 )
+
+replace github.com/mmcdole/gofeed => github.com/makeworld-the-better-one/gofeed v1.1.1-0.20201123002655-c0c6354134fe

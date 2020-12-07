@@ -122,9 +122,9 @@ Features in *italics* are in the master branch, but not in the latest release.
     - Manage and browse them
     - Similar to [Kristall](https://github.com/MasterQ32/kristall)
     - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
-- [ ] Subscribe to RSS and Atom feeds and display them
-  - Subscribing to page changes, similar to how Spacewalk works, will also be supported
-  - *In progress on `feeds` branch*
+- [x] *Subscriptions*
+  - Subscribing to RSS, Atom, and [JSON Feeds](https://jsonfeed.org/) are all supported
+  - So is subscribing to a page, to know when it changes
 - [ ] Stream support
 - [ ] Table of contents for pages
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>
@@ -151,8 +151,9 @@ Amfora ❤️ open source!
   - It uses [tcell](https://github.com/gdamore/tcell) for low level terminal operations
 - [Viper](https://github.com/spf13/viper) for configuration and TOFU storing
 - [go-gemini](https://github.com/makeworld-the-better-one/go-gemini), my forked and updated Gemini client/server library
-- My [progressbar fork](https://github.com/makeworld-the-better-one/progressbar)
+- My [progressbar fork](https://github.com/makeworld-the-better-one/progressbar) - pull request [here](https://github.com/schollz/progressbar/pull/69)
 - [go-humanize](https://github.com/dustin/go-humanize)
+- My [gofeed fork](https://github.com/makeworld-the-better-one/gofeed) - pull request [here](https://github.com/mmcdole/gofeed/pull/164)
 
 ## License
 This project is licensed under the GPL v3.0. See the [LICENSE](./LICENSE) file for details.

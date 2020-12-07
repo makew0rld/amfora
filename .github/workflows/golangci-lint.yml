@@ -9,9 +9,9 @@ on:
       - 'LICENSE'
   pull_request:
     paths-ignore:
-      - '*.md'
-      - '*.toml'
-      - '*.desktop'
+      - '**.md'
+      - '**.toml'
+      - '**.desktop'
       - 'LICENSE'
 
 jobs:

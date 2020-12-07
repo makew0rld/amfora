@@ -54,13 +54,13 @@ func Init() error {
 			}
 			err = json.Unmarshal(jsonBytes, &data)
 			if err != nil {
-				return fmt.Errorf("subscriptions.json is corrupted: %w", err) //nolint:goerr113
+				return fmt.Errorf("subscriptions.json is corrupted: %w", err)
 			}
 		}
 		f.Close()
 	} else if !os.IsNotExist(err) {
 		// There's an error opening the file, but it's not bc is doesn't exist
-		return fmt.Errorf("open subscriptions.json error: %w", err) //nolint:goerr113
+		return fmt.Errorf("open subscriptions.json error: %w", err)
 	} else {
 		// File does not exist, initialize maps
 		data.Feeds = make(map[string]*gofeed.Feed)
@@ -312,9 +312,9 @@ func updateAll() {
 	// Start workers, waiting for jobs
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
-		go func(i int) {
+		go func() {
 			worker(jobs, &wg)
-		}(w)
+		}()
 	}
 
 	// Get map keys in a slice

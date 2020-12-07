@@ -142,7 +142,7 @@ func Subscriptions(t *tab, u string) string {
 				"\n\n=> about:subscriptions?%d Previous Page\n",
 				pageN, // pageN is zero-indexed but the query string is one-indexed
 			)
-			if end != len(pe.Entries)-1 {
+			if end != len(pe.Entries) {
 				// There's more
 				rawPage += fmt.Sprintf("=> about:subscriptions?%d Next Page\n", pageN+2)
 			}

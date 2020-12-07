@@ -122,9 +122,9 @@ Features in *italics* are in the master branch, but not in the latest release.
     - Manage and browse them
     - Similar to [Kristall](https://github.com/MasterQ32/kristall)
     - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
-- [x] Subscriptions
-  - RSS, Atom, and [JSON Feeds](https://jsonfeed.org/) are all supported
-  - So is tracking a page, to know when its content changes
+- [x] *Subscriptions*
+  - Subscribing to RSS, Atom, and [JSON Feeds](https://jsonfeed.org/) are all supported
+  - So is subscribing to a page, to know when it changes
 - [ ] Stream support
 - [ ] Table of contents for pages
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>

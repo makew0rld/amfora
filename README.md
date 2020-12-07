@@ -5,7 +5,6 @@
 <h6>Image modified from: amphora by Alvaro Cabrera from the Noun Project</h6>
 </center>
 
-[![travis build status](https://img.shields.io/travis/com/makeworld-the-better-one/amfora/master?label=master)](https://travis-ci.com/github/makeworld-the-better-one/amfora)
 [![go reportcard](https://goreportcard.com/badge/github.com/makeworld-the-better-one/amfora)](https://goreportcard.com/report/github.com/makeworld-the-better-one/amfora)
 [![license GPLv3](https://img.shields.io/github/license/makeworld-the-better-one/amfora)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
@@ -61,6 +60,10 @@ brew upgrade amfora
 ```
 
 ### From Source
+
+<details>
+<summary>Click to expand</summary>
+
 This section is for advanced users who want to install the latest (possibly unstable) version of Amfora.
 
 **Requirements:**
@@ -90,17 +93,8 @@ You can update it with:
 brew upgrade --fetch-HEAD amfora
 ```
 
-## Usage
+</details>
 
-Just call `amfora` or `amfora <url>` on the terminal. On Windows it might be `amfora.exe` instead.
-
-To determine the version, you can run `amfora --version` or `amfora -v`.
-
-The project keeps many standard terminal keybindings and is intuitive. Press <kbd>?</kbd> inside the application to pull up the help menu with a list of all the keybindings, and <kbd>Esc</kbd> to leave it. If you have used Bombadillo you will find it similar.
-
-It is designed with large terminals in mind, but should look and work well at any reasonable terminal size.
-
-It was tested with left-to-right languages, and will likely not work as well with right-to-left languages like Arabic.
 
 ## Features / Roadmap
 Features in *italics* are in the master branch, but not in the latest release.
@@ -133,22 +127,14 @@ Features in *italics* are in the master branch, but not in the latest release.
   - So is tracking a page, to know when its content changes
 - [ ] Stream support
 - [ ] Table of contents for pages
-- [ ] History browser
+- [ ] Search in pages with <kbd>Ctrl-F</kbd>
+- [ ] Support Markdown rendering
+- [ ] Persistent history
 
-## Configuration
-The config file is written in the intuitive [TOML](https://github.com/toml-lang/toml) file format. See [default-config.toml](./default-config.toml) for details. By default this file is available at `~/.config/amfora/config.toml`, or `$XDG_CONFIG_HOME/amfora/config.toml`, if that variable is set.
 
-On Windows, the file is in `%APPDATA%\amfora\config.toml`, which usually expands to `C:\Users\<username>\AppData\Roaming\amfora\config.toml`.
+## Usage & Configuration
+Please see [the wiki](https://github.com/makeworld-the-better-one/amfora/wiki) for an introduction on how to use Amfora and configure it.
 
-## Client Certificates
-
-Amfora has early support for client certs. Eventually Amfora will be able to generate them itself, but for you can do it by using OpenSSL:
-
-```shell
-openssl req -new -subj "/CN=username" -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -days 1825 -nodes -out cert.pem -keyout key.pem
-```
-
-This will create a certificate and key file, that can be renamed and moved as you like. See the configuration section above for how to edit your config file to tell Amfora about them.
 
 ## Known Bugs
 

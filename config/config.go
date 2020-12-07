@@ -224,6 +224,7 @@ func Init() error {
 	viper.SetDefault("a-general.color", true)
 	viper.SetDefault("a-general.ansi", true)
 	viper.SetDefault("a-general.bullets", true)
+	viper.SetDefault("a-general.show_link", false)
 	viper.SetDefault("a-general.left_margin", 0.15)
 	viper.SetDefault("a-general.max_width", 100)
 	viper.SetDefault("a-general.downloads", "")

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Opening local files with `file://` URIs (#103, #117)
+- `show_link` option added in config to optionally see the URL (#133)
 
 ### Changed
 - Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.9.3

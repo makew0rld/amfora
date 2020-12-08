@@ -46,6 +46,8 @@ const (
 	CmdPrevTab
 	CmdQuit
 	CmdHelp
+	CmdSub
+	CmdAddSub
 )
 
 type keyBinding struct {
@@ -70,6 +72,8 @@ func parseBinding(cmd int, binding string) {
 	if len(binding) == 1 {
 		k = tcell.KeyRune
 		r = []rune(binding)[0]
+	} else if len(binding) == 0 {
+		return
 	} else if binding == "Space" {
 		k = tcell.KeyRune
 		r = ' '
@@ -116,6 +120,8 @@ func KeyInit() {
 		CmdPrevTab:     "keybindings.bind_prev_tab",
 		CmdQuit:        "keybindings.bind_quit",
 		CmdHelp:        "keybindings.bind_help",
+		CmdSub:         "keybindings.bind_sub",
+		CmdAddSub:      "keybindings.bind_add_sub",
 	}
 	configTabNBindings := map[int]string{
 		CmdTab1: "keybindings.bind_tab1",
@@ -144,7 +150,7 @@ func KeyInit() {
 
 	// Backwards compatibility with the old shift_numbers config line.
 	shift_numbers := []rune(viper.GetString("keybindings.shift_numbers"))
-	if len(shift_numbers) == 10 {
+	if len(shift_numbers) > 0 && len(shift_numbers) <= 10 {
 		for i, r := range shift_numbers {
 			bindings[keyBinding{tcell.KeyRune, 0, r}] = CmdTab1 + i
 		}

@@ -235,6 +235,8 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_home", "Backspace")
 	viper.SetDefault("keybindings.bind_bookmarks", "Ctrl-B")
 	viper.SetDefault("keybindings.bind_add_bookmark", "Ctrl-D")
+	viper.SetDefault("keybindings.bind_sub", "Ctrl-A")
+	viper.SetDefault("keybindings.bind_add_sub", "Ctrl-X")
 	viper.SetDefault("keybindings.bind_save", "Ctrl-S")
 	viper.SetDefault("keybindings.bind_pgup", []string{"PgUp", "u"})
 	viper.SetDefault("keybindings.bind_pgdn", []string{"PgDn", "d"})

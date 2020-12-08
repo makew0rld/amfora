@@ -17,7 +17,7 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/structs"
-	"github.com/makeworld-the-better-one/amfora/webbrowser"
+	"github.com/makeworld-the-better-one/amfora/sysopen"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/makeworld-the-better-one/progressbar/v3"
 	"github.com/spf13/viper"
@@ -160,7 +160,7 @@ func downloadAndOpen(u string, resp *gemini.Response) {
 	}
 	if mediaHandler.Cmd == nil {
 		// Open with system default viewer
-		_, err := webbrowser.Open(path)
+		_, err := sysopen.Open(path)
 		if err != nil {
 			Error("System Viewer Error", err.Error())
 			return

@@ -118,6 +118,9 @@ other = 'off'
 #   cmd = ["feh"]
 #   types = ["image/jpeg"]
 #
+# Each command that you specify must come under its own [[mediatype-handlers]]. You may
+# specify as many [[mediatype-handlers]] as you want to setup multiple commands.
+#
 # If the subtype is omitted then the specified command will be used for the
 # entire type:
 #   [[mediatype-handlers]]
@@ -142,9 +145,6 @@ other = 'off'
 #   cmd = ["feh"]
 #   types = ["image"]
 #   no_prompt = true
-#
-# NOTE: There may be multiple [[mediatype-handlers]] specified to setup multiple
-# handler commands
 
 
 [cache]

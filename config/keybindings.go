@@ -97,16 +97,6 @@ func KeyInit() {
 		CmdLink8:       "keybindings.bind_link8",
 		CmdLink9:       "keybindings.bind_link9",
 		CmdLink0:       "keybindings.bind_link0",
-		CmdTab1:        "keybindings.bind_tab1",
-		CmdTab2:        "keybindings.bind_tab2",
-		CmdTab3:        "keybindings.bind_tab3",
-		CmdTab4:        "keybindings.bind_tab4",
-		CmdTab5:        "keybindings.bind_tab5",
-		CmdTab6:        "keybindings.bind_tab6",
-		CmdTab7:        "keybindings.bind_tab7",
-		CmdTab8:        "keybindings.bind_tab8",
-		CmdTab9:        "keybindings.bind_tab9",
-		CmdTab0:        "keybindings.bind_tab0",
 		CmdBottom:      "keybindings.bind_bottom",
 		CmdEdit:        "keybindings.bind_edit",
 		CmdHome:        "keybindings.bind_home",
@@ -125,6 +115,18 @@ func KeyInit() {
 		CmdQuit:        "keybindings.bind_quit",
 		CmdHelp:        "keybindings.bind_help",
 	}
+	configTabNBindings := map[int]string{
+		CmdTab1: "keybindings.bind_tab1",
+		CmdTab2: "keybindings.bind_tab2",
+		CmdTab3: "keybindings.bind_tab3",
+		CmdTab4: "keybindings.bind_tab4",
+		CmdTab5: "keybindings.bind_tab5",
+		CmdTab6: "keybindings.bind_tab6",
+		CmdTab7: "keybindings.bind_tab7",
+		CmdTab8: "keybindings.bind_tab8",
+		CmdTab9: "keybindings.bind_tab9",
+		CmdTab0: "keybindings.bind_tab0",
+	}
 	tcellKeys = make(map[string]tcell.Key)
 	bindings = make(map[KeyBinding]int)
 
@@ -133,9 +135,22 @@ func KeyInit() {
 	}
 
 	for c, allb := range configBindings {
-		allb = viper.GetString(allb)
-		for _, b := range strings.Split(allb, ",") {
+		for _, b := range viper.GetStringSlice(allb) {
 			parseBinding(c, b)
+		}
+	}
+
+	// Backwards compatibility with the old shift_numbers config line.
+	shift_numbers := []rune(viper.GetString("keybindings.shift_numbers"))
+	if len(shift_numbers) == 10 {
+		for i, r := range shift_numbers {
+			bindings[KeyBinding{tcell.KeyRune, 0, r}] = CmdTab1 + i
+		}
+	} else {
+		for c, allb := range configTabNBindings {
+			for _, b := range viper.GetStringSlice(allb) {
+				parseBinding(c, b)
+			}
 		}
 	}
 }

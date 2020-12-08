@@ -39,6 +39,10 @@ var bkmkPath string
 
 var DownloadsDir string
 
+// Subscriptions
+var subscriptionDir string
+var SubscriptionPath string
+
 // Command for opening HTTP(S) URLs in the browser, from "a-general.http" in config.
 var HTTPCommand []string
 
@@ -96,6 +100,22 @@ func Init() error {
 	}
 	bkmkPath = filepath.Join(bkmkDir, "bookmarks.toml")
 
+	// Feeds dir and path
+	if runtime.GOOS == "windows" {
+		// In APPDATA beside other Amfora files
+		subscriptionDir = amforaAppData
+	} else {
+		// XDG data dir on POSIX systems
+		xdg_data, ok := os.LookupEnv("XDG_DATA_HOME")
+		if ok && strings.TrimSpace(xdg_data) != "" {
+			subscriptionDir = filepath.Join(xdg_data, "amfora")
+		} else {
+			// Default to ~/.local/share/amfora
+			subscriptionDir = filepath.Join(home, ".local", "share", "amfora")
+		}
+	}
+	SubscriptionPath = filepath.Join(subscriptionDir, "subscriptions.json")
+
 	// *** Create necessary files and folders ***
 
 	// Config
@@ -130,6 +150,11 @@ func Init() error {
 	f, err = os.OpenFile(bkmkPath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
 	if err == nil {
 		f.Close()
+	}
+	// Feeds
+	err = os.MkdirAll(subscriptionDir, 0755)
+	if err != nil {
+		return err
 	}
 
 	// *** Downloads paths, setup, and creation ***
@@ -247,6 +272,10 @@ func Init() error {
 	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
+	viper.SetDefault("subscriptions.popup", true)
+	viper.SetDefault("subscriptions.update_interval", 1800)
+	viper.SetDefault("subscriptions.workers", 3)
+	viper.SetDefault("subscriptions.entries_per_page", 20)
 
 	viper.SetConfigFile(configPath)
 	viper.SetConfigType("toml")

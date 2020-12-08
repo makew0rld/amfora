@@ -15,7 +15,6 @@ linters:
     - dupl
     - exhaustive
     - exportloopref
-    - goconst
     - gocritic
     - goerr113
     - gofmt

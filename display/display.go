@@ -207,6 +207,7 @@ func Init() {
 	})
 
 	// Render the default new tab content ONCE and store it for later
+	// This code is repeated in Reload()
 	newTabContent := getNewTabContent()
 	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin(), false)
 	newTabPage = structs.Page{
@@ -298,6 +299,13 @@ func Init() {
 				return nil
 			case config.CmdForward:
 				histForward(tabs[curTab])
+				return nil
+			case config.CmdSub:
+				Subscriptions(tabs[curTab], "about:subscriptions")
+				tabs[curTab].addToHistory("about:subscriptions")
+				return nil
+			case config.CmdAddSub:
+				go addSubscription()
 				return nil
 			}
 
@@ -526,20 +534,11 @@ func Reload() {
 // URL loads and handles the provided URL for the current tab.
 // It should be an absolute URL.
 func URL(u string) {
-	// Some code is copied in followLink()
-
-	if u == "about:bookmarks" { //nolint:goconst
-		Bookmarks(tabs[curTab])
-		tabs[curTab].addToHistory("about:bookmarks")
-		return
-	}
-	if u == "about:newtab" {
-		temp := newTabPage // Copy
-		setPage(tabs[curTab], &temp)
-		return
-	}
+	t := tabs[curTab]
 	if strings.HasPrefix(u, "about:") {
-		Error("Error", "Not a valid 'about:' URL.")
+		if final, ok := handleAbout(t, u); ok {
+			t.addToHistory(final)
+		}
 		return
 	}
 
@@ -547,7 +546,7 @@ func URL(u string) {
 		// Assume it's a Gemini URL
 		u = "gemini://" + u
 	}
-	go goURL(tabs[curTab], u)
+	go goURL(t, u)
 }
 
 func NumTabs() int {

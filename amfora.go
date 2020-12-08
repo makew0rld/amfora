@@ -7,6 +7,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/display"
+	"github.com/makeworld-the-better-one/amfora/subscriptions"
 )
 
 var (
@@ -40,7 +41,12 @@ func main() {
 
 	err := config.Init()
 	if err != nil {
-		fmt.Printf("Config error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Config error: %v\n", err)
+		os.Exit(1)
+	}
+	err = subscriptions.Init()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "subscriptions.json error: %v\n", err)
 		os.Exit(1)
 	}
 

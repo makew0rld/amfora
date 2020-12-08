@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Subscriptions** to feeds and page changes (#61)
 - Opening local files with `file://` URIs (#103, #117)
 - `show_link` option added in config to optionally see the URL (#133)
 

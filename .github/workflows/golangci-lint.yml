@@ -1,5 +1,19 @@
 name: golangci-lint
-on: [push, pull_request]
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+      - '**.toml'
+      - '**.desktop'
+      - 'LICENSE'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - '**.toml'
+      - '**.desktop'
+      - 'LICENSE'
+
 jobs:
   golangci:
     name: lint

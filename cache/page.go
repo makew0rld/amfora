@@ -1,10 +1,8 @@
 // Package cache provides an interface for a cache of strings, aka text/gemini pages, and redirects.
 // It is fully thread safe.
-// The redirect cache is not limited.
 package cache
 
 import (
-	"strings"
 	"sync"
 
 	"github.com/makeworld-the-better-one/amfora/structs"
@@ -22,7 +20,7 @@ func SetMaxPages(max int) {
 	maxPages = max
 }
 
-// SetMaxSize sets the max size the cache can be, in bytes.
+// SetMaxSize sets the max size the page cache can be, in bytes.
 // A value <= 0 means infinite size.
 func SetMaxSize(max int) {
 	maxSize = max
@@ -48,7 +46,7 @@ func removeURL(url string) {
 // If your page is larger than the max cache size, the provided page
 // will silently not be added to the cache.
 func AddPage(p *structs.Page) {
-	if p.URL == "" || strings.HasPrefix(p.URL, "about:") {
+	if p.URL == "" {
 		// Just in case, these pages shouldn't be cached
 		return
 	}

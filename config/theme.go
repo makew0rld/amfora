@@ -8,7 +8,7 @@ import (
 )
 
 // Functions to allow themeing configuration.
-// UI element colors are mapped to a string key, such as "error" or "tab_background"
+// UI element colors are mapped to a string key, such as "error" or "tab_bg"
 // These are the same keys used in the config file.
 
 var themeMu = sync.RWMutex{}
@@ -26,18 +26,20 @@ var theme = map[string]tcell.Color{
 	"btn_bg":   tcell.ColorNavy, // All modal buttons
 	"btn_text": tcell.ColorWhite,
 
-	"dl_choice_modal_bg":   tcell.ColorPurple,
-	"dl_choice_modal_text": tcell.ColorWhite,
-	"dl_modal_bg":          tcell.Color130, // xterm:DarkOrange3, #af5f00
-	"dl_modal_text":        tcell.ColorWhite,
-	"info_modal_bg":        tcell.ColorGray,
-	"info_modal_text":      tcell.ColorWhite,
-	"error_modal_bg":       tcell.ColorMaroon,
-	"error_modal_text":     tcell.ColorWhite,
-	"yesno_modal_bg":       tcell.ColorPurple,
-	"yesno_modal_text":     tcell.ColorWhite,
-	"tofu_modal_bg":        tcell.ColorMaroon,
-	"tofu_modal_text":      tcell.ColorWhite,
+	"dl_choice_modal_bg":      tcell.ColorPurple,
+	"dl_choice_modal_text":    tcell.ColorWhite,
+	"dl_modal_bg":             tcell.Color130, // xterm:DarkOrange3, #af5f00
+	"dl_modal_text":           tcell.ColorWhite,
+	"info_modal_bg":           tcell.ColorGray,
+	"info_modal_text":         tcell.ColorWhite,
+	"error_modal_bg":          tcell.ColorMaroon,
+	"error_modal_text":        tcell.ColorWhite,
+	"yesno_modal_bg":          tcell.ColorPurple,
+	"yesno_modal_text":        tcell.ColorWhite,
+	"tofu_modal_bg":           tcell.ColorMaroon,
+	"tofu_modal_text":         tcell.ColorWhite,
+	"subscription_modal_bg":   tcell.Color61, // xterm:SlateBlue3, #5f5faf
+	"subscription_modal_text": tcell.ColorWhite,
 
 	"input_modal_bg":         tcell.ColorGreen,
 	"input_modal_text":       tcell.ColorWhite,
@@ -64,8 +66,8 @@ var theme = map[string]tcell.Color{
 
 func SetColor(key string, color tcell.Color) {
 	themeMu.Lock()
-	defer themeMu.Unlock()
 	theme[key] = color
+	themeMu.Unlock()
 }
 
 // GetColor will return tcell.ColorBlack if there is no color for the provided key.

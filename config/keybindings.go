@@ -48,41 +48,43 @@ const (
 	CmdHelp
 )
 
-type KeyBinding struct {
+type keyBinding struct {
 	key tcell.Key
 	mod tcell.ModMask
 	r   rune
 }
 
-var bindings map[KeyBinding]int
+var bindings map[keyBinding]int
 var tcellKeys map[string]tcell.Key
 
 func parseBinding(cmd int, binding string) {
-	bslice := strings.Split(binding, ":")
 	var k tcell.Key
 	var m tcell.ModMask = 0
 	var r rune = 0
 
-	if len(bslice) > 1 && bslice[0] == "Alt" {
+	if strings.HasPrefix(binding, "Alt-") {
 		m = tcell.ModAlt
-		bslice = bslice[1:]
+		binding = binding[4:]
 	}
 
-	if len(bslice) > 1 && bslice[0] == "Rune" {
+	if len(binding) == 1 {
 		k = tcell.KeyRune
-		r = []rune(bslice[1])[0]
+		r = []rune(binding)[0]
+	} else if binding == "Space" {
+		k = tcell.KeyRune
+		r = ' '
 	} else {
 		var ok bool
-		k, ok = tcellKeys[bslice[0]]
+		k, ok = tcellKeys[binding]
 		if !ok { // Bad keybinding!  Quietly ignore...
 			return
 		}
-		if strings.HasPrefix(bslice[0], "Ctrl") {
+		if strings.HasPrefix(binding, "Ctrl") {
 			m += tcell.ModCtrl
 		}
 	}
 
-	bindings[KeyBinding{k, m, r}] = cmd
+	bindings[keyBinding{k, m, r}] = cmd
 }
 
 func KeyInit() {
@@ -128,7 +130,7 @@ func KeyInit() {
 		CmdTab0: "keybindings.bind_tab0",
 	}
 	tcellKeys = make(map[string]tcell.Key)
-	bindings = make(map[KeyBinding]int)
+	bindings = make(map[keyBinding]int)
 
 	for k, kname := range tcell.KeyNames {
 		tcellKeys[kname] = k
@@ -144,7 +146,7 @@ func KeyInit() {
 	shift_numbers := []rune(viper.GetString("keybindings.shift_numbers"))
 	if len(shift_numbers) == 10 {
 		for i, r := range shift_numbers {
-			bindings[KeyBinding{tcell.KeyRune, 0, r}] = CmdTab1 + i
+			bindings[keyBinding{tcell.KeyRune, 0, r}] = CmdTab1 + i
 		}
 	} else {
 		for c, allb := range configTabNBindings {
@@ -160,9 +162,9 @@ func TranslateKeyEvent(e *tcell.EventKey) int {
 	var cmd int
 	k := e.Key()
 	if k == tcell.KeyRune {
-		cmd, ok = bindings[KeyBinding{k, e.Modifiers(), e.Rune()}]
+		cmd, ok = bindings[keyBinding{k, e.Modifiers(), e.Rune()}]
 	} else { // Sometimes tcell sets e.Rune() on non-KeyRune events.
-		cmd, ok = bindings[KeyBinding{k, e.Modifiers(), 0}]
+		cmd, ok = bindings[keyBinding{k, e.Modifiers(), 0}]
 	}
 	if ok {
 		return cmd

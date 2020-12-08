@@ -149,9 +149,9 @@ func KeyInit() {
 	}
 
 	// Backwards compatibility with the old shift_numbers config line.
-	shift_numbers := []rune(viper.GetString("keybindings.shift_numbers"))
-	if len(shift_numbers) > 0 && len(shift_numbers) <= 10 {
-		for i, r := range shift_numbers {
+	shiftNumbers := []rune(viper.GetString("keybindings.shift_numbers"))
+	if len(shiftNumbers) > 0 && len(shiftNumbers) <= 10 {
+		for i, r := range shiftNumbers {
 			bindings[keyBinding{tcell.KeyRune, 0, r}] = CmdTab1 + i
 		}
 	} else {

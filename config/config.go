@@ -179,7 +179,7 @@ func Init() error {
 
 	// Setup temporary downloads dir
 	if viper.GetString("a-general.temp_downloads") == "" {
-		TempDownloadsDir = filepath.Join(os.TempDir(), "amfora-downloads")
+		TempDownloadsDir = filepath.Join(os.TempDir(), "amfora_temp")
 
 		// Make sure it exists
 		err = os.MkdirAll(TempDownloadsDir, 0755)
@@ -295,12 +295,12 @@ func Init() error {
 	}
 	err = viper.UnmarshalKey("mediatype-handlers", &rawMediaHandlers)
 	if err != nil {
-		return err
+		return fmt.Errorf("couldn't parse mediatype-handlers section in config: %w", err)
 	}
 	for _, rawMediaHandler := range rawMediaHandlers {
 		for _, typ := range rawMediaHandler.Types {
 			if _, ok := MediaHandlers[typ]; ok {
-				return fmt.Errorf(`Multiple midiatype-handlers defined for %v`, typ)
+				return fmt.Errorf(`Multiple mediatype-handlers defined for %v`, typ)
 			}
 			MediaHandlers[typ] = MediaHandler{
 				Cmd:      rawMediaHandler.Cmd,

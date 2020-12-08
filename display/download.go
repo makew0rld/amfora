@@ -24,9 +24,9 @@ import (
 	"gitlab.com/tslocum/cview"
 )
 
-// For choosing between download and the portal - copy of YesNo basically
+// For choosing between download and opening - copy of YesNo basically
 var dlChoiceModal = cview.NewModal().
-	AddButtons([]string{"Download", "Open", "Cancel"})
+	AddButtons([]string{"Open", "Download", "Cancel"})
 
 // Channel to indicate what choice they made using the button text
 var dlChoiceCh = make(chan string)
@@ -101,8 +101,8 @@ func getMediaHandler(resp *gemini.Response) config.MediaHandler {
 		return ret
 	}
 
-	splitType := strings.Split(mediatype, "/")
-	if ret, ok := config.MediaHandlers[splitType[0]]; ok {
+	splitType := strings.Split(mediatype, "/")[0]
+	if ret, ok := config.MediaHandlers[splitType]; ok {
 		return ret
 	}
 
@@ -165,12 +165,12 @@ func downloadAndOpen(u string, resp *gemini.Response) {
 			Error("System Viewer Error", err.Error())
 			return
 		}
-		dlModal.SetText("Opened in system default viewer")
+		dlModal.SetText("Opened in default system viewer")
 	} else {
 		cmd := mediaHandler.Cmd
 		err := exec.Command(cmd[0], append(cmd[1:], path)...).Start()
 		if err != nil {
-			Error("System Viewer Error", "Error executing custom command: "+err.Error())
+			Error("File Opening Error", "Error executing custom command: "+err.Error())
 			return
 		}
 		dlModal.SetText("Opened in system viewer")
@@ -181,7 +181,7 @@ func downloadAndOpen(u string, resp *gemini.Response) {
 
 // downloadURL pulls up a modal to show download progress and saves the URL content.
 // downloadPage should be used for Page content.
-// Returns location downloaded to or an empty string on error
+// Returns location downloaded to or an empty string on error.
 func downloadURL(dir, u string, resp *gemini.Response) string {
 	_, _, width, _ := dlModal.GetInnerRect()
 	// Copy of progressbar.DefaultBytesSilent with custom width
@@ -273,7 +273,7 @@ func downloadPage(p *structs.Page) (string, error) {
 // downloadNameFromURL takes a URl and returns a safe download path that will not overwrite any existing file.
 // ext is an extension that will be added if the file has no extension, and for domain only URLs.
 // It should include the dot.
-func downloadNameFromURL(dir, u string, ext string) (string, error) {
+func downloadNameFromURL(dir, u, ext string) (string, error) {
 	var name string
 	var err error
 	parsed, _ := url.Parse(u)

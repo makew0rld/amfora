@@ -141,7 +141,7 @@ func dlChoice(text, u string, resp *gemini.Response) {
 	if choice == "Open" {
 		tabPages.HidePage("dlChoice")
 		App.Draw()
-		downloadAndOpen(u, resp)
+		open(u, resp)
 		return
 	}
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
@@ -149,10 +149,10 @@ func dlChoice(text, u string, resp *gemini.Response) {
 	App.Draw()
 }
 
-// downloadAndOpen performs the same actions as downloadURL except it also opens the file.
+// open performs the same actions as downloadURL except it also opens the file.
 // If there is no system viewer configured for the particular mediatype, it opens it
 // with the default system viewer.
-func downloadAndOpen(u string, resp *gemini.Response) {
+func open(u string, resp *gemini.Response) {
 	mediaHandler := getMediaHandler(resp)
 	path := downloadURL(config.TempDownloadsDir, u, resp)
 	if path == "" {

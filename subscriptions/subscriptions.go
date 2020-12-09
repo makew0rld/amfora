@@ -22,9 +22,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// TODO: Test for deadlocks and whether there should be more
-// goroutines for file writing or other things.
-
 var (
 	ErrSaving     = errors.New("couldn't save JSON to disk")
 	ErrNotSuccess = errors.New("status 20 not returned")
@@ -277,8 +274,6 @@ func updatePage(url string) error {
 // updateAll updates all subscriptions using workers.
 // It only returns once all the workers are done.
 func updateAll() {
-	// TODO: Is two goroutines the right amount?
-
 	worker := func(jobs <-chan [2]string, wg *sync.WaitGroup) {
 		// Each job is: [2]string{<type>, "url"}
 		// where <type> is "feed" or "page"

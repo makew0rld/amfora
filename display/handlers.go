@@ -244,7 +244,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 				feed, isFeed := getFeedFromPage(p)
 				if isFeed && isValidTab(t) && t.page == p {
 					// After parsing and track-checking time, the page is still being displayed
-					addFeedDirect(p.URL, feed, false)
+					addFeedDirect(p.URL, feed, subscriptions.IsSubscribed(p.URL))
 				}
 			}
 		}(t.page)

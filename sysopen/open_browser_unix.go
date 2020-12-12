@@ -13,8 +13,6 @@ import (
 // xdg-open. It only works if there is a display server working.
 func Open(path string) (string, error) {
 	var (
-		// In prev versions there was also Xorg executable checked for.
-		// I don't see any reason to check for it.
 		xorgDisplay                     = os.Getenv("DISPLAY")
 		waylandDisplay                  = os.Getenv("WAYLAND_DISPLAY")
 		xdgOpenPath, xdgOpenNotFoundErr = exec.LookPath("xdg-open")
@@ -32,6 +30,6 @@ func Open(path string) (string, error) {
 		return "Opened in default system viewer", nil
 	default:
 		return "", fmt.Errorf("could not determine default system viewer. " +
-			"Set a default [[mediatype-handlers]] command in the config")
+			"Set a catch-all [[mediatype-handlers]] command in the config")
 	}
 }

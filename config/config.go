@@ -184,7 +184,7 @@ func Init() error {
 		// Make sure it exists
 		err = os.MkdirAll(TempDownloadsDir, 0755)
 		if err != nil {
-			return fmt.Errorf("downloads path could not be created: %s", DownloadsDir)
+			return fmt.Errorf("temp downloads path could not be created: %s", TempDownloadsDir)
 		}
 	} else {
 		// Validate path
@@ -300,7 +300,7 @@ func Init() error {
 	for _, rawMediaHandler := range rawMediaHandlers {
 		for _, typ := range rawMediaHandler.Types {
 			if _, ok := MediaHandlers[typ]; ok {
-				return fmt.Errorf(`Multiple mediatype-handlers defined for %v`, typ)
+				return fmt.Errorf("multiple mediatype-handlers defined for %v", typ)
 			}
 			MediaHandlers[typ] = MediaHandler{
 				Cmd:      rawMediaHandler.Cmd,

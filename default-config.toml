@@ -110,8 +110,10 @@ other = 'off'
 
 
 # [[mediatype-handlers]]
-# Specify what applications will open certain filetypes.
+# Specify what applications will open certain media types.
 # By default your default application will be used to open the file when you select "Open".
+# You only need to configure this section if you want to override your default application,
+# or do special things like streaming.
 #
 # To open jpeg files with the feh command:
 #   [[mediatype-handlers]]
@@ -145,6 +147,14 @@ other = 'off'
 #   cmd = ["feh"]
 #   types = ["image"]
 #   no_prompt = true
+#
+# Note: Multiple handlers cannot be defined for the same full media type, but
+# still there needs to be an order for which handlers are used. The following
+# order applies regardless of the order written in the config:
+#
+# 1. Full media type: "image/jpeg"
+# 2. Just type: "image"
+# 3. Catch-all: "*"
 
 
 [cache]

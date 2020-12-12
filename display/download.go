@@ -158,6 +158,9 @@ func open(u string, resp *gemini.Response) {
 	if path == "" {
 		return
 	}
+	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	App.SetFocus(tabs[curTab].view)
+	App.Draw()
 	if mediaHandler.Cmd == nil {
 		// Open with system default viewer
 		_, err := sysopen.Open(path)
@@ -165,7 +168,7 @@ func open(u string, resp *gemini.Response) {
 			Error("System Viewer Error", err.Error())
 			return
 		}
-		dlModal.SetText("Opened in default system viewer")
+		Info("Opened in default system viewer")
 	} else {
 		cmd := mediaHandler.Cmd
 		err := exec.Command(cmd[0], append(cmd[1:], path)...).Start()
@@ -173,7 +176,7 @@ func open(u string, resp *gemini.Response) {
 			Error("File Opening Error", "Error executing custom command: "+err.Error())
 			return
 		}
-		dlModal.SetText("Opened with "+cmd[0])
+		Info("Opened with "+cmd[0])
 	}
 	App.SetFocus(dlModal)
 	App.Draw()

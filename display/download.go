@@ -176,7 +176,7 @@ func open(u string, resp *gemini.Response) {
 			Error("File Opening Error", "Error executing custom command: "+err.Error())
 			return
 		}
-		Info("Opened with "+cmd[0])
+		Info("Opened with " + cmd[0])
 	}
 	App.SetFocus(dlModal)
 	App.Draw()

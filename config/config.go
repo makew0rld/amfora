@@ -38,6 +38,7 @@ var bkmkDir string
 var bkmkPath string
 
 var DownloadsDir string
+var TempDownloadsDir string
 
 // Subscriptions
 var subscriptionDir string
@@ -45,6 +46,13 @@ var SubscriptionPath string
 
 // Command for opening HTTP(S) URLs in the browser, from "a-general.http" in config.
 var HTTPCommand []string
+
+type MediaHandler struct {
+	Cmd      []string
+	NoPrompt bool
+}
+
+var MediaHandlers = make(map[string]MediaHandler)
 
 func Init() error {
 
@@ -194,6 +202,36 @@ func Init() error {
 		DownloadsDir = dDir
 	}
 
+	// Setup temporary downloads dir
+	if viper.GetString("a-general.temp_downloads") == "" {
+		TempDownloadsDir = filepath.Join(os.TempDir(), "amfora_temp")
+
+		// Make sure it exists
+		err = os.MkdirAll(TempDownloadsDir, 0755)
+		if err != nil {
+			return fmt.Errorf("temp downloads path could not be created: %s", TempDownloadsDir)
+		}
+	} else {
+		// Validate path
+		dDir := viper.GetString("a-general.temp_downloads")
+		di, err := os.Stat(dDir)
+		if err == nil {
+			if !di.IsDir() {
+				return fmt.Errorf("temp downloads path specified is not a directory: %s", dDir)
+			}
+		} else if os.IsNotExist(err) {
+			// Try to create path
+			err = os.MkdirAll(dDir, 0755)
+			if err != nil {
+				return fmt.Errorf("temp downloads path could not be created: %s", dDir)
+			}
+		} else {
+			// Some other error
+			return fmt.Errorf("couldn't access temp downloads directory: %s", dDir)
+		}
+		TempDownloadsDir = dDir
+	}
+
 	// *** Setup vipers ***
 
 	TofuStore.SetConfigFile(tofuDBPath)
@@ -228,6 +266,7 @@ func Init() error {
 	viper.SetDefault("a-general.left_margin", 0.15)
 	viper.SetDefault("a-general.max_width", 100)
 	viper.SetDefault("a-general.downloads", "")
+	viper.SetDefault("a-general.temp_downloads", "")
 	viper.SetDefault("a-general.page_max_size", 2097152)
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.emoji_favicons", false)
@@ -277,6 +316,27 @@ func Init() error {
 		// Split on spaces to maintain compatibility with old versions
 		// The new better way to is to just define a string array in config
 		HTTPCommand = strings.Fields(viper.GetString("a-general.http"))
+	}
+
+	var rawMediaHandlers []struct {
+		Cmd      []string `mapstructure:"cmd"`
+		Types    []string `mapstructure:"types"`
+		NoPrompt bool     `mapstructure:"no_prompt"`
+	}
+	err = viper.UnmarshalKey("mediatype-handlers", &rawMediaHandlers)
+	if err != nil {
+		return fmt.Errorf("couldn't parse mediatype-handlers section in config: %w", err)
+	}
+	for _, rawMediaHandler := range rawMediaHandlers {
+		for _, typ := range rawMediaHandler.Types {
+			if _, ok := MediaHandlers[typ]; ok {
+				return fmt.Errorf("multiple mediatype-handlers defined for %v", typ)
+			}
+			MediaHandlers[typ] = MediaHandler{
+				Cmd:      rawMediaHandler.Cmd,
+				NoPrompt: rawMediaHandler.NoPrompt,
+			}
+		}
 	}
 
 	return nil

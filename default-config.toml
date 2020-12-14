@@ -112,6 +112,54 @@ shift_numbers = "!@#$%^&*()"
 other = 'off'
 
 
+# [[mediatype-handlers]]
+# Specify what applications will open certain media types.
+# By default your default application will be used to open the file when you select "Open".
+# You only need to configure this section if you want to override your default application,
+# or do special things like streaming.
+#
+# To open jpeg files with the feh command:
+#   [[mediatype-handlers]]
+#   cmd = ["feh"]
+#   types = ["image/jpeg"]
+#
+# Each command that you specify must come under its own [[mediatype-handlers]]. You may
+# specify as many [[mediatype-handlers]] as you want to setup multiple commands.
+#
+# If the subtype is omitted then the specified command will be used for the
+# entire type:
+#   [[mediatype-handlers]]
+#   command = ["vlc", "--flag"]
+#   types = ["audio", "video"]
+#
+# A catch-all handler can by specified with "*".
+# Note that there are already catch-all handlers in place for all OSes,
+# that open the file using your default application. This is only if you
+# want to override that.
+#   [[mediatype-handlers]]
+#   cmd = ["some-command"]
+#   types = [
+#           "application/pdf",
+#           "*",
+#   ]
+#
+# If you want to always open a type in its viewer without the download or open
+# prompt appearing, you can add no_prompt = true
+#
+#   [[mediatype-handlers]]
+#   cmd = ["feh"]
+#   types = ["image"]
+#   no_prompt = true
+#
+# Note: Multiple handlers cannot be defined for the same full media type, but
+# still there needs to be an order for which handlers are used. The following
+# order applies regardless of the order written in the config:
+#
+# 1. Full media type: "image/jpeg"
+# 2. Just type: "image"
+# 3. Catch-all: "*"
+
+
 [cache]
 # Options for page cache - which is only for text/gemini pages
 # Increase the cache size to speed up browsing at the expense of memory

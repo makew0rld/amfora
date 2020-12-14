@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime"
 	"net/url"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -15,15 +17,16 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/structs"
+	"github.com/makeworld-the-better-one/amfora/sysopen"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/makeworld-the-better-one/progressbar/v3"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
 
-// For choosing between download and the portal - copy of YesNo basically
+// For choosing between download and opening - copy of YesNo basically
 var dlChoiceModal = cview.NewModal().
-	AddButtons([]string{"Download", "Open in portal", "Cancel"})
+	AddButtons([]string{"Open", "Download", "Cancel"})
 
 // Channel to indicate what choice they made using the button text
 var dlChoiceCh = make(chan string)
@@ -83,46 +86,62 @@ func dlInit() {
 	})
 }
 
+func getMediaHandler(resp *gemini.Response) config.MediaHandler {
+	def := config.MediaHandler{
+		Cmd:      nil,
+		NoPrompt: false,
+	}
+
+	mediatype, _, err := mime.ParseMediaType(resp.Meta)
+	if err != nil {
+		return def
+	}
+
+	if ret, ok := config.MediaHandlers[mediatype]; ok {
+		return ret
+	}
+
+	splitType := strings.Split(mediatype, "/")[0]
+	if ret, ok := config.MediaHandlers[splitType]; ok {
+		return ret
+	}
+
+	if ret, ok := config.MediaHandlers["*"]; ok {
+		return ret
+	}
+
+	return def
+}
+
 // dlChoice displays the download choice modal and acts on the user's choice.
 // It should run in a goroutine.
 func dlChoice(text, u string, resp *gemini.Response) {
 	defer resp.Body.Close()
 
-	parsed, err := url.Parse(u)
-	if err != nil {
-		Error("URL Error", err.Error())
-		return
+	mediaHandler := getMediaHandler(resp)
+	var choice string
+
+	if mediaHandler.NoPrompt {
+		choice = "Open"
+	} else {
+		dlChoiceModal.SetText(text)
+		tabPages.ShowPage("dlChoice")
+		tabPages.SendToFront("dlChoice")
+		App.SetFocus(dlChoiceModal)
+		App.Draw()
+		choice = <-dlChoiceCh
 	}
 
-	dlChoiceModal.SetText(text)
-	tabPages.ShowPage("dlChoice")
-	tabPages.SendToFront("dlChoice")
-	App.SetFocus(dlChoiceModal)
-	App.Draw()
-
-	choice := <-dlChoiceCh
 	if choice == "Download" {
 		tabPages.HidePage("dlChoice")
 		App.Draw()
-		downloadURL(u, resp)
+		downloadURL(config.DownloadsDir, u, resp)
 		return
 	}
-	if choice == "Open in portal" {
-		// Open in mozz's proxy
-		portalURL := u
-		if parsed.RawQuery != "" {
-			// Remove query and add encoded version on the end
-			query := parsed.RawQuery
-			parsed.RawQuery = ""
-			portalURL = parsed.String() + "%3F" + query
-		}
-		portalURL = strings.TrimPrefix(portalURL, "gemini://") + "?raw=1"
-		ok := handleHTTP("https://portal.mozz.us/gemini/"+portalURL, false)
-		if ok {
-			tabPages.SwitchToPage(strconv.Itoa(curTab))
-			App.SetFocus(tabs[curTab].view)
-			App.Draw()
-		}
+	if choice == "Open" {
+		tabPages.HidePage("dlChoice")
+		App.Draw()
+		open(u, resp)
 		return
 	}
 	tabPages.SwitchToPage(strconv.Itoa(curTab))
@@ -130,9 +149,43 @@ func dlChoice(text, u string, resp *gemini.Response) {
 	App.Draw()
 }
 
+// open performs the same actions as downloadURL except it also opens the file.
+// If there is no system viewer configured for the particular mediatype, it opens it
+// with the default system viewer.
+func open(u string, resp *gemini.Response) {
+	mediaHandler := getMediaHandler(resp)
+	path := downloadURL(config.TempDownloadsDir, u, resp)
+	if path == "" {
+		return
+	}
+	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	App.SetFocus(tabs[curTab].view)
+	App.Draw()
+	if mediaHandler.Cmd == nil {
+		// Open with system default viewer
+		_, err := sysopen.Open(path)
+		if err != nil {
+			Error("System Viewer Error", err.Error())
+			return
+		}
+		Info("Opened in default system viewer")
+	} else {
+		cmd := mediaHandler.Cmd
+		err := exec.Command(cmd[0], append(cmd[1:], path)...).Start()
+		if err != nil {
+			Error("File Opening Error", "Error executing custom command: "+err.Error())
+			return
+		}
+		Info("Opened with " + cmd[0])
+	}
+	App.SetFocus(dlModal)
+	App.Draw()
+}
+
 // downloadURL pulls up a modal to show download progress and saves the URL content.
 // downloadPage should be used for Page content.
-func downloadURL(u string, resp *gemini.Response) {
+// Returns location downloaded to or an empty string on error.
+func downloadURL(dir, u string, resp *gemini.Response) string {
 	_, _, width, _ := dlModal.GetInnerRect()
 	// Copy of progressbar.DefaultBytesSilent with custom width
 	bar := progressbar.NewOptions64(
@@ -146,15 +199,15 @@ func downloadURL(u string, resp *gemini.Response) {
 	)
 	bar.RenderBlank() //nolint:errcheck
 
-	savePath, err := downloadNameFromURL(u, "")
+	savePath, err := downloadNameFromURL(dir, u, "")
 	if err != nil {
 		Error("Download Error", "Error deciding on file name: "+err.Error())
-		return
+		return ""
 	}
 	f, err := os.OpenFile(savePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		Error("Download Error", "Error creating download file: "+err.Error())
-		return
+		return ""
 	}
 	defer f.Close()
 
@@ -184,7 +237,7 @@ func downloadURL(u string, resp *gemini.Response) {
 		Error("Download Error", err.Error())
 		f.Close()
 		os.Remove(savePath) // Remove partial file
-		return
+		return ""
 	}
 	dlModal.SetText(fmt.Sprintf("Download complete! File saved to %s.", savePath))
 	dlModal.ClearButtons()
@@ -192,6 +245,8 @@ func downloadURL(u string, resp *gemini.Response) {
 	dlModal.GetForm().SetFocus(100)
 	App.SetFocus(dlModal)
 	App.Draw()
+
+	return savePath
 }
 
 // downloadPage saves the passed Page to a file.
@@ -202,9 +257,9 @@ func downloadPage(p *structs.Page) (string, error) {
 	var err error
 
 	if p.Mediatype == structs.TextGemini {
-		savePath, err = downloadNameFromURL(p.URL, ".gmi")
+		savePath, err = downloadNameFromURL(config.DownloadsDir, p.URL, ".gmi")
 	} else {
-		savePath, err = downloadNameFromURL(p.URL, ".txt")
+		savePath, err = downloadNameFromURL(config.DownloadsDir, p.URL, ".txt")
 	}
 	if err != nil {
 		return "", err
@@ -221,13 +276,13 @@ func downloadPage(p *structs.Page) (string, error) {
 // downloadNameFromURL takes a URl and returns a safe download path that will not overwrite any existing file.
 // ext is an extension that will be added if the file has no extension, and for domain only URLs.
 // It should include the dot.
-func downloadNameFromURL(u string, ext string) (string, error) {
+func downloadNameFromURL(dir, u, ext string) (string, error) {
 	var name string
 	var err error
 	parsed, _ := url.Parse(u)
 	if parsed.Path == "" || path.Base(parsed.Path) == "/" {
 		// No file, just the root domain
-		name, err = getSafeDownloadName(parsed.Hostname()+ext, true, 0)
+		name, err = getSafeDownloadName(dir, parsed.Hostname()+ext, true, 0)
 		if err != nil {
 			return "", err
 		}
@@ -238,23 +293,23 @@ func downloadNameFromURL(u string, ext string) (string, error) {
 			// No extension
 			name += ext
 		}
-		name, err = getSafeDownloadName(name, false, 0)
+		name, err = getSafeDownloadName(dir, name, false, 0)
 		if err != nil {
 			return "", err
 		}
 	}
-	return filepath.Join(config.DownloadsDir, name), nil
+	return filepath.Join(dir, name), nil
 }
 
 // getSafeDownloadName is used by downloads.go only.
-// It returns a modified name that is unique for the downloads folder.
+// It returns a modified name that is unique for the specified folder.
 // This way duplicate saved files will not overwrite each other.
 //
 // lastDot should be set to true if the number added to the name should come before
 // the last dot in the filename instead of the first.
 //
 // n should be set to 0, it is used for recursiveness.
-func getSafeDownloadName(name string, lastDot bool, n int) (string, error) {
+func getSafeDownloadName(dir, name string, lastDot bool, n int) (string, error) {
 	// newName("test.txt", 3) -> "test(3).txt"
 	newName := func() string {
 		if n <= 0 {
@@ -271,7 +326,7 @@ func getSafeDownloadName(name string, lastDot bool, n int) (string, error) {
 		return name[:idx] + "(" + strconv.Itoa(n) + ")" + name[idx:]
 	}
 
-	d, err := os.Open(config.DownloadsDir)
+	d, err := os.Open(dir)
 	if err != nil {
 		return "", err
 	}
@@ -285,7 +340,7 @@ func getSafeDownloadName(name string, lastDot bool, n int) (string, error) {
 	for i := range files {
 		if nn == files[i] {
 			d.Close()
-			return getSafeDownloadName(name, lastDot, n+1)
+			return getSafeDownloadName(dir, name, lastDot, n+1)
 		}
 	}
 	d.Close()

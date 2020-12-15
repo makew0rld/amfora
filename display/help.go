@@ -72,9 +72,9 @@ func helpInit() {
 		}
 	})
 
-	tabKeys := fmt.Sprintf("%s-%s", strings.Split(config.GetKeyBinding(config.CmdTab1), ",")[0],
+	tabKeys := fmt.Sprintf("%s to %s", strings.Split(config.GetKeyBinding(config.CmdTab1), ",")[0],
 		strings.Split(config.GetKeyBinding(config.CmdTab9), ",")[0])
-	linkKeys := fmt.Sprintf("%s-%s", strings.Split(config.GetKeyBinding(config.CmdLink1), ",")[0],
+	linkKeys := fmt.Sprintf("%s to %s", strings.Split(config.GetKeyBinding(config.CmdLink1), ",")[0],
 		strings.Split(config.GetKeyBinding(config.CmdLink0), ",")[0])
 
 	helpCells = fmt.Sprintf(helpCells,

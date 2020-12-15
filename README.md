@@ -20,13 +20,13 @@ Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) c
 
 It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Use [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701) instead, and make sure it [works with UTF-8](https://akr.am/blog/posts/using-utf-8-in-the-windows-terminal). Note that some of the application colors might not display correctly on Windows, but all functionality will still work.
 
-It fully passes Sean Conman's client torture test, including the new Unicode tests. It mostly passes the Egsam test.
+It fully passes Sean Conman's client torture test, as well as the Egsam one.
 
 ## Installation
 
 ### Binary
 
-Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you might have to make the file executable with `chmod +x <filename>`. You can rename the file to just `amfora` for easy access, and move it to `/usr/local/bin/`.
+Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you will have to make the file executable with `chmod +x <filename>`. You can rename the file to just `amfora` for easy access, and move it to `/usr/local/bin/`.
 
 On Windows, make sure you click "Advanced > Run anyway" after double-clicking, or something like that.
 
@@ -36,7 +36,7 @@ curl -sSL https://raw.githubusercontent.com/makeworld-the-better-one/amfora/mast
 update-desktop-database ~/.local/share/applications
 ```
 
-Make sure to click "Watch" > "Releases only" in the top right to get notified about new releases!
+Make sure to click "Watch" in the top right, then "Custom" > "Releases" to get notified about new releases!
 
 
 ### Arch Linux
@@ -49,7 +49,7 @@ sudo pacman -S amfora
 
 ### Homebrew
 
-If you use [Homebrew](https://brew.sh/), you can install Amfora through the official tap.
+If you use [Homebrew](https://brew.sh/), you can install Amfora through the my personal tap.
 ```
 brew tap makeworld-the-better-one/tap
 brew install amfora
@@ -61,10 +61,10 @@ brew upgrade amfora
 
 ### From Source
 
+This section is for advanced users who want to install the latest (possibly unstable) version of Amfora.
+
 <details>
 <summary>Click to expand</summary>
-
-This section is for advanced users who want to install the latest (possibly unstable) version of Amfora.
 
 **Requirements:**
 - Go 1.13 or later

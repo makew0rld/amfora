@@ -76,8 +76,8 @@ func keyBindingToString(kb keyBinding) (string, bool) {
 		if ok {
 			return prefix + s, true
 		}
+        return "", false
 	}
-	return "", false
 }
 
 func GetKeyBinding(cmd int) string {

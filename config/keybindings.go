@@ -59,6 +59,44 @@ type keyBinding struct {
 var bindings map[keyBinding]int
 var tcellKeys map[string]tcell.Key
 
+func keyBindingToString(kb keyBinding) (string, bool) {
+	var prefix string = ""
+
+	if kb.mod&tcell.ModAlt == tcell.ModAlt {
+		prefix = "Alt-"
+	}
+
+	if kb.key == tcell.KeyRune {
+		if kb.r == ' ' {
+			return prefix + "Space", true
+		}
+		return prefix + string(kb.r), true
+	} else {
+		s, ok := tcell.KeyNames[kb.key]
+		if ok {
+			return prefix + s, true
+		}
+	}
+	return "", false
+}
+
+func GetKeyBinding(cmd int) string {
+	var s string = ""
+	for kb, c := range bindings {
+		if c == cmd {
+			t, ok := keyBindingToString(kb)
+			if ok {
+				s += t + ", "
+			}
+		}
+	}
+
+	if len(s) > 0 {
+		return s[:len(s)-2]
+	}
+	return s
+}
+
 func parseBinding(cmd int, binding string) {
 	var k tcell.Key
 	var m tcell.ModMask = 0

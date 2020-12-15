@@ -71,13 +71,12 @@ func keyBindingToString(kb keyBinding) (string, bool) {
 			return prefix + "Space", true
 		}
 		return prefix + string(kb.r), true
-	} else {
-		s, ok := tcell.KeyNames[kb.key]
-		if ok {
-			return prefix + s, true
-		}
-        return "", false
 	}
+    s, ok := tcell.KeyNames[kb.key]
+    if ok {
+        return prefix + s, true
+    }
+    return "", false
 }
 
 func GetKeyBinding(cmd int) string {

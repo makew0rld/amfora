@@ -11,10 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `show_link` option added in config to optionally see the URL (#133)
 
 ### Changed
-- Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.9.3
+- Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.10.0
   - Supports CN-only wildcard certs
   - Time out when header takes too long
 - Preformatted text is now light yellow by default
+- Downloading a file no longer uses a second request
 
 ### Fixed
 - Single quotes are used in the default config for commands and paths so that Windows paths with backslashes will be parsed correctly

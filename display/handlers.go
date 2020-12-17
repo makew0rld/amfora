@@ -15,6 +15,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
+	"github.com/makeworld-the-better-one/amfora/rr"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
 	"github.com/makeworld-the-better-one/amfora/webbrowser"
@@ -362,6 +363,10 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		Error("URL Fetch Error", err.Error())
 		return ret("", false)
 	}
+
+	// Fetch happened successfully, use RestartReader to buffer read data
+	res.Body = rr.NewRestartReader(res.Body)
+
 	if renderer.CanDisplay(res) {
 		page, err := renderer.MakePage(u, res, textWidth(), leftMargin(), usingProxy)
 		// Rendering may have taken a while, make sure tab is still valid
@@ -369,35 +374,20 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			return ret("", false)
 		}
 
-		var res2 *gemini.Response
-		var dlErr error
-
 		if errors.Is(err, renderer.ErrTooLarge) {
-			// Make new request for downloading purposes
-			if usingProxy {
-				res2, dlErr = client.DownloadWithProxy(proxyHostname, proxyPort, u)
-			} else {
-				res2, dlErr = client.Download(u)
-			}
-			if dlErr != nil && !errors.Is(dlErr, client.ErrTofu) {
-				Error("URL Fetch Error", err.Error())
-				return ret("", false)
-			}
-			go dlChoice("That page is too large. What would you like to do?", u, res2)
+			// Downloading now
+			// Disable read timeout and go back to start
+			res.SetReadTimeout(0)
+			res.Body.(*rr.RestartReader).Restart()
+			go dlChoice("That page is too large. What would you like to do?", u, res)
 			return ret("", false)
 		}
 		if errors.Is(err, renderer.ErrTimedOut) {
-			// Make new request for downloading purposes
-			if usingProxy {
-				res2, dlErr = client.DownloadWithProxy(proxyHostname, proxyPort, u)
-			} else {
-				res2, dlErr = client.Download(u)
-			}
-			if dlErr != nil && !errors.Is(dlErr, client.ErrTofu) {
-				Error("URL Fetch Error", err.Error())
-				return ret("", false)
-			}
-			go dlChoice("Loading that page timed out. What would you like to do?", u, res2)
+			// Downloading now
+			// Disable read timeout and go back to start
+			res.SetReadTimeout(0)
+			res.Body.(*rr.RestartReader).Restart()
+			go dlChoice("Loading that page timed out. What would you like to do?", u, res)
 			return ret("", false)
 		}
 		if err != nil {
@@ -510,6 +500,9 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			added := addFeedDirect(u, feed, subscriptions.IsSubscribed(u))
 			if !added {
 				// Otherwise offer download choices
+				// Disable read timeout and go back to start
+				res.SetReadTimeout(0)
+				res.Body.(*rr.RestartReader).Restart()
 				go dlChoice("That file could not be displayed. What would you like to do?", u, res)
 			}
 		}()
@@ -517,6 +510,9 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	}
 
 	// Otherwise offer download choices
+	// Disable read timeout and go back to start
+	res.SetReadTimeout(0)
+	res.Body.(*rr.RestartReader).Restart()
 	go dlChoice("That file could not be displayed. What would you like to do?", u, res)
 	return ret("", false)
 }

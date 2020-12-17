@@ -18,17 +18,12 @@ var (
 	certCacheMu = &sync.RWMutex{}
 
 	fetchClient *gemini.Client
-	dlClient    *gemini.Client // For downloading
 )
 
 func Init() {
 	fetchClient = &gemini.Client{
 		ConnectTimeout: 10 * time.Second, // Default is 15
 		ReadTimeout:    time.Duration(viper.GetInt("a-general.page_max_time")) * time.Second,
-	}
-	dlClient = &gemini.Client{
-		ConnectTimeout: 10 * time.Second, // Default is 15
-		// No read timeout, download can take as long as it needs
 	}
 }
 
@@ -112,11 +107,6 @@ func Fetch(u string) (*gemini.Response, error) {
 	return fetch(u, fetchClient)
 }
 
-// Download is the same as Fetch but with no read timeout.
-func Download(u string) (*gemini.Response, error) {
-	return fetch(u, dlClient)
-}
-
 func fetchWithProxy(proxyHostname, proxyPort, u string, c *gemini.Client) (*gemini.Response, error) {
 	parsed, _ := url.Parse(u)
 	cert, key := clientCert(parsed.Host)
@@ -144,9 +134,4 @@ func fetchWithProxy(proxyHostname, proxyPort, u string, c *gemini.Client) (*gemi
 // FetchWithProxy is the same as Fetch, but uses a proxy.
 func FetchWithProxy(proxyHostname, proxyPort, u string) (*gemini.Response, error) {
 	return fetchWithProxy(proxyHostname, proxyPort, u, fetchClient)
-}
-
-// DownloadWithProxy is the same as FetchWithProxy but with no read timeout.
-func DownloadWithProxy(proxyHostname, proxyPort, u string) (*gemini.Response, error) {
-	return fetchWithProxy(proxyHostname, proxyPort, u, dlClient)
 }

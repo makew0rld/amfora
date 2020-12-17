@@ -377,7 +377,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		if errors.Is(err, renderer.ErrTooLarge) {
 			// Downloading now
 			// Disable read timeout and go back to start
-			res.SetReadTimeout(0)
+			res.SetReadTimeout(0) //nolint: errcheck
 			res.Body.(*rr.RestartReader).Restart()
 			go dlChoice("That page is too large. What would you like to do?", u, res)
 			return ret("", false)
@@ -385,7 +385,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		if errors.Is(err, renderer.ErrTimedOut) {
 			// Downloading now
 			// Disable read timeout and go back to start
-			res.SetReadTimeout(0)
+			res.SetReadTimeout(0) //nolint: errcheck
 			res.Body.(*rr.RestartReader).Restart()
 			go dlChoice("Loading that page timed out. What would you like to do?", u, res)
 			return ret("", false)
@@ -501,7 +501,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			if !added {
 				// Otherwise offer download choices
 				// Disable read timeout and go back to start
-				res.SetReadTimeout(0)
+				res.SetReadTimeout(0) //nolint: errcheck
 				res.Body.(*rr.RestartReader).Restart()
 				go dlChoice("That file could not be displayed. What would you like to do?", u, res)
 			}
@@ -511,7 +511,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 
 	// Otherwise offer download choices
 	// Disable read timeout and go back to start
-	res.SetReadTimeout(0)
+	res.SetReadTimeout(0) //nolint: errcheck
 	res.Body.(*rr.RestartReader).Restart()
 	go dlChoice("That file could not be displayed. What would you like to do?", u, res)
 	return ret("", false)

@@ -23,6 +23,7 @@ func TestRead(t *testing.T) {
 	assert.Equal(t, []byte{'1'}, p, "should have read one byte, '1'")
 }
 
+//nolint
 func TestRestart(t *testing.T) {
 	reset()
 	p := make([]byte, 4)

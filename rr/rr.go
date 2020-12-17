@@ -5,7 +5,6 @@ import (
 	"io"
 )
 
-// ErrTooLarge is passed to panic if memory cannot be allocated to store data in a buffer.
 var ErrClosed = errors.New("RestartReader: closed")
 
 type RestartReader struct {

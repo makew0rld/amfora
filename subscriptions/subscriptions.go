@@ -115,7 +115,7 @@ func GetFeed(mediatype, filename string, r io.Reader) (*gofeed.Feed, bool) {
 	// Check mediatype and filename
 	if mediatype != "application/atom+xml" && mediatype != "application/rss+xml" && mediatype != "application/json+feed" &&
 		filename != "atom.xml" && filename != "feed.xml" && filename != "feed.json" &&
-		!strings.HasSuffix(filename, ".atom") && !strings.HasSuffix(filename, ".rss") {
+		!strings.HasSuffix(filename, ".atom") && !strings.HasSuffix(filename, ".rss") && !strings.HasSuffix(filename, ".xml") {
 		// No part of the above is true
 		return nil, false
 	}

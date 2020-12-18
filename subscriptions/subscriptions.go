@@ -341,10 +341,10 @@ func updateFeed(url string) {
 		return
 	}
 
-	AddFeed(newURL, feed)
-	if url != newURL {
+	err = AddFeed(newURL, feed)
+	if url != newURL && err == nil {
 		// URL has changed, remove old one
-		Remove(url)
+		Remove(url) //nolint:errcheck
 	}
 }
 
@@ -354,10 +354,10 @@ func updatePage(url string) {
 		return
 	}
 
-	AddPage(newURL, res.Body)
-	if url != newURL {
+	err = AddPage(newURL, res.Body)
+	if url != newURL && err == nil {
 		// URL has changed, remove old one
-		Remove(url)
+		Remove(url) //nolint:errcheck
 	}
 }
 

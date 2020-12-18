@@ -406,7 +406,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		return ret(u, true)
 	}
 	// Not displayable
-	// Could be a non 20 (or 21) status code, or a different kind of document
+	// Could be a non 20 status code, or a different kind of document
 
 	// Handle each status code
 	switch res.Status {
@@ -414,7 +414,6 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		userInput, ok := Input(res.Meta)
 		if ok {
 			// Make another request with the query string added
-			// + chars are replaced because PathEscape doesn't do that
 			parsed.RawQuery = gemini.QueryEscape(userInput)
 			if len(parsed.String()) > gemini.URLMaxLength {
 				Error("Input Error", "URL for that input would be too long.")

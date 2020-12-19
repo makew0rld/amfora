@@ -286,7 +286,7 @@ func Init() error {
 		return err
 	}
 
-	// Setup the key bindings:
+	// Setup the key bindings
 	KeyInit()
 
 	// Setup cache from config

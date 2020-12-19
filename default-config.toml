@@ -104,12 +104,11 @@ emoji_favicons = false
 # EG, for US keyboards (the default):
 #shift_numbers = "!@#$%^&*()"
 
-# Notes:
-# * whitespace is not allowed in any of the keybindings! Use 'Space' and 'Tab' to bind to those keys.
-# * Multiple keys can be bound to one command, just use a TOML array.
-# * To add the Alt modifier, the binding must start with Alt-, should be reasonably universal
-# * Ctrl- isn't a universal modifier, just the keys listed in tcell.KeyNames, see:
-# https://github.com/gdamore/tcell/blob/master/key.go (it was line 83 when this comment was written)
+# Whitespace is not allowed in any of the keybindings! Use 'Space' and 'Tab' to bind to those keys.
+# Multiple keys can be bound to one command, just use a TOML array.
+# To add the Alt modifier, the binding must start with Alt-, should be reasonably universal
+# Ctrl- won't work on all keys, see this for a list:
+# https://github.com/gdamore/tcell/blob/cb1e5d6fa606/key.go#L83
 
 # And the rest of the default keybindings
 #bind_reload = ["R","Ctrl-R"]

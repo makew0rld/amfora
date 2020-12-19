@@ -249,7 +249,7 @@ func Init() {
 		// the two switch statements here.  You'll also need to add an enum entry in
 		// config/keybindings.go, update KeyInit() in config/keybindings.go, add a default
 		// keybinding in config/config.go and update the help panel in display/help.go
-		
+
 		cmd := config.TranslateKeyEvent(event)
 		if tabs[curTab].mode == tabModeDone {
 			// All the keys and operations that can only work while NOT loading
@@ -316,7 +316,7 @@ func Init() {
 
 			// Number key: 1-9, 0, LINK1-LINK10
 			if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
-				if cmd <= len(tabs[curTab].page.Links) {
+				if int(cmd) <= len(tabs[curTab].page.Links) {
 					// It's a valid link number
 					followLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Links[cmd-1])
 					return nil
@@ -364,7 +364,7 @@ func Init() {
 				// Zero key goes to the last tab
 				SwitchTab(NumTabs() - 1)
 			} else {
-				SwitchTab(cmd - config.CmdTab1)
+				SwitchTab(int(cmd - config.CmdTab1))
 			}
 			return nil
 		}

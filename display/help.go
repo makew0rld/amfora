@@ -99,7 +99,7 @@ func helpInit() {
 		config.GetKeyBinding(config.CmdSub),
 		config.GetKeyBinding(config.CmdAddSub),
 		config.GetKeyBinding(config.CmdQuit),
-		)
+	)
 
 	rows := strings.Count(helpCells, "\n") + 1
 	cells := strings.Split(

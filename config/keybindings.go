@@ -7,29 +7,33 @@ import (
 	"github.com/spf13/viper"
 )
 
+// NOTE: CmdLink[1-90] and CmdTab[1-90] need to be in-order and consecutive
+// This property is used to simplify key handling in display/display.go
+type Command int
+
 const (
-	CmdInvalid = 0
-	CmdLink1   = 1
-	CmdLink2   = 2
-	CmdLink3   = 3
-	CmdLink4   = 4
-	CmdLink5   = 5
-	CmdLink6   = 6
-	CmdLink7   = 7
-	CmdLink8   = 8
-	CmdLink9   = 9
-	CmdLink0   = 10
-	CmdTab1    = 11
-	CmdTab2    = 12
-	CmdTab3    = 13
-	CmdTab4    = 14
-	CmdTab5    = 15
-	CmdTab6    = 16
-	CmdTab7    = 17
-	CmdTab8    = 18
-	CmdTab9    = 19
-	CmdTab0    = 20
-	CmdBottom  = iota
+	CmdInvalid Command = 0
+	CmdLink1           = 1
+	CmdLink2           = 2
+	CmdLink3           = 3
+	CmdLink4           = 4
+	CmdLink5           = 5
+	CmdLink6           = 6
+	CmdLink7           = 7
+	CmdLink8           = 8
+	CmdLink9           = 9
+	CmdLink0           = 10
+	CmdTab1            = 11
+	CmdTab2            = 12
+	CmdTab3            = 13
+	CmdTab4            = 14
+	CmdTab5            = 15
+	CmdTab6            = 16
+	CmdTab7            = 17
+	CmdTab8            = 18
+	CmdTab9            = 19
+	CmdTab0            = 20
+	CmdBottom          = iota
 	CmdEdit
 	CmdHome
 	CmdBookmarks
@@ -56,9 +60,16 @@ type keyBinding struct {
 	r   rune
 }
 
-var bindings map[keyBinding]int
+// Map of active keybindings to commands.
+var bindings map[keyBinding]Command
+
+// inversion of tcell.KeyNames, used to simplify config parsing.
+// used by parseBinding() below.
 var tcellKeys map[string]tcell.Key
 
+// helper function that takes a single keyBinding object and returns
+// a string in the format used by the configuration file.  Support
+// function for GetKeyBinding(), used to make the help panel helpful.
 func keyBindingToString(kb keyBinding) (string, bool) {
 	var prefix string = ""
 
@@ -79,7 +90,10 @@ func keyBindingToString(kb keyBinding) (string, bool) {
 	return "", false
 }
 
-func GetKeyBinding(cmd int) string {
+// Get all keybindings for a Command as a string.
+// Used by the help panel so bindable keys display with their
+// bound values rather than hardcoded defaults.
+func GetKeyBinding(cmd Command) string {
 	var s string = ""
 	for kb, c := range bindings {
 		if c == cmd {
@@ -96,7 +110,8 @@ func GetKeyBinding(cmd int) string {
 	return s
 }
 
-func parseBinding(cmd int, binding string) {
+// Parse a single keybinding string and add it to the binding map
+func parseBinding(cmd Command, binding string) {
 	var k tcell.Key
 	var m tcell.ModMask = 0
 	var r rune = 0
@@ -128,8 +143,10 @@ func parseBinding(cmd int, binding string) {
 	bindings[keyBinding{k, m, r}] = cmd
 }
 
+// Generate the bindings map from the TOML configuration file.
+// Called by config.Init()
 func KeyInit() {
-	configBindings := map[int]string{
+	configBindings := map[Command]string{
 		CmdLink1:       "keybindings.bind_link1",
 		CmdLink2:       "keybindings.bind_link2",
 		CmdLink3:       "keybindings.bind_link3",
@@ -160,7 +177,10 @@ func KeyInit() {
 		CmdSub:         "keybindings.bind_sub",
 		CmdAddSub:      "keybindings.bind_add_sub",
 	}
-	configTabNBindings := map[int]string{
+	// This is split off to allow shift_numbers to override bind_tab[1-90]
+	// (This is needed for older configs so that the default bind_tab values
+	// aren't used)
+	configTabNBindings := map[Command]string{
 		CmdTab1: "keybindings.bind_tab1",
 		CmdTab2: "keybindings.bind_tab2",
 		CmdTab3: "keybindings.bind_tab3",
@@ -173,7 +193,7 @@ func KeyInit() {
 		CmdTab0: "keybindings.bind_tab0",
 	}
 	tcellKeys = make(map[string]tcell.Key)
-	bindings = make(map[keyBinding]int)
+	bindings = make(map[keyBinding]Command)
 
 	for k, kname := range tcell.KeyNames {
 		tcellKeys[kname] = k
@@ -189,7 +209,7 @@ func KeyInit() {
 	shiftNumbers := []rune(viper.GetString("keybindings.shift_numbers"))
 	if len(shiftNumbers) > 0 && len(shiftNumbers) <= 10 {
 		for i, r := range shiftNumbers {
-			bindings[keyBinding{tcell.KeyRune, 0, r}] = CmdTab1 + i
+			bindings[keyBinding{tcell.KeyRune, 0, r}] = CmdTab1 + Command(i)
 		}
 	} else {
 		for c, allb := range configTabNBindings {
@@ -200,9 +220,10 @@ func KeyInit() {
 	}
 }
 
-func TranslateKeyEvent(e *tcell.EventKey) int {
+// Used by the display package to turn a tcell.EventKey into a Command
+func TranslateKeyEvent(e *tcell.EventKey) Command {
 	var ok bool
-	var cmd int
+	var cmd Command
 	k := e.Key()
 	if k == tcell.KeyRune {
 		cmd, ok = bindings[keyBinding{k, e.Modifiers(), e.Rune()}]

@@ -9,12 +9,12 @@ require (
 	github.com/google/go-cmp v0.5.0 // indirect
 	github.com/makeworld-the-better-one/go-gemini v0.11.0
 	github.com/makeworld-the-better-one/go-isemoji v1.1.0
-	github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20200710151429-125743e22b4f
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
 	github.com/mmcdole/gofeed v1.1.0
 	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/rkoesters/xdg v0.0.0-20181125232953-edd15b846f9b
+	github.com/schollz/progressbar/v3 v3.7.2
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
@@ -28,3 +28,5 @@ require (
 )
 
 replace github.com/mmcdole/gofeed => github.com/makeworld-the-better-one/gofeed v1.1.1-0.20201123002655-c0c6354134fe
+
+replace github.com/schollz/progressbar/v3 => github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20201220005701-b036c4d38568

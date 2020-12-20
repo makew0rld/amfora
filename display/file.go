@@ -31,6 +31,10 @@ func handleFile(u string) (*structs.Page, bool) {
 
 	switch mode := fi.Mode(); {
 	case mode.IsDir():
+		// Must end in slash
+		if u[len(u)-1] != '/' {
+			u += "/"
+		}
 		return createDirectoryListing(u)
 	case mode.IsRegular():
 		if fi.Size() > viper.GetInt64("a-general.page_max_size") {

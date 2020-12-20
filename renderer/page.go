@@ -7,6 +7,7 @@ import (
 	"mime"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/go-gemini"
@@ -108,6 +109,7 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int, proxied b
 			Raw:          utfText,
 			Content:      rendered,
 			Links:        links,
+			MadeAt:       time.Now(),
 		}, nil
 	} else if strings.HasPrefix(mediatype, "text/") {
 		if mediatype == "text/x-ansi" || strings.HasSuffix(url, ".ans") || strings.HasSuffix(url, ".ansi") {
@@ -119,6 +121,7 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int, proxied b
 				Raw:          utfText,
 				Content:      RenderANSI(utfText, leftMargin),
 				Links:        []string{},
+				MadeAt:       time.Now(),
 			}, nil
 		}
 
@@ -130,6 +133,7 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int, proxied b
 			Raw:          utfText,
 			Content:      RenderPlainText(utfText, leftMargin),
 			Links:        []string{},
+			MadeAt:       time.Now(),
 		}, nil
 	}
 

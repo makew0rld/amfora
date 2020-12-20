@@ -180,10 +180,10 @@ func Init() error {
 
 	// Setup main config
 
-	viper.SetDefault("a-general.home", "gemini.circumlunar.space")
+	viper.SetDefault("a-general.home", "gemini://gemini.circumlunar.space")
 	viper.SetDefault("a-general.auto_redirect", false)
 	viper.SetDefault("a-general.http", "default")
-	viper.SetDefault("a-general.search", "gus.guru/search")
+	viper.SetDefault("a-general.search", "gemini://gus.guru/search")
 	viper.SetDefault("a-general.color", true)
 	viper.SetDefault("a-general.ansi", true)
 	viper.SetDefault("a-general.bullets", true)
@@ -198,6 +198,7 @@ func Init() error {
 	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
+	viper.SetDefault("cache.timeout", 1800)
 	viper.SetDefault("subscriptions.popup", true)
 	viper.SetDefault("subscriptions.update_interval", 1800)
 	viper.SetDefault("subscriptions.workers", 3)
@@ -249,6 +250,7 @@ func Init() error {
 	// Setup cache from config
 	cache.SetMaxSize(viper.GetInt("cache.max_size"))
 	cache.SetMaxPages(viper.GetInt("cache.max_pages"))
+	cache.SetTimeout(viper.GetInt("cache.timeout"))
 
 	// Setup theme
 	configTheme := viper.Sub("theme")

@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Downloading now uses proxies when appropriate
 - User-entered URLs with invalid characters will be percent-encoded (#138)
 - Custom downloads dir is actually used (#148)
+- Empty quote lines no longer disappear
 
 
 ## [1.6.0] - 2020-11-04

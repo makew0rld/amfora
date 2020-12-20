@@ -187,6 +187,11 @@ func handleAbout(t *tab, u string) (string, bool) {
 		setPage(t, &temp)
 		t.applyBottomBar()
 		return u, true
+	case "about:version":
+		temp := versionPage
+		setPage(t, &temp)
+		t.applyBottomBar()
+		return u, true
 	}
 
 	if u == "about:subscriptions" || (len(u) > 20 && u[:20] == "about:subscriptions?") {

@@ -59,6 +59,7 @@ var layout = cview.NewFlex().
 	SetDirection(cview.FlexRow)
 
 var newTabPage structs.Page
+var versionPage structs.Page
 
 var App = cview.NewApplication().
 	EnableMouse(false).
@@ -77,7 +78,21 @@ var App = cview.NewApplication().
 		}(tabs[curTab])
 	})
 
-func Init() {
+func Init(version, commit, builtBy string) {
+	versionContent := fmt.Sprintf(
+		"# Amfora Version Info\n\nAmfora:   %s\nCommit:   %s\nBuilt by: %s",
+		version, commit, builtBy,
+	)
+	renderVersionContent, versionLinks := renderer.RenderGemini(versionContent, textWidth(), leftMargin(), false)
+	versionPage = structs.Page{
+		Raw:       versionContent,
+		Content:   renderVersionContent,
+		Links:     versionLinks,
+		URL:       "about:version",
+		Width:     -1, // Force reformatting on first display
+		Mediatype: structs.TextGemini,
+	}
+
 	tabRow.SetChangedFunc(func() {
 		App.Draw()
 	})

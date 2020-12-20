@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - URLs are NFC-normalized before any processing (#138)
 - Links to the wiki in the new tab
 - Cache times out after 30 minutes by default (#110)
+- `about:version` page (#126)
 
 ### Changed
 - Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.11.0

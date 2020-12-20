@@ -52,7 +52,7 @@ func main() {
 
 	client.Init()
 
-	display.Init()
+	display.Init(version, commit, builtBy)
 	display.NewTab()
 	display.NewTab() // Open extra tab and close it to fully initialize the app and wrapping
 	display.CloseTab()

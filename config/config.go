@@ -157,43 +157,6 @@ func Init() error {
 		return err
 	}
 
-	// *** Downloads paths, setup, and creation ***
-
-	// Setup downloads dir
-	if viper.GetString("a-general.downloads") == "" {
-		// Find default Downloads dir
-		// This seems to work for all OSes?
-		if userdirs.Download == "" {
-			DownloadsDir = filepath.Join(home, "Downloads")
-		} else {
-			DownloadsDir = userdirs.Download
-		}
-		// Create it just in case
-		err = os.MkdirAll(DownloadsDir, 0755)
-		if err != nil {
-			return fmt.Errorf("downloads path could not be created: %s", DownloadsDir)
-		}
-	} else {
-		// Validate path
-		dDir := viper.GetString("a-general.downloads")
-		di, err := os.Stat(dDir)
-		if err == nil {
-			if !di.IsDir() {
-				return fmt.Errorf("downloads path specified is not a directory: %s", dDir)
-			}
-		} else if os.IsNotExist(err) {
-			// Try to create path
-			err = os.MkdirAll(dDir, 0755)
-			if err != nil {
-				return fmt.Errorf("downloads path could not be created: %s", dDir)
-			}
-		} else {
-			// Some other error
-			return fmt.Errorf("couldn't access downloads directory: %s", dDir)
-		}
-		DownloadsDir = dDir
-	}
-
 	// *** Setup vipers ***
 
 	TofuStore.SetConfigFile(tofuDBPath)
@@ -245,6 +208,42 @@ func Init() error {
 	err = viper.ReadInConfig()
 	if err != nil {
 		return err
+	}
+
+	// *** Downloads paths, setup, and creation ***
+
+	// Setup downloads dir
+	if viper.GetString("a-general.downloads") == "" {
+		// Find default Downloads dir
+		if userdirs.Download == "" {
+			DownloadsDir = filepath.Join(home, "Downloads")
+		} else {
+			DownloadsDir = userdirs.Download
+		}
+		// Create it just in case
+		err = os.MkdirAll(DownloadsDir, 0755)
+		if err != nil {
+			return fmt.Errorf("downloads path could not be created: %s", DownloadsDir)
+		}
+	} else {
+		// Validate path
+		dDir := viper.GetString("a-general.downloads")
+		di, err := os.Stat(dDir)
+		if err == nil {
+			if !di.IsDir() {
+				return fmt.Errorf("downloads path specified is not a directory: %s", dDir)
+			}
+		} else if os.IsNotExist(err) {
+			// Try to create path
+			err = os.MkdirAll(dDir, 0755)
+			if err != nil {
+				return fmt.Errorf("downloads path could not be created: %s", dDir)
+			}
+		} else {
+			// Some other error
+			return fmt.Errorf("couldn't access downloads directory: %s", dDir)
+		}
+		DownloadsDir = dDir
 	}
 
 	// Setup cache from config

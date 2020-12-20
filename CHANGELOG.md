@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Single quotes are used in the default config for commands and paths so that Windows paths with backslashes will be parsed correctly
 - Downloading now uses proxies when appropriate
 - User-entered URLs with invalid characters will be percent-encoded (#138)
+- Custom downloads dir is actually used (#148)
 
 
 ## [1.6.0] - 2020-11-04

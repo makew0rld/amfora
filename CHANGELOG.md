@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Unicode in domain names (IDNs)
 - Unnecessarily encoded characters in URLs will be decoded (#138)
 - URLs are NFC-normalized before any processing (#138)
+- Links to the wiki in the new tab
 
 ### Changed
 - Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.11.0

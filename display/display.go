@@ -3,6 +3,7 @@ package display
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -25,6 +26,12 @@ var termH int
 
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField()
+
+// When the bottom bar string has a space, this regex decides whether it's
+// a non-encoded URL or a search string.
+// See this comment for details:
+// https://github.com/makeworld-the-better-one/amfora/issues/138#issuecomment-740961292
+var hasSpaceisURL = regexp.MustCompile(`[^ ]+\.[^ ].*/.`)
 
 // Viewer for the tab primitives
 // Pages are named as strings of tab numbers - so the textview for the first tab
@@ -176,8 +183,7 @@ func Init() {
 				} else {
 					// It's a full URL or search term
 					// Detect if it's a search or URL
-					if strings.Contains(query, " ") ||
-						(!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
+					if strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query) {
 						u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
 						cache.RemovePage(u) // Don't use the cached version of the search
 						URL(u)

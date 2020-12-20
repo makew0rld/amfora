@@ -439,10 +439,8 @@ func NewTab() {
 	tabs = append(tabs, makeNewTab())
 	temp := newTabPage // Copy
 	setPage(tabs[curTab], &temp)
-
-	// Can't go backwards, but this isn't the first page either.
-	// The first page will be the next one the user goes to.
-	tabs[curTab].history.pos = -1
+	tabs[curTab].addToHistory("about:newtab")
+	tabs[curTab].history.pos = 0 // Manually set as first page
 
 	tabPages.AddAndSwitchToPage(strconv.Itoa(curTab), tabs[curTab].view, true)
 	App.SetFocus(tabs[curTab].view)

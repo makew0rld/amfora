@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Time out when header takes too long
 - Preformatted text is now light yellow by default
 - Downloading a file no longer uses a second request
+- You can go back to the new tab page in history (#96)
 
 ### Fixed
 - Single quotes are used in the default config for commands and paths so that Windows paths with backslashes will be parsed correctly

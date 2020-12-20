@@ -21,6 +21,11 @@ var normalizeURLTests = []struct {
 	{"mailto:example@example.com", "mailto:example@example.com"},
 	{"magnet:?xt=urn:btih:test", "magnet:?xt=urn:btih:test"},
 	{"https://example.com", "https://example.com"},
+	// Fixing URL tests
+	{"gemini://gemini.circumlunar.space/%64%6f%63%73/%66%61%71%2e%67%6d%69", "gemini://gemini.circumlunar.space/docs/faq.gmi"},
+	{"gemini://example.com/蛸", "gemini://example.com/%E8%9B%B8"},
+	{"gemini://gemini.circumlunar.space/%64%6f%63%73/;;.'%66%61%71蛸%2e%67%6d%69", "gemini://gemini.circumlunar.space/docs/%3B%3B.%27faq%E8%9B%B8.gmi"},
+	{"gemini://example.com/?%2Ch%64ello蛸", "gemini://example.com/?%2Chdello%E8%9B%B8"},
 }
 
 func TestNormalizeURL(t *testing.T) {

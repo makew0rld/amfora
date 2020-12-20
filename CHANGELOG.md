@@ -9,9 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Subscriptions** to feeds and page changes (#61)
 - Opening local files with `file://` URIs (#103, #117)
 - `show_link` option added in config to optionally see the URL (#133)
+- Support for Unicode in domain names (IDNs)
+- Unnecessarily encoded characters in URLs will be decoded (#138)
+- URLs are NFC-normalized before any processing (#138)
 
 ### Changed
-- Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.10.0
+- Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.11.0
   - Supports CN-only wildcard certs
   - Time out when header takes too long
 - Preformatted text is now light yellow by default
@@ -20,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Single quotes are used in the default config for commands and paths so that Windows paths with backslashes will be parsed correctly
 - Downloading now uses proxies when appropriate
+- User-entered URLs with invalid characters will be percent-encoded (#138)
 
 
 ## [1.6.0] - 2020-11-04

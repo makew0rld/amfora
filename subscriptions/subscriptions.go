@@ -60,9 +60,12 @@ func Init() error {
 	} else if !os.IsNotExist(err) {
 		// There's an error opening the file, but it's not bc is doesn't exist
 		return fmt.Errorf("open subscriptions.json error: %w", err)
-	} else {
-		// File does not exist, initialize maps
+	}
+
+	if data.Feeds == nil {
 		data.Feeds = make(map[string]*gofeed.Feed)
+	}
+	if data.Pages == nil {
 		data.Pages = make(map[string]*pageJSON)
 	}
 

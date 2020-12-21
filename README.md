@@ -59,6 +59,22 @@ You can update it with:
 brew upgrade amfora
 ```
 
+### KISS Linux
+
+[KISS](k1ss.org) Linux users can install Amfora from jedahan's repository.
+
+Add jedahan's kiss repository:
+```
+git clone https://github.com/jedahan/kiss-repo.git repo-jedahan
+export KISS_PATH="$KISS_PATH:$PWD/repo-jedahan"
+```
+
+Build and install Amfora:
+```
+kiss build amfora
+kiss install amfora
+```
+
 ### From Source
 
 This section is for advanced users who want to install the latest (possibly unstable) version of Amfora.

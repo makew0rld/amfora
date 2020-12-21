@@ -198,7 +198,13 @@ func Init(version, commit, builtBy string) {
 				} else {
 					// It's a full URL or search term
 					// Detect if it's a search or URL
-					if strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query) {
+					if (strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
+						(!strings.HasPrefix(query, "//") && !strings.Contains(query, "://") &&
+							!strings.Contains(query, ".")) {
+						// Has a space and follows regex, OR
+						// doesn't start with "//", contain "://", and doesn't have a dot either.
+						// Then it's a search
+
 						u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
 						cache.RemovePage(u) // Don't use the cached version of the search
 						URL(u)

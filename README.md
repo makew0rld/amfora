@@ -65,7 +65,7 @@ brew upgrade amfora
 
 Add jedahan's kiss repository:
 ```
-git clone https://github.com/jedaha/kiss-repo.git repo-jedahan
+git clone https://github.com/jedahan/kiss-repo.git repo-jedahan
 export KISS_PATH="$KISS_PATH:$PWD/repo-jedahan"
 ```
 

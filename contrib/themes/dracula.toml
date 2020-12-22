@@ -101,3 +101,5 @@ bkmk_modal_label =	"#f8f8f2"
 bkmk_modal_field_bg =	"#000000"
 bkmk_modal_field_text = "#f8f8f2"
 
+subscription_modal_bg =	"#282a36"
+subscription_modal_text = "#f8f8f2"

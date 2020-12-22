@@ -243,13 +243,18 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 		} else if strings.HasPrefix(lines[i], ">") {
 			// It's a quote line, add extra quote symbols and italics to the start of each wrapped line
 
-			// Remove beginning quote and maybe space
-			lines[i] = strings.TrimPrefix(lines[i], ">")
-			lines[i] = strings.TrimPrefix(lines[i], " ")
-			wrappedLines = append(wrappedLines,
-				wrapLine(lines[i], width, fmt.Sprintf("[%s::i]> ", config.GetColorString("quote_text")),
-					"[-::-]", true)...,
-			)
+			if len(lines[i]) == 1 {
+				// Just an empty quote line
+				wrappedLines = append(wrappedLines, fmt.Sprintf("[%s::i]>[-::-]", config.GetColorString("quote_text")))
+			} else {
+				// Remove beginning quote and maybe space
+				lines[i] = strings.TrimPrefix(lines[i], ">")
+				lines[i] = strings.TrimPrefix(lines[i], " ")
+				wrappedLines = append(wrappedLines,
+					wrapLine(lines[i], width, fmt.Sprintf("[%s::i]> ", config.GetColorString("quote_text")),
+						"[-::-]", true)...,
+				)
+			}
 
 		} else if strings.TrimSpace(lines[i]) == "" {
 			// Just add empty line without processing

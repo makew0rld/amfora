@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/makeworld-the-better-one/go-gemini"
@@ -14,8 +15,9 @@ import (
 
 var (
 	certCache   = make(map[string][][]byte)
+	certCacheMu = &sync.RWMutex{}
+
 	fetchClient *gemini.Client
-	dlClient    *gemini.Client // For downloading
 )
 
 func Init() {
@@ -23,15 +25,14 @@ func Init() {
 		ConnectTimeout: 10 * time.Second, // Default is 15
 		ReadTimeout:    time.Duration(viper.GetInt("a-general.page_max_time")) * time.Second,
 	}
-	dlClient = &gemini.Client{
-		ConnectTimeout: 10 * time.Second, // Default is 15
-		// No read timeout, download can take as long as it needs
-	}
 }
 
 func clientCert(host string) ([]byte, []byte) {
-	if cert := certCache[host]; cert != nil {
-		return cert[0], cert[1]
+	certCacheMu.RLock()
+	pair, ok := certCache[host]
+	certCacheMu.RUnlock()
+	if ok {
+		return pair[0], pair[1]
 	}
 
 	// Expand paths starting with ~/
@@ -44,22 +45,30 @@ func clientCert(host string) ([]byte, []byte) {
 		keyPath = viper.GetString("auth.keys." + host)
 	}
 	if certPath == "" && keyPath == "" {
+		certCacheMu.Lock()
 		certCache[host] = [][]byte{nil, nil}
+		certCacheMu.Unlock()
 		return nil, nil
 	}
 
 	cert, err := ioutil.ReadFile(certPath)
 	if err != nil {
+		certCacheMu.Lock()
 		certCache[host] = [][]byte{nil, nil}
+		certCacheMu.Unlock()
 		return nil, nil
 	}
 	key, err := ioutil.ReadFile(keyPath)
 	if err != nil {
+		certCacheMu.Lock()
 		certCache[host] = [][]byte{nil, nil}
+		certCacheMu.Unlock()
 		return nil, nil
 	}
 
+	certCacheMu.Lock()
 	certCache[host] = [][]byte{cert, key}
+	certCacheMu.Unlock()
 	return cert, key
 }
 
@@ -98,11 +107,6 @@ func Fetch(u string) (*gemini.Response, error) {
 	return fetch(u, fetchClient)
 }
 
-// Download is the same as Fetch but with no read timeout.
-func Download(u string) (*gemini.Response, error) {
-	return fetch(u, dlClient)
-}
-
 func fetchWithProxy(proxyHostname, proxyPort, u string, c *gemini.Client) (*gemini.Response, error) {
 	parsed, _ := url.Parse(u)
 	cert, key := clientCert(parsed.Host)
@@ -130,9 +134,4 @@ func fetchWithProxy(proxyHostname, proxyPort, u string, c *gemini.Client) (*gemi
 // FetchWithProxy is the same as Fetch, but uses a proxy.
 func FetchWithProxy(proxyHostname, proxyPort, u string) (*gemini.Response, error) {
 	return fetchWithProxy(proxyHostname, proxyPort, u, fetchClient)
-}
-
-// DownloadWithProxy is the same as FetchWithProxy but with no read timeout.
-func DownloadWithProxy(proxyHostname, proxyPort, u string) (*gemini.Response, error) {
-	return fetchWithProxy(proxyHostname, proxyPort, u, dlClient)
 }

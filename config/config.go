@@ -39,6 +39,10 @@ var bkmkPath string
 
 var DownloadsDir string
 
+// Subscriptions
+var subscriptionDir string
+var SubscriptionPath string
+
 // Command for opening HTTP(S) URLs in the browser, from "a-general.http" in config.
 var HTTPCommand []string
 
@@ -96,6 +100,22 @@ func Init() error {
 	}
 	bkmkPath = filepath.Join(bkmkDir, "bookmarks.toml")
 
+	// Feeds dir and path
+	if runtime.GOOS == "windows" {
+		// In APPDATA beside other Amfora files
+		subscriptionDir = amforaAppData
+	} else {
+		// XDG data dir on POSIX systems
+		xdg_data, ok := os.LookupEnv("XDG_DATA_HOME")
+		if ok && strings.TrimSpace(xdg_data) != "" {
+			subscriptionDir = filepath.Join(xdg_data, "amfora")
+		} else {
+			// Default to ~/.local/share/amfora
+			subscriptionDir = filepath.Join(home, ".local", "share", "amfora")
+		}
+	}
+	SubscriptionPath = filepath.Join(subscriptionDir, "subscriptions.json")
+
 	// *** Create necessary files and folders ***
 
 	// Config
@@ -131,13 +151,71 @@ func Init() error {
 	if err == nil {
 		f.Close()
 	}
+	// Feeds
+	err = os.MkdirAll(subscriptionDir, 0755)
+	if err != nil {
+		return err
+	}
+
+	// *** Setup vipers ***
+
+	TofuStore.SetConfigFile(tofuDBPath)
+	TofuStore.SetConfigType("toml")
+	err = TofuStore.ReadInConfig()
+	if err != nil {
+		return err
+	}
+
+	BkmkStore.SetConfigFile(bkmkPath)
+	BkmkStore.SetConfigType("toml")
+	err = BkmkStore.ReadInConfig()
+	if err != nil {
+		return err
+	}
+	BkmkStore.Set("DO NOT TOUCH", true)
+	err = BkmkStore.WriteConfig()
+	if err != nil {
+		return err
+	}
+
+	// Setup main config
+
+	viper.SetDefault("a-general.home", "gemini://gemini.circumlunar.space")
+	viper.SetDefault("a-general.auto_redirect", false)
+	viper.SetDefault("a-general.http", "default")
+	viper.SetDefault("a-general.search", "gemini://gus.guru/search")
+	viper.SetDefault("a-general.color", true)
+	viper.SetDefault("a-general.ansi", true)
+	viper.SetDefault("a-general.bullets", true)
+	viper.SetDefault("a-general.show_link", false)
+	viper.SetDefault("a-general.left_margin", 0.15)
+	viper.SetDefault("a-general.max_width", 100)
+	viper.SetDefault("a-general.downloads", "")
+	viper.SetDefault("a-general.page_max_size", 2097152)
+	viper.SetDefault("a-general.page_max_time", 10)
+	viper.SetDefault("a-general.emoji_favicons", false)
+	viper.SetDefault("keybindings.shift_numbers", "!@#$%^&*()")
+	viper.SetDefault("url-handlers.other", "off")
+	viper.SetDefault("cache.max_size", 0)
+	viper.SetDefault("cache.max_pages", 20)
+	viper.SetDefault("cache.timeout", 1800)
+	viper.SetDefault("subscriptions.popup", true)
+	viper.SetDefault("subscriptions.update_interval", 1800)
+	viper.SetDefault("subscriptions.workers", 3)
+	viper.SetDefault("subscriptions.entries_per_page", 20)
+
+	viper.SetConfigFile(configPath)
+	viper.SetConfigType("toml")
+	err = viper.ReadInConfig()
+	if err != nil {
+		return err
+	}
 
 	// *** Downloads paths, setup, and creation ***
 
 	// Setup downloads dir
 	if viper.GetString("a-general.downloads") == "" {
 		// Find default Downloads dir
-		// This seems to work for all OSes?
 		if userdirs.Download == "" {
 			DownloadsDir = filepath.Join(home, "Downloads")
 		} else {
@@ -169,58 +247,10 @@ func Init() error {
 		DownloadsDir = dDir
 	}
 
-	// *** Setup vipers ***
-
-	TofuStore.SetConfigFile(tofuDBPath)
-	TofuStore.SetConfigType("toml")
-	err = TofuStore.ReadInConfig()
-	if err != nil {
-		return err
-	}
-
-	BkmkStore.SetConfigFile(bkmkPath)
-	BkmkStore.SetConfigType("toml")
-	err = BkmkStore.ReadInConfig()
-	if err != nil {
-		return err
-	}
-	BkmkStore.Set("DO NOT TOUCH", true)
-	err = BkmkStore.WriteConfig()
-	if err != nil {
-		return err
-	}
-
-	// Setup main config
-
-	viper.SetDefault("a-general.home", "gemini.circumlunar.space")
-	viper.SetDefault("a-general.auto_redirect", false)
-	viper.SetDefault("a-general.http", "default")
-	viper.SetDefault("a-general.search", "gus.guru/search")
-	viper.SetDefault("a-general.color", true)
-	viper.SetDefault("a-general.ansi", true)
-	viper.SetDefault("a-general.bullets", true)
-	viper.SetDefault("a-general.show_link", false)
-	viper.SetDefault("a-general.left_margin", 0.15)
-	viper.SetDefault("a-general.max_width", 100)
-	viper.SetDefault("a-general.downloads", "")
-	viper.SetDefault("a-general.page_max_size", 2097152)
-	viper.SetDefault("a-general.page_max_time", 10)
-	viper.SetDefault("a-general.emoji_favicons", false)
-	viper.SetDefault("keybindings.shift_numbers", "!@#$%^&*()")
-	viper.SetDefault("url-handlers.other", "off")
-	viper.SetDefault("cache.max_size", 0)
-	viper.SetDefault("cache.max_pages", 20)
-
-	viper.SetConfigFile(configPath)
-	viper.SetConfigType("toml")
-	err = viper.ReadInConfig()
-	if err != nil {
-		return err
-	}
-
 	// Setup cache from config
 	cache.SetMaxSize(viper.GetInt("cache.max_size"))
 	cache.SetMaxPages(viper.GetInt("cache.max_pages"))
+	cache.SetTimeout(viper.GetInt("cache.timeout"))
 
 	// Setup theme
 	configTheme := viper.Sub("theme")

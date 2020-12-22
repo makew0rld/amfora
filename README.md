@@ -20,13 +20,13 @@ Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) c
 
 It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Use [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701) instead, and make sure it [works with UTF-8](https://akr.am/blog/posts/using-utf-8-in-the-windows-terminal). Note that some of the application colors might not display correctly on Windows, but all functionality will still work.
 
-It fully passes Sean Conman's client torture test, including the new Unicode tests. It mostly passes the Egsam test.
+It fully passes Sean Conman's client torture test, as well as the Egsam one.
 
 ## Installation
 
 ### Binary
 
-Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you might have to make the file executable with `chmod +x <filename>`. You can rename the file to just `amfora` for easy access, and move it to `/usr/local/bin/`.
+Download a binary from the [releases](https://github.com/makeworld-the-better-one/amfora/releases) page. On Unix-based systems you will have to make the file executable with `chmod +x <filename>`. You can rename the file to just `amfora` for easy access, and move it to `/usr/local/bin/`.
 
 On Windows, make sure you click "Advanced > Run anyway" after double-clicking, or something like that.
 
@@ -36,7 +36,7 @@ curl -sSL https://raw.githubusercontent.com/makeworld-the-better-one/amfora/mast
 update-desktop-database ~/.local/share/applications
 ```
 
-Make sure to click "Watch" > "Releases only" in the top right to get notified about new releases!
+Make sure to click "Watch" in the top right, then "Custom" > "Releases" to get notified about new releases!
 
 
 ### Arch Linux
@@ -49,7 +49,7 @@ sudo pacman -S amfora
 
 ### Homebrew
 
-If you use [Homebrew](https://brew.sh/), you can install Amfora through the official tap.
+If you use [Homebrew](https://brew.sh/), you can install Amfora through the my personal tap.
 ```
 brew tap makeworld-the-better-one/tap
 brew install amfora
@@ -59,12 +59,28 @@ You can update it with:
 brew upgrade amfora
 ```
 
+### KISS Linux
+
+[KISS](k1ss.org) Linux users can install Amfora from jedahan's repository.
+
+Add jedahan's kiss repository:
+```
+git clone https://github.com/jedahan/kiss-repo.git repo-jedahan
+export KISS_PATH="$KISS_PATH:$PWD/repo-jedahan"
+```
+
+Build and install Amfora:
+```
+kiss build amfora
+kiss install amfora
+```
+
 ### From Source
+
+This section is for advanced users who want to install the latest (possibly unstable) version of Amfora.
 
 <details>
 <summary>Click to expand</summary>
-
-This section is for advanced users who want to install the latest (possibly unstable) version of Amfora.
 
 **Requirements:**
 - Go 1.13 or later
@@ -122,9 +138,9 @@ Features in *italics* are in the master branch, but not in the latest release.
     - Manage and browse them
     - Similar to [Kristall](https://github.com/MasterQ32/kristall)
     - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
-- [ ] Subscribe to RSS and Atom feeds and display them
-  - Subscribing to page changes, similar to how Spacewalk works, will also be supported
-  - *In progress on `feeds` branch*
+- [x] Subscriptions
+  - Subscribing to RSS, Atom, and [JSON Feeds](https://jsonfeed.org/) are all supported
+  - So is subscribing to a page, to know when it changes
 - [ ] Stream support
 - [ ] Table of contents for pages
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>
@@ -151,8 +167,9 @@ Amfora ❤️ open source!
   - It uses [tcell](https://github.com/gdamore/tcell) for low level terminal operations
 - [Viper](https://github.com/spf13/viper) for configuration and TOFU storing
 - [go-gemini](https://github.com/makeworld-the-better-one/go-gemini), my forked and updated Gemini client/server library
-- My [progressbar fork](https://github.com/makeworld-the-better-one/progressbar)
+- My [progressbar fork](https://github.com/makeworld-the-better-one/progressbar) - pull request [here](https://github.com/schollz/progressbar/pull/69)
 - [go-humanize](https://github.com/dustin/go-humanize)
+- My [gofeed fork](https://github.com/makeworld-the-better-one/gofeed) - pull request [here](https://github.com/mmcdole/gofeed/pull/164)
 
 ## License
 This project is licensed under the GPL v3.0. See the [LICENSE](./LICENSE) file for details.

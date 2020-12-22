@@ -7,10 +7,11 @@ import (
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/display"
+	"github.com/makeworld-the-better-one/amfora/subscriptions"
 )
 
 var (
-	version = "v1.6.0"
+	version = "v1.7.1"
 	commit  = "unknown"
 	builtBy = "unknown"
 )
@@ -40,13 +41,18 @@ func main() {
 
 	err := config.Init()
 	if err != nil {
-		fmt.Printf("Config error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Config error: %v\n", err)
+		os.Exit(1)
+	}
+	err = subscriptions.Init()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "subscriptions.json error: %v\n", err)
 		os.Exit(1)
 	}
 
 	client.Init()
 
-	display.Init()
+	display.Init(version, commit, builtBy)
 	display.NewTab()
 	display.NewTab() // Open extra tab and close it to fully initialize the app and wrapping
 	display.CloseTab()

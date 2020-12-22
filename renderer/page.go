@@ -7,6 +7,7 @@ import (
 	"mime"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/go-gemini"
@@ -102,31 +103,37 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int, proxied b
 	if mediatype == "text/gemini" {
 		rendered, links := RenderGemini(utfText, width, leftMargin, proxied)
 		return &structs.Page{
-			Mediatype: structs.TextGemini,
-			URL:       url,
-			Raw:       utfText,
-			Content:   rendered,
-			Links:     links,
+			Mediatype:    structs.TextGemini,
+			RawMediatype: mediatype,
+			URL:          url,
+			Raw:          utfText,
+			Content:      rendered,
+			Links:        links,
+			MadeAt:       time.Now(),
 		}, nil
 	} else if strings.HasPrefix(mediatype, "text/") {
 		if mediatype == "text/x-ansi" || strings.HasSuffix(url, ".ans") || strings.HasSuffix(url, ".ansi") {
 			// ANSI
 			return &structs.Page{
-				Mediatype: structs.TextAnsi,
-				URL:       url,
-				Raw:       utfText,
-				Content:   RenderANSI(utfText, leftMargin),
-				Links:     []string{},
+				Mediatype:    structs.TextAnsi,
+				RawMediatype: mediatype,
+				URL:          url,
+				Raw:          utfText,
+				Content:      RenderANSI(utfText, leftMargin),
+				Links:        []string{},
+				MadeAt:       time.Now(),
 			}, nil
 		}
 
 		// Treated as plaintext
 		return &structs.Page{
-			Mediatype: structs.TextPlain,
-			URL:       url,
-			Raw:       utfText,
-			Content:   RenderPlainText(utfText, leftMargin),
-			Links:     []string{},
+			Mediatype:    structs.TextPlain,
+			RawMediatype: mediatype,
+			URL:          url,
+			Raw:          utfText,
+			Content:      RenderPlainText(utfText, leftMargin),
+			Links:        []string{},
+			MadeAt:       time.Now(),
 		}, nil
 	}
 

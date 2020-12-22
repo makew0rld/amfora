@@ -1,5 +1,7 @@
 package structs
 
+import "time"
+
 type Mediatype string
 
 const (
@@ -31,6 +33,7 @@ type Page struct {
 	SelectedID   string    // The cview region ID for the selected text/link
 	Mode         PageMode
 	Favicon      string
+	MadeAt       time.Time // When the page was made. Zero value indicates it should stay in cache forever.
 }
 
 // Size returns an approx. size of a Page in bytes.

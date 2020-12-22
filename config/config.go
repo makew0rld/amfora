@@ -157,43 +157,6 @@ func Init() error {
 		return err
 	}
 
-	// *** Downloads paths, setup, and creation ***
-
-	// Setup downloads dir
-	if viper.GetString("a-general.downloads") == "" {
-		// Find default Downloads dir
-		// This seems to work for all OSes?
-		if userdirs.Download == "" {
-			DownloadsDir = filepath.Join(home, "Downloads")
-		} else {
-			DownloadsDir = userdirs.Download
-		}
-		// Create it just in case
-		err = os.MkdirAll(DownloadsDir, 0755)
-		if err != nil {
-			return fmt.Errorf("downloads path could not be created: %s", DownloadsDir)
-		}
-	} else {
-		// Validate path
-		dDir := viper.GetString("a-general.downloads")
-		di, err := os.Stat(dDir)
-		if err == nil {
-			if !di.IsDir() {
-				return fmt.Errorf("downloads path specified is not a directory: %s", dDir)
-			}
-		} else if os.IsNotExist(err) {
-			// Try to create path
-			err = os.MkdirAll(dDir, 0755)
-			if err != nil {
-				return fmt.Errorf("downloads path could not be created: %s", dDir)
-			}
-		} else {
-			// Some other error
-			return fmt.Errorf("couldn't access downloads directory: %s", dDir)
-		}
-		DownloadsDir = dDir
-	}
-
 	// *** Setup vipers ***
 
 	TofuStore.SetConfigFile(tofuDBPath)
@@ -217,10 +180,10 @@ func Init() error {
 
 	// Setup main config
 
-	viper.SetDefault("a-general.home", "gemini.circumlunar.space")
+	viper.SetDefault("a-general.home", "gemini://gemini.circumlunar.space")
 	viper.SetDefault("a-general.auto_redirect", false)
 	viper.SetDefault("a-general.http", "default")
-	viper.SetDefault("a-general.search", "gus.guru/search")
+	viper.SetDefault("a-general.search", "gemini://gus.guru/search")
 	viper.SetDefault("a-general.color", true)
 	viper.SetDefault("a-general.ansi", true)
 	viper.SetDefault("a-general.bullets", true)
@@ -274,6 +237,7 @@ func Init() error {
 	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
+	viper.SetDefault("cache.timeout", 1800)
 	viper.SetDefault("subscriptions.popup", true)
 	viper.SetDefault("subscriptions.update_interval", 1800)
 	viper.SetDefault("subscriptions.workers", 3)
@@ -289,9 +253,46 @@ func Init() error {
 	// Setup the key bindings
 	KeyInit()
 
+	// *** Downloads paths, setup, and creation ***
+
+	// Setup downloads dir
+	if viper.GetString("a-general.downloads") == "" {
+		// Find default Downloads dir
+		if userdirs.Download == "" {
+			DownloadsDir = filepath.Join(home, "Downloads")
+		} else {
+			DownloadsDir = userdirs.Download
+		}
+		// Create it just in case
+		err = os.MkdirAll(DownloadsDir, 0755)
+		if err != nil {
+			return fmt.Errorf("downloads path could not be created: %s", DownloadsDir)
+		}
+	} else {
+		// Validate path
+		dDir := viper.GetString("a-general.downloads")
+		di, err := os.Stat(dDir)
+		if err == nil {
+			if !di.IsDir() {
+				return fmt.Errorf("downloads path specified is not a directory: %s", dDir)
+			}
+		} else if os.IsNotExist(err) {
+			// Try to create path
+			err = os.MkdirAll(dDir, 0755)
+			if err != nil {
+				return fmt.Errorf("downloads path could not be created: %s", dDir)
+			}
+		} else {
+			// Some other error
+			return fmt.Errorf("couldn't access downloads directory: %s", dDir)
+		}
+		DownloadsDir = dDir
+	}
+
 	// Setup cache from config
 	cache.SetMaxSize(viper.GetInt("cache.max_size"))
 	cache.SetMaxPages(viper.GetInt("cache.max_pages"))
+	cache.SetTimeout(viper.GetInt("cache.timeout"))
 
 	// Setup theme
 	configTheme := viper.Sub("theme")

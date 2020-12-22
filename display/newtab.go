@@ -17,11 +17,18 @@ You can customize this page by creating a gemtext file called newtab.gmi, in Amf
 
 Happy browsing!
 
+## Internal Pages
+
 => about:bookmarks Bookmarks
 => about:subscriptions Subscriptions
 
+## Learn more about Amfora!
+
+=> https://github.com/makeworld-the-better-one/amfora Amfora homepage
+=> https://github.com/makeworld-the-better-one/amfora/wiki Amfora Wiki [GitHub]
+=> gemini://makeworld.gq/amfora-wiki/ Amfora Wiki [On Gemini!]
+
 => //gemini.circumlunar.space Project Gemini
-=> https://github.com/makeworld-the-better-one/amfora Amfora homepage [HTTPS]
 `
 
 // Read the new tab content from a file if it exists or fallback to a default page.

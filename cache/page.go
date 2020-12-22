@@ -4,6 +4,7 @@ package cache
 
 import (
 	"sync"
+	"time"
 
 	"github.com/makeworld-the-better-one/amfora/structs"
 )
@@ -13,6 +14,7 @@ var urls = make([]string, 0)               // Duplicate of the keys in the `page
 var maxPages = 0                           // Max allowed number of pages in cache
 var maxSize = 0                            // Max allowed cache size in bytes
 var lock = sync.RWMutex{}
+var timeout = time.Duration(0)
 
 // SetMaxPages sets the max number of pages the cache can hold.
 // A value <= 0 means infinite pages.
@@ -24,6 +26,16 @@ func SetMaxPages(max int) {
 // A value <= 0 means infinite size.
 func SetMaxSize(max int) {
 	maxSize = max
+}
+
+// SetTimeout sets the max number of a seconds a page can still
+// be valid for. A value <= 0 means forever.
+func SetTimeout(t int) {
+	if t <= 0 {
+		timeout = time.Duration(0)
+		return
+	}
+	timeout = time.Duration(t) * time.Second
 }
 
 func removeIndex(s []string, i int) []string {
@@ -110,10 +122,14 @@ func NumPages() int {
 }
 
 // GetPage returns the page struct, and a bool indicating if the page was in the cache or not.
-// An empty page struct is returned if the page isn't in the cache.
+// (nil, false) is returned if the page isn't in the cache.
 func GetPage(url string) (*structs.Page, bool) {
 	lock.RLock()
 	defer lock.RUnlock()
+
 	p, ok := pages[url]
-	return p, ok
+	if ok && (timeout == 0 || time.Since(p.MadeAt) < timeout) {
+		return p, ok
+	}
+	return nil, false
 }

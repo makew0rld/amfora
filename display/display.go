@@ -3,6 +3,7 @@ package display
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -25,6 +26,12 @@ var termH int
 
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField()
+
+// When the bottom bar string has a space, this regex decides whether it's
+// a non-encoded URL or a search string.
+// See this comment for details:
+// https://github.com/makeworld-the-better-one/amfora/issues/138#issuecomment-740961292
+var hasSpaceisURL = regexp.MustCompile(`[^ ]+\.[^ ].*/.`)
 
 // Viewer for the tab primitives
 // Pages are named as strings of tab numbers - so the textview for the first tab
@@ -52,6 +59,7 @@ var layout = cview.NewFlex().
 	SetDirection(cview.FlexRow)
 
 var newTabPage structs.Page
+var versionPage structs.Page
 
 var App = cview.NewApplication().
 	EnableMouse(false).
@@ -70,7 +78,21 @@ var App = cview.NewApplication().
 		}(tabs[curTab])
 	})
 
-func Init() {
+func Init(version, commit, builtBy string) {
+	versionContent := fmt.Sprintf(
+		"# Amfora Version Info\n\nAmfora:   %s\nCommit:   %s\nBuilt by: %s",
+		version, commit, builtBy,
+	)
+	renderVersionContent, versionLinks := renderer.RenderGemini(versionContent, textWidth(), leftMargin(), false)
+	versionPage = structs.Page{
+		Raw:       versionContent,
+		Content:   renderVersionContent,
+		Links:     versionLinks,
+		URL:       "about:version",
+		Width:     -1, // Force reformatting on first display
+		Mediatype: structs.TextGemini,
+	}
+
 	tabRow.SetChangedFunc(func() {
 		App.Draw()
 	})
@@ -176,8 +198,13 @@ func Init() {
 				} else {
 					// It's a full URL or search term
 					// Detect if it's a search or URL
-					if strings.Contains(query, " ") ||
-						(!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
+					if (strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
+						(!strings.HasPrefix(query, "//") && !strings.Contains(query, "://") &&
+							!strings.Contains(query, ".")) {
+						// Has a space and follows regex, OR
+						// doesn't start with "//", contain "://", and doesn't have a dot either.
+						// Then it's a search
+
 						u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
 						cache.RemovePage(u) // Don't use the cached version of the search
 						URL(u)
@@ -402,10 +429,8 @@ func NewTab() {
 	tabs = append(tabs, makeNewTab())
 	temp := newTabPage // Copy
 	setPage(tabs[curTab], &temp)
-
-	// Can't go backwards, but this isn't the first page either.
-	// The first page will be the next one the user goes to.
-	tabs[curTab].history.pos = -1
+	tabs[curTab].addToHistory("about:newtab")
+	tabs[curTab].history.pos = 0 // Manually set as first page
 
 	tabPages.AddAndSwitchToPage(strconv.Itoa(curTab), tabs[curTab].view, true)
 	App.SetFocus(tabs[curTab].view)

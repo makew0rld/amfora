@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"mime"
+	urlPkg "net/url"
 	"os"
 	"path"
 	"reflect"
@@ -22,13 +23,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-// TODO: Test for deadlocks and whether there should be more
-// goroutines for file writing or other things.
-
 var (
-	ErrSaving     = errors.New("couldn't save JSON to disk")
-	ErrNotSuccess = errors.New("status 20 not returned")
-	ErrNotFeed    = errors.New("not a valid feed")
+	ErrSaving           = errors.New("couldn't save JSON to disk")
+	ErrNotSuccess       = errors.New("status 20 not returned")
+	ErrNotFeed          = errors.New("not a valid feed")
+	ErrTooManyRedirects = errors.New("redirected more than 5 times")
 )
 
 var writeMu = sync.Mutex{} // Prevent concurrent writes to subscriptions.json file
@@ -61,9 +60,12 @@ func Init() error {
 	} else if !os.IsNotExist(err) {
 		// There's an error opening the file, but it's not bc is doesn't exist
 		return fmt.Errorf("open subscriptions.json error: %w", err)
-	} else {
-		// File does not exist, initialize maps
+	}
+
+	if data.Feeds == nil {
 		data.Feeds = make(map[string]*gofeed.Feed)
+	}
+	if data.Pages == nil {
 		data.Pages = make(map[string]*pageJSON)
 	}
 
@@ -118,7 +120,8 @@ func GetFeed(mediatype, filename string, r io.Reader) (*gofeed.Feed, bool) {
 	// Check mediatype and filename
 	if mediatype != "application/atom+xml" && mediatype != "application/rss+xml" && mediatype != "application/json+feed" &&
 		filename != "atom.xml" && filename != "feed.xml" && filename != "feed.json" &&
-		!strings.HasSuffix(filename, ".atom") && !strings.HasSuffix(filename, ".rss") {
+		!strings.HasSuffix(filename, ".atom") && !strings.HasSuffix(filename, ".rss") &&
+		!strings.HasSuffix(filename, ".xml") {
 		// No part of the above is true
 		return nil, false
 	}
@@ -232,53 +235,138 @@ func AddPage(url string, r io.Reader) error {
 	return nil
 }
 
-func updateFeed(url string) error {
+// getResource returns a URL and Response for the given URL.
+// It will follow up to 5 redirects, and if there is a permanent
+// redirect it will return the new URL. Otherwise the URL will
+// stay the same. THe returned URL will never be empty.
+//
+// If there is over 5 redirects the error will be ErrTooManyRedirects.
+// ErrNotSuccess, as well as other fetch errors will also be returned.
+func getResource(url string) (string, *gemini.Response, error) {
 	res, err := client.Fetch(url)
 	if err != nil {
 		if res != nil {
 			res.Body.Close()
 		}
-		return err
+		return url, nil, err
 	}
-	defer res.Body.Close()
 
-	if res.Status != gemini.StatusSuccess {
-		return ErrNotSuccess
+	if res.Status == gemini.StatusSuccess {
+		// No redirects
+		return url, res, nil
 	}
-	mediatype, _, err := mime.ParseMediaType(res.Meta)
+
+	parsed, err := urlPkg.Parse(url)
 	if err != nil {
-		return err
+		return url, nil, err
 	}
-	filename := path.Base(url)
-	feed, ok := GetFeed(mediatype, filename, res.Body)
-	if !ok {
-		return ErrNotFeed
+
+	i := 0
+	redirs := make([]int, 0)
+	urls := make([]*urlPkg.URL, 0)
+
+	// Loop through redirects
+	for (res.Status == gemini.StatusRedirectPermanent || res.Status == gemini.StatusRedirectTemporary) && i < 5 {
+		redirs = append(redirs, res.Status)
+		urls = append(urls, parsed)
+
+		tmp, err := parsed.Parse(res.Meta)
+		if err != nil {
+			// Redirect URL returned by the server is invalid
+			return url, nil, err
+		}
+		parsed = tmp
+
+		// Make the new request
+		res, err := client.Fetch(parsed.String())
+		if err != nil {
+			if res != nil {
+				res.Body.Close()
+			}
+			return url, nil, err
+		}
+
+		i++
 	}
-	return AddFeed(url, feed)
+
+	// Two possible options here:
+	// - Never redirected, got error on start
+	// - No more redirects, other status code
+	// - Too many redirects
+
+	if i == 0 {
+		// Never redirected or succeeded
+		return url, res, ErrNotSuccess
+	}
+
+	if i < 5 {
+		// The server stopped redirecting after <5 redirects
+
+		if res.Status == gemini.StatusSuccess {
+			// It ended by succeeding
+
+			for j := range redirs {
+				if redirs[j] == gemini.StatusRedirectTemporary {
+					if j == 0 {
+						// First redirect is temporary
+						return url, res, nil
+					}
+					// There were permanent redirects before this one
+					// Return the URL of the latest permanent redirect
+					return urls[j-1].String(), res, nil
+				}
+			}
+			// They were all permanent redirects
+			return urls[len(urls)-1].String(), res, nil
+		}
+
+		// It stopped because there was a non-redirect, non-success response
+		return url, res, ErrNotSuccess
+	}
+
+	// Too many redirects, return original
+	return url, nil, ErrTooManyRedirects
 }
 
-func updatePage(url string) error {
-	res, err := client.Fetch(url)
+func updateFeed(url string) {
+	newURL, res, err := getResource(url)
 	if err != nil {
-		if res != nil {
-			res.Body.Close()
-		}
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.Status != gemini.StatusSuccess {
-		return ErrNotSuccess
+		return
 	}
 
-	return AddPage(url, res.Body)
+	mediatype, _, err := mime.ParseMediaType(res.Meta)
+	if err != nil {
+		return
+	}
+	filename := path.Base(newURL)
+	feed, ok := GetFeed(mediatype, filename, res.Body)
+	if !ok {
+		return
+	}
+
+	err = AddFeed(newURL, feed)
+	if url != newURL && err == nil {
+		// URL has changed, remove old one
+		Remove(url) //nolint:errcheck
+	}
+}
+
+func updatePage(url string) {
+	newURL, res, err := getResource(url)
+	if err != nil {
+		return
+	}
+
+	err = AddPage(newURL, res.Body)
+	if url != newURL && err == nil {
+		// URL has changed, remove old one
+		Remove(url) //nolint:errcheck
+	}
 }
 
 // updateAll updates all subscriptions using workers.
 // It only returns once all the workers are done.
 func updateAll() {
-	// TODO: Is two goroutines the right amount?
-
 	worker := func(jobs <-chan [2]string, wg *sync.WaitGroup) {
 		// Each job is: [2]string{<type>, "url"}
 		// where <type> is "feed" or "page"

@@ -19,7 +19,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/sysopen"
 	"github.com/makeworld-the-better-one/go-gemini"
-	"github.com/makeworld-the-better-one/progressbar/v3"
+	"github.com/schollz/progressbar/v3"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )

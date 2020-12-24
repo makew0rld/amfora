@@ -6,7 +6,7 @@ You can use these themes by replacing the `[theme]` section of your config with 
 
 Contributed by **[@lokesh-krishna](https://github.com/lokesh-krishna)**.
 
-![screenshot of the nord theme](https://user-images.githubusercontent.com/20235646/99020443-a93a1980-2584-11eb-8028-0b95cfcf0fc6.png)
+![screenshot of the nord theme](https://user-images.githubusercontent.com/20235646/102846450-005dc480-4436-11eb-89a9-a1a4350f5415.png)
 
 ## Dracula
 

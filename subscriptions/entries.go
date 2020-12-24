@@ -112,14 +112,14 @@ func GetPageEntries() *PageEntries {
 
 		// Path is title
 		title := parsed.Path
-		if strings.HasPrefix(title, "/~") {
+		if strings.HasPrefix(title, "/~") && title != "/~" {
 			// A user dir
 			title = title[2:] // Remove beginning slash and tilde
 			// Remove trailing slash if the root of a user dir is being tracked
 			if strings.Count(title, "/") <= 1 && title[len(title)-1] == '/' {
 				title = title[:len(title)-1]
 			}
-		} else if strings.HasPrefix(title, "/users/") {
+		} else if strings.HasPrefix(title, "/users/") && title != "/users/" {
 			// "/users/" is removed for aesthetics when tracking hosted users
 			title = strings.TrimPrefix(title, "/users/")
 			title = strings.TrimPrefix(title, "~") // Remove leading tilde

@@ -87,12 +87,51 @@ emoji_favicons = false
 
 
 [keybindings]
-# In the future there will be more settings here.
+# If you have a non-US keyboard, use bind_tab1 through bind_tab0 to
+# setup the shift-number bindings: Eg, for US keyboards (the default):
+# bind_tab1 = "!"
+# bind_tab2 = "@"
+# bind_tab3 = "#"
+# bind_tab4 = "$"
+# bind_tab5 = "%"
+# bind_tab6 = "^"
+# bind_tab7 = "&"
+# bind_tab8 = "*"
+# bind_tab9 = "("
+# bind_tab0 = ")"
 
-# Hold down shift and press the numbers on your keyboard (1,2,3,4,5,6,7,8,9,0) to set this up.
-# It is default set to be accurate for US keyboards.
-shift_numbers = "!@#$%^&*()"
+# Whitespace is not allowed in any of the keybindings! Use 'Space' and 'Tab' to bind to those keys.
+# Multiple keys can be bound to one command, just use a TOML array.
+# To add the Alt modifier, the binding must start with Alt-, should be reasonably universal
+# Ctrl- won't work on all keys, see this for a list:
+# https://github.com/gdamore/tcell/blob/cb1e5d6fa606/key.go#L83
 
+# An example of a TOML array for multiple keys being bound to one command is the default
+# binding for reload:
+# bind_reload = ["R","Ctrl-R"]
+# One thing to note here is that "R" is capitalization sensitive, so it means shift-r.
+# "Ctrl-R" means both ctrl-r and ctrl-shift-R (this is a quirk of what ctrl-r means on
+# an ANSI terminal)
+
+# The default binding for opening the bottom bar for entering a URL or link number is:
+# bind_bottom = "Space"
+# This is how to get the Spacebar as a keybinding, if you try to use " ", it won't work.
+# And, finally, an example of a simple, unmodified character is:
+# bind_edit = "e"
+# This binds the "e" key to the command to edit the current URL.
+
+# The bind_link[1-90] options are for the commands to go to the first 10 links on a page,
+# typically these are bound to the number keys:
+# bind_link1 = "1"
+# bind_link2 = "2"
+# bind_link3 = "3"
+# bind_link4 = "4"
+# bind_link5 = "5"
+# bind_link6 = "6"
+# bind_link7 = "7"
+# bind_link8 = "8"
+# bind_link9 = "9"
+# bind_link0 = "0"
 
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.
@@ -161,13 +200,15 @@ other = 'off'
 
 
 [cache]
-# Options for page cache - which is only for text/gemini pages
+# Options for page cache - which is only for text pages
 # Increase the cache size to speed up browsing at the expense of memory
-
 # Zero values mean there is no limit
+
 max_size = 0  # Size in bytes
 max_pages = 30 # The maximum number of pages the cache will store
 
+# How long a page will stay in cache, in seconds.
+timeout = 1800 # 30 mins
 
 [proxies]
 # Allows setting a Gemini proxy for different schemes.

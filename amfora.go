@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	version = "v1.6.0"
+	version = "v1.7.2"
 	commit  = "unknown"
 	builtBy = "unknown"
 )
@@ -52,7 +52,7 @@ func main() {
 
 	client.Init()
 
-	display.Init()
+	display.Init(version, commit, builtBy)
 	display.NewTab()
 	display.NewTab() // Open extra tab and close it to fully initialize the app and wrapping
 	display.CloseTab()

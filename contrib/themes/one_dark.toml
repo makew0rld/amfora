@@ -52,15 +52,15 @@ bottombar_label = "#282c34"
 # preformatted_text
 # list_text
 
-hdg_1 = "#c678dd"
+hdg_1 = "#e06c75"
 hdg_2 = "#c678dd"
 hdg_3 = "#c678dd"
 amfora_link = "#61afef"
 foreign_link = "#56b6c2"
 link_number = "#abb2bf"
 regular_text = "#abb2bf"
-quote_text = "#abb2bf"
-preformatted_text = "#abb2bf"
+quote_text = "#98c379"
+preformatted_text = "#e5c07b"
 list_text = "#abb2bf"
 
 # btn_bg: The bg color for all modal buttons
@@ -121,3 +121,8 @@ bkmk_modal_text = "#282c34"
 bkmk_modal_label = "#282c34"
 bkmk_modal_field_bg = "#282c34"
 bkmk_modal_field_text = "#abb2bf"
+
+# subscription_modal_bg
+# subscription_modal_text
+subscription_modal_bg = "#c678dd"
+subscription_modal_text = "#282c34"

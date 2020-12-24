@@ -138,8 +138,6 @@ Features in *italics* are in the master branch, but not in the latest release.
   - Disabled by default, enable in config
 - [x] Proxying
   - Schemes like Gopher or HTTP can be proxied through a Gemini server
-- [x] *Configure applications to open particular mediatypes*
-    - [ ] Allow piping/streaming content instead of downloading it first
 - [x] Client certificate support
   - [ ] Full client certificate UX within the client
     - Create transient and permanent certs within the client, per domain
@@ -149,6 +147,8 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Subscriptions
   - Subscribing to RSS, Atom, and [JSON Feeds](https://jsonfeed.org/) are all supported
   - So is subscribing to a page, to know when it changes
+- [x] *Open non-text files in another application*
+  - [ ] Allow piping/streaming content instead of downloading it first
 - [ ] Stream support
 - [ ] Table of contents for pages
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>

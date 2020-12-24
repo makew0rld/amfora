@@ -98,6 +98,12 @@ sudo make install # If you want to install the binary for all users
 
 Because you installed with the Makefile, running `amfora -v` will tell you exactly what commit the binary was built from.
 
+Arch Linux users can also install the latest commit of Amfora from the AUR. It has the package name `amfora-git`, and is maintained by @lovetocode999
+
+```
+yay -S amfora-git
+```
+
 MacOS users can also use [Homebrew](https://brew.sh/) to install the latest commit of Amfora:
 
 ```

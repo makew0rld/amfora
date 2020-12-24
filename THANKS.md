@@ -13,3 +13,4 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 - Trevor Slocum (@tsclocum)
 - Mattias Jadelius (@jedthehumanoid)
 - Lokesh Krishna (@lokesh-krishna)
+- Jeff (@phaedrus-jaf)

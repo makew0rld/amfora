@@ -298,6 +298,36 @@ func Init() error {
 		DownloadsDir = dDir
 	}
 
+	// Setup temporary downloads dir
+	if viper.GetString("a-general.temp_downloads") == "" {
+		TempDownloadsDir = filepath.Join(os.TempDir(), "amfora_temp")
+
+		// Make sure it exists
+		err = os.MkdirAll(TempDownloadsDir, 0755)
+		if err != nil {
+			return fmt.Errorf("temp downloads path could not be created: %s", TempDownloadsDir)
+		}
+	} else {
+		// Validate path
+		dDir := viper.GetString("a-general.temp_downloads")
+		di, err := os.Stat(dDir)
+		if err == nil {
+			if !di.IsDir() {
+				return fmt.Errorf("temp downloads path specified is not a directory: %s", dDir)
+			}
+		} else if os.IsNotExist(err) {
+			// Try to create path
+			err = os.MkdirAll(dDir, 0755)
+			if err != nil {
+				return fmt.Errorf("temp downloads path could not be created: %s", dDir)
+			}
+		} else {
+			// Some other error
+			return fmt.Errorf("couldn't access temp downloads directory: %s", dDir)
+		}
+		TempDownloadsDir = dDir
+	}
+
 	// Setup cache from config
 	cache.SetMaxSize(viper.GetInt("cache.max_size"))
 	cache.SetMaxPages(viper.GetInt("cache.max_pages"))

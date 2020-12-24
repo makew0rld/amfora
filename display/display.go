@@ -206,11 +206,13 @@ func Init(version, commit, builtBy string) {
 						// Then it's a search
 
 						u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
-						cache.RemovePage(u) // Don't use the cached version of the search
+						// Don't use the cached version of the search
+						cache.RemovePage(normalizeURL(u))
 						URL(u)
 					} else {
 						// Full URL
-						cache.RemovePage(query) // Don't use cached version for manually entered URL
+						// Don't use cached version for manually entered URL
+						cache.RemovePage(normalizeURL(fixUserURL(query)))
 						URL(query)
 					}
 					return
@@ -572,11 +574,7 @@ func URL(u string) {
 		return
 	}
 
-	if !strings.HasPrefix(u, "//") && !strings.HasPrefix(u, "gemini://") && !strings.Contains(u, "://") {
-		// Assume it's a Gemini URL
-		u = "gemini://" + u
-	}
-	go goURL(t, u)
+	go goURL(t, fixUserURL(u))
 }
 
 func NumTabs() int {

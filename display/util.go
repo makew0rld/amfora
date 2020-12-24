@@ -127,3 +127,17 @@ func normalizeURL(u string) string {
 
 	return parsed.String()
 }
+
+// fixUserURL will take a user-typed URL and add a gemini scheme to it if
+// necessary. It is not the same as normalizeURL, and that func should still
+// be used, afterward.
+//
+// For example "example.com" will become "gemini://example.com", but
+// "//example.com" will be left untouched.
+func fixUserURL(u string) string {
+	if !strings.HasPrefix(u, "//") && !strings.HasPrefix(u, "gemini://") && !strings.Contains(u, "://") {
+		// Assume it's a Gemini URL
+		u = "gemini://" + u
+	}
+	return u
+}

@@ -272,43 +272,36 @@ func Init(version, commit, builtBy string) {
 			return event
 		}
 
+		// To add a configurable global key command, you'll need to update one of
+		// the two switch statements here.  You'll also need to add an enum entry in
+		// config/keybindings.go, update KeyInit() in config/keybindings.go, add a default
+		// keybinding in config/config.go and update the help panel in display/help.go
+
+		cmd := config.TranslateKeyEvent(event)
 		if tabs[curTab].mode == tabModeDone {
 			// All the keys and operations that can only work while NOT loading
-
-			// History arrow keys
-			if event.Modifiers() == tcell.ModAlt {
-				if event.Key() == tcell.KeyLeft {
-					histBack(tabs[curTab])
-					return nil
-				}
-				if event.Key() == tcell.KeyRight {
-					histForward(tabs[curTab])
-					return nil
-				}
-			}
-
 			//nolint:exhaustive
-			switch event.Key() {
-			case tcell.KeyCtrlR:
+			switch cmd {
+			case config.CmdReload:
 				Reload()
 				return nil
-			case tcell.KeyCtrlH:
+			case config.CmdHome:
 				URL(viper.GetString("a-general.home"))
 				return nil
-			case tcell.KeyCtrlB:
+			case config.CmdBookmarks:
 				Bookmarks(tabs[curTab])
 				tabs[curTab].addToHistory("about:bookmarks")
 				return nil
-			case tcell.KeyCtrlD:
+			case config.CmdAddBookmark:
 				go addBookmark()
 				return nil
-			case tcell.KeyPgUp:
+			case config.CmdPgup:
 				tabs[curTab].pageUp()
 				return nil
-			case tcell.KeyPgDn:
+			case config.CmdPgdn:
 				tabs[curTab].pageDown()
 				return nil
-			case tcell.KeyCtrlS:
+			case config.CmdSave:
 				if tabs[curTab].hasContent() {
 					savePath, err := downloadPage(tabs[curTab].page)
 					if err != nil {
@@ -320,66 +313,48 @@ func Init(version, commit, builtBy string) {
 					Info("The current page has no content, so it couldn't be downloaded.")
 				}
 				return nil
-			case tcell.KeyCtrlA:
+			case config.CmdBottom:
+				// Space starts typing, like Bombadillo
+				bottomBar.SetLabel("[::b]URL/Num./Search: [::-]")
+				bottomBar.SetText("")
+				// Don't save bottom bar, so that whenever you switch tabs, it's not in that mode
+				App.SetFocus(bottomBar)
+				return nil
+			case config.CmdEdit:
+				// Letter e allows to edit current URL
+				bottomBar.SetLabel("[::b]Edit URL: [::-]")
+				bottomBar.SetText(tabs[curTab].page.URL)
+				App.SetFocus(bottomBar)
+				return nil
+			case config.CmdBack:
+				histBack(tabs[curTab])
+				return nil
+			case config.CmdForward:
+				histForward(tabs[curTab])
+				return nil
+			case config.CmdSub:
 				Subscriptions(tabs[curTab], "about:subscriptions")
 				tabs[curTab].addToHistory("about:subscriptions")
 				return nil
-			case tcell.KeyCtrlX:
+			case config.CmdAddSub:
 				go addSubscription()
 				return nil
-			case tcell.KeyRune:
-				// Regular key was sent
-				switch string(event.Rune()) {
-				case " ":
-					// Space starts typing, like Bombadillo
-					bottomBar.SetLabel("[::b]URL/Num./Search: [::-]")
-					bottomBar.SetText("")
-					// Don't save bottom bar, so that whenever you switch tabs, it's not in that mode
-					App.SetFocus(bottomBar)
-					return nil
-				case "e":
-					// Letter e allows to edit current URL
-					bottomBar.SetLabel("[::b]Edit URL: [::-]")
-					bottomBar.SetText(tabs[curTab].page.URL)
-					App.SetFocus(bottomBar)
-					return nil
-				case "R":
-					Reload()
-					return nil
-				case "b":
-					histBack(tabs[curTab])
-					return nil
-				case "f":
-					histForward(tabs[curTab])
-					return nil
-				case "u":
-					tabs[curTab].pageUp()
-					return nil
-				case "d":
-					tabs[curTab].pageDown()
-					return nil
-				}
+			}
 
-				// Number key: 1-9, 0
-				i, err := strconv.Atoi(string(event.Rune()))
-				if err == nil {
-					if i == 0 {
-						i = 10 // 0 key is for link 10
-					}
-					if i <= len(tabs[curTab].page.Links) && i > 0 {
-						// It's a valid link number
-						followLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Links[i-1])
-						return nil
-					}
+			// Number key: 1-9, 0, LINK1-LINK10
+			if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
+				if int(cmd) <= len(tabs[curTab].page.Links) {
+					// It's a valid link number
+					followLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Links[cmd-1])
+					return nil
 				}
 			}
 		}
 
 		// All the keys and operations that can work while a tab IS loading
-
 		//nolint:exhaustive
-		switch event.Key() {
-		case tcell.KeyCtrlT:
+		switch cmd {
+		case config.CmdNewTab:
 			if tabs[curTab].page.Mode == structs.ModeLinkSelect {
 				next, err := resolveRelLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Selected)
 				if err != nil {
@@ -392,45 +367,33 @@ func Init(version, commit, builtBy string) {
 				NewTab()
 			}
 			return nil
-		case tcell.KeyCtrlW:
+		case config.CmdCloseTab:
 			CloseTab()
 			return nil
-		case tcell.KeyCtrlQ:
+		case config.CmdQuit:
 			Stop()
 			return nil
-		case tcell.KeyCtrlC:
-			Stop()
-			return nil
-		case tcell.KeyF1:
+		case config.CmdPrevTab:
 			// Wrap around, allow for modulo with negative numbers
 			n := NumTabs()
 			SwitchTab((((curTab - 1) % n) + n) % n)
 			return nil
-		case tcell.KeyF2:
+		case config.CmdNextTab:
 			SwitchTab((curTab + 1) % NumTabs())
 			return nil
-		case tcell.KeyRune:
-			// Regular key was sent
+		case config.CmdHelp:
+			Help()
+			return nil
+		}
 
-			if num, err := config.KeyToNum(event.Rune()); err == nil {
-				// It's a Shift+Num key
-				if num == 0 {
-					// Zero key goes to the last tab
-					SwitchTab(NumTabs() - 1)
-				} else {
-					SwitchTab(num - 1)
-				}
-				return nil
+		if cmd >= config.CmdTab1 && cmd <= config.CmdTab0 {
+			if cmd == config.CmdTab0 {
+				// Zero key goes to the last tab
+				SwitchTab(NumTabs() - 1)
+			} else {
+				SwitchTab(int(cmd - config.CmdTab1))
 			}
-
-			switch string(event.Rune()) {
-			case "q":
-				Stop()
-				return nil
-			case "?":
-				Help()
-				return nil
-			}
+			return nil
 		}
 
 		// Let another element handle the event, it's not a special global key

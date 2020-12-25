@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"mime"
+	"os"
 	"strings"
 	"time"
 
@@ -63,19 +64,17 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int, proxied b
 	}
 
 	buf := new(bytes.Buffer)
-	go func() {
-		time.Sleep(time.Duration(viper.GetInt("a-general.page_max_time")) * time.Second)
-		res.Body.Close()
-	}()
-
 	_, err := io.CopyN(buf, res.Body, viper.GetInt64("a-general.page_max_size")+1)
-	res.Body.Close()
+
 	if err == nil {
 		// Content was larger than max size
 		return nil, ErrTooLarge
 	} else if err != io.EOF {
-		if strings.HasSuffix(err.Error(), "use of closed network connection") {
-			// Timed out
+		if os.IsTimeout(err) {
+			// I would use
+			// errors.Is(err, os.ErrDeadlineExceeded)
+			// but that isn't supported before Go 1.15.
+
 			return nil, ErrTimedOut
 		}
 		// Some other error
@@ -104,31 +103,37 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int, proxied b
 	if mediatype == "text/gemini" {
 		rendered, links := RenderGemini(utfText, width, leftMargin, proxied)
 		return &structs.Page{
-			Mediatype: structs.TextGemini,
-			URL:       url,
-			Raw:       utfText,
-			Content:   rendered,
-			Links:     links,
+			Mediatype:    structs.TextGemini,
+			RawMediatype: mediatype,
+			URL:          url,
+			Raw:          utfText,
+			Content:      rendered,
+			Links:        links,
+			MadeAt:       time.Now(),
 		}, nil
 	} else if strings.HasPrefix(mediatype, "text/") {
 		if mediatype == "text/x-ansi" || strings.HasSuffix(url, ".ans") || strings.HasSuffix(url, ".ansi") {
 			// ANSI
 			return &structs.Page{
-				Mediatype: structs.TextAnsi,
-				URL:       url,
-				Raw:       utfText,
-				Content:   RenderANSI(utfText, leftMargin),
-				Links:     []string{},
+				Mediatype:    structs.TextAnsi,
+				RawMediatype: mediatype,
+				URL:          url,
+				Raw:          utfText,
+				Content:      RenderANSI(utfText, leftMargin),
+				Links:        []string{},
+				MadeAt:       time.Now(),
 			}, nil
 		}
 
 		// Treated as plaintext
 		return &structs.Page{
-			Mediatype: structs.TextPlain,
-			URL:       url,
-			Raw:       utfText,
-			Content:   RenderPlainText(utfText, leftMargin),
-			Links:     []string{},
+			Mediatype:    structs.TextPlain,
+			RawMediatype: mediatype,
+			URL:          url,
+			Raw:          utfText,
+			Content:      RenderPlainText(utfText, leftMargin),
+			Links:        []string{},
+			MadeAt:       time.Now(),
 		}, nil
 	}
 

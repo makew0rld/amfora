@@ -3,10 +3,6 @@
 ## Issues
 - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
 
-
-## Regressions
-
-
 ## Upstream Bugs
 - Wrapping messes up on brackets
   - Filed [issue 23](https://gitlab.com/tslocum/cview/-/issues/23)

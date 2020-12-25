@@ -3,6 +3,7 @@ package display
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -26,8 +27,17 @@ var termH int
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField()
 
-// Viewer for primitives
-// This contains the browser and any modals modals drawn on top of it.
+// When the bottom bar string has a space, this regex decides whether it's
+// a non-encoded URL or a search string.
+// See this comment for details:
+// https://github.com/makeworld-the-better-one/amfora/issues/138#issuecomment-740961292
+var hasSpaceisURL = regexp.MustCompile(`[^ ]+\.[^ ].*/.`)
+
+// Viewer for the tab primitives
+// Pages are named as strings of tab numbers - so the textview for the first tab
+// is held in the page named "0".
+// The only pages that don't confine to this scheme are those named after modals,
+// which are used to draw modals on top the current tab.
 // Ex: "info", "error", "input", "yesno"
 var panels = cview.NewPanels()
 
@@ -40,10 +50,25 @@ var browser = cview.NewTabbedPanels()
 var layout = cview.NewFlex()
 
 var newTabPage structs.Page
+var versionPage structs.Page
 
 var App = cview.NewApplication()
 
-func Init() {
+func Init(version, commit, builtBy string) {
+	versionContent := fmt.Sprintf(
+		"# Amfora Version Info\n\nAmfora:   %s\nCommit:   %s\nBuilt by: %s",
+		version, commit, builtBy,
+	)
+	renderVersionContent, versionLinks := renderer.RenderGemini(versionContent, textWidth(), leftMargin(), false)
+	versionPage = structs.Page{
+		Raw:       versionContent,
+		Content:   renderVersionContent,
+		Links:     versionLinks,
+		URL:       "about:version",
+		Width:     -1, // Force reformatting on first display
+		Mediatype: structs.TextGemini,
+	}
+
 	App.EnableMouse(false)
 	App.SetRoot(layout, true)
 	App.SetAfterResizeFunc(func(width int, height int) {
@@ -61,6 +86,10 @@ func Init() {
 	})
 
 	panels.AddPanel("browser", browser, true, true)
+
+	tabRow.SetChangedFunc(func() {
+		App.Draw()
+	})
 
 	helpInit()
 
@@ -157,14 +186,21 @@ func Init() {
 				} else {
 					// It's a full URL or search term
 					// Detect if it's a search or URL
-					if strings.Contains(query, " ") ||
-						(!strings.Contains(query, "//") && !strings.Contains(query, ".") && !strings.HasPrefix(query, "about:")) {
+					if (strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
+						(!strings.HasPrefix(query, "//") && !strings.Contains(query, "://") &&
+							!strings.Contains(query, ".")) {
+						// Has a space and follows regex, OR
+						// doesn't start with "//", contain "://", and doesn't have a dot either.
+						// Then it's a search
+
 						u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
-						cache.RemovePage(u) // Don't use the cached version of the search
+						// Don't use the cached version of the search
+						cache.RemovePage(normalizeURL(u))
 						URL(u)
 					} else {
 						// Full URL
-						cache.RemovePage(query) // Don't use cached version for manually entered URL
+						// Don't use cached version for manually entered URL
+						cache.RemovePage(normalizeURL(fixUserURL(query)))
 						URL(query)
 					}
 					return
@@ -188,6 +224,7 @@ func Init() {
 	})
 
 	// Render the default new tab content ONCE and store it for later
+	// This code is repeated in Reload()
 	newTabContent := getNewTabContent()
 	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin(), false)
 	newTabPage = structs.Page{
@@ -225,43 +262,36 @@ func Init() {
 			return event
 		}
 
+		// To add a configurable global key command, you'll need to update one of
+		// the two switch statements here.  You'll also need to add an enum entry in
+		// config/keybindings.go, update KeyInit() in config/keybindings.go, add a default
+		// keybinding in config/config.go and update the help panel in display/help.go
+
+		cmd := config.TranslateKeyEvent(event)
 		if tabs[curTab].mode == tabModeDone {
 			// All the keys and operations that can only work while NOT loading
-
-			// History arrow keys
-			if event.Modifiers() == tcell.ModAlt {
-				if event.Key() == tcell.KeyLeft {
-					histBack(tabs[curTab])
-					return nil
-				}
-				if event.Key() == tcell.KeyRight {
-					histForward(tabs[curTab])
-					return nil
-				}
-			}
-
 			//nolint:exhaustive
-			switch event.Key() {
-			case tcell.KeyCtrlR:
+			switch cmd {
+			case config.CmdReload:
 				Reload()
 				return nil
-			case tcell.KeyCtrlH:
+			case config.CmdHome:
 				URL(viper.GetString("a-general.home"))
 				return nil
-			case tcell.KeyCtrlB:
+			case config.CmdBookmarks:
 				Bookmarks(tabs[curTab])
 				tabs[curTab].addToHistory("about:bookmarks")
 				return nil
-			case tcell.KeyCtrlD:
+			case config.CmdAddBookmark:
 				go addBookmark()
 				return nil
-			case tcell.KeyPgUp:
+			case config.CmdPgup:
 				tabs[curTab].pageUp()
 				return nil
-			case tcell.KeyPgDn:
+			case config.CmdPgdn:
 				tabs[curTab].pageDown()
 				return nil
-			case tcell.KeyCtrlS:
+			case config.CmdSave:
 				if tabs[curTab].hasContent() {
 					savePath, err := downloadPage(tabs[curTab].page)
 					if err != nil {
@@ -273,59 +303,48 @@ func Init() {
 					Info("The current page has no content, so it couldn't be downloaded.")
 				}
 				return nil
-			case tcell.KeyRune:
-				// Regular key was sent
-				switch string(event.Rune()) {
-				case " ":
-					// Space starts typing, like Bombadillo
-					bottomBar.SetLabel("[::b]URL/Num./Search: [::-]")
-					bottomBar.SetText("")
-					// Don't save bottom bar, so that whenever you switch tabs, it's not in that mode
-					App.SetFocus(bottomBar)
-					return nil
-				case "e":
-					// Letter e allows to edit current URL
-					bottomBar.SetLabel("[::b]Edit URL: [::-]")
-					bottomBar.SetText(tabs[curTab].page.URL)
-					App.SetFocus(bottomBar)
-					return nil
-				case "R":
-					Reload()
-					return nil
-				case "b":
-					histBack(tabs[curTab])
-					return nil
-				case "f":
-					histForward(tabs[curTab])
-					return nil
-				case "u":
-					tabs[curTab].pageUp()
-					return nil
-				case "d":
-					tabs[curTab].pageDown()
-					return nil
-				}
+			case config.CmdBottom:
+				// Space starts typing, like Bombadillo
+				bottomBar.SetLabel("[::b]URL/Num./Search: [::-]")
+				bottomBar.SetText("")
+				// Don't save bottom bar, so that whenever you switch tabs, it's not in that mode
+				App.SetFocus(bottomBar)
+				return nil
+			case config.CmdEdit:
+				// Letter e allows to edit current URL
+				bottomBar.SetLabel("[::b]Edit URL: [::-]")
+				bottomBar.SetText(tabs[curTab].page.URL)
+				App.SetFocus(bottomBar)
+				return nil
+			case config.CmdBack:
+				histBack(tabs[curTab])
+				return nil
+			case config.CmdForward:
+				histForward(tabs[curTab])
+				return nil
+			case config.CmdSub:
+				Subscriptions(tabs[curTab], "about:subscriptions")
+				tabs[curTab].addToHistory("about:subscriptions")
+				return nil
+			case config.CmdAddSub:
+				go addSubscription()
+				return nil
+			}
 
-				// Number key: 1-9, 0
-				i, err := strconv.Atoi(string(event.Rune()))
-				if err == nil {
-					if i == 0 {
-						i = 10 // 0 key is for link 10
-					}
-					if i <= len(tabs[curTab].page.Links) && i > 0 {
-						// It's a valid link number
-						followLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Links[i-1])
-						return nil
-					}
+			// Number key: 1-9, 0, LINK1-LINK10
+			if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
+				if int(cmd) <= len(tabs[curTab].page.Links) {
+					// It's a valid link number
+					followLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Links[cmd-1])
+					return nil
 				}
 			}
 		}
 
 		// All the keys and operations that can work while a tab IS loading
-
 		//nolint:exhaustive
-		switch event.Key() {
-		case tcell.KeyCtrlT:
+		switch cmd {
+		case config.CmdNewTab:
 			if tabs[curTab].page.Mode == structs.ModeLinkSelect {
 				next, err := resolveRelLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Selected)
 				if err != nil {
@@ -338,45 +357,33 @@ func Init() {
 				NewTab()
 			}
 			return nil
-		case tcell.KeyCtrlW:
+		case config.CmdCloseTab:
 			CloseTab()
 			return nil
-		case tcell.KeyCtrlQ:
+		case config.CmdQuit:
 			Stop()
 			return nil
-		case tcell.KeyCtrlC:
-			Stop()
-			return nil
-		case tcell.KeyF1:
+		case config.CmdPrevTab:
 			// Wrap around, allow for modulo with negative numbers
 			n := NumTabs()
 			SwitchTab((((curTab - 1) % n) + n) % n)
 			return nil
-		case tcell.KeyF2:
+		case config.CmdNextTab:
 			SwitchTab((curTab + 1) % NumTabs())
 			return nil
-		case tcell.KeyRune:
-			// Regular key was sent
+		case config.CmdHelp:
+			Help()
+			return nil
+		}
 
-			if num, err := config.KeyToNum(event.Rune()); err == nil {
-				// It's a Shift+Num key
-				if num == 0 {
-					// Zero key goes to the last tab
-					SwitchTab(NumTabs() - 1)
-				} else {
-					SwitchTab(num - 1)
-				}
-				return nil
+		if cmd >= config.CmdTab1 && cmd <= config.CmdTab0 {
+			if cmd == config.CmdTab0 {
+				// Zero key goes to the last tab
+				SwitchTab(NumTabs() - 1)
+			} else {
+				SwitchTab(int(cmd - config.CmdTab1))
 			}
-
-			switch string(event.Rune()) {
-			case "q":
-				Stop()
-				return nil
-			case "?":
-				Help()
-				return nil
-			}
+			return nil
 		}
 
 		// Let another element handle the event, it's not a special global key
@@ -412,10 +419,8 @@ func NewTab() {
 	tabs = append(tabs, makeNewTab())
 	temp := newTabPage // Copy
 	setPage(tabs[curTab], &temp)
-
-	// Can't go backwards, but this isn't the first page either.
-	// The first page will be the next one the user goes to.
-	tabs[curTab].history.pos = -1
+	tabs[curTab].addToHistory("about:newtab")
+	tabs[curTab].history.pos = 0 // Manually set as first page
 
 	browser.AddTab(strconv.Itoa(curTab), strconv.Itoa(curTab+1), tabs[curTab].view)
 	browser.SetCurrentTab(strconv.Itoa(curTab))
@@ -534,28 +539,15 @@ func Reload() {
 // URL loads and handles the provided URL for the current tab.
 // It should be an absolute URL.
 func URL(u string) {
-	// Some code is copied in followLink()
-
-	if u == "about:bookmarks" { //nolint:goconst
-		Bookmarks(tabs[curTab])
-		tabs[curTab].addToHistory("about:bookmarks")
-		return
-	}
-	if u == "about:newtab" {
-		temp := newTabPage // Copy
-		setPage(tabs[curTab], &temp)
-		return
-	}
+	t := tabs[curTab]
 	if strings.HasPrefix(u, "about:") {
-		Error("Error", "Not a valid 'about:' URL.")
+		if final, ok := handleAbout(t, u); ok {
+			t.addToHistory(final)
+		}
 		return
 	}
 
-	if !strings.HasPrefix(u, "//") && !strings.HasPrefix(u, "gemini://") && !strings.Contains(u, "://") {
-		// Assume it's a Gemini URL
-		u = "gemini://" + u
-	}
-	go goURL(tabs[curTab], u)
+	go goURL(t, fixUserURL(u))
 }
 
 func NumTabs() int {

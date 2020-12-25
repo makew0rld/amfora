@@ -148,9 +148,8 @@ func (t *tab) pageDown() {
 	t.view.ScrollTo(row+(termH/4)*3, col)
 }
 
-// hasContent returns true when the tab has a page that could be displayed.
-// The most likely situation where false would be returned is when the default
-// new tab content is being displayed.
+// hasContent returns false when the tab's page is malformed,
+// has no content or URL, or if it's an 'about:' page.
 func (t *tab) hasContent() bool {
 	if t.page == nil || t.view == nil {
 		return false

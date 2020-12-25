@@ -5,15 +5,59 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Media type handlers** - open non-text files in another application (#121, #134)
+- Ability to set custom keybindings in config (#135)
+
 ### Changed
-- Update cview to `36671ba7d31c2287748e22966a92c5e94ff850cc` for large perf and feature updates (#107)
-- Update to tcell v2 (depencency of cview)
+- Update cview to `1af0da7606b8476944b5740bb4f0b711aaf2a1df` for large perf and feature updates (#107)
+- Update to tcell v2 (dependency of cview)
 
 ### Fixed
+- Don't use cache when URL is typed in bottom bar (#159)
+- Fix downloading of pages that are too large or timed out
  - More reliable start, no more flash of unindented text, or text that stays unindented (#107)
 
 
-## [v1.6.0] - 2020-11-04
+## [1.7.2] - 2020-12-21
+### Fixed
+- Viewing subscriptions after subscribing to a certain user page won't crash Amfora (#157)
+
+
+## [1.7.1] - 2020-12-21
+### Fixed
+- Fixed bug that caused Amfora to crash when subscribing to a page (#151)
+
+
+## [1.7.0] - 2020-12-20
+### Added
+- **Subscriptions** to feeds and page changes (#61)
+- Opening local files with `file://` URIs (#103, #117)
+- `show_link` option added in config to optionally see the URL (#133)
+- Support for Unicode in domain names (IDNs)
+- Unnecessarily encoded characters in URLs will be decoded (#138)
+- URLs are NFC-normalized before any processing (#138)
+- Links to the wiki in the new tab
+- Cache times out after 30 minutes by default (#110)
+- `about:version` page (#126)
+
+### Changed
+- Updated [go-gemini](https://github.com/makeworld-the-better-one/go-gemini) to v0.11.0
+  - Supports CN-only wildcard certs
+  - Time out when header takes too long
+- Preformatted text is now light yellow by default
+- Downloading a file no longer uses a second request
+- You can go back to the new tab page in history (#96)
+
+### Fixed
+- Single quotes are used in the default config for commands and paths so that Windows paths with backslashes will be parsed correctly
+- Downloading now uses proxies when appropriate
+- User-entered URLs with invalid characters will be percent-encoded (#138)
+- Custom downloads dir is actually used (#148)
+- Empty quote lines no longer disappear
+
+
+## [1.6.0] - 2020-11-04
 ### Added
 - **Support client certificates** through config (#112)
 - `ansi` config setting, to disable ANSI colors in pages (#79, #86)
@@ -39,7 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make the `..` command work lke it used to in v1.4.0
 
 
-## [v1.5.0] - 2020-09-01
+## [1.5.0] - 2020-09-01
 ### Added
 - **Proxy support** - see the `[proxies]` section in the config (#66, #80)
 - **Emoji favicons** can now be seen if `emoji_favicons` is enabled in the config (#62)

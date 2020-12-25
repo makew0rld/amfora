@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/gdamore/tcell/v2 v2.0.1-0.20201019142633-1057d5591ed1
+	github.com/gdamore/tcell/v2 v2.1.0
 	github.com/google/go-cmp v0.5.0 // indirect
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/makeworld-the-better-one/go-gemini v0.9.0
@@ -21,9 +21,8 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
-	gitlab.com/tslocum/cview v1.5.1-0.20201103192513-888dcd2560e2
-	golang.org/x/sys v0.0.0-20201026173827-119d4633e4d1 // indirect
-	golang.org/x/text v0.3.3
+	gitlab.com/tslocum/cview v1.5.3-0.20201215184006-1af0da7606b8
+	golang.org/x/text v0.3.4
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect

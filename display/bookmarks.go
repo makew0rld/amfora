@@ -2,7 +2,6 @@ package display
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
@@ -103,7 +102,7 @@ func openBkmkModal(name string, exists bool, favicon string) (string, int) {
 	App.Draw()
 
 	action := <-bkmkCh
-	browser.SetCurrentTab(strconv.Itoa(curTab))
+	panels.HidePanel("bkmk")
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 

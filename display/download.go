@@ -33,8 +33,8 @@ var dlChoiceCh = make(chan string)
 var dlModal = cview.NewModal()
 
 func dlInit() {
-	panels.AddPanel("dlChoice", dlChoiceModal, false, false)
 	panels.AddPanel("dl", dlModal, false, false)
+	panels.AddPanel("dlChoice", dlChoiceModal, false, false)
 
 	dlm := dlModal
 	chm := dlChoiceModal
@@ -84,7 +84,7 @@ func dlInit() {
 	frame.SetTitle(" Download ")
 	dlm.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		if buttonLabel == "Ok" {
-			browser.SetCurrentTab(strconv.Itoa(curTab))
+			panels.HidePanel("dl")
 			App.SetFocus(tabs[curTab].view)
 			App.Draw()
 		}
@@ -148,7 +148,9 @@ func dlChoice(text, u string, resp *gemini.Response) {
 		open(u, resp)
 		return
 	}
-	browser.SetCurrentTab(strconv.Itoa(curTab))
+
+	// They chose the "Cancel" button
+	panels.HidePanel("dlChoice")
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 }
@@ -184,9 +186,11 @@ func open(u string, resp *gemini.Response) {
 	if path == "" {
 		return
 	}
-	browser.SetCurrentTab(strconv.Itoa(curTab))
+
+	panels.HidePanel("dl")
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
+
 	if mediaHandler.Cmd == nil {
 		// Open with system default viewer
 		_, err := sysopen.Open(path)

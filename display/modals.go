@@ -2,7 +2,6 @@ package display
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -120,7 +119,7 @@ func modalInit() {
 	frame.SetTitleAlign(cview.AlignCenter)
 	frame.SetTitle(" Info ")
 	infoModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-		browser.SetCurrentTab(strconv.Itoa(curTab))
+		panels.HidePanel("info")
 		App.SetFocus(tabs[curTab].view)
 		App.Draw()
 	})
@@ -128,7 +127,7 @@ func modalInit() {
 	errorModal.SetBorder(true)
 	errorModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 	errorModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-		browser.SetCurrentTab(strconv.Itoa(curTab))
+		panels.HidePanel("error")
 		App.SetFocus(tabs[curTab].view)
 		App.Draw()
 	})
@@ -213,7 +212,7 @@ func Input(prompt string) (string, bool) {
 
 	resp := <-inputCh
 
-	browser.SetCurrentTab(strconv.Itoa(curTab))
+	panels.HidePanel("input")
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 
@@ -248,7 +247,7 @@ func YesNo(prompt string) bool {
 	App.Draw()
 
 	resp := <-yesNoCh
-	browser.SetCurrentTab(strconv.Itoa(curTab))
+	panels.HidePanel("yesno")
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 	return resp
@@ -286,7 +285,7 @@ func Tofu(host string, expiry time.Time) bool {
 	App.Draw()
 
 	resp := <-yesNoCh
-	browser.SetCurrentTab(strconv.Itoa(curTab))
+	panels.HidePanel("yesno")
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 	return resp

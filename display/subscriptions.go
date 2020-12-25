@@ -266,7 +266,7 @@ func openSubscriptionModal(validFeed, subscribed bool) bool {
 	App.Draw()
 
 	resp := <-yesNoCh
-	browser.SetCurrentTab(strconv.Itoa(curTab))
+	panels.HidePanel("yesno")
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 	return resp

@@ -40,9 +40,6 @@ func modalInit() {
 	panels.AddPanel("error", errorModal, false, false)
 	panels.AddPanel("input", inputModal, false, false)
 	panels.AddPanel("yesno", yesNoModal, false, false)
-	panels.AddPanel("bkmk", bkmkModal, false, false)
-	panels.AddPanel("dlChoice", dlChoiceModal, false, false)
-	panels.AddPanel("dl", dlModal, false, false)
 
 	// Color setup
 	if viper.GetBool("a-general.color") {

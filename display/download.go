@@ -33,6 +33,9 @@ var dlChoiceCh = make(chan string)
 var dlModal = cview.NewModal()
 
 func dlInit() {
+	panels.AddPanel("dlChoice", dlChoiceModal, false, false)
+	panels.AddPanel("dl", dlModal, false, false)
+
 	dlm := dlModal
 	chm := dlChoiceModal
 	if viper.GetBool("a-general.color") {
@@ -126,8 +129,7 @@ func dlChoice(text, u string, resp *gemini.Response) {
 		choice = "Open"
 	} else {
 		dlChoiceModal.SetText(text)
-		tabPages.ShowPage("dlChoice")
-		tabPages.SendToFront("dlChoice")
+		panels.ShowPanel("dlChoice")
 		App.SetFocus(dlChoiceModal)
 		App.Draw()
 		choice = <-dlChoiceCh
@@ -141,12 +143,12 @@ func dlChoice(text, u string, resp *gemini.Response) {
 		return
 	}
 	if choice == "Open" {
-		tabPages.HidePage("dlChoice")
+		panels.HidePanel("dlChoice")
 		App.Draw()
 		open(u, resp)
 		return
 	}
-	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	browser.SetCurrentTab(strconv.Itoa(curTab))
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 }

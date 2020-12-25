@@ -95,7 +95,7 @@ func handleFavicon(t *tab, host, old string) {
 	defer func() {
 		// Update display if needed
 		if t.page.Favicon != old && isValidTab(t) {
-			rewriteTabRow()
+			// TODO update browser tab label
 		}
 	}()
 
@@ -117,7 +117,7 @@ func handleFavicon(t *tab, host, old string) {
 	}
 	if fav != "" {
 		t.page.Favicon = fav
-		rewriteTabRow()
+		// TODO update browser tab label
 		return
 	}
 

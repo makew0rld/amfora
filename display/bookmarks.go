@@ -21,6 +21,8 @@ var bkmkCh = make(chan int) // 1, 0, -1 for add/update, cancel, and remove
 var bkmkModalText string    // The current text of the input field in the modal
 
 func bkmkInit() {
+	panels.AddPanel("bkmk", bkmkModal, false, false)
+
 	m := bkmkModal
 	if viper.GetBool("a-general.color") {
 		m.SetBackgroundColor(config.GetColor("bkmk_modal_bg"))

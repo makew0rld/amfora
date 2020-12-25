@@ -5,7 +5,6 @@ go 1.14
 require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/gdamore/tcell v1.4.0
 	github.com/gdamore/tcell/v2 v2.1.0
 	github.com/google/go-cmp v0.5.0 // indirect
 	github.com/makeworld-the-better-one/go-gemini v0.11.0

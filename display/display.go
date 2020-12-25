@@ -87,10 +87,6 @@ func Init(version, commit, builtBy string) {
 
 	panels.AddPanel("browser", browser, true, true)
 
-	tabRow.SetChangedFunc(func() {
-		App.Draw()
-	})
-
 	helpInit()
 
 	layout.SetDirection(cview.FlexRow)

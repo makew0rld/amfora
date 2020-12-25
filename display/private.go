@@ -1,15 +1,11 @@
 package display
 
 import (
-	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 
-	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
-	"github.com/spf13/viper"
 )
 
 // This file contains the functions that aren't part of the public API.
@@ -143,33 +139,4 @@ func goURL(t *tab, u string) {
 		// Display the bottomBar state that handleURL set
 		t.applyBottomBar()
 	}
-}
-
-// rewriteTabRow clears the tabRow and writes all the tabs number/favicons into it.
-func rewriteTabRow() {
-	tabRow.Clear()
-	if viper.GetBool("a-general.color") {
-		for i := 0; i < NumTabs(); i++ {
-			char := strconv.Itoa(i + 1)
-			if tabs[i].page.Favicon != "" {
-				char = tabs[i].page.Favicon
-			}
-			fmt.Fprintf(tabRow, `["%d"][%s]  %s  [%s][""]|`,
-				i,
-				config.GetColorString("tab_num"),
-				char,
-				config.GetColorString("tab_divider"),
-			)
-		}
-	} else {
-		for i := 0; i < NumTabs(); i++ {
-			char := strconv.Itoa(i + 1)
-			if tabs[i].page.Favicon != "" {
-				char = tabs[i].page.Favicon
-			}
-			fmt.Fprintf(tabRow, `["%d"]  %s  [""]|`, i, char)
-		}
-	}
-	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
-	App.Draw()
 }

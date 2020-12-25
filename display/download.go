@@ -178,7 +178,6 @@ func open(u string, resp *gemini.Response) {
 		}
 		Info("Opened with " + cmd[0])
 	}
-	App.SetFocus(dlModal)
 	App.Draw()
 }
 

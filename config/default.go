@@ -162,10 +162,13 @@ other = 'off'
 # You only need to configure this section if you want to override your default application,
 # or do special things like streaming.
 #
+# Note the use of single quotes for commands, so that backslashes will not be escaped.
+#
+#
 # To open jpeg files with the feh command:
 #
 # [[mediatype-handlers]]
-# cmd = ["feh"]
+# cmd = ['feh']
 # types = ["image/jpeg"]
 #
 # Each command that you specify must come under its own [[mediatype-handlers]]. You may
@@ -175,7 +178,7 @@ other = 'off'
 # entire type:
 #
 # [[mediatype-handlers]]
-# command = ["vlc", "--flag"]
+# command = ['vlc', '--flag']
 # types = ["audio", "video"]
 #
 # A catch-all handler can by specified with "*".
@@ -184,17 +187,30 @@ other = 'off'
 # want to override that.
 #
 # [[mediatype-handlers]]
-# cmd = ["some-command"]
+# cmd = ['some-command']
 # types = [
 #         "application/pdf",
 #         "*",
 # ]
 #
+# You can also choose to stream the data instead of downloading it all before
+# opening it. This is especially useful for large video or audio files, as
+# well as radio streams, which will never complete. You can do this like so:
+#
+# [[mediatype-handlers]]
+# cmd = ['vlc', '-']
+# types = ["audio", "video"]
+# stream = true
+#
+# This uses vlc to stream all video and audio content.
+# By default stream is set to off for all handlers
+#
+#
 # If you want to always open a type in its viewer without the download or open
 # prompt appearing, you can add no_prompt = true
 #
 # [[mediatype-handlers]]
-# cmd = ["feh"]
+# cmd = ['feh']
 # types = ["image"]
 # no_prompt = true
 #

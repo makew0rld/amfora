@@ -50,6 +50,7 @@ var HTTPCommand []string
 type MediaHandler struct {
 	Cmd      []string
 	NoPrompt bool
+	Stream   bool
 }
 
 var MediaHandlers = make(map[string]MediaHandler)
@@ -365,12 +366,20 @@ func Init() error {
 		Cmd      []string `mapstructure:"cmd"`
 		Types    []string `mapstructure:"types"`
 		NoPrompt bool     `mapstructure:"no_prompt"`
+		Stream   bool     `mapstructure:"stream"`
 	}
 	err = viper.UnmarshalKey("mediatype-handlers", &rawMediaHandlers)
 	if err != nil {
 		return fmt.Errorf("couldn't parse mediatype-handlers section in config: %w", err)
 	}
 	for _, rawMediaHandler := range rawMediaHandlers {
+		if len(rawMediaHandler.Cmd) == 0 {
+			return fmt.Errorf("empty cmd array in mediatype-handlers section")
+		}
+		if len(rawMediaHandler.Types) == 0 {
+			return fmt.Errorf("empty types array in mediatype-handlers section")
+		}
+
 		for _, typ := range rawMediaHandler.Types {
 			if _, ok := MediaHandlers[typ]; ok {
 				return fmt.Errorf("multiple mediatype-handlers defined for %v", typ)
@@ -378,6 +387,7 @@ func Init() error {
 			MediaHandlers[typ] = MediaHandler{
 				Cmd:      rawMediaHandler.Cmd,
 				NoPrompt: rawMediaHandler.NoPrompt,
+				Stream:   rawMediaHandler.Stream,
 			}
 		}
 	}

@@ -90,6 +90,7 @@ func getMediaHandler(resp *gemini.Response) config.MediaHandler {
 	def := config.MediaHandler{
 		Cmd:      nil,
 		NoPrompt: false,
+		Stream:   false,
 	}
 
 	mediatype, _, err := mime.ParseMediaType(resp.Meta)
@@ -116,8 +117,6 @@ func getMediaHandler(resp *gemini.Response) config.MediaHandler {
 // dlChoice displays the download choice modal and acts on the user's choice.
 // It should run in a goroutine.
 func dlChoice(text, u string, resp *gemini.Response) {
-	defer resp.Body.Close()
-
 	mediaHandler := getMediaHandler(resp)
 	var choice string
 
@@ -136,6 +135,7 @@ func dlChoice(text, u string, resp *gemini.Response) {
 		tabPages.HidePage("dlChoice")
 		App.Draw()
 		downloadURL(config.DownloadsDir, u, resp)
+		resp.Body.Close() // Only close when the file is downloaded
 		return
 	}
 	if choice == "Open" {
@@ -154,6 +154,28 @@ func dlChoice(text, u string, resp *gemini.Response) {
 // with the default system viewer.
 func open(u string, resp *gemini.Response) {
 	mediaHandler := getMediaHandler(resp)
+
+	if mediaHandler.Stream {
+		// Run command with downloaded data from stdin
+
+		cmd := mediaHandler.Cmd
+		var proc *exec.Cmd
+		if len(cmd) == 1 {
+			proc = exec.Command(cmd[0])
+		} else {
+			proc = exec.Command(cmd[0], cmd[1:]...)
+		}
+		proc.Stdin = resp.Body
+
+		err := proc.Start()
+		if err != nil {
+			Error("File Opening Error", "Error executing custom command: "+err.Error())
+			return
+		}
+		Info("Opened with " + cmd[0])
+		return
+	}
+
 	path := downloadURL(config.TempDownloadsDir, u, resp)
 	if path == "" {
 		return

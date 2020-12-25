@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Media type handlers** - open non-text files in another application (#121, #134)
 - Ability to set custom keybindings in config (#135)
 
 ### Fixed

@@ -130,6 +130,7 @@ func dlChoice(text, u string, resp *gemini.Response) {
 	} else {
 		dlChoiceModal.SetText(text)
 		panels.ShowPanel("dlChoice")
+		panels.SendToFront("dlChoice")
 		App.SetFocus(dlChoiceModal)
 		App.Draw()
 		choice = <-dlChoiceCh
@@ -255,6 +256,7 @@ func downloadURL(dir, u string, resp *gemini.Response) string {
 	dlModal.ClearButtons()
 	dlModal.AddButtons([]string{"Downloading..."})
 	panels.ShowPanel("dl")
+	panels.SendToFront("dl")
 	App.SetFocus(dlModal)
 	App.Draw()
 

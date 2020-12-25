@@ -98,6 +98,7 @@ func openBkmkModal(name string, exists bool, favicon string) (string, int) {
 		})
 
 	panels.ShowPanel("bkmk")
+	panels.SendToFront("bkmk")
 	App.SetFocus(bkmkModal)
 	App.Draw()
 

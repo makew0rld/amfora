@@ -65,7 +65,7 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int, proxied b
 
 	buf := new(bytes.Buffer)
 	_, err := io.CopyN(buf, res.Body, viper.GetInt64("a-general.page_max_size")+1)
-	res.Body.Close()
+
 	if err == nil {
 		// Content was larger than max size
 		return nil, ErrTooLarge

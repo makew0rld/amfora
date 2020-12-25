@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Don't use cache when URL is typed in bottom bar (#159)
+- Fix downloading of pages that are too large or timed out
+
 
 ## [1.7.2] - 2020-12-21
 ### Fixed

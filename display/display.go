@@ -100,12 +100,29 @@ func Init(version, commit, builtBy string) {
 		bottomBar.SetLabelColor(config.GetColor("bottombar_label"))
 		bottomBar.SetFieldBackgroundColor(config.GetColor("bottombar_bg"))
 		bottomBar.SetFieldTextColor(config.GetColor("bottombar_text"))
+
+		browser.SetTabBackgroundColor(config.GetColor("bg"))
+		browser.SetTabBackgroundColorFocused(config.GetColor("tab_num"))
+		browser.SetTabTextColor(config.GetColor("tab_num"))
+		browser.SetTabTextColorFocused(config.GetColor("bg"))
+		browser.SetTabSwitcherDivider(
+			"",
+			fmt.Sprintf("[%s]|[-]", config.GetColorString("tab_divider")),
+			fmt.Sprintf("[%s]|[-]", config.GetColorString("tab_divider")),
+		)
 	} else {
 		bottomBar.SetBackgroundColor(tcell.ColorWhite)
 		bottomBar.SetLabelColor(tcell.ColorBlack)
 		bottomBar.SetFieldBackgroundColor(tcell.ColorWhite)
 		bottomBar.SetFieldTextColor(tcell.ColorBlack)
+
+		browser.SetTabBackgroundColor(tcell.ColorBlack)
+		browser.SetTabBackgroundColorFocused(tcell.ColorWhite)
+		browser.SetTabTextColor(tcell.ColorWhite)
+		browser.SetTabTextColorFocused(tcell.ColorBlack)
+		browser.SetTabSwitcherDivider("", "|", "|")
 	}
+
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
 		tab := curTab
 

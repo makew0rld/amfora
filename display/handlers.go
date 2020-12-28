@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os/exec"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/cache"
@@ -95,7 +96,8 @@ func handleFavicon(t *tab, host, old string) {
 	defer func() {
 		// Update display if needed
 		if t.page.Favicon != old && isValidTab(t) {
-			// TODO update browser tab label
+			browser.SetTabLabel(strconv.Itoa(tabNumber(t)), t.page.Favicon)
+			App.Draw()
 		}
 	}()
 
@@ -117,7 +119,6 @@ func handleFavicon(t *tab, host, old string) {
 	}
 	if fav != "" {
 		t.page.Favicon = fav
-		// TODO update browser tab label
 		return
 	}
 

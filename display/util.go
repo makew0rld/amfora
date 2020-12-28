@@ -13,6 +13,18 @@ import (
 
 // This file contains funcs that are small, self-contained utilities.
 
+// tabNumber gets the index of the tab in the tabs slice. It returns -1
+// if the tab is not in that slice.
+func tabNumber(t *tab) int {
+	tempTabs := tabs
+	for i := range tempTabs {
+		if tempTabs[i] == t {
+			return i
+		}
+	}
+	return -1
+}
+
 // escapeMeta santizes a META string for use within a cview modal.
 func escapeMeta(meta string) string {
 	return cview.Escape(strings.ReplaceAll(meta, "\n", ""))
@@ -20,13 +32,7 @@ func escapeMeta(meta string) string {
 
 // isValidTab indicates whether the passed tab is still being used, even if it's not currently displayed.
 func isValidTab(t *tab) bool {
-	tempTabs := tabs
-	for i := range tempTabs {
-		if tempTabs[i] == t {
-			return true
-		}
-	}
-	return false
+	return tabNumber(t) != -1
 }
 
 func leftMargin() int {

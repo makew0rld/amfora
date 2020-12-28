@@ -91,11 +91,10 @@ func handleOther(u string) {
 }
 
 // handleFavicon handles getting and displaying a favicon.
-// `old` is the previous favicon for the tab.
-func handleFavicon(t *tab, host, old string) {
+func handleFavicon(t *tab, host string) {
 	defer func() {
 		// Update display if needed
-		if t.page.Favicon != old && isValidTab(t) {
+		if t.page.Favicon != "" && isValidTab(t) {
 			browser.SetTabLabel(strconv.Itoa(tabNumber(t)), t.page.Favicon)
 			App.Draw()
 		}

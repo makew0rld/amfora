@@ -2,6 +2,7 @@ package display
 
 import (
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/renderer"
@@ -103,19 +104,22 @@ func setPage(t *tab, p *structs.Page) {
 	// Make sure the page content is fitted to the terminal every time it's displayed
 	reformatPage(p)
 
-	oldFav := t.page.Favicon
-
 	t.page = p
-
-	go func() {
-		parsed, _ := url.Parse(p.URL)
-		handleFavicon(t, parsed.Host, oldFav)
-	}()
 
 	// Change page on screen
 	t.view.SetText(p.Content)
 	t.view.Highlight("") // Turn off highlights, other funcs may restore if necessary
 	t.view.ScrollToBeginning()
+
+	// Set tab number in case a favicon from before overwrote it
+	tabNum := tabNumber(t)
+	browser.SetTabLabel(strconv.Itoa(tabNum), strconv.Itoa(tabNum+1))
+	App.Draw()
+
+	go func() {
+		parsed, _ := url.Parse(p.URL)
+		handleFavicon(t, parsed.Host)
+	}()
 
 	// Setup display
 	App.SetFocus(t.view)

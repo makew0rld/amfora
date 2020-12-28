@@ -107,8 +107,8 @@ func Init(version, commit, builtBy string) {
 		browser.SetTabTextColorFocused(config.GetColor("bg"))
 		browser.SetTabSwitcherDivider(
 			"",
-			fmt.Sprintf("[%s]|[-]", config.GetColorString("tab_divider")),
-			fmt.Sprintf("[%s]|[-]", config.GetColorString("tab_divider")),
+			fmt.Sprintf("[%s:%s]|[-]", config.GetColorString("tab_divider"), config.GetColorString("bg")),
+			fmt.Sprintf("[%s:%s]|[-]", config.GetColorString("tab_divider"), config.GetColorString("bg")),
 		)
 	} else {
 		bottomBar.SetBackgroundColor(tcell.ColorWhite)

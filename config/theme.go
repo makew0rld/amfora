@@ -74,7 +74,7 @@ func SetColor(key string, color tcell.Color) {
 func GetColor(key string) tcell.Color {
 	themeMu.RLock()
 	defer themeMu.RUnlock()
-	return theme[key]
+	return theme[key].TrueColor()
 }
 
 // GetColorString returns a string that can be used in a cview color tag,
@@ -83,5 +83,5 @@ func GetColor(key string) tcell.Color {
 func GetColorString(key string) string {
 	themeMu.RLock()
 	defer themeMu.RUnlock()
-	return fmt.Sprintf("#%06x", theme[key].Hex())
+	return fmt.Sprintf("#%06x", theme[key].TrueColor().Hex())
 }

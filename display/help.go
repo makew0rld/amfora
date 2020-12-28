@@ -2,7 +2,6 @@ package display
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"text/tabwriter"
 
@@ -55,12 +54,9 @@ var helpTable = cview.NewTextView()
 // Help displays the help and keybindings.
 func Help() {
 	helpTable.ScrollToBeginning()
-	if !browser.HasTab("help") {
-		browser.AddTab("help", "Help", helpTable)
-	}
-	browser.SetCurrentTab("help")
+	panels.ShowPanel("help")
+	panels.SendToFront("help")
 	App.SetFocus(helpTable)
-	App.Draw()
 }
 
 func helpInit() {
@@ -69,7 +65,7 @@ func helpInit() {
 	helpTable.SetPadding(0, 0, 1, 1)
 	helpTable.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEsc || key == tcell.KeyEnter {
-			browser.SetCurrentTab(strconv.Itoa(curTab))
+			panels.HidePanel("help")
 			App.SetFocus(tabs[curTab].view)
 			App.Draw()
 		}
@@ -115,5 +111,6 @@ func helpInit() {
 	}
 
 	w.Flush()
-	browser.AddTab("help", "Help", helpTable)
+
+	panels.AddPanel("help", helpTable, true, false)
 }

@@ -52,7 +52,7 @@ func main() {
 
 	client.Init()
 
-	// Initalize lower-level cview app
+	// Initialize lower-level cview app
 	if err = display.App.Init(); err != nil {
 		panic(err)
 	}

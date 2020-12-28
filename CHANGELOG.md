@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ability to set custom keybindings in config (#135)
 
 ### Changed
-- Update cview to `1af0da7606b8476944b5740bb4f0b711aaf2a1df` for large perf and feature updates (#107)
+- Update cview to `1af0da7606b8476944b5740bb4f0b711aaf2a1df` for large performance and feature updates (#107)
 - Update to tcell v2 (dependency of cview)
 
 ### Fixed

@@ -4,8 +4,6 @@
 - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
 
 ## Upstream Bugs
-- Wrapping messes up on brackets
-  - Filed [issue 23](https://gitlab.com/tslocum/cview/-/issues/23)
 - Text background not reset on ANSI pages
   - Filed [issue 25](https://gitlab.com/tslocum/cview/-/issues/25)
   - Add some bold back into modal text after this is fixed

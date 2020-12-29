@@ -110,6 +110,7 @@ func Init(version, commit, builtBy string) {
 			fmt.Sprintf("[%s:%s]|[-]", config.GetColorString("tab_divider"), config.GetColorString("bg")),
 			fmt.Sprintf("[%s:%s]|[-]", config.GetColorString("tab_divider"), config.GetColorString("bg")),
 		)
+		browser.Switcher.SetBackgroundColor(config.GetColor("bg"))
 	} else {
 		bottomBar.SetBackgroundColor(tcell.ColorWhite)
 		bottomBar.SetLabelColor(tcell.ColorBlack)
@@ -435,7 +436,7 @@ func NewTab() {
 	tabs[curTab].addToHistory("about:newtab")
 	tabs[curTab].history.pos = 0 // Manually set as first page
 
-	browser.AddTab(strconv.Itoa(curTab), strconv.Itoa(curTab+1), tabs[curTab].view)
+	browser.AddTab(strconv.Itoa(curTab), makeTabLabel(strconv.Itoa(curTab+1)), tabs[curTab].view)
 	browser.SetCurrentTab(strconv.Itoa(curTab))
 	App.SetFocus(tabs[curTab].view)
 

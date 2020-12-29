@@ -13,6 +13,12 @@ import (
 
 // This file contains funcs that are small, self-contained utilities.
 
+// makeTabLabel takes a string and adds spacing to it, making it
+// suitable for display as a tab label.
+func makeTabLabel(s string) string {
+	return " " + s + " "
+}
+
 // tabNumber gets the index of the tab in the tabs slice. It returns -1
 // if the tab is not in that slice.
 func tabNumber(t *tab) int {

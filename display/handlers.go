@@ -95,7 +95,7 @@ func handleFavicon(t *tab, host string) {
 	defer func() {
 		// Update display if needed
 		if t.page.Favicon != "" && isValidTab(t) {
-			browser.SetTabLabel(strconv.Itoa(tabNumber(t)), t.page.Favicon)
+			browser.SetTabLabel(strconv.Itoa(tabNumber(t)), makeTabLabel(t.page.Favicon))
 			App.Draw()
 		}
 	}()

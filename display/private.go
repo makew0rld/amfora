@@ -113,7 +113,7 @@ func setPage(t *tab, p *structs.Page) {
 
 	// Set tab number in case a favicon from before overwrote it
 	tabNum := tabNumber(t)
-	browser.SetTabLabel(strconv.Itoa(tabNum), strconv.Itoa(tabNum+1))
+	browser.SetTabLabel(strconv.Itoa(tabNum), makeTabLabel(strconv.Itoa(tabNum+1)))
 	App.Draw()
 
 	go func() {

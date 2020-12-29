@@ -25,13 +25,18 @@ func RenderANSI(s string, leftMargin int) string {
 	s = cview.Escape(s)
 	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
 		s = cview.TranslateANSI(s)
+		// The TranslateANSI function injects tags like [-:-:-]
+		// but this will reset the background to use the user's terminal color.
+		// These tags need to be replaced with resets that use the theme color.
+		s = strings.ReplaceAll(s, "[-:-:-]",
+			fmt.Sprintf("[-:%s:-]", config.GetColorString("bg")))
 	} else {
 		s = ansiRegex.ReplaceAllString(s, "")
 	}
 	var shifted string
 	lines := strings.Split(s, "\n")
 	for i := range lines {
-		shifted += strings.Repeat(" ", leftMargin) + lines[i] + "\n"
+		shifted += fmt.Sprintf("[-:%s]", config.GetColorString("bg")) + strings.Repeat(" ", leftMargin) + lines[i] + "\n"
 	}
 	return shifted
 }

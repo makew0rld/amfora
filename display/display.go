@@ -90,7 +90,7 @@ func Init(version, commit, builtBy string) {
 				browser.AddTab(strconv.Itoa(i), makeTabLabel(strconv.Itoa(i+1)), makeContentLayout(tabs[i].view))
 				if tabs[i] == t {
 					// Reformat page ASAP, in the middle of loop
-					// TODO The per-tab mutext is unecessary if the global one is used
+					// TODO The per-tab mutext is unnecessary if the global one is used
 					t.reformatMu.Lock() // Only one reformat job per tab
 					reformatPageAndSetView(t, t.page)
 					t.reformatMu.Unlock()

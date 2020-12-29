@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - More reliable start, no more flash of unindented text, or text that stays unindented (#107)
 - Pages with ANSI resets don't use the terminal's default text and background colors (#107)
 - ANSI documents don't leak color into the left margin (#107)
-- Rendering very long documents is now ~96% faster, excluding gemtext parsing (#107)
+- Rendering very long documents is now ~96% faster, excluding gemtext parsing (#26, #107)
 
 
 ## [1.7.2] - 2020-12-21

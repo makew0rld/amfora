@@ -21,7 +21,7 @@ var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 // RenderANSI renders plain text pages containing ANSI codes.
 // Practically, it is used for the text/x-ansi.
-func RenderANSI(s string, leftMargin int) string {
+func RenderANSI(s string) string {
 	s = cview.Escape(s)
 	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
 		s = cview.TranslateANSI(s)
@@ -33,24 +33,15 @@ func RenderANSI(s string, leftMargin int) string {
 	} else {
 		s = ansiRegex.ReplaceAllString(s, "")
 	}
-	var shifted string
-	lines := strings.Split(s, "\n")
-	for i := range lines {
-		shifted += fmt.Sprintf("[-:%s]", config.GetColorString("bg")) + strings.Repeat(" ", leftMargin) + lines[i] + "\n"
-	}
-	return shifted
+	return s
 }
 
 // RenderPlainText should be used to format plain text pages.
-func RenderPlainText(s string, leftMargin int) string {
-	var shifted string
-	lines := strings.Split(cview.Escape(s), "\n")
-	for i := range lines {
-		shifted += strings.Repeat(" ", leftMargin) +
-			"[" + config.GetColorString("regular_text") + "]" + lines[i] + "[-]" +
-			"\n"
-	}
-	return shifted
+func RenderPlainText(s string) string {
+	// It used to add a left margin, now this is done elsewhere.
+	// The function is kept for convenience and in case rendering
+	// is needed in the future.
+	return s
 }
 
 // wrapLine wraps a line to the provided width, and adds the provided prefix and suffix to each wrapped line.
@@ -283,7 +274,7 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 //
 // proxied is whether the request is through the gemini:// scheme.
 // If it's not a gemini:// page, set this to true.
-func RenderGemini(s string, width, leftMargin int, proxied bool) (string, []string) {
+func RenderGemini(s string, width int, proxied bool) (string, []string) {
 	s = cview.Escape(s)
 
 	lines := strings.Split(s, "\n")
@@ -355,14 +346,6 @@ func RenderGemini(s string, width, leftMargin int, proxied bool) (string, []stri
 	} else {
 		// Not preformatted, regular text
 		processRegular()
-	}
-
-	if leftMargin > 0 {
-		renLines := strings.Split(rendered, "\n")
-		for i := range renLines {
-			renLines[i] = strings.Repeat(" ", leftMargin) + renLines[i]
-		}
-		return strings.Join(renLines, "\n"), links
 	}
 
 	return rendered, links

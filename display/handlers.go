@@ -373,7 +373,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	res.Body = rr.NewRestartReader(res.Body)
 
 	if renderer.CanDisplay(res) {
-		page, err := renderer.MakePage(u, res, textWidth(), leftMargin(), usingProxy)
+		page, err := renderer.MakePage(u, res, textWidth(), usingProxy)
 		// Rendering may have taken a while, make sure tab is still valid
 		if !isValidTab(t) {
 			return ret("", false)

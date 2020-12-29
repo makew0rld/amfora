@@ -13,6 +13,17 @@ import (
 
 // This file contains funcs that are small, self-contained utilities.
 
+// makeContentLayout returns a flex that contains the given TextView
+// along with the current correct left margin.
+func makeContentLayout(tv *cview.TextView) *cview.Flex {
+	// Create horizontal flex with the left margin as an empty space
+	flex := cview.NewFlex()
+	flex.SetDirection(cview.FlexColumn)
+	flex.AddItem(nil, leftMargin(), 0, false)
+	flex.AddItem(tv, 0, 1, true)
+	return flex
+}
+
 // makeTabLabel takes a string and adds spacing to it, making it
 // suitable for display as a tab label.
 func makeTabLabel(s string) string {

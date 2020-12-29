@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
@@ -52,6 +53,9 @@ var layout = cview.NewFlex()
 var newTabPage structs.Page
 var versionPage structs.Page
 
+// Global mutex for changing the size of the left margin on all tabs.
+var reformatMu = sync.Mutex{}
+
 var App = cview.NewApplication()
 
 func Init(version, commit, builtBy string) {
@@ -59,7 +63,7 @@ func Init(version, commit, builtBy string) {
 		"# Amfora Version Info\n\nAmfora:   %s\nCommit:   %s\nBuilt by: %s",
 		version, commit, builtBy,
 	)
-	renderVersionContent, versionLinks := renderer.RenderGemini(versionContent, textWidth(), leftMargin(), false)
+	renderVersionContent, versionLinks := renderer.RenderGemini(versionContent, textWidth(), false)
 	versionPage = structs.Page{
 		Raw:       versionContent,
 		Content:   renderVersionContent,
@@ -78,10 +82,22 @@ func Init(version, commit, builtBy string) {
 
 		// Make sure the current tab content is reformatted when the terminal size changes
 		go func(t *tab) {
-			t.reformatMu.Lock() // Only one reformat job per tab
-			defer t.reformatMu.Unlock()
-			// Use the current tab, but don't affect other tabs if the user switches tabs
-			reformatPageAndSetView(t, t.page)
+			reformatMu.Lock()
+			// Lock the app to prevent screen updates until this is done, because calling
+			// browser.AddTab updates the display
+			for i := range tabs {
+				// Overwrite tabs with a new, differently sized, left margin
+				browser.AddTab(strconv.Itoa(i), makeTabLabel(strconv.Itoa(i+1)), makeContentLayout(tabs[i].view))
+				if tabs[i] == t {
+					// Reformat page ASAP, in the middle of loop
+					// TODO The per-tab mutext is unecessary if the global one is used
+					t.reformatMu.Lock() // Only one reformat job per tab
+					reformatPageAndSetView(t, t.page)
+					t.reformatMu.Unlock()
+				}
+			}
+			App.Draw()
+			reformatMu.Unlock()
 		}(tabs[curTab])
 	})
 
@@ -240,7 +256,7 @@ func Init(version, commit, builtBy string) {
 	// Render the default new tab content ONCE and store it for later
 	// This code is repeated in Reload()
 	newTabContent := getNewTabContent()
-	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin(), false)
+	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), false)
 	newTabPage = structs.Page{
 		Raw:       newTabContent,
 		Content:   renderedNewTabContent,
@@ -436,7 +452,7 @@ func NewTab() {
 	tabs[curTab].addToHistory("about:newtab")
 	tabs[curTab].history.pos = 0 // Manually set as first page
 
-	browser.AddTab(strconv.Itoa(curTab), makeTabLabel(strconv.Itoa(curTab+1)), tabs[curTab].view)
+	browser.AddTab(strconv.Itoa(curTab), makeTabLabel(strconv.Itoa(curTab+1)), makeContentLayout(tabs[curTab].view))
 	browser.SetCurrentTab(strconv.Itoa(curTab))
 	App.SetFocus(tabs[curTab].view)
 
@@ -520,7 +536,7 @@ func Reload() {
 		// Re-render new tab, similar to Init()
 		newTabContent := getNewTabContent()
 		tmpTermW := termW
-		renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin(), false)
+		renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), false)
 		newTabPage = structs.Page{
 			Raw:       newTabContent,
 			Content:   renderedNewTabContent,

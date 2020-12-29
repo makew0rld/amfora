@@ -65,11 +65,11 @@ func reformatPage(p *structs.Page) {
 			strings.HasPrefix(p.URL, "file") {
 			proxied = false
 		}
-		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin(), proxied)
+		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), proxied)
 	case structs.TextPlain:
-		rendered = renderer.RenderPlainText(p.Raw, leftMargin())
+		rendered = renderer.RenderPlainText(p.Raw)
 	case structs.TextAnsi:
-		rendered = renderer.RenderANSI(p.Raw, leftMargin())
+		rendered = renderer.RenderANSI(p.Raw)
 	default:
 		// Rendering this type is not implemented
 		return
@@ -89,6 +89,8 @@ func reformatPageAndSetView(t *tab, p *structs.Page) {
 	reformatPage(p)
 	t.view.SetText(p.Content)
 	t.applyScroll() // Go back to where you were, roughly
+
+	App.Draw()
 }
 
 // setPage displays a Page on the passed tab number.

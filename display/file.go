@@ -59,7 +59,7 @@ func handleFile(u string) (*structs.Page, bool) {
 		}
 
 		if mimetype == "text/gemini" {
-			rendered, links := renderer.RenderGemini(string(content), textWidth(), leftMargin(), false)
+			rendered, links := renderer.RenderGemini(string(content), textWidth(), false)
 			page = &structs.Page{
 				Mediatype: structs.TextGemini,
 				URL:       u,
@@ -73,7 +73,7 @@ func handleFile(u string) (*structs.Page, bool) {
 				Mediatype: structs.TextPlain,
 				URL:       u,
 				Raw:       string(content),
-				Content:   renderer.RenderPlainText(string(content), leftMargin()),
+				Content:   renderer.RenderPlainText(string(content)),
 				Links:     []string{},
 				Width:     termW,
 			}
@@ -107,7 +107,7 @@ func createDirectoryListing(u string) (*structs.Page, bool) {
 		content += fmt.Sprintf("=> %s%s %s%s\n", f.Name(), separator, f.Name(), separator)
 	}
 
-	rendered, links := renderer.RenderGemini(content, textWidth(), leftMargin(), false)
+	rendered, links := renderer.RenderGemini(content, textWidth(), false)
 	page = &structs.Page{
 		Mediatype: structs.TextGemini,
 		URL:       u,

@@ -149,7 +149,7 @@ func Subscriptions(t *tab, u string) string {
 		}
 	}
 
-	content, links := renderer.RenderGemini(rawPage, textWidth(), leftMargin(), false)
+	content, links := renderer.RenderGemini(rawPage, textWidth(), false)
 	page := structs.Page{
 		Raw:       rawPage,
 		Content:   content,
@@ -191,7 +191,7 @@ func ManageSubscriptions(t *tab, u string) {
 		)
 	}
 
-	content, links := renderer.RenderGemini(rawPage, textWidth(), leftMargin(), false)
+	content, links := renderer.RenderGemini(rawPage, textWidth(), false)
 	page := structs.Page{
 		Raw:       rawPage,
 		Content:   content,

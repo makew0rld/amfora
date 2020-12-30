@@ -137,7 +137,11 @@ func Init(version, commit, builtBy string) {
 		browser.SetTabBackgroundColorFocused(tcell.ColorWhite)
 		browser.SetTabTextColor(tcell.ColorWhite)
 		browser.SetTabTextColorFocused(tcell.ColorBlack)
-		browser.SetTabSwitcherDivider("", "|", "|")
+		browser.SetTabSwitcherDivider(
+			"",
+			"[#ffffff:#000000]|[-]",
+			"[#ffffff:#000000]|[-]",
+		)
 	}
 
 	bottomBar.SetDoneFunc(func(key tcell.Key) {

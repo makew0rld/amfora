@@ -30,3 +30,5 @@ require (
 replace github.com/mmcdole/gofeed => github.com/makeworld-the-better-one/gofeed v1.1.1-0.20201123002655-c0c6354134fe
 
 replace github.com/schollz/progressbar/v3 => github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20201220005701-b036c4d38568
+
+replace gitlab.com/tslocum/cview => gitlab.com/makeworld-the-better-one/cview v1.5.3-0.20210101054702-a6023214767d

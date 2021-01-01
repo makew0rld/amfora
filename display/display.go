@@ -82,18 +82,15 @@ func Init(version, commit, builtBy string) {
 
 		// Make sure the current tab content is reformatted when the terminal size changes
 		go func(t *tab) {
-			reformatMu.Lock()
-			// Lock the app to prevent screen updates until this is done, because calling
-			// browser.AddTab updates the display
+			reformatMu.Lock() // Only allow one reformat job at a time
 			for i := range tabs {
-				// Overwrite tabs with a new, differently sized, left margin
-				browser.AddTab(strconv.Itoa(i), makeTabLabel(strconv.Itoa(i+1)), makeContentLayout(tabs[i].view))
+				// Overwrite all tabs with a new, differently sized, left margin
+				// TODO: Should only the current tab's margin be changed, just like how
+				// reformatPageAndSetView is only called for the current tab?
+				browser.SetTabItem(strconv.Itoa(i), makeContentLayout(tabs[i].view))
 				if tabs[i] == t {
 					// Reformat page ASAP, in the middle of loop
-					// TODO The per-tab mutext is unnecessary if the global one is used
-					t.reformatMu.Lock() // Only one reformat job per tab
 					reformatPageAndSetView(t, t.page)
-					t.reformatMu.Unlock()
 				}
 			}
 			App.Draw()

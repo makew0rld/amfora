@@ -3,7 +3,6 @@ package display
 import (
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/config"
@@ -25,23 +24,21 @@ type tabHistory struct {
 
 // tab hold the information needed for each browser tab.
 type tab struct {
-	page       *structs.Page
-	view       *cview.TextView
-	history    *tabHistory
-	mode       tabMode
-	reformatMu *sync.Mutex // Mutex for reformatting, so there's only one reformat job at once
-	barLabel   string      // The bottomBar label for the tab
-	barText    string      // The bottomBar text for the tab
+	page     *structs.Page
+	view     *cview.TextView
+	history  *tabHistory
+	mode     tabMode
+	barLabel string // The bottomBar label for the tab
+	barText  string // The bottomBar text for the tab
 }
 
 // makeNewTab initializes an tab struct with no content.
 func makeNewTab() *tab {
 	t := tab{
-		page:       &structs.Page{Mode: structs.ModeOff},
-		view:       cview.NewTextView(),
-		history:    &tabHistory{},
-		reformatMu: &sync.Mutex{},
-		mode:       tabModeDone,
+		page:    &structs.Page{Mode: structs.ModeOff},
+		view:    cview.NewTextView(),
+		history: &tabHistory{},
+		mode:    tabModeDone,
 	}
 	t.view.SetDynamicColors(true)
 	t.view.SetRegions(true)
@@ -53,7 +50,8 @@ func makeNewTab() *tab {
 		App.Draw()
 	})
 	t.view.SetDoneFunc(func(key tcell.Key) {
-		// Altered from: https://gitlab.com/tslocum/cview/-/blob/1f765c8695c3f4b35dae57f469d3aee0b1adbde7/demos/textview/main.go
+		// Altered from:
+		// https://gitlab.com/tslocum/cview/-/blob/1f765c8695c3f4b35dae57f469d3aee0b1adbde7/demos/textview/main.go
 		// Handles being able to select and "click" links with the enter and tab keys
 
 		tab := curTab // Don't let it change in the middle of the code

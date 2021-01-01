@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"gitlab.com/tslocum/cview"
 )
@@ -46,11 +47,13 @@ func makeNewTab() *tab {
 	t.view.SetRegions(true)
 	t.view.SetScrollable(true)
 	t.view.SetWrap(false)
+	t.view.SetScrollBarVisibility(config.ScrollBar)
+	t.view.SetScrollBarColor(config.GetColor("scrollbar"))
 	t.view.SetChangedFunc(func() {
 		App.Draw()
 	})
 	t.view.SetDoneFunc(func(key tcell.Key) {
-		// Altered from: https://gitlab.com/tslocum/cview/-/blob/master/demos/textview/main.go
+		// Altered from: https://gitlab.com/tslocum/cview/-/blob/1f765c8695c3f4b35dae57f469d3aee0b1adbde7/demos/textview/main.go
 		// Handles being able to select and "click" links with the enter and tab keys
 
 		tab := curTab // Don't let it change in the middle of the code

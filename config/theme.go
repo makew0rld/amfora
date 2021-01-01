@@ -21,6 +21,7 @@ var theme = map[string]tcell.Color{
 	"bottombar_label": tcell.Color30,
 	"bottombar_text":  tcell.ColorBlack,
 	"bottombar_bg":    tcell.ColorWhite,
+	"scrollbar":       tcell.ColorWhite,
 
 	// Modals
 	"btn_bg":   tcell.ColorNavy, // All modal buttons

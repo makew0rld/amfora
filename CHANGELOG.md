@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Media type handlers** - open non-text files in another application (#121, #134)
 - Ability to set custom keybindings in config (#135)
+- Pages have a scrollbar by default (#89, #107)
 
 ### Changed
 - Update cview to `c34e0954618b8e697819f88391ff3a492e990cb6` for large performance and feature updates (#107)

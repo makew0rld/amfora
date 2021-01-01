@@ -55,6 +55,10 @@ type MediaHandler struct {
 
 var MediaHandlers = make(map[string]MediaHandler)
 
+// Controlled by "a-general.scrollbar" in config
+// Defaults to ScrollBarAuto on an invalid value
+var ScrollBar cview.ScrollBarVisibility
+
 func Init() error {
 
 	// *** Set paths ***
@@ -204,6 +208,7 @@ func Init() error {
 	viper.SetDefault("a-general.page_max_size", 2097152)
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.emoji_favicons", false)
+	viper.SetDefault("a-general.scrollbar", "auto")
 	viper.SetDefault("keybindings.bind_reload", []string{"R", "Ctrl-R"})
 	viper.SetDefault("keybindings.bind_home", "Backspace")
 	viper.SetDefault("keybindings.bind_bookmarks", "Ctrl-B")
@@ -390,6 +395,16 @@ func Init() error {
 				Stream:   rawMediaHandler.Stream,
 			}
 		}
+	}
+
+	// Parse scrollbar options
+	switch viper.GetString("a-general.scrollbar") {
+	case "never":
+		ScrollBar = cview.ScrollBarNever
+	case "always":
+		ScrollBar = cview.ScrollBarAlways
+	default:
+		ScrollBar = cview.ScrollBarAuto
 	}
 
 	return nil

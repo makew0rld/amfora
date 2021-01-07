@@ -61,7 +61,7 @@ brew upgrade amfora
 
 ### KISS Linux
 
-[KISS](k1ss.org) Linux users can install Amfora from jedahan's repository.
+[KISS](https://k1ss.org) Linux users can install Amfora from jedahan's repository.
 
 Add jedahan's kiss repository:
 ```

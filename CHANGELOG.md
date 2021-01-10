@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Media type handlers** - open non-text files in another application (#121, #134)
 - Ability to set custom keybindings in config (#135)
-- Pages have a scrollbar by default (#89, #107)
+- Scrollbar, by default only appears on pages that go off-screen (#89, #107)
 
 ### Changed
-- Update cview to `c34e0954618b8e697819f88391ff3a492e990cb6` for large performance and feature updates (#107)
+- Update cview to `3bd98fd55f8718f0eded1186fa99fd242d330434` for large performance and feature updates (#107)
 - Update to tcell v2 (dependency of cview)
 
 ### Fixed
@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pages with ANSI resets don't use the terminal's default text and background colors (#107)
 - ANSI documents don't leak color into the left margin (#107)
 - Rendering very long documents is now ~96% faster, excluding gemtext parsing (#26, #107)
+- Due to that same change, less memory is used per-page (#26, #107)
 
 
 ## [1.7.2] - 2020-12-21

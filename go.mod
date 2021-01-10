@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/gdamore/tcell/v2 v2.1.0
+	github.com/gdamore/tcell/v2 v2.1.1-0.20201225194624-29bb185874fd
 	github.com/google/go-cmp v0.5.0 // indirect
 	github.com/makeworld-the-better-one/go-gemini v0.11.0
 	github.com/makeworld-the-better-one/go-isemoji v1.1.0
@@ -21,7 +21,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
-	gitlab.com/tslocum/cview v1.5.3-0.20201228180808-c34e0954618b
+	gitlab.com/tslocum/cview v1.5.3-0.20210105225340-3bd98fd55f87
 	golang.org/x/text v0.3.5-0.20201208001344-75a595aef632
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
@@ -30,5 +30,3 @@ require (
 replace github.com/mmcdole/gofeed => github.com/makeworld-the-better-one/gofeed v1.1.1-0.20201123002655-c0c6354134fe
 
 replace github.com/schollz/progressbar/v3 => github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20201220005701-b036c4d38568
-
-replace gitlab.com/tslocum/cview => gitlab.com/makeworld-the-better-one/cview v1.5.3-0.20210101054702-a6023214767d

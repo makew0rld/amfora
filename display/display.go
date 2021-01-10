@@ -87,7 +87,7 @@ func Init(version, commit, builtBy string) {
 				// Overwrite all tabs with a new, differently sized, left margin
 				// TODO: Should only the current tab's margin be changed, just like how
 				// reformatPageAndSetView is only called for the current tab?
-				browser.SetTabItem(strconv.Itoa(i), makeContentLayout(tabs[i].view))
+				browser.AddTab(strconv.Itoa(i), makeTabLabel(strconv.Itoa(i+1)), makeContentLayout(tabs[i].view))
 				if tabs[i] == t {
 					// Reformat page ASAP, in the middle of loop
 					reformatPageAndSetView(t, t.page)

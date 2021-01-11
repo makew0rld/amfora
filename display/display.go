@@ -200,7 +200,7 @@ func Init(version, commit, builtBy string) {
 					// Detect if it's a search or URL
 					if (strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
 						(!strings.HasPrefix(query, "//") && !strings.Contains(query, "://") &&
-							!strings.Contains(query, ".")) {
+							!strings.Contains(query, ".")) && !strings.HasPrefix(query, "about:") {
 						// Has a space and follows regex, OR
 						// doesn't start with "//", contain "://", and doesn't have a dot either.
 						// Then it's a search

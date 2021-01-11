@@ -374,9 +374,9 @@ func updateAll() {
 		defer wg.Done()
 		for j := range jobs {
 			if j[0] == "feed" {
-				updateFeed(j[1]) //nolint:errcheck
+				updateFeed(j[1])
 			} else if j[0] == "page" {
-				updatePage(j[1]) //nolint:errcheck
+				updatePage(j[1])
 			}
 		}
 	}

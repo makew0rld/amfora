@@ -12,7 +12,8 @@ import (
 
 var helpCells = strings.TrimSpace(`
 ?|Bring up this help. You can scroll!
-Esc, Enter|Leave the help
+Enter|Close this help page
+Esc|Close this help page or any active modal popups
 Arrow keys, h/j/k/l|Scroll and move a page.
 %s|Go up a page in document
 %s|Go down a page in document

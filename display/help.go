@@ -12,7 +12,7 @@ import (
 
 var helpCells = strings.TrimSpace(`
 ?|Bring up this help. You can scroll!
-Esc|Leave the help
+Esc, Enter|Leave the help
 Arrow keys, h/j/k/l|Scroll and move a page.
 %s|Go up a page in document
 %s|Go down a page in document

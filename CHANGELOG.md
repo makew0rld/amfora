@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Don't use cache when URL is typed in bottom bar (#159)
 - Fix downloading of pages that are too large or timed out
 - `about:` URLs can be typed into the bottom bar (#167)
+- Bookmarks modal closes on ESC like the others (#173)
 
 
 ## [1.7.2] - 2020-12-21

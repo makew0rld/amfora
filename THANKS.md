@@ -15,3 +15,4 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 - Lokesh Krishna (@lokesh-krishna)
 - Jeff (@phaedrus-jaf)
 - Stephen Robinson (@sudobash1)
+- Peter Steinberg (@objectliteral)

@@ -24,12 +24,23 @@ var ErrBadMediatype = errors.New("displayable mediatype is not handled in the co
 // isUTF8 returns true for charsets that are compatible with UTF-8 and don't need to be decoded.
 func isUTF8(charset string) bool {
 	utfCharsets := []string{"", "utf-8", "us-ascii"}
-	for i := range utfCharsets {
-		if strings.ToLower(charset) == utfCharsets[i] {
+	for _, s := range utfCharsets {
+		if charset == s || strings.ToLower(charset) == s {
 			return true
 		}
 	}
 	return false
+}
+
+// getMetaInfo returns the output of mime.ParseMediaType, but handles the empty
+// META which is equal to "text/gemini; charset=utf-8" according to the spec.
+func decodeMeta(meta string) (string, map[string]string, error) {
+	if meta == "" {
+		params := make(map[string]string)
+		params["charset"] = "utf-8"
+		return "text/gemini", params, nil
+	}
+	return mime.ParseMediaType(meta)
 }
 
 // CanDisplay returns true if the response is supported by Amfora
@@ -40,7 +51,7 @@ func CanDisplay(res *gemini.Response) bool {
 		// No content
 		return false
 	}
-	mediatype, params, err := mime.ParseMediaType(res.Meta)
+	mediatype, params, err := decodeMeta(res.Meta)
 	if err != nil {
 		return false
 	}
@@ -82,7 +93,7 @@ func MakePage(url string, res *gemini.Response, width, leftMargin int, proxied b
 	}
 	// Otherwise, the error is EOF, which is what we want.
 
-	mediatype, params, _ := mime.ParseMediaType(res.Meta)
+	mediatype, params, _ := decodeMeta(res.Meta)
 
 	// Convert content first
 	var utfText string

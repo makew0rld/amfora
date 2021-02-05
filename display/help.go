@@ -10,44 +10,43 @@ import (
 	"gitlab.com/tslocum/cview"
 )
 
-var helpCells = strings.TrimSpace(`
-?|Bring up this help. You can scroll!
-Esc|Leave the help
-Arrow keys, h/j/k/l|Scroll and move a page.
-%s|Go up a page in document
-%s|Go down a page in document
-g|Go to top of document
-G|Go to bottom of document
-Tab|Navigate to the next item in a popup.
-Shift-Tab|Navigate to the previous item in a popup.
-%s|Go back in the history
-%s|Go forward in the history
-%s|Open bar at the bottom - type a URL, link number, search term.
-|You can also type two dots (..) to go up a directory in the URL.
-|Typing new:N will open link number N in a new tab
-|instead of the current one.
-%s|Go to links 1-10 respectively.
-%s|Edit current URL
-Enter, Tab|On a page this will start link highlighting.
-|Press Tab and Shift-Tab to pick different links.
-|Press Enter again to go to one, or Esc to stop.
-%s|Go to a specific tab. (Default: Shift-NUMBER)
-%s|Go to the last tab.
-%s|Previous tab
-%s|Next tab
-%s|Go home
-%s|New tab, or if a link is selected,
-|this will open the link in a new tab.
-%s|Close tab. For now, only the right-most tab can be closed.
-%s|Reload a page, discarding the cached version.
-|This can also be used if you resize your terminal.
-%s|View bookmarks
-%s|Add, change, or remove a bookmark for the current page.
-%s|Save the current page to your downloads.
-%s|View subscriptions
-%s|Add or update a subscription
-%s|Quit
-`)
+var helpCells = strings.TrimSpace(
+	"?\tBring up this help. You can scroll!\n" +
+		"Esc\tLeave the help\n" +
+		"Arrow keys, h/j/k/l\tScroll and move a page.\n" +
+		"%s\tGo up a page in document\n" +
+		"%s\tGo down a page in document\n" +
+		"g\tGo to top of document\n" +
+		"G\tGo to bottom of document\n" +
+		"Tab\tNavigate to the next item in a popup.\n" +
+		"Shift-Tab\tNavigate to the previous item in a popup.\n" +
+		"%s\tGo back in the history\n" +
+		"%s\tGo forward in the history\n" +
+		"%s\tOpen bar at the bottom - type a URL, link number, search term.\n" +
+		"\tYou can also type two dots (..) to go up a directory in the URL.\n" +
+		"\tTyping new:N will open link number N in a new tab\n" +
+		"\tinstead of the current one.\n" +
+		"%s\tGo to links 1-10 respectively.\n" +
+		"%s\tEdit current URL\n" +
+		"Enter, Tab\tOn a page this will start link highlighting.\n" +
+		"\tPress Tab and Shift-Tab to pick different links.\n" +
+		"\tPress Enter again to go to one, or Esc to stop.\n" +
+		"%s\tGo to a specific tab. (Default: Shift-NUMBER)\n" +
+		"%s\tGo to the last tab.\n" +
+		"%s\tPrevious tab\n" +
+		"%s\tNext tab\n" +
+		"%s\tGo home\n" +
+		"%s\tNew tab, or if a link is selected,\n" +
+		"\tthis will open the link in a new tab.\n" +
+		"%s\tClose tab. For now, only the right-most tab can be closed.\n" +
+		"%s\tReload a page, discarding the cached version.\n" +
+		"\tThis can also be used if you resize your terminal.\n" +
+		"%s\tView bookmarks\n" +
+		"%s\tAdd, change, or remove a bookmark for the current page.\n" +
+		"%s\tSave the current page to your downloads.\n" +
+		"%s\tView subscriptions\n" +
+		"%s\tAdd or update a subscription\n" +
+		"%s\tQuit\n")
 
 var helpTable = cview.NewTextView()
 
@@ -103,11 +102,10 @@ func helpInit() {
 	lines := strings.Split(helpCells, "\n")
 	w := tabwriter.NewWriter(helpTable, 0, 8, 2, ' ', 0)
 	for i, line := range lines {
-		cells := strings.Split(line, "|")
-		if i > 0 && len(cells[0]) > 0 {
+		if i > 0 && line[0] != '\t' {
 			fmt.Fprintln(w, "\t")
 		}
-		fmt.Fprintf(w, "%s\t%s\n", cells[0], cells[1])
+		fmt.Fprintln(w, line)
 	}
 
 	w.Flush()

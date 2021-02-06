@@ -47,6 +47,14 @@ Arch Linux users can install Amfora using pacman.
 sudo pacman -S amfora
 ```
 
+### Void Linux
+
+Void Linux users can install Amfora using xbps.
+
+```
+sudo xbps-install amfora
+```
+
 ### Homebrew
 
 If you use [Homebrew](https://brew.sh/), you can install Amfora through the my personal tap.

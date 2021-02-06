@@ -142,91 +142,8 @@ func Init(version, commit, builtBy string) {
 			// And send out a request
 
 			query := bottomBar.GetText()
-
-			if strings.TrimSpace(query) == "" {
-				// Ignore
-				reset()
-				return
-			}
-			if query[0] == '.' && tabs[tab].hasContent() {
-				// Relative url
-				current, err := url.Parse(tabs[tab].page.URL)
-				if err != nil {
-					// This shouldn't occur
-					return
-				}
-
-				if query == ".." && tabs[tab].page.URL[len(tabs[tab].page.URL)-1] != '/' {
-					// Support what ".." used to work like
-					// If on /dir/doc.gmi, got to /dir/
-					query = "./"
-				}
-
-				target, err := current.Parse(query)
-				if err != nil {
-					// Invalid relative url
-					return
-				}
-				URL(target.String())
-				return
-			}
-
-			i, err := strconv.Atoi(query)
-			if err != nil {
-				if strings.HasPrefix(query, "new:") && len(query) > 4 {
-					// They're trying to open a link number in a new tab
-					i, err = strconv.Atoi(query[4:])
-					if err != nil {
-						reset()
-						return
-					}
-					if i <= len(tabs[tab].page.Links) && i > 0 {
-						// Open new tab and load link
-						oldTab := tab
-						NewTab()
-						// Resolve and follow link manually
-						prevParsed, _ := url.Parse(tabs[oldTab].page.URL)
-						nextParsed, err := url.Parse(tabs[oldTab].page.Links[i-1])
-						if err != nil {
-							Error("URL Error", "link URL could not be parsed")
-							reset()
-							return
-						}
-						URL(prevParsed.ResolveReference(nextParsed).String())
-						return
-					}
-				} else {
-					// It's a full URL or search term
-					// Detect if it's a search or URL
-					if (strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
-						(!strings.HasPrefix(query, "//") && !strings.Contains(query, "://") &&
-							!strings.Contains(query, ".")) && !strings.HasPrefix(query, "about:") {
-						// Has a space and follows regex, OR
-						// doesn't start with "//", contain "://", and doesn't have a dot either.
-						// Then it's a search
-
-						u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
-						// Don't use the cached version of the search
-						cache.RemovePage(normalizeURL(u))
-						URL(u)
-					} else {
-						// Full URL
-						// Don't use cached version for manually entered URL
-						cache.RemovePage(normalizeURL(fixUserURL(query)))
-						URL(query)
-					}
-					return
-				}
-			}
-			if i <= len(tabs[tab].page.Links) && i > 0 {
-				// It's a valid link number
-				followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[i-1])
-				return
-			}
-			// Invalid link number, don't do anything
+			SearchOrLoad(query, tab)
 			reset()
-			return
-
 		case tcell.KeyEsc:
 			// Set back to what it was
 			reset()
@@ -401,6 +318,88 @@ func Init(version, commit, builtBy string) {
 		// Let another element handle the event, it's not a special global key
 		return event
 	})
+}
+
+// Work out whether what the user entered either in the search bar, or on the
+// command line when invoking amfora (amfora gemini://example.org), whether we
+// are searching for this, or loading a page directly.
+func SearchOrLoad(query string, tab int) {
+	if strings.TrimSpace(query) == "" {
+		return
+	}
+	if query[0] == '.' && tabs[tab].hasContent() {
+		// Relative url
+		current, err := url.Parse(tabs[tab].page.URL)
+		if err != nil {
+			// This shouldn't occur
+			return
+		}
+
+		if query == ".." && tabs[tab].page.URL[len(tabs[tab].page.URL)-1] != '/' {
+			// Support what ".." used to work like
+			// If on /dir/doc.gmi, got to /dir/
+			query = "./"
+		}
+
+		target, err := current.Parse(query)
+		if err != nil {
+			// Invalid relative url
+			return
+		}
+		URL(target.String())
+		return
+	}
+
+	i, err := strconv.Atoi(query)
+	if err != nil {
+		if strings.HasPrefix(query, "new:") && len(query) > 4 {
+			// They're trying to open a link number in a new tab
+			i, err = strconv.Atoi(query[4:])
+			if err != nil {
+				return
+			}
+			if i <= len(tabs[tab].page.Links) && i > 0 {
+				// Open new tab and load link
+				oldTab := tab
+				NewTab()
+				// Resolve and follow link manually
+				prevParsed, _ := url.Parse(tabs[oldTab].page.URL)
+				nextParsed, err := url.Parse(tabs[oldTab].page.Links[i-1])
+				if err != nil {
+					Error("URL Error", "link URL could not be parsed")
+					return
+				}
+				URL(prevParsed.ResolveReference(nextParsed).String())
+				return
+			}
+		} else {
+			// It's a full URL or search term
+			// Detect if it's a search or URL
+			if (strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
+				(!strings.HasPrefix(query, "//") && !strings.Contains(query, "://") &&
+					!strings.Contains(query, ".")) && !strings.HasPrefix(query, "about:") {
+				// Has a space and follows regex, OR
+				// doesn't start with "//", contain "://", and doesn't have a dot either.
+				// Then it's a search
+
+				u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
+				// Don't use the cached version of the search
+				cache.RemovePage(normalizeURL(u))
+				URL(u)
+			} else {
+				// Full URL
+				// Don't use cached version for manually entered URL
+				cache.RemovePage(normalizeURL(fixUserURL(query)))
+				URL(query)
+			}
+			return
+		}
+	}
+	if i <= len(tabs[tab].page.Links) && i > 0 {
+		// It's a valid link number
+		followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[i-1])
+		return
+	}
 }
 
 // Stop stops the app gracefully.

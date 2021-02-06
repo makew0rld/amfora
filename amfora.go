@@ -57,7 +57,7 @@ func main() {
 	display.NewTab() // Open extra tab and close it to fully initialize the app and wrapping
 	display.CloseTab()
 	if len(os.Args[1:]) > 0 {
-		display.URL(os.Args[1])
+		display.SearchOrLoad(os.Args[1], -1)
 	}
 
 	if err = display.App.Run(); err != nil {

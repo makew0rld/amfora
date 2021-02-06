@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"io/ioutil"
 	"mime"
 	"net"
 	"net/url"
@@ -22,6 +23,11 @@ import (
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/makeworld-the-better-one/go-isemoji"
 	"github.com/spf13/viper"
+)
+
+var (
+	licensePath = "/usr/share/licenses/amfora/LICENSE"
+	thanksPath = "/usr/share/doc/amfora/THANKS.md"
 )
 
 // handleHTTP is used by handleURL.
@@ -165,6 +171,66 @@ func handleFavicon(t *tab, host, old string) {
 	cache.AddFavicon(host, emoji)
 }
 
+func licensePage() structs.Page {
+	licenseFile, err := ioutil.ReadFile(licensePath)
+	licenseContent := "GNU GENERAL PUBLIC LICENSE Version 3"
+	if err == nil {
+		licenseContent = string(licenseFile)
+	}
+	renderLicenseContent, licenseLinks := renderer.RenderGemini(licenseContent, textWidth(), leftMargin(), false)
+	licensePage := structs.Page{
+		Raw:       licenseContent,
+		Content:   renderLicenseContent,
+		Links:     licenseLinks,
+		URL:       "about:license",
+		Width:     -1, // Force reformatting on first display
+		Mediatype: structs.TextGemini,
+	}
+	return licensePage
+}
+
+func thanksPage() structs.Page {
+	thanksFile, err := ioutil.ReadFile(thanksPath)
+	thanksContent := "Thanks to all contributors!"
+	if err == nil {
+		thanksContent = string(thanksFile)
+	}
+	renderThanksContent, thanksLinks := renderer.RenderGemini(thanksContent, textWidth(), leftMargin(), false)
+	thanksPage := structs.Page{
+		Raw:       thanksContent,
+		Content:   renderThanksContent,
+		Links:     thanksLinks,
+		URL:       "about:thanks",
+		Width:     -1, // Force reformatting on first display
+		Mediatype: structs.TextGemini,
+	}
+	return thanksPage
+}
+
+func aboutPage() structs.Page {
+	aboutContent := `# Builtin Pages
+
+=> about:bookmarks Your bookmarks
+=> about:subscriptions Your subscriptions
+=> about:manage-subscriptions Manage your subscriptions
+=> about:newtab A new tab
+=> about:version Version and build information
+=> about:license License and copyright information
+=> about:thanks Credits
+=> about:about This page
+`
+	renderAboutContent, aboutLinks := renderer.RenderGemini(aboutContent, textWidth(), leftMargin(), false)
+	aboutPage := structs.Page{
+		Raw:       aboutContent,
+		Content:   renderAboutContent,
+		Links:     aboutLinks,
+		URL:       "about:about",
+		Width:     -1, // Force reformatting on first display
+		Mediatype: structs.TextGemini,
+	}
+	return aboutPage
+}
+
 // handleAbout can be called to deal with any URLs that start with
 // 'about:'. It will display errors if the URL is not recognized,
 // but not display anything if an 'about:' URL is not passed.
@@ -190,6 +256,21 @@ func handleAbout(t *tab, u string) (string, bool) {
 		return u, true
 	case "about:version":
 		temp := versionPage
+		setPage(t, &temp)
+		t.applyBottomBar()
+		return u, true
+	case "about:license":
+		temp := licensePage()
+		setPage(t, &temp)
+		t.applyBottomBar()
+		return u, true
+	case "about:thanks":
+		temp := thanksPage()
+		setPage(t, &temp)
+		t.applyBottomBar()
+		return u, true
+	case "about:about":
+		temp := aboutPage()
 		setPage(t, &temp)
 		t.applyBottomBar()
 		return u, true

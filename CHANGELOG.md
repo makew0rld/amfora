@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scrollbar, by default only appears on pages that go off-screen (#89, #107)
 
 ### Changed
-- Update cview to `3bd98fd55f8718f0eded1186fa99fd242d330434` for large performance and feature updates (#107)
+- Update cview to `d776e728ef6d2a9990a5cd86a70b31f0678613e2` for large performance and feature updates (#107)
 - Update to tcell v2 (dependency of cview)
 
 ### Fixed

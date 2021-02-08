@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `about:` URLs can be typed into the bottom bar (#167)
 - Bookmarks modal closes on ESC like the others (#173)
 - Handle empty META string (#176)
+- Whitespace around the URL entered in the bottom bar is stripped (#184)
 
 
 ## [1.7.2] - 2020-12-21

@@ -198,6 +198,11 @@ func Init(version, commit, builtBy string) {
 				} else {
 					// It's a full URL or search term
 					// Detect if it's a search or URL
+
+					// Remove whitespace from the string.
+					// We don't want to convert legitimate
+					// :// links to search terms.
+					query := strings.TrimSpace(query)
 					if (strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
 						(!strings.HasPrefix(query, "//") && !strings.Contains(query, "://") &&
 							!strings.Contains(query, ".")) && !strings.HasPrefix(query, "about:") {

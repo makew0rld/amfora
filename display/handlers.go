@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
 	"mime"
 	"net"
 	"net/url"
@@ -23,11 +22,6 @@ import (
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/makeworld-the-better-one/go-isemoji"
 	"github.com/spf13/viper"
-)
-
-var (
-	licensePath = "/usr/share/licenses/amfora/LICENSE"
-	thanksPath = "/usr/share/doc/amfora/THANKS.md"
 )
 
 // handleHTTP is used by handleURL.
@@ -172,14 +166,9 @@ func handleFavicon(t *tab, host, old string) {
 }
 
 func licensePage() structs.Page {
-	licenseFile, err := ioutil.ReadFile(licensePath)
-	licenseContent := "GNU GENERAL PUBLIC LICENSE Version 3"
-	if err == nil {
-		licenseContent = string(licenseFile)
-	}
-	renderLicenseContent, licenseLinks := renderer.RenderGemini(licenseContent, textWidth(), leftMargin(), false)
+	renderLicenseContent, licenseLinks := renderer.RenderGemini(string(license), textWidth(), leftMargin(), false)
 	licensePage := structs.Page{
-		Raw:       licenseContent,
+		Raw:       string(license),
 		Content:   renderLicenseContent,
 		Links:     licenseLinks,
 		URL:       "about:license",
@@ -190,14 +179,9 @@ func licensePage() structs.Page {
 }
 
 func thanksPage() structs.Page {
-	thanksFile, err := ioutil.ReadFile(thanksPath)
-	thanksContent := "Thanks to all contributors!"
-	if err == nil {
-		thanksContent = string(thanksFile)
-	}
-	renderThanksContent, thanksLinks := renderer.RenderGemini(thanksContent, textWidth(), leftMargin(), false)
+	renderThanksContent, thanksLinks := renderer.RenderGemini(string(thanks), textWidth(), leftMargin(), false)
 	thanksPage := structs.Page{
-		Raw:       thanksContent,
+		Raw:       string(thanks),
 		Content:   renderThanksContent,
 		Links:     thanksLinks,
 		URL:       "about:thanks",

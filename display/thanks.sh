@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
-echo "package display\n" > display/thanks.go
-echo -n 'var thanks = []byte(`' >> display/thanks.go
-cat THANKS.md |tr '`' "'" >> display/thanks.go
-echo '`)' >> display/thanks.go
+echo "package display\n" > thanks.go
+echo -n 'var thanks = []byte(`' >> thanks.go
+cat ../THANKS.md |tr '`' "'" >> thanks.go
+echo '`)' >> thanks.go
 

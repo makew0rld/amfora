@@ -165,56 +165,6 @@ func handleFavicon(t *tab, host, old string) {
 	cache.AddFavicon(host, emoji)
 }
 
-func licensePage() structs.Page {
-	renderLicenseContent, licenseLinks := renderer.RenderGemini(string(license), textWidth(), leftMargin(), false)
-	licensePage := structs.Page{
-		Raw:       string(license),
-		Content:   renderLicenseContent,
-		Links:     licenseLinks,
-		URL:       "about:license",
-		Width:     -1, // Force reformatting on first display
-		Mediatype: structs.TextGemini,
-	}
-	return licensePage
-}
-
-func thanksPage() structs.Page {
-	renderThanksContent, thanksLinks := renderer.RenderGemini(string(thanks), textWidth(), leftMargin(), false)
-	thanksPage := structs.Page{
-		Raw:       string(thanks),
-		Content:   renderThanksContent,
-		Links:     thanksLinks,
-		URL:       "about:thanks",
-		Width:     -1, // Force reformatting on first display
-		Mediatype: structs.TextGemini,
-	}
-	return thanksPage
-}
-
-func aboutPage() structs.Page {
-	aboutContent := `# Builtin Pages
-
-=> about:bookmarks Your bookmarks
-=> about:subscriptions Your subscriptions
-=> about:manage-subscriptions Manage your subscriptions
-=> about:newtab A new tab
-=> about:version Version and build information
-=> about:license License and copyright information
-=> about:thanks Credits
-=> about:about This page
-`
-	renderAboutContent, aboutLinks := renderer.RenderGemini(aboutContent, textWidth(), leftMargin(), false)
-	aboutPage := structs.Page{
-		Raw:       aboutContent,
-		Content:   renderAboutContent,
-		Links:     aboutLinks,
-		URL:       "about:about",
-		Width:     -1, // Force reformatting on first display
-		Mediatype: structs.TextGemini,
-	}
-	return aboutPage
-}
-
 // handleAbout can be called to deal with any URLs that start with
 // 'about:'. It will display errors if the URL is not recognized,
 // but not display anything if an 'about:' URL is not passed.
@@ -244,17 +194,17 @@ func handleAbout(t *tab, u string) (string, bool) {
 		t.applyBottomBar()
 		return u, true
 	case "about:license":
-		temp := licensePage()
+		temp := licensePage
 		setPage(t, &temp)
 		t.applyBottomBar()
 		return u, true
 	case "about:thanks":
-		temp := thanksPage()
+		temp := thanksPage
 		setPage(t, &temp)
 		t.applyBottomBar()
 		return u, true
 	case "about:about":
-		temp := aboutPage()
+		temp := aboutPage
 		setPage(t, &temp)
 		t.applyBottomBar()
 		return u, true

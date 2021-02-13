@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Media type handlers** - open non-text files in another application (#121, #134)
 - Ability to set custom keybindings in config (#135)
+- More internal about pages, see `about:about` (#160, 187)
 
 ### Fixed
 - Don't use cache when URL is typed in bottom bar (#159)

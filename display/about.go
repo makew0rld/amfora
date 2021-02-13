@@ -1,6 +1,8 @@
 package display
 
 import (
+	"fmt"
+
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 )
@@ -10,19 +12,23 @@ var versionPage structs.Page
 var licensePage structs.Page
 var thanksPage structs.Page
 
-func aboutInit() {
-	aboutPage = createAboutPage("about:about", `# Builtin Pages
+func aboutInit(version, commit, builtBy string) {
+	aboutPage = createAboutPage("about:about", `# Internal Pages
 
-=> about:bookmarks Your bookmarks
-=> about:subscriptions Your subscriptions
-=> about:manage-subscriptions Manage your subscriptions
-=> about:newtab A new tab
-=> about:version Version and build information
-=> about:license License and copyright information
-=> about:thanks Credits
-=> about:about This page
+=> about:bookmarks
+=> about:subscriptions
+=> about:manage-subscriptions
+=> about:newtab
+=> about:version
+=> about:license
+=> about:thanks
 `)
-	versionPage = createAboutPage("about:version", "# Amfora Version Info\n\nAmfora:   %s\nCommit:   %s\nBuilt by: %s")
+	versionPage = createAboutPage("about:version",
+		fmt.Sprintf(
+			"# Amfora Version Info\n\nAmfora:   %s\nCommit:   %s\nBuilt by: %s",
+			version, commit, builtBy,
+		),
+	)
 	licensePage = createAboutPage("about:license", string(license))
 	thanksPage = createAboutPage("about:thanks", string(thanks))
 }

@@ -78,7 +78,7 @@ var App = cview.NewApplication().
 	})
 
 func Init(version, commit, builtBy string) {
-	aboutInit()
+	aboutInit(version, commit, builtBy)
 
 	tabRow.SetChangedFunc(func() {
 		App.Draw()

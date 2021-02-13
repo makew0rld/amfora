@@ -1,7 +1,11 @@
 #!/usr/bin/env sh
 
-echo "package display\n" > license.go
+cat > license.go <<-EOF
+package display
+
+//go:generate ./license.sh
+EOF
 echo -n 'var license = []byte(`' >> license.go
-cat ../LICENSE |tr '`' "'" >> license.go
+cat ../LICENSE | tr '`' "'" >> license.go
 echo '`)' >> license.go
 

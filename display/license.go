@@ -1,5 +1,6 @@
 package display
 
+//go:generate ./license.sh
 var license = []byte(`                    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 

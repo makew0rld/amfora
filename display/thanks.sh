@@ -1,7 +1,11 @@
 #!/usr/bin/env sh
 
-echo "package display\n" > thanks.go
+cat > thanks.go <<-EOF
+package display
+
+//go:generate ./thanks.sh
+EOF
 echo -n 'var thanks = []byte(`' >> thanks.go
-cat ../THANKS.md |tr '`' "'" >> thanks.go
+cat ../THANKS.md | tr '`' "'" >> thanks.go
 echo '`)' >> thanks.go
 

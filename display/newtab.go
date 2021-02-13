@@ -21,6 +21,7 @@ Happy browsing!
 
 => about:bookmarks Bookmarks
 => about:subscriptions Subscriptions
+=> about:about All internal pages
 
 ## Learn more about Amfora!
 

@@ -193,6 +193,21 @@ func handleAbout(t *tab, u string) (string, bool) {
 		setPage(t, &temp)
 		t.applyBottomBar()
 		return u, true
+	case "about:license":
+		temp := licensePage
+		setPage(t, &temp)
+		t.applyBottomBar()
+		return u, true
+	case "about:thanks":
+		temp := thanksPage
+		setPage(t, &temp)
+		t.applyBottomBar()
+		return u, true
+	case "about:about":
+		temp := aboutPage
+		setPage(t, &temp)
+		t.applyBottomBar()
+		return u, true
 	}
 
 	if u == "about:subscriptions" || (len(u) > 20 && u[:20] == "about:subscriptions?") {

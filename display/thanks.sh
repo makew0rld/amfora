@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
 cat > thanks.go <<-EOF
+//nolint
 package display
 
 //go:generate ./thanks.sh

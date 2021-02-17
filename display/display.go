@@ -6,8 +6,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
@@ -39,76 +40,92 @@ var hasSpaceisURL = regexp.MustCompile(`[^ ]+\.[^ ].*/.`)
 // The only pages that don't confine to this scheme are those named after modals,
 // which are used to draw modals on top the current tab.
 // Ex: "info", "error", "input", "yesno"
-var tabPages = cview.NewPages()
+var panels = cview.NewPanels()
 
-// The tabs at the top with titles
-var tabRow = cview.NewTextView().
-	SetDynamicColors(true).
-	SetRegions(true).
-	SetScrollable(true).
-	SetWrap(false).
-	SetHighlightedFunc(func(added, removed, remaining []string) {
-		// There will always only be one string in added - never multiple highlights
-		// Remaining should always be empty
-		i, _ := strconv.Atoi(added[0])
-		tabPages.SwitchToPage(strconv.Itoa(i)) // Tab names are just numbers, zero-indexed
-	})
+// Tabbed viewer for primitives
+// Panels are named as strings of tab numbers - so the textview for the first tab
+// is held in the page named "0".
+var browser = cview.NewTabbedPanels()
 
 // Root layout
-var layout = cview.NewFlex().
-	SetDirection(cview.FlexRow)
+var layout = cview.NewFlex()
 
 var newTabPage structs.Page
 
-var App = cview.NewApplication().
-	EnableMouse(false).
-	SetRoot(layout, true).
-	SetAfterResizeFunc(func(width int, height int) {
+// Global mutex for changing the size of the left margin on all tabs.
+var reformatMu = sync.Mutex{}
+
+var App = cview.NewApplication()
+
+func Init(version, commit, builtBy string) {
+	aboutInit(version, commit, builtBy)
+
+	App.EnableMouse(false)
+	App.SetRoot(layout, true)
+	App.SetAfterResizeFunc(func(width int, height int) {
 		// Store for calculations
 		termW = width
 		termH = height
 
 		// Make sure the current tab content is reformatted when the terminal size changes
 		go func(t *tab) {
-			t.reformatMu.Lock() // Only one reformat job per tab
-			defer t.reformatMu.Unlock()
-			// Use the current tab, but don't affect other tabs if the user switches tabs
-			reformatPageAndSetView(t, t.page)
+			reformatMu.Lock() // Only allow one reformat job at a time
+			for i := range tabs {
+				// Overwrite all tabs with a new, differently sized, left margin
+				browser.AddTab(strconv.Itoa(i), makeTabLabel(strconv.Itoa(i+1)), makeContentLayout(tabs[i].view))
+				if tabs[i] == t {
+					// Reformat page ASAP, in the middle of loop
+					reformatPageAndSetView(t, t.page)
+				}
+			}
+			App.Draw()
+			reformatMu.Unlock()
 		}(tabs[curTab])
 	})
 
-func Init(version, commit, builtBy string) {
-	aboutInit(version, commit, builtBy)
-
-	tabRow.SetChangedFunc(func() {
-		App.Draw()
-	})
+	panels.AddPanel("browser", browser, true, true)
 
 	helpInit()
 
-	layout.
-		AddItem(tabRow, 1, 1, false).
-		AddItem(nil, 1, 1, false). // One line of empty space above the page
-		AddItem(tabPages, 0, 1, true).
-		AddItem(nil, 1, 1, false). // One line of empty space before bottomBar
-		AddItem(bottomBar, 1, 1, false)
+	layout.SetDirection(cview.FlexRow)
+	layout.AddItem(panels, 0, 1, true)
+	layout.AddItem(bottomBar, 1, 1, false)
 
 	if viper.GetBool("a-general.color") {
 		layout.SetBackgroundColor(config.GetColor("bg"))
-		tabRow.SetBackgroundColor(config.GetColor("bg"))
 
 		bottomBar.SetBackgroundColor(config.GetColor("bottombar_bg"))
-		bottomBar.
-			SetLabelColor(config.GetColor("bottombar_label")).
-			SetFieldBackgroundColor(config.GetColor("bottombar_bg")).
-			SetFieldTextColor(config.GetColor("bottombar_text"))
+		bottomBar.SetLabelColor(config.GetColor("bottombar_label"))
+		bottomBar.SetFieldBackgroundColor(config.GetColor("bottombar_bg"))
+		bottomBar.SetFieldTextColor(config.GetColor("bottombar_text"))
+
+		browser.SetTabBackgroundColor(config.GetColor("bg"))
+		browser.SetTabBackgroundColorFocused(config.GetColor("tab_num"))
+		browser.SetTabTextColor(config.GetColor("tab_num"))
+		browser.SetTabTextColorFocused(config.GetColor("bg"))
+		browser.SetTabSwitcherDivider(
+			"",
+			fmt.Sprintf("[%s:%s]|[-]", config.GetColorString("tab_divider"), config.GetColorString("bg")),
+			fmt.Sprintf("[%s:%s]|[-]", config.GetColorString("tab_divider"), config.GetColorString("bg")),
+		)
+		browser.Switcher.SetBackgroundColor(config.GetColor("bg"))
 	} else {
 		bottomBar.SetBackgroundColor(tcell.ColorWhite)
-		bottomBar.
-			SetLabelColor(tcell.ColorBlack).
-			SetFieldBackgroundColor(tcell.ColorWhite).
-			SetFieldTextColor(tcell.ColorBlack)
+		bottomBar.SetLabelColor(tcell.ColorBlack)
+		bottomBar.SetFieldBackgroundColor(tcell.ColorWhite)
+		bottomBar.SetFieldTextColor(tcell.ColorBlack)
+
+		browser.SetTabBackgroundColor(tcell.ColorBlack)
+		browser.SetTabBackgroundColorFocused(tcell.ColorWhite)
+		browser.SetTabTextColor(tcell.ColorWhite)
+		browser.SetTabTextColorFocused(tcell.ColorBlack)
+		browser.SetTabSwitcherDivider(
+			"",
+			"[#ffffff:#000000]|[-]",
+			"[#ffffff:#000000]|[-]",
+		)
 	}
+
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
 		tab := curTab
 
@@ -230,7 +247,7 @@ func Init(version, commit, builtBy string) {
 	// Render the default new tab content ONCE and store it for later
 	// This code is repeated in Reload()
 	newTabContent := getNewTabContent()
-	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin(), false)
+	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), false)
 	newTabPage = structs.Page{
 		Raw:       newTabContent,
 		Content:   renderedNewTabContent,
@@ -426,22 +443,9 @@ func NewTab() {
 	tabs[curTab].addToHistory("about:newtab")
 	tabs[curTab].history.pos = 0 // Manually set as first page
 
-	tabPages.AddAndSwitchToPage(strconv.Itoa(curTab), tabs[curTab].view, true)
+	browser.AddTab(strconv.Itoa(curTab), makeTabLabel(strconv.Itoa(curTab+1)), makeContentLayout(tabs[curTab].view))
+	browser.SetCurrentTab(strconv.Itoa(curTab))
 	App.SetFocus(tabs[curTab].view)
-
-	// Add tab number to the actual place where tabs are show on the screen
-	// Tab regions are 0-indexed but text displayed on the screen starts at 1
-	if viper.GetBool("a-general.color") {
-		fmt.Fprintf(tabRow, `["%d"][%s]  %d  [%s][""]|`,
-			curTab,
-			config.GetColorString("tab_num"),
-			curTab+1,
-			config.GetColorString("tab_divider"),
-		)
-	} else {
-		fmt.Fprintf(tabRow, `["%d"]  %d  [""]|`, curTab, curTab+1)
-	}
-	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
 
 	bottomBar.SetLabel("")
 	bottomBar.SetText("")
@@ -469,7 +473,7 @@ func CloseTab() {
 	}
 
 	tabs = tabs[:len(tabs)-1]
-	tabPages.RemovePage(strconv.Itoa(curTab))
+	browser.RemoveTab(strconv.Itoa(curTab))
 
 	if curTab <= 0 {
 		curTab = NumTabs() - 1
@@ -477,8 +481,7 @@ func CloseTab() {
 		curTab--
 	}
 
-	tabPages.SwitchToPage(strconv.Itoa(curTab)) // Go to previous page
-	rewriteTabRow()
+	browser.SetCurrentTab(strconv.Itoa(curTab)) // Go to previous page
 	// Restore previous tab's state
 	tabs[curTab].applyAll()
 
@@ -510,8 +513,7 @@ func SwitchTab(tab int) {
 
 	// Display tab
 	reformatPageAndSetView(tabs[curTab], tabs[curTab].page)
-	tabPages.SwitchToPage(strconv.Itoa(curTab))
-	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
+	browser.SetCurrentTab(strconv.Itoa(curTab))
 	tabs[curTab].applyAll()
 
 	App.SetFocus(tabs[curTab].view)
@@ -525,7 +527,7 @@ func Reload() {
 		// Re-render new tab, similar to Init()
 		newTabContent := getNewTabContent()
 		tmpTermW := termW
-		renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), leftMargin(), false)
+		renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), false)
 		newTabPage = structs.Page{
 			Raw:       newTabContent,
 			Content:   renderedNewTabContent,

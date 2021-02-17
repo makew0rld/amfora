@@ -73,6 +73,10 @@ page_max_time = 10
 # Whether to replace tab numbers with emoji favicons, which are cached.
 emoji_favicons = false
 
+# When a scrollbar appears. "never", "auto", and "always" are the only valid values.
+# "auto" means the scrollbar only appears when the page is longer than the window.
+scrollbar = "auto"
+
 
 [auth]
 # Authentication settings
@@ -301,6 +305,7 @@ entries_per_page = 20
 # bottombar_label: The color of the prompt that appears when you press space
 # bottombar_text: The color of the text you type
 # bottombar_bg
+# scrollbar: The scrollbar that appears on the right for long pages
 
 # hdg_1
 # hdg_2

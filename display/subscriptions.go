@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
@@ -149,7 +149,7 @@ func Subscriptions(t *tab, u string) string {
 		}
 	}
 
-	content, links := renderer.RenderGemini(rawPage, textWidth(), leftMargin(), false)
+	content, links := renderer.RenderGemini(rawPage, textWidth(), false)
 	page := structs.Page{
 		Raw:       rawPage,
 		Content:   content,
@@ -191,7 +191,7 @@ func ManageSubscriptions(t *tab, u string) {
 		)
 	}
 
-	content, links := renderer.RenderGemini(rawPage, textWidth(), leftMargin(), false)
+	content, links := renderer.RenderGemini(rawPage, textWidth(), false)
 	page := structs.Page{
 		Raw:       rawPage,
 		Content:   content,
@@ -230,19 +230,19 @@ func openSubscriptionModal(validFeed, subscribed bool) bool {
 	// Reuses yesNoModal
 
 	if viper.GetBool("a-general.color") {
-		yesNoModal.
-			SetBackgroundColor(config.GetColor("subscription_modal_bg")).
-			SetTextColor(config.GetColor("subscription_modal_text"))
-		yesNoModal.GetFrame().
-			SetBorderColor(config.GetColor("subscription_modal_text")).
-			SetTitleColor(config.GetColor("subscription_modal_text"))
+		m := yesNoModal
+		m.SetBackgroundColor(config.GetColor("subscription_modal_bg"))
+		m.SetTextColor(config.GetColor("subscription_modal_text"))
+		frame := yesNoModal.GetFrame()
+		frame.SetBorderColor(config.GetColor("subscription_modal_text"))
+		frame.SetTitleColor(config.GetColor("subscription_modal_text"))
 	} else {
-		yesNoModal.
-			SetBackgroundColor(tcell.ColorBlack).
-			SetTextColor(tcell.ColorWhite)
-		yesNoModal.GetFrame().
-			SetBorderColor(tcell.ColorWhite).
-			SetTitleColor(tcell.ColorWhite)
+		m := yesNoModal
+		m.SetBackgroundColor(tcell.ColorBlack)
+		m.SetTextColor(tcell.ColorWhite)
+		frame := yesNoModal.GetFrame()
+		frame.SetBorderColor(tcell.ColorWhite)
+		frame.SetTitleColor(tcell.ColorWhite)
 	}
 	if validFeed {
 		yesNoModal.GetFrame().SetTitle("Feed Subscription")
@@ -260,13 +260,13 @@ func openSubscriptionModal(validFeed, subscribed bool) bool {
 		}
 	}
 
-	tabPages.ShowPage("yesno")
-	tabPages.SendToFront("yesno")
+	panels.ShowPanel("yesno")
+	panels.SendToFront("yesno")
 	App.SetFocus(yesNoModal)
 	App.Draw()
 
 	resp := <-yesNoCh
-	tabPages.SwitchToPage(strconv.Itoa(curTab))
+	panels.HidePanel("yesno")
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 	return resp

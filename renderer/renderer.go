@@ -21,31 +21,27 @@ var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 // RenderANSI renders plain text pages containing ANSI codes.
 // Practically, it is used for the text/x-ansi.
-func RenderANSI(s string, leftMargin int) string {
+func RenderANSI(s string) string {
 	s = cview.Escape(s)
 	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
 		s = cview.TranslateANSI(s)
+		// The TranslateANSI function injects tags like [-:-:-]
+		// but this will reset the background to use the user's terminal color.
+		// These tags need to be replaced with resets that use the theme color.
+		s = strings.ReplaceAll(s, "[-:-:-]",
+			fmt.Sprintf("[-:%s:-]", config.GetColorString("bg")))
 	} else {
 		s = ansiRegex.ReplaceAllString(s, "")
 	}
-	var shifted string
-	lines := strings.Split(s, "\n")
-	for i := range lines {
-		shifted += strings.Repeat(" ", leftMargin) + lines[i] + "\n"
-	}
-	return shifted
+	return s
 }
 
 // RenderPlainText should be used to format plain text pages.
-func RenderPlainText(s string, leftMargin int) string {
-	var shifted string
-	lines := strings.Split(cview.Escape(s), "\n")
-	for i := range lines {
-		shifted += strings.Repeat(" ", leftMargin) +
-			"[" + config.GetColorString("regular_text") + "]" + lines[i] + "[-]" +
-			"\n"
-	}
-	return shifted
+func RenderPlainText(s string) string {
+	// It used to add a left margin, now this is done elsewhere.
+	// The function is kept for convenience and in case rendering
+	// is needed in the future.
+	return s
 }
 
 // wrapLine wraps a line to the provided width, and adds the provided prefix and suffix to each wrapped line.
@@ -278,7 +274,7 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 //
 // proxied is whether the request is through the gemini:// scheme.
 // If it's not a gemini:// page, set this to true.
-func RenderGemini(s string, width, leftMargin int, proxied bool) (string, []string) {
+func RenderGemini(s string, width int, proxied bool) (string, []string) {
 	s = cview.Escape(s)
 
 	lines := strings.Split(s, "\n")
@@ -289,30 +285,52 @@ func RenderGemini(s string, width, leftMargin int, proxied bool) (string, []stri
 	rendered := "" // Final result
 	pre := false
 	buf := "" // Block of regular or preformatted lines
+
+	// processPre is for rendering preformatted blocks
+	processPre := func() {
+		// Support ANSI color codes in preformatted blocks - see #59
+		if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
+			buf = cview.TranslateANSI(buf)
+			// The TranslateANSI function injects tags like [-:-:-]
+			// but this will reset the background to use the user's terminal color.
+			// These tags need to be replaced with resets that use the theme color.
+			buf = strings.ReplaceAll(buf, "[-:-:-]",
+				fmt.Sprintf("[%s:%s:-]", config.GetColorString("preformatted_text"), config.GetColorString("bg")))
+		} else {
+			buf = ansiRegex.ReplaceAllString(buf, "")
+		}
+
+		// The final newline is removed (and re-added) to prevent background glitches
+		// where the terminal background color slips through. This only happens on
+		// preformatted blocks with ANSI characters.
+		//
+		// Lines are modified below to always end with \r\n
+		buf = strings.TrimSuffix(buf, "\r\n")
+
+		rendered += fmt.Sprintf("[%s]", config.GetColorString("preformatted_text")) +
+			buf + fmt.Sprintf("[%s:%s:-]\r\n", config.GetColorString("regular_text"), config.GetColorString("bg"))
+	}
+
+	// processRegular processes non-preformatted sections
+	processRegular := func() {
+		// ANSI not allowed in regular text - see #59
+		buf = ansiRegex.ReplaceAllString(buf, "")
+
+		ren, lks := convertRegularGemini(buf, len(links), width, proxied)
+		links = append(links, lks...)
+		rendered += ren
+	}
+
 	for i := range lines {
 		if strings.HasPrefix(lines[i], "```") {
 			if pre {
 				// In a preformatted block, so add the text as is
 				// Don't add the current line with backticks
+				processPre()
 
-				// Support ANSI color codes in preformatted blocks - see #59
-				if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
-					buf = cview.TranslateANSI(buf)
-				} else {
-					buf = ansiRegex.ReplaceAllString(buf, "")
-				}
-
-				rendered += fmt.Sprintf("[%s]", config.GetColorString("preformatted_text")) +
-					buf + "[-]"
 			} else {
 				// Not preformatted, regular text
-
-				// ANSI not allowed in regular text - see #59
-				buf = ansiRegex.ReplaceAllString(buf, "")
-
-				ren, lks := convertRegularGemini(buf, len(links), width, proxied)
-				links = append(links, lks...)
-				rendered += ren
+				processRegular()
 			}
 			buf = "" // Clear buffer for next block
 			pre = !pre
@@ -324,32 +342,10 @@ func RenderGemini(s string, width, leftMargin int, proxied bool) (string, []stri
 	// Gone through all the lines, but there still is likely a block in the buffer
 	if pre {
 		// File ended without closing the preformatted block
-		// Same code as in the loop above
-
-		if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
-			buf = cview.TranslateANSI(buf)
-		} else {
-			buf = ansiRegex.ReplaceAllString(buf, "")
-		}
-		rendered += fmt.Sprintf("[%s]", config.GetColorString("preformatted_text")) +
-			buf + "[-]"
+		processPre()
 	} else {
 		// Not preformatted, regular text
-		// Same code as in the loop above
-
-		buf = ansiRegex.ReplaceAllString(buf, "")
-
-		ren, lks := convertRegularGemini(buf, len(links), width, proxied)
-		links = append(links, lks...)
-		rendered += ren
-	}
-
-	if leftMargin > 0 {
-		renLines := strings.Split(rendered, "\n")
-		for i := range renLines {
-			renLines[i] = strings.Repeat(" ", leftMargin) + renLines[i]
-		}
-		return strings.Join(renLines, "\n"), links
+		processRegular()
 	}
 
 	return rendered, links

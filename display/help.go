@@ -2,72 +2,69 @@ package display
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
+	"text/tabwriter"
 
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"gitlab.com/tslocum/cview"
 )
 
-var helpCells = strings.TrimSpace(`
-?|Bring up this help. You can scroll!
-Enter|Close this help page
-Esc|Close this help page or any active modal popups
-Arrow keys, h/j/k/l|Scroll and move a page.
-%s|Go up a page in document
-%s|Go down a page in document
-g|Go to top of document
-G|Go to bottom of document
-Tab|Navigate to the next item in a popup.
-Shift-Tab|Navigate to the previous item in a popup.
-%s|Go back in the history
-%s|Go forward in the history
-%s|Open bar at the bottom - type a URL, link number, search term.
-|You can also type two dots (..) to go up a directory in the URL.
-|Typing new:N will open link number N in a new tab
-|instead of the current one.
-%s|Go to links 1-10 respectively.
-%s|Edit current URL
-Enter, Tab|On a page this will start link highlighting.
-|Press Tab and Shift-Tab to pick different links.
-|Press Enter again to go to one, or Esc to stop.
-%s|Go to a specific tab. (Default: Shift-NUMBER)
-%s|Go to the last tab.
-%s|Previous tab
-%s|Next tab
-%s|Go home
-%s|New tab, or if a link is selected,
-|this will open the link in a new tab.
-%s|Close tab. For now, only the right-most tab can be closed.
-%s|Reload a page, discarding the cached version.
-|This can also be used if you resize your terminal.
-%s|View bookmarks
-%s|Add, change, or remove a bookmark for the current page.
-%s|Save the current page to your downloads.
-%s|View subscriptions
-%s|Add or update a subscription
-%s|Quit
-`)
+var helpCells = strings.TrimSpace(
+	"?\tBring up this help. You can scroll!\n" +
+		"Esc\tLeave the help\n" +
+		"Arrow keys, h/j/k/l\tScroll and move a page.\n" +
+		"%s\tGo up a page in document\n" +
+		"%s\tGo down a page in document\n" +
+		"g\tGo to top of document\n" +
+		"G\tGo to bottom of document\n" +
+		"Tab\tNavigate to the next item in a popup.\n" +
+		"Shift-Tab\tNavigate to the previous item in a popup.\n" +
+		"%s\tGo back in the history\n" +
+		"%s\tGo forward in the history\n" +
+		"%s\tOpen bar at the bottom - type a URL, link number, search term.\n" +
+		"\tYou can also type two dots (..) to go up a directory in the URL.\n" +
+		"\tTyping new:N will open link number N in a new tab\n" +
+		"\tinstead of the current one.\n" +
+		"%s\tGo to links 1-10 respectively.\n" +
+		"%s\tEdit current URL\n" +
+		"Enter, Tab\tOn a page this will start link highlighting.\n" +
+		"\tPress Tab and Shift-Tab to pick different links.\n" +
+		"\tPress Enter again to go to one, or Esc to stop.\n" +
+		"%s\tGo to a specific tab. (Default: Shift-NUMBER)\n" +
+		"%s\tGo to the last tab.\n" +
+		"%s\tPrevious tab\n" +
+		"%s\tNext tab\n" +
+		"%s\tGo home\n" +
+		"%s\tNew tab, or if a link is selected,\n" +
+		"\tthis will open the link in a new tab.\n" +
+		"%s\tClose tab. For now, only the right-most tab can be closed.\n" +
+		"%s\tReload a page, discarding the cached version.\n" +
+		"\tThis can also be used if you resize your terminal.\n" +
+		"%s\tView bookmarks\n" +
+		"%s\tAdd, change, or remove a bookmark for the current page.\n" +
+		"%s\tSave the current page to your downloads.\n" +
+		"%s\tView subscriptions\n" +
+		"%s\tAdd or update a subscription\n" +
+		"%s\tQuit\n")
 
-var helpTable = cview.NewTable().
-	SetSelectable(false, false).
-	SetBorders(false).
-	SetScrollBarVisibility(cview.ScrollBarNever)
+var helpTable = cview.NewTextView()
 
 // Help displays the help and keybindings.
 func Help() {
 	helpTable.ScrollToBeginning()
-	tabPages.SwitchToPage("help")
+	panels.ShowPanel("help")
+	panels.SendToFront("help")
 	App.SetFocus(helpTable)
-	App.Draw()
 }
 
 func helpInit() {
 	// Populate help table
+	helpTable.SetBackgroundColor(config.GetColor("bg"))
+	helpTable.SetPadding(0, 0, 1, 1)
 	helpTable.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEsc || key == tcell.KeyEnter {
-			tabPages.SwitchToPage(strconv.Itoa(curTab))
+			panels.HidePanel("help")
 			App.SetFocus(tabs[curTab].view)
 			App.Draw()
 		}
@@ -102,34 +99,16 @@ func helpInit() {
 		config.GetKeyBinding(config.CmdQuit),
 	)
 
-	rows := strings.Count(helpCells, "\n") + 1
-	cells := strings.Split(
-		strings.ReplaceAll(helpCells, "\n", "|"),
-		"|")
-	cell := 0
-	extraRows := 0 // Rows continued from the previous, without spacing
-	for r := 0; r < rows; r++ {
-		for c := 0; c < 2; c++ {
-			var tableCell *cview.TableCell
-			if c == 0 {
-				// First column, the keybinding
-				tableCell = cview.NewTableCell(" " + cells[cell]).
-					SetAttributes(tcell.AttrBold).
-					SetAlign(cview.AlignLeft)
-			} else {
-				tableCell = cview.NewTableCell(" " + cells[cell])
-			}
-			if c == 0 && cells[cell] == "" || (cell > 0 && cells[cell-1] == "" && c == 1) {
-				// The keybinding column for this row was blank, meaning the explanation
-				// column is continued from the previous row.
-				// The row should be added without any spacing rows
-				helpTable.SetCell(((2*r)-extraRows/2)-1, c, tableCell)
-				extraRows++
-			} else {
-				helpTable.SetCell((2*r)-extraRows/2, c, tableCell) // Every other row, for readability
-			}
-			cell++
+	lines := strings.Split(helpCells, "\n")
+	w := tabwriter.NewWriter(helpTable, 0, 8, 2, ' ', 0)
+	for i, line := range lines {
+		if i > 0 && line[0] != '\t' {
+			fmt.Fprintln(w, "\t")
 		}
+		fmt.Fprintln(w, line)
 	}
-	tabPages.AddPage("help", helpTable, true, false)
+
+	w.Flush()
+
+	panels.AddPanel("help", helpTable, true, false)
 }

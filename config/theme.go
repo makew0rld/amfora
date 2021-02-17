@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 )
 
 // Functions to allow themeing configuration.
@@ -21,6 +21,7 @@ var theme = map[string]tcell.Color{
 	"bottombar_label": tcell.Color30,
 	"bottombar_text":  tcell.ColorBlack,
 	"bottombar_bg":    tcell.ColorWhite,
+	"scrollbar":       tcell.ColorWhite,
 
 	// Modals
 	"btn_bg":   tcell.ColorNavy, // All modal buttons
@@ -74,7 +75,7 @@ func SetColor(key string, color tcell.Color) {
 func GetColor(key string) tcell.Color {
 	themeMu.RLock()
 	defer themeMu.RUnlock()
-	return theme[key]
+	return theme[key].TrueColor()
 }
 
 // GetColorString returns a string that can be used in a cview color tag,
@@ -83,5 +84,5 @@ func GetColor(key string) tcell.Color {
 func GetColorString(key string) string {
 	themeMu.RLock()
 	defer themeMu.RUnlock()
-	return fmt.Sprintf("#%06x", theme[key].Hex())
+	return fmt.Sprintf("#%06x", theme[key].TrueColor().Hex())
 }

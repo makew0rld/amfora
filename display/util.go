@@ -13,6 +13,43 @@ import (
 
 // This file contains funcs that are small, self-contained utilities.
 
+// makeContentLayout returns a flex that contains the given TextView
+// along with the current correct left margin, as well as a single empty
+// line at the top, for a top margin.
+func makeContentLayout(tv *cview.TextView) *cview.Flex {
+	// Create horizontal flex with the left margin as an empty space
+	horiz := cview.NewFlex()
+	horiz.SetDirection(cview.FlexColumn)
+	horiz.AddItem(nil, leftMargin(), 0, false)
+	horiz.AddItem(tv, 0, 1, true)
+
+	// Create a vertical flex with the other one and a top margin
+	vert := cview.NewFlex()
+	vert.SetDirection(cview.FlexRow)
+	vert.AddItem(nil, 1, 0, false)
+	vert.AddItem(horiz, 0, 1, true)
+
+	return vert
+}
+
+// makeTabLabel takes a string and adds spacing to it, making it
+// suitable for display as a tab label.
+func makeTabLabel(s string) string {
+	return " " + s + " "
+}
+
+// tabNumber gets the index of the tab in the tabs slice. It returns -1
+// if the tab is not in that slice.
+func tabNumber(t *tab) int {
+	tempTabs := tabs
+	for i := range tempTabs {
+		if tempTabs[i] == t {
+			return i
+		}
+	}
+	return -1
+}
+
 // escapeMeta santizes a META string for use within a cview modal.
 func escapeMeta(meta string) string {
 	return cview.Escape(strings.ReplaceAll(meta, "\n", ""))
@@ -20,13 +57,7 @@ func escapeMeta(meta string) string {
 
 // isValidTab indicates whether the passed tab is still being used, even if it's not currently displayed.
 func isValidTab(t *tab) bool {
-	tempTabs := tabs
-	for i := range tempTabs {
-		if tempTabs[i] == t {
-			return true
-		}
-	}
-	return false
+	return tabNumber(t) != -1
 }
 
 func leftMargin() int {

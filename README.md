@@ -178,7 +178,7 @@ You can also check out [all the issues with the bug label](https://github.com/ma
 ## Libraries
 Amfora ❤️ open source!
 
-- [cview](https://gitlab.com/tslocum/cview/) for the TUI
+- My [cview fork](https://gitlab.com/makeworld-the-better-one/cview/) for the TUI - pull request [here](https://gitlab.com/tslocum/cview/-/merge_requests/12)
   - It's a fork of [tview](https://github.com/rivo/tview) with PRs merged and active support
   - It uses [tcell](https://github.com/gdamore/tcell) for low level terminal operations
 - [Viper](https://github.com/spf13/viper) for configuration and TOFU storing

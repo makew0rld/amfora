@@ -1,15 +1,12 @@
 package display
 
 import (
-	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 
-	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
-	"github.com/spf13/viper"
 )
 
 // This file contains the functions that aren't part of the public API.
@@ -68,11 +65,11 @@ func reformatPage(p *structs.Page) {
 			strings.HasPrefix(p.URL, "file") {
 			proxied = false
 		}
-		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), leftMargin(), proxied)
+		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), proxied)
 	case structs.TextPlain:
-		rendered = renderer.RenderPlainText(p.Raw, leftMargin())
+		rendered = renderer.RenderPlainText(p.Raw)
 	case structs.TextAnsi:
-		rendered = renderer.RenderANSI(p.Raw, leftMargin())
+		rendered = renderer.RenderANSI(p.Raw)
 	default:
 		// Rendering this type is not implemented
 		return
@@ -92,6 +89,8 @@ func reformatPageAndSetView(t *tab, p *structs.Page) {
 	reformatPage(p)
 	t.view.SetText(p.Content)
 	t.applyScroll() // Go back to where you were, roughly
+
+	App.Draw()
 }
 
 // setPage displays a Page on the passed tab number.
@@ -107,19 +106,22 @@ func setPage(t *tab, p *structs.Page) {
 	// Make sure the page content is fitted to the terminal every time it's displayed
 	reformatPage(p)
 
-	oldFav := t.page.Favicon
-
 	t.page = p
-
-	go func() {
-		parsed, _ := url.Parse(p.URL)
-		handleFavicon(t, parsed.Host, oldFav)
-	}()
 
 	// Change page on screen
 	t.view.SetText(p.Content)
 	t.view.Highlight("") // Turn off highlights, other funcs may restore if necessary
 	t.view.ScrollToBeginning()
+
+	// Set tab number in case a favicon from before overwrote it
+	tabNum := tabNumber(t)
+	browser.SetTabLabel(strconv.Itoa(tabNum), makeTabLabel(strconv.Itoa(tabNum+1)))
+	App.Draw()
+
+	go func() {
+		parsed, _ := url.Parse(p.URL)
+		handleFavicon(t, parsed.Host)
+	}()
 
 	// Setup display
 	App.SetFocus(t.view)
@@ -143,33 +145,4 @@ func goURL(t *tab, u string) {
 		// Display the bottomBar state that handleURL set
 		t.applyBottomBar()
 	}
-}
-
-// rewriteTabRow clears the tabRow and writes all the tabs number/favicons into it.
-func rewriteTabRow() {
-	tabRow.Clear()
-	if viper.GetBool("a-general.color") {
-		for i := 0; i < NumTabs(); i++ {
-			char := strconv.Itoa(i + 1)
-			if tabs[i].page.Favicon != "" {
-				char = tabs[i].page.Favicon
-			}
-			fmt.Fprintf(tabRow, `["%d"][%s]  %s  [%s][""]|`,
-				i,
-				config.GetColorString("tab_num"),
-				char,
-				config.GetColorString("tab_divider"),
-			)
-		}
-	} else {
-		for i := 0; i < NumTabs(); i++ {
-			char := strconv.Itoa(i + 1)
-			if tabs[i].page.Favicon != "" {
-				char = tabs[i].page.Favicon
-			}
-			fmt.Fprintf(tabRow, `["%d"]  %s  [""]|`, i, char)
-		}
-	}
-	tabRow.Highlight(strconv.Itoa(curTab)).ScrollToHighlight()
-	App.Draw()
 }

@@ -34,7 +34,7 @@ func aboutInit(version, commit, builtBy string) {
 }
 
 func createAboutPage(url string, content string) structs.Page {
-	renderContent, links := renderer.RenderGemini(content, textWidth(), leftMargin(), false)
+	renderContent, links := renderer.RenderGemini(content, textWidth(), false)
 	return structs.Page{
 		Raw:       content,
 		Content:   renderContent,

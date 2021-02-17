@@ -27,7 +27,7 @@ Happy browsing!
 
 => https://github.com/makeworld-the-better-one/amfora Amfora homepage
 => https://github.com/makeworld-the-better-one/amfora/wiki Amfora Wiki [GitHub]
-=> gemini://makeworld.gq/amfora-wiki/ Amfora Wiki [On Gemini!]
+=> gemini://makeworld.space/amfora-wiki/ Amfora Wiki [On Gemini!]
 
 => //gemini.circumlunar.space Project Gemini
 `

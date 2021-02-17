@@ -105,7 +105,12 @@ func normalizeURL(u string) string {
 	parsed.Fragment = "" // No fragments either
 	if parsed.Port() == "1965" {
 		// Always remove default port
-		parsed.Host = parsed.Hostname()
+		hostname := parsed.Hostname()
+		if strings.Contains(hostname, ":") {
+			parsed.Host = "[" + parsed.Hostname() + "]"
+		} else {
+			parsed.Host = parsed.Hostname()
+		}
 	}
 
 	// Add slash to the end of a URL with just a domain

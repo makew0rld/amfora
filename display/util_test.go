@@ -27,6 +27,11 @@ var normalizeURLTests = []struct {
 	{"gemini://example.com/蛸", "gemini://example.com/%E8%9B%B8"},
 	{"gemini://gemini.circumlunar.space/%64%6f%63%73/;;.'%66%61%71蛸%2e%67%6d%69", "gemini://gemini.circumlunar.space/docs/%3B%3B.%27faq%E8%9B%B8.gmi"},
 	{"gemini://example.com/?%2Ch%64ello蛸", "gemini://example.com/?%2Chdello%E8%9B%B8"},
+	// IPv6 tests, see #195
+	{"gemini://[::1]", "gemini://[::1]/"},
+	{"gemini://[::1]:1965", "gemini://[::1]/"},
+	{"gemini://[::1]/test", "gemini://[::1]/test"},
+	{"gemini://[::1]:1965/test", "gemini://[::1]/test"},
 }
 
 func TestNormalizeURL(t *testing.T) {

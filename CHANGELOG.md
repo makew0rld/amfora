@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bookmarks modal closes on ESC like the others (#173)
 - Handle empty META string (#176)
 - Whitespace around the URL entered in the bottom bar is stripped (#184)
+- Don't break visiting IPv6 hosts when port 1965 is specified (#195)
 
 
 ## [1.7.2] - 2020-12-21

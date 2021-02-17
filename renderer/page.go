@@ -32,15 +32,21 @@ func isUTF8(charset string) bool {
 	return false
 }
 
-// getMetaInfo returns the output of mime.ParseMediaType, but handles the empty
+// decodeMeta returns the output of mime.ParseMediaType, but handles the empty
 // META which is equal to "text/gemini; charset=utf-8" according to the spec.
 func decodeMeta(meta string) (string, map[string]string, error) {
 	if meta == "" {
-		params := make(map[string]string)
-		params["charset"] = "utf-8"
-		return "text/gemini", params, nil
+		return "text/gemini", make(map[string]string), nil
 	}
-	return mime.ParseMediaType(meta)
+
+	mediatype, params, err := mime.ParseMediaType(meta)
+
+	if mediatype != "" && err != nil {
+		// The mediatype was successfully decoded but there's some error with the params
+		// Ignore the params
+		return mediatype, make(map[string]string), nil
+	}
+	return mediatype, params, err
 }
 
 // CanDisplay returns true if the response is supported by Amfora

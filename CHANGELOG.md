@@ -10,11 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ability to set custom keybindings in config (#135)
 - Added scrollbar, by default only appears on pages that go off-screen (#89, #107)
 - More internal about pages, see `about:about` (#160, 187)
-- Sensitive input fields (status code 11) display with asterisks over the text (#106)
 
 ### Changed
 - Update cview to `d776e728ef6d2a9990a5cd86a70b31f0678613e2` for large performance and feature updates (#107)
 - Update to tcell v2 (dependency of cview)
+- Display page even if mediatype params are malformed (#141)
+- Sensitive input fields (status code 11) display with asterisks over the text (#106)
 
 ### Fixed
 - Don't use cache when URL is typed in bottom bar (#159)

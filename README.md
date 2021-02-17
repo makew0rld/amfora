@@ -155,7 +155,7 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Subscriptions
   - Subscribing to RSS, Atom, and [JSON Feeds](https://jsonfeed.org/) are all supported
   - So is subscribing to a page, to know when it changes
-- [x] Open non-text files in another application*
+- [x] Open non-text files in another application
   - [x] Ability to stream content instead of downloading it first
 - [ ] Stream support
 - [ ] Table of contents for pages

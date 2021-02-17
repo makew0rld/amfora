@@ -167,14 +167,6 @@ Features in *italics* are in the master branch, but not in the latest release.
 ## Usage & Configuration
 Please see [the wiki](https://github.com/makeworld-the-better-one/amfora/wiki) for an introduction on how to use Amfora and configure it.
 
-
-## Known Bugs
-
-- Pasting on Windows is truncated, the full paste content won't be added. ([#43](https://github.com/makeworld-the-better-one/amfora/issues/43))
-
-You can also check out [all the issues with the bug label](https://github.com/makeworld-the-better-one/amfora/issues?q=is%3Aopen+is%3Aissue+label%3Abug).
-
-
 ## Libraries
 Amfora ❤️ open source!
 

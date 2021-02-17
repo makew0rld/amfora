@@ -67,6 +67,8 @@ func bkmkInit() {
 			bkmkCh <- -1
 		case "Cancel":
 			bkmkCh <- 0
+		case "":
+			bkmkCh <- 0
 		}
 	})
 }

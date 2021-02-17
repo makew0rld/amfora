@@ -51,7 +51,6 @@ var browser = cview.NewTabbedPanels()
 var layout = cview.NewFlex()
 
 var newTabPage structs.Page
-var versionPage structs.Page
 
 // Global mutex for changing the size of the left margin on all tabs.
 var reformatMu = sync.Mutex{}
@@ -59,19 +58,7 @@ var reformatMu = sync.Mutex{}
 var App = cview.NewApplication()
 
 func Init(version, commit, builtBy string) {
-	versionContent := fmt.Sprintf(
-		"# Amfora Version Info\n\nAmfora:   %s\nCommit:   %s\nBuilt by: %s",
-		version, commit, builtBy,
-	)
-	renderVersionContent, versionLinks := renderer.RenderGemini(versionContent, textWidth(), false)
-	versionPage = structs.Page{
-		Raw:       versionContent,
-		Content:   renderVersionContent,
-		Links:     versionLinks,
-		URL:       "about:version",
-		Width:     -1, // Force reformatting on first display
-		Mediatype: structs.TextGemini,
-	}
+	aboutInit(version, commit, builtBy)
 
 	App.EnableMouse(false)
 	App.SetRoot(layout, true)
@@ -217,9 +204,14 @@ func Init(version, commit, builtBy string) {
 				} else {
 					// It's a full URL or search term
 					// Detect if it's a search or URL
+
+					// Remove whitespace from the string.
+					// We don't want to convert legitimate
+					// :// links to search terms.
+					query := strings.TrimSpace(query)
 					if (strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
 						(!strings.HasPrefix(query, "//") && !strings.Contains(query, "://") &&
-							!strings.Contains(query, ".")) {
+							!strings.Contains(query, ".")) && !strings.HasPrefix(query, "about:") {
 						// Has a space and follows regex, OR
 						// doesn't start with "//", contain "://", and doesn't have a dot either.
 						// Then it's a search

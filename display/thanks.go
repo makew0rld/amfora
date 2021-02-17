@@ -1,4 +1,8 @@
-# THANKS
+//nolint
+package display
+
+//go:generate ./thanks.sh
+var thanks = []byte(`# THANKS
 
 Thank you to the following contributors, who have helped make Amfora great. FOSS projects are a community effort, and we would be worse off without you.
 
@@ -17,3 +21,4 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 * Stephen Robinson (@sudobash1)
 * Peter Steinberg (@objectliteral)
 * Thomas Adam (@ThomasAdam)
+`)

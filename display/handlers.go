@@ -136,7 +136,8 @@ func handleFavicon(t *tab, host string) {
 		cache.AddFavicon(host, cache.KnownNoFavicon)
 		return
 	}
-	if !strings.HasPrefix(res.Meta, "text/") {
+	if !strings.HasPrefix(res.Meta, "text/") && res.Meta != "" {
+		// Not a textual page
 		cache.AddFavicon(host, cache.KnownNoFavicon)
 		return
 	}
@@ -189,6 +190,21 @@ func handleAbout(t *tab, u string) (string, bool) {
 		return u, true
 	case "about:version":
 		temp := versionPage
+		setPage(t, &temp)
+		t.applyBottomBar()
+		return u, true
+	case "about:license":
+		temp := licensePage
+		setPage(t, &temp)
+		t.applyBottomBar()
+		return u, true
+	case "about:thanks":
+		temp := thanksPage
+		setPage(t, &temp)
+		t.applyBottomBar()
+		return u, true
+	case "about:about":
+		temp := aboutPage
 		setPage(t, &temp)
 		t.applyBottomBar()
 		return u, true

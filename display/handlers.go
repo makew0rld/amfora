@@ -432,7 +432,16 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	// Handle each status code
 	switch res.Status {
 	case 10, 11:
-		userInput, ok := Input(res.Meta)
+		var userInput string
+		var ok bool
+
+		if res.Status == 10 {
+			// Regular input
+			userInput, ok = Input(res.Meta, false)
+		} else {
+			// Sensitive input
+			userInput, ok = Input(res.Meta, true)
+		}
 		if ok {
 			// Make another request with the query string added
 			parsed.RawQuery = gemini.QueryEscape(userInput)

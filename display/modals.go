@@ -213,18 +213,27 @@ func Info(s string) {
 
 // Input pulls up a modal that asks for input, and returns the user's input.
 // It returns an bool indicating if the user chose to send input or not.
-func Input(prompt string) (string, bool) {
+func Input(prompt string, sensitive bool) (string, bool) {
 	// Remove elements and re-add them - to clear input text and keep input in focus
 	inputModal.ClearButtons()
 	inputModal.GetForm().Clear(false)
 
 	inputModal.AddButtons([]string{"Send", "Cancel"})
 	inputModalText = ""
-	inputModal.GetForm().AddInputField("", "", 0, nil,
-		func(text string) {
-			// Store for use later
-			inputModalText = text
-		})
+
+	if sensitive {
+		// TODO use bullet characters if user wants it once bug is fixed - see NOTES.md
+		inputModal.GetForm().AddPasswordField("", "", 0, '*',
+			func(text string) {
+				// Store for use later
+				inputModalText = text
+			})
+	} else {
+		inputModal.GetForm().AddInputField("", "", 0, nil,
+			func(text string) {
+				inputModalText = text
+			})
+	}
 
 	inputModal.SetText(prompt + " ")
 	panels.ShowPanel("input")

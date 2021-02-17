@@ -137,6 +137,28 @@ scrollbar = "auto"
 # bind_link9 = "9"
 # bind_link0 = "0"
 
+# All keybindings:
+#
+# bind_bottom
+# bind_edit
+# bind_home
+# bind_bookmarks
+# bind_add_bookmark
+# bind_save
+# bind_reload
+# bind_back
+# bind_forward
+# bind_pgup
+# bind_pgdn
+# bind_new_tab
+# bind_close_tab
+# bind_next_tab
+# bind_prev_tab
+# bind_quit
+# bind_help
+# bind_sub: for viewing the subscriptions page
+# bind_add_sub
+
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.
 # E.g. to open FTP URLs with FileZilla set the following key:

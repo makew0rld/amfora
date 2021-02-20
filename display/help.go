@@ -61,6 +61,7 @@ func Help() {
 func helpInit() {
 	// Populate help table
 	helpTable.SetBackgroundColor(config.GetColor("bg"))
+	helpTable.SetTextColor(config.GetColor("regular_text"))
 	helpTable.SetPadding(0, 0, 1, 1)
 	helpTable.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEsc || key == tcell.KeyEnter {

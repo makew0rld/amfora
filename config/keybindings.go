@@ -121,7 +121,7 @@ func parseBinding(cmd Command, binding string) {
 		binding = binding[4:]
 	}
 
-	if len(binding) == 1 {
+	if len([]rune(binding)) == 1 {
 		k = tcell.KeyRune
 		r = []rune(binding)[0]
 	} else if len(binding) == 0 {

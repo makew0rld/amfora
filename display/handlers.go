@@ -1,15 +1,12 @@
 package display
 
 import (
-	"bytes"
 	"errors"
-	"io"
 	"mime"
 	"net"
 	"net/url"
 	"os/exec"
 	"path"
-	"strconv"
 	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/cache"
@@ -21,7 +18,6 @@ import (
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
 	"github.com/makeworld-the-better-one/amfora/webbrowser"
 	"github.com/makeworld-the-better-one/go-gemini"
-	"github.com/makeworld-the-better-one/go-isemoji"
 	"github.com/spf13/viper"
 )
 
@@ -88,81 +84,6 @@ func handleOther(u string) {
 		}
 	}
 	App.Draw()
-}
-
-// handleFavicon handles getting and displaying a favicon.
-func handleFavicon(t *tab, host string) {
-	defer func() {
-		// Update display if needed
-		if t.page.Favicon != "" && isValidTab(t) {
-			browser.SetTabLabel(strconv.Itoa(tabNumber(t)), makeTabLabel(t.page.Favicon))
-			App.Draw()
-		}
-	}()
-
-	if !viper.GetBool("a-general.emoji_favicons") {
-		// Not enabled
-		return
-	}
-	if t.page.Favicon != "" {
-		return
-	}
-	if host == "" {
-		return
-	}
-
-	fav := cache.GetFavicon(host)
-	if fav == cache.KnownNoFavicon {
-		// It's been cached that this host doesn't have a favicon
-		return
-	}
-	if fav != "" {
-		t.page.Favicon = fav
-		return
-	}
-
-	// No favicon cached
-	res, err := client.Fetch("gemini://" + host + "/favicon.txt")
-	if err != nil {
-		if res != nil {
-			res.Body.Close()
-		}
-		cache.AddFavicon(host, cache.KnownNoFavicon)
-		return
-	}
-	defer res.Body.Close()
-
-	if res.Status != 20 {
-		cache.AddFavicon(host, cache.KnownNoFavicon)
-		return
-	}
-	if !strings.HasPrefix(res.Meta, "text/") && res.Meta != "" {
-		// Not a textual page
-		cache.AddFavicon(host, cache.KnownNoFavicon)
-		return
-	}
-	// It's a regular plain response
-
-	buf := new(bytes.Buffer)
-	_, err = io.CopyN(buf, res.Body, 29+2+1) // 29 is the max emoji length, +2 for CRLF, +1 so that the right size will EOF
-	if err == nil {
-		// Content was too large
-		cache.AddFavicon(host, cache.KnownNoFavicon)
-		return
-	} else if err != io.EOF {
-		// Some network reading error
-		// No favicon is NOT known, could be a temporary error
-		return
-	}
-	// EOF, which is what we want.
-	emoji := strings.TrimRight(buf.String(), "\r\n")
-	if !isemoji.IsEmoji(emoji) {
-		cache.AddFavicon(host, cache.KnownNoFavicon)
-		return
-	}
-	// Valid favicon found
-	t.page.Favicon = emoji
-	cache.AddFavicon(host, emoji)
 }
 
 // handleAbout can be called to deal with any URLs that start with

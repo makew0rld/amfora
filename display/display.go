@@ -545,10 +545,8 @@ func Reload() {
 		return
 	}
 
-	parsed, _ := url.Parse(tabs[curTab].page.URL)
 	go func(t *tab) {
 		cache.RemovePage(tabs[curTab].page.URL)
-		cache.RemoveFavicon(parsed.Host)
 		handleURL(t, t.page.URL, 0) // goURL is not used bc history shouldn't be added to
 		if t == tabs[curTab] {
 			// Display the bottomBar state that handleURL set

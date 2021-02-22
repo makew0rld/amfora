@@ -118,11 +118,6 @@ func setPage(t *tab, p *structs.Page) {
 	browser.SetTabLabel(strconv.Itoa(tabNum), makeTabLabel(strconv.Itoa(tabNum+1)))
 	App.Draw()
 
-	go func() {
-		parsed, _ := url.Parse(p.URL)
-		handleFavicon(t, parsed.Host)
-	}()
-
 	// Setup display
 	App.SetFocus(t.view)
 

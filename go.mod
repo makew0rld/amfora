@@ -8,7 +8,6 @@ require (
 	github.com/gdamore/tcell/v2 v2.1.1-0.20210125004847-19e17097d8fe
 	github.com/google/go-cmp v0.5.0 // indirect
 	github.com/makeworld-the-better-one/go-gemini v0.11.0
-	github.com/makeworld-the-better-one/go-isemoji v1.1.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
 	github.com/mmcdole/gofeed v1.1.0
@@ -25,6 +24,7 @@ require (
 	golang.org/x/text v0.3.5
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
 
 replace github.com/mmcdole/gofeed => github.com/makeworld-the-better-one/gofeed v1.1.1-0.20201123002655-c0c6354134fe

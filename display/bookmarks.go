@@ -78,7 +78,7 @@ func bkmkInit() {
 // It also accepts a bool indicating whether this page already has a bookmark.
 // It returns the bookmark name and the bookmark action:
 // 1, 0, -1 for add/update, cancel, and remove
-func openBkmkModal(name string, exists bool, favicon string) (string, int) {
+func openBkmkModal(name string, exists bool) (string, int) {
 	// Basically a copy of Input()
 
 	// Reset buttons before input field, to make sure the input is in focus
@@ -93,9 +93,7 @@ func openBkmkModal(name string, exists bool, favicon string) (string, int) {
 
 	// Remove and re-add input field - to clear the old text
 	bkmkModal.GetForm().Clear(false)
-	if favicon != "" && !exists {
-		name = favicon + " " + name
-	}
+
 	bkmkModalText = name
 	bkmkModal.GetForm().AddInputField("Name: ", name, 0, nil,
 		func(text string) {
@@ -152,7 +150,7 @@ func addBookmark() {
 	}
 	name, exists := bookmarks.Get(p.URL)
 	// Open a bookmark modal with the current name of the bookmark, if it exists
-	newName, action := openBkmkModal(name, exists, p.Favicon)
+	newName, action := openBkmkModal(name, exists)
 	switch action {
 	case 1:
 		// Add/change the bookmark

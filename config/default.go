@@ -70,9 +70,6 @@ page_max_size = 2097152  # 2 MiB
 # Max time it takes to load a page in seconds - after that a download window pops up
 page_max_time = 10
 
-# Whether to replace tab numbers with emoji favicons, which are cached.
-emoji_favicons = false
-
 # When a scrollbar appears. "never", "auto", and "always" are the only valid values.
 # "auto" means the scrollbar only appears when the page is longer than the window.
 scrollbar = "auto"

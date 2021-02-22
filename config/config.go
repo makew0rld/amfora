@@ -207,7 +207,6 @@ func Init() error {
 	viper.SetDefault("a-general.temp_downloads", "")
 	viper.SetDefault("a-general.page_max_size", 2097152)
 	viper.SetDefault("a-general.page_max_time", 10)
-	viper.SetDefault("a-general.emoji_favicons", false)
 	viper.SetDefault("a-general.scrollbar", "auto")
 	viper.SetDefault("keybindings.bind_reload", []string{"R", "Ctrl-R"})
 	viper.SetDefault("keybindings.bind_home", "Backspace")

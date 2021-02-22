@@ -32,7 +32,6 @@ type Page struct {
 	Selected     string    // The current text or link selected
 	SelectedID   string    // The cview region ID for the selected text/link
 	Mode         PageMode
-	Favicon      string
 	MadeAt       time.Time // When the page was made. Zero value indicates it should stay in cache forever.
 }
 

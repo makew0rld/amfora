@@ -187,7 +187,7 @@ func Init(version, commit, builtBy string) {
 					if i <= len(tabs[tab].page.Links) && i > 0 {
 						// Open new tab and load link
 						oldTab := tab
-						NewTab()
+						NewTab(false)
 						// Resolve and follow link manually
 						prevParsed, _ := url.Parse(tabs[oldTab].page.URL)
 						nextParsed, err := url.Parse(tabs[oldTab].page.Links[i-1])
@@ -372,10 +372,10 @@ func Init(version, commit, builtBy string) {
 					Error("URL Error", err.Error())
 					return nil
 				}
-				NewTab()
+				NewTab(false)
 				URL(next)
 			} else {
-				NewTab()
+				NewTab(true)
 			}
 			return nil
 		case config.CmdCloseTab:
@@ -420,7 +420,7 @@ func Stop() {
 
 // NewTab opens a new tab and switches to it, displaying the
 // the default empty content because there's no URL.
-func NewTab() {
+func NewTab(showNewTab bool) {
 	// Create TextView and change curTab
 	// Set the TextView options, and the changed func to App.Draw()
 	// SetDoneFunc to do link highlighting
@@ -438,10 +438,12 @@ func NewTab() {
 	curTab = NumTabs()
 
 	tabs = append(tabs, makeNewTab())
-	temp := newTabPage // Copy
-	setPage(tabs[curTab], &temp)
-	tabs[curTab].addToHistory("about:newtab")
-	tabs[curTab].history.pos = 0 // Manually set as first page
+	if showNewTab {
+		temp := newTabPage // Copy
+		setPage(tabs[curTab], &temp)
+		tabs[curTab].addToHistory("about:newtab")
+		tabs[curTab].history.pos = 0 // Manually set as first page
+	}
 
 	browser.AddTab(strconv.Itoa(curTab), makeTabLabel(strconv.Itoa(curTab+1)), makeContentLayout(tabs[curTab].view))
 	browser.SetCurrentTab(strconv.Itoa(curTab))

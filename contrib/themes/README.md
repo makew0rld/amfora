@@ -21,6 +21,17 @@ Contributed by **[@crdpa](https://github.com/crdpa)**.
 ![screenshot of dracula theme](https://user-images.githubusercontent.com/61637474/99983210-53d2e900-2d8a-11eb-9ab7-12dc10c2933a.png)
 </details>
 
+## Greyscale Light
+
+Contributed by **[@leifmetcalf](https://github.com/leifmetcalf)**.
+![screenshot of greyscale light theme](https://user-images.githubusercontent.com/35786377/109232516-53d10200-782d-11eb-9863-4bb745d27195.png)
+
+<details>
+<summary>More screenshots</summary>
+
+![screenshot of greyscale light theme](https://user-images.githubusercontent.com/35786377/109232522-55022f00-782d-11eb-93a2-4d50c61317c5.png)
+</details>
+
 ## Gruvbox
 
 Contributed by **[@Skraylet](https://github.com/Skraylet)**.

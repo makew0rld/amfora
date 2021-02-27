@@ -32,10 +32,10 @@ var tofuDBDir string
 var tofuDBPath string
 
 // Bookmarks
-
-var BkmkStore = viper.New()
+var BkmkStore = viper.New() // TOML API for old bookmarks file
 var bkmkDir string
-var bkmkPath string
+var OldBkmkPath string // Old bookmarks file that used TOML format
+var BkmkPath string    // New XBEL (XML) bookmarks file, see #68
 
 var DownloadsDir string
 var TempDownloadsDir string
@@ -111,7 +111,8 @@ func Init() error {
 		// XDG data dir on POSIX systems
 		bkmkDir = filepath.Join(basedir.DataHome, "amfora")
 	}
-	bkmkPath = filepath.Join(bkmkDir, "bookmarks.toml")
+	OldBkmkPath = filepath.Join(bkmkDir, "bookmarks.toml")
+	BkmkPath = filepath.Join(bkmkDir, "bookmarks.xml")
 
 	// Feeds dir and path
 	if runtime.GOOS == "windows" {
@@ -160,10 +161,8 @@ func Init() error {
 	if err != nil {
 		return err
 	}
-	f, err = os.OpenFile(bkmkPath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
-	if err == nil {
-		f.Close()
-	}
+	// OldBkmkPath isn't created because it shouldn't be there anyway
+
 	// Feeds
 	err = os.MkdirAll(subscriptionDir, 0755)
 	if err != nil {
@@ -179,16 +178,12 @@ func Init() error {
 		return err
 	}
 
-	BkmkStore.SetConfigFile(bkmkPath)
+	BkmkStore.SetConfigFile(OldBkmkPath)
 	BkmkStore.SetConfigType("toml")
 	err = BkmkStore.ReadInConfig()
 	if err != nil {
-		return err
-	}
-	BkmkStore.Set("DO NOT TOUCH", true)
-	err = BkmkStore.WriteConfig()
-	if err != nil {
-		return err
+		// File doesn't exist, so remove the viper
+		BkmkStore = nil
 	}
 
 	// Setup main config

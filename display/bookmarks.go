@@ -15,9 +15,18 @@ import (
 // For adding and removing bookmarks, basically a clone of the input modal.
 var bkmkModal = cview.NewModal()
 
+type bkmkAction int
+
+const (
+	add bkmkAction = iota
+	change
+	cancel
+	remove
+)
+
 // bkmkCh is for the user action
-var bkmkCh = make(chan int) // 1, 0, -1 for add/update, cancel, and remove
-var bkmkModalText string    // The current text of the input field in the modal
+var bkmkCh = make(chan bkmkAction)
+var bkmkModalText string // The current text of the input field in the modal
 
 func bkmkInit() {
 	panels.AddPanel("bkmk", bkmkModal, false, false)
@@ -60,15 +69,15 @@ func bkmkInit() {
 	m.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		switch buttonLabel {
 		case "Add":
-			bkmkCh <- 1
+			bkmkCh <- add
 		case "Change":
-			bkmkCh <- 1
+			bkmkCh <- change
 		case "Remove":
-			bkmkCh <- -1
+			bkmkCh <- remove
 		case "Cancel":
-			bkmkCh <- 0
+			bkmkCh <- cancel
 		case "":
-			bkmkCh <- 0
+			bkmkCh <- cancel
 		}
 	})
 }
@@ -76,9 +85,8 @@ func bkmkInit() {
 // Bkmk displays the "Add a bookmark" modal.
 // It accepts the default value for the bookmark name that will be displayed, but can be changed by the user.
 // It also accepts a bool indicating whether this page already has a bookmark.
-// It returns the bookmark name and the bookmark action:
-// 1, 0, -1 for add/update, cancel, and remove
-func openBkmkModal(name string, exists bool) (string, int) {
+// It returns the bookmark name and the bookmark action.
+func openBkmkModal(name string, exists bool) (string, bkmkAction) {
 	// Basically a copy of Input()
 
 	// Reset buttons before input field, to make sure the input is in focus
@@ -152,11 +160,12 @@ func addBookmark() {
 	// Open a bookmark modal with the current name of the bookmark, if it exists
 	newName, action := openBkmkModal(name, exists)
 	switch action {
-	case 1:
-		// Add/change the bookmark
-		bookmarks.Set(p.URL, newName)
-	case -1:
+	case add:
+		bookmarks.Add(p.URL, newName)
+	case change:
+		bookmarks.Change(p.URL, newName)
+	case remove:
 		bookmarks.Remove(p.URL)
 	}
-	// Other case is action = 0, meaning "Cancel", so nothing needs to happen
+	// Other case is action == cancel, so nothing needs to happen
 }

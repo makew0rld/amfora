@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/makeworld-the-better-one/amfora/bookmarks"
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/display"
@@ -44,13 +45,18 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Config error: %v\n", err)
 		os.Exit(1)
 	}
+	client.Init()
+
 	err = subscriptions.Init()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "subscriptions.json error: %v\n", err)
 		os.Exit(1)
 	}
-
-	client.Init()
+	err = bookmarks.Init()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "bookmarks.xml error: %v\n", err)
+		os.Exit(1)
+	}
 
 	// Initialize lower-level cview app
 	if err = display.App.Init(); err != nil {

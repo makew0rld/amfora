@@ -65,7 +65,7 @@ func Init() error {
 				"couldn't delete old bookmarks file (%s), you must delete it yourself to prevent duplicate bookmarks: %w",
 				config.OldBkmkPath,
 				err,
-			) //nolint:goerr113
+			) //nolint:goerr113,nolintlint
 		}
 		config.BkmkStore = nil
 	}

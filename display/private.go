@@ -24,7 +24,6 @@ func followLink(t *tab, prev, next string) {
 	}
 
 	if t.hasContent() {
-		t.saveScroll() // Likely called later on, it's here just in case
 		nextURL, err := resolveRelLink(t, prev, next)
 		if err != nil {
 			Error("URL Error", err.Error())
@@ -48,7 +47,7 @@ func followLink(t *tab, prev, next string) {
 // It will not waste resources if the passed page is already fitted to the current terminal width, and can be
 // called safely even when the page might be already formatted properly.
 func reformatPage(p *structs.Page) {
-	if p.Width == termW {
+	if p.TermWidth == termW {
 		// No changes to make
 		return
 	}
@@ -65,7 +64,7 @@ func reformatPage(p *structs.Page) {
 			strings.HasPrefix(p.URL, "file") {
 			proxied = false
 		}
-		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), proxied)
+		rendered, _, _ = renderer.RenderGemini(p.Raw, textWidth(), proxied)
 	case structs.TextPlain:
 		rendered = renderer.RenderPlainText(p.Raw)
 	case structs.TextAnsi:
@@ -75,17 +74,16 @@ func reformatPage(p *structs.Page) {
 		return
 	}
 	p.Content = rendered
-	p.Width = termW
+	p.TermWidth = termW
 }
 
 // reformatPageAndSetView is for reformatting a page that is already being displayed.
 // setPage should be used when a page is being loaded for the first time.
 func reformatPageAndSetView(t *tab, p *structs.Page) {
-	if p.Width == termW {
+	if p.TermWidth == termW {
 		// No changes to make
 		return
 	}
-	t.saveScroll()
 	reformatPage(p)
 	t.view.SetText(p.Content)
 	t.applyScroll() // Go back to where you were, roughly
@@ -101,8 +99,6 @@ func setPage(t *tab, p *structs.Page) {
 		return
 	}
 
-	t.saveScroll() // Save the scroll of the previous page
-
 	// Make sure the page content is fitted to the terminal every time it's displayed
 	reformatPage(p)
 
@@ -112,10 +108,13 @@ func setPage(t *tab, p *structs.Page) {
 	t.view.SetText(p.Content)
 	t.view.Highlight("") // Turn off highlights, other funcs may restore if necessary
 	t.view.ScrollToBeginning()
-
-	// Set tab number in case a favicon from before overwrote it
+	// Reset page left margin
 	tabNum := tabNumber(t)
-	browser.SetTabLabel(strconv.Itoa(tabNum), makeTabLabel(strconv.Itoa(tabNum+1)))
+	browser.AddTab(
+		strconv.Itoa(tabNum),
+		makeTabLabel(strconv.Itoa(tabNum+1)),
+		makeContentLayout(t.view, leftMargin()),
+	)
 	App.Draw()
 
 	// Setup display

@@ -72,7 +72,11 @@ func Init(version, commit, builtBy string) {
 			reformatMu.Lock() // Only allow one reformat job at a time
 			for i := range tabs {
 				// Overwrite all tabs with a new, differently sized, left margin
-				browser.AddTab(strconv.Itoa(i), makeTabLabel(strconv.Itoa(i+1)), makeContentLayout(tabs[i].view))
+				browser.AddTab(
+					strconv.Itoa(i),
+					makeTabLabel(strconv.Itoa(i+1)),
+					makeContentLayout(tabs[i].view, leftMargin()),
+				)
 				if tabs[i] == t {
 					// Reformat page ASAP, in the middle of loop
 					reformatPageAndSetView(t, t.page)
@@ -128,8 +132,6 @@ func Init(version, commit, builtBy string) {
 
 	bottomBar.SetDoneFunc(func(key tcell.Key) {
 		tab := curTab
-
-		tabs[tab].saveScroll()
 
 		// Reset func to set the bottomBar back to what it was before
 		// Use for errors.
@@ -247,14 +249,15 @@ func Init(version, commit, builtBy string) {
 	// Render the default new tab content ONCE and store it for later
 	// This code is repeated in Reload()
 	newTabContent := getNewTabContent()
-	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), false)
+	renderedNewTabContent, newTabLinks, maxPreCols := renderer.RenderGemini(newTabContent, textWidth(), false)
 	newTabPage = structs.Page{
-		Raw:       newTabContent,
-		Content:   renderedNewTabContent,
-		Links:     newTabLinks,
-		URL:       "about:newtab",
-		Width:     -1, // Force reformatting on first display
-		Mediatype: structs.TextGemini,
+		Raw:        newTabContent,
+		Content:    renderedNewTabContent,
+		MaxPreCols: maxPreCols,
+		Links:      newTabLinks,
+		URL:        "about:newtab",
+		TermWidth:  -1, // Force reformatting on first display
+		Mediatype:  structs.TextGemini,
 	}
 
 	modalInit()
@@ -432,7 +435,6 @@ func NewTab() {
 		tabs[curTab].view.Highlight("")
 		// Save bottomBar state
 		tabs[curTab].saveBottomBar()
-		tabs[curTab].saveScroll()
 	}
 
 	curTab = NumTabs()
@@ -443,7 +445,11 @@ func NewTab() {
 	tabs[curTab].addToHistory("about:newtab")
 	tabs[curTab].history.pos = 0 // Manually set as first page
 
-	browser.AddTab(strconv.Itoa(curTab), makeTabLabel(strconv.Itoa(curTab+1)), makeContentLayout(tabs[curTab].view))
+	browser.AddTab(
+		strconv.Itoa(curTab),
+		makeTabLabel(strconv.Itoa(curTab+1)),
+		makeContentLayout(tabs[curTab].view, leftMargin()),
+	)
 	browser.SetCurrentTab(strconv.Itoa(curTab))
 	App.SetFocus(tabs[curTab].view)
 
@@ -506,7 +512,6 @@ func SwitchTab(tab int) {
 	if curTab > -1 {
 		// Save bottomBar state
 		tabs[curTab].saveBottomBar()
-		tabs[curTab].saveScroll()
 	}
 
 	curTab = tab % NumTabs()
@@ -527,14 +532,15 @@ func Reload() {
 		// Re-render new tab, similar to Init()
 		newTabContent := getNewTabContent()
 		tmpTermW := termW
-		renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), false)
+		renderedNewTabContent, newTabLinks, maxPreCols := renderer.RenderGemini(newTabContent, textWidth(), false)
 		newTabPage = structs.Page{
-			Raw:       newTabContent,
-			Content:   renderedNewTabContent,
-			Links:     newTabLinks,
-			URL:       "about:newtab",
-			Width:     tmpTermW,
-			Mediatype: structs.TextGemini,
+			Raw:        newTabContent,
+			Content:    renderedNewTabContent,
+			MaxPreCols: maxPreCols,
+			Links:      newTabLinks,
+			URL:        "about:newtab",
+			TermWidth:  tmpTermW,
+			Mediatype:  structs.TextGemini,
 		}
 		temp := newTabPage // Copy
 		setPage(tabs[curTab], &temp)

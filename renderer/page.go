@@ -118,13 +118,14 @@ func MakePage(url string, res *gemini.Response, width int, proxied bool) (*struc
 	}
 
 	if mediatype == "text/gemini" {
-		rendered, links := RenderGemini(utfText, width, proxied)
+		rendered, links, maxPreCols := RenderGemini(utfText, width, proxied)
 		return &structs.Page{
 			Mediatype:    structs.TextGemini,
 			RawMediatype: mediatype,
 			URL:          url,
 			Raw:          utfText,
 			Content:      rendered,
+			MaxPreCols:   maxPreCols,
 			Links:        links,
 			MadeAt:       time.Now(),
 		}, nil
@@ -137,6 +138,7 @@ func MakePage(url string, res *gemini.Response, width int, proxied bool) (*struc
 				URL:          url,
 				Raw:          utfText,
 				Content:      RenderANSI(utfText),
+				MaxPreCols:   -1,
 				Links:        []string{},
 				MadeAt:       time.Now(),
 			}, nil
@@ -149,6 +151,7 @@ func MakePage(url string, res *gemini.Response, width int, proxied bool) (*struc
 			URL:          url,
 			Raw:          utfText,
 			Content:      RenderPlainText(utfText),
+			MaxPreCols:   -1,
 			Links:        []string{},
 			MadeAt:       time.Now(),
 		}, nil

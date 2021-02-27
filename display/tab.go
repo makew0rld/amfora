@@ -121,6 +121,58 @@ func makeNewTab() *tab {
 			tabs[tab].page.SelectedID = strconv.Itoa(index)
 		}
 	})
+	t.view.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		// Capture left/right scrolling and change the left margin size accordingly
+		// See #197
+		// Up/down scrolling is saved in this func to keep them in sync, but the keys
+		// are passed and no extra behaviour happens.
+
+		key := event.Key()
+		mod := event.Modifiers()
+		ru := event.Rune()
+
+		oldCol := t.page.Column
+
+		if (key == tcell.KeyRight && mod == tcell.ModNone) ||
+			(key == tcell.KeyRune && mod == tcell.ModNone && ru == 'l') {
+			// Scrolling to the right
+			// TODO check if already scrolled to the end
+			t.page.Column++
+		} else if (key == tcell.KeyLeft && mod == tcell.ModNone) ||
+			(key == tcell.KeyRune && mod == tcell.ModNone && ru == 'h') {
+			// Scrolling to the left
+			if t.page.Column == 0 {
+				// Can't scroll to the left anymore
+				return nil
+			}
+			t.page.Column--
+		} else if (key == tcell.KeyUp && mod == tcell.ModNone) ||
+			(key == tcell.KeyRune && mod == tcell.ModNone && ru == 'k') {
+			// Scrolling up
+			if t.page.Row > 0 {
+				t.page.Row--
+			}
+			return event
+		} else if (key == tcell.KeyDown && mod == tcell.ModNone) ||
+			(key == tcell.KeyRune && mod == tcell.ModNone && ru == 'j') {
+			// Scrolling down
+			// TODO need to check for max vertical scroll before doing this
+			return event
+		} else {
+			// Some other key, stop processing it
+			return event
+		}
+
+		if t.page.MaxPreCols <= termW && t.page.MaxPreCols > -1 {
+			// No scrolling is actually necessary
+			t.page.Column = oldCol // Reset
+			return nil             // Ignore keys
+		}
+
+		t.applyHorizontalScroll()
+		App.Draw()
+		return nil
+	})
 
 	return &t
 }
@@ -167,19 +219,39 @@ func (t *tab) hasContent() bool {
 	return true
 }
 
-// saveScroll saves where in the page the user was.
-// It should be used whenever moving from one page to another.
-func (t *tab) saveScroll() {
-	// It will also be saved in the cache because the cache uses the same pointer
-	row, col := t.view.GetScrollOffset()
-	t.page.Row = row
-	t.page.Column = col
+// applyHorizontalScroll handles horizontal scroll logic including left margin resizing,
+// see #197 for details. Use applyScroll instead.
+//
+// In certain cases it will still use and apply the saved Row.
+func (t *tab) applyHorizontalScroll() {
+	i := tabNumber(t)
+	if i == -1 {
+		// Tab is not actually being used and should not be (re)added to the browser
+		return
+	}
+	if t.page.Column >= leftMargin() {
+		// Scrolled to the right far enough that no left margin is needed
+		browser.AddTab(
+			strconv.Itoa(i),
+			makeTabLabel(strconv.Itoa(i+1)),
+			makeContentLayout(t.view, 0),
+		)
+		t.view.ScrollTo(t.page.Row, t.page.Column-leftMargin())
+	} else {
+		// Left margin is still needed, but is not necessarily at the right size by default
+		browser.AddTab(
+			strconv.Itoa(i),
+			makeTabLabel(strconv.Itoa(i+1)),
+			makeContentLayout(t.view, leftMargin()-t.page.Column),
+		)
+	}
 }
 
 // applyScroll applies the saved scroll values to the page and tab.
 // It should only be used when going backward and forward.
 func (t *tab) applyScroll() {
-	t.view.ScrollTo(t.page.Row, t.page.Column)
+	t.view.ScrollTo(t.page.Row, 0)
+	t.applyHorizontalScroll()
 }
 
 // saveBottomBar saves the current bottomBar values in the tab.

@@ -59,23 +59,25 @@ func handleFile(u string) (*structs.Page, bool) {
 		}
 
 		if mimetype == "text/gemini" {
-			rendered, links := renderer.RenderGemini(string(content), textWidth(), false)
+			rendered, links, maxPreCols := renderer.RenderGemini(string(content), textWidth(), false)
 			page = &structs.Page{
-				Mediatype: structs.TextGemini,
-				URL:       u,
-				Raw:       string(content),
-				Content:   rendered,
-				Links:     links,
-				Width:     termW,
+				Mediatype:  structs.TextGemini,
+				URL:        u,
+				Raw:        string(content),
+				Content:    rendered,
+				MaxPreCols: maxPreCols,
+				Links:      links,
+				TermWidth:  termW,
 			}
 		} else {
 			page = &structs.Page{
-				Mediatype: structs.TextPlain,
-				URL:       u,
-				Raw:       string(content),
-				Content:   renderer.RenderPlainText(string(content)),
-				Links:     []string{},
-				Width:     termW,
+				Mediatype:  structs.TextPlain,
+				URL:        u,
+				Raw:        string(content),
+				Content:    renderer.RenderPlainText(string(content)),
+				MaxPreCols: -1,
+				Links:      []string{},
+				TermWidth:  termW,
 			}
 		}
 	}
@@ -107,14 +109,15 @@ func createDirectoryListing(u string) (*structs.Page, bool) {
 		content += fmt.Sprintf("=> %s%s %s%s\n", f.Name(), separator, f.Name(), separator)
 	}
 
-	rendered, links := renderer.RenderGemini(content, textWidth(), false)
+	rendered, links, maxPreCols := renderer.RenderGemini(content, textWidth(), false)
 	page = &structs.Page{
-		Mediatype: structs.TextGemini,
-		URL:       u,
-		Raw:       content,
-		Content:   rendered,
-		Links:     links,
-		Width:     termW,
+		Mediatype:  structs.TextGemini,
+		URL:        u,
+		Raw:        content,
+		Content:    rendered,
+		MaxPreCols: maxPreCols,
+		Links:      links,
+		TermWidth:  termW,
 	}
 	return page, true
 }

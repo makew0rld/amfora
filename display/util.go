@@ -14,13 +14,15 @@ import (
 // This file contains funcs that are small, self-contained utilities.
 
 // makeContentLayout returns a flex that contains the given TextView
-// along with the current correct left margin, as well as a single empty
+// along with the provided left margin, as well as a single empty
 // line at the top, for a top margin.
-func makeContentLayout(tv *cview.TextView) *cview.Flex {
+func makeContentLayout(tv *cview.TextView, leftMargin int) *cview.Flex {
 	// Create horizontal flex with the left margin as an empty space
 	horiz := cview.NewFlex()
 	horiz.SetDirection(cview.FlexColumn)
-	horiz.AddItem(nil, leftMargin(), 0, false)
+	if leftMargin > 0 {
+		horiz.AddItem(nil, leftMargin, 0, false)
+	}
 	horiz.AddItem(tv, 0, 1, true)
 
 	// Create a vertical flex with the other one and a top margin

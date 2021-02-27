@@ -149,14 +149,15 @@ func Subscriptions(t *tab, u string) string {
 		}
 	}
 
-	content, links := renderer.RenderGemini(rawPage, textWidth(), false)
+	content, links, maxPreCols := renderer.RenderGemini(rawPage, textWidth(), false)
 	page := structs.Page{
-		Raw:       rawPage,
-		Content:   content,
-		Links:     links,
-		URL:       u,
-		Width:     termW,
-		Mediatype: structs.TextGemini,
+		Raw:        rawPage,
+		Content:    content,
+		MaxPreCols: maxPreCols,
+		Links:      links,
+		URL:        u,
+		TermWidth:  termW,
+		Mediatype:  structs.TextGemini,
 	}
 	go cache.AddPage(&page)
 	setPage(t, &page)
@@ -191,14 +192,15 @@ func ManageSubscriptions(t *tab, u string) {
 		)
 	}
 
-	content, links := renderer.RenderGemini(rawPage, textWidth(), false)
+	content, links, maxPreCols := renderer.RenderGemini(rawPage, textWidth(), false)
 	page := structs.Page{
-		Raw:       rawPage,
-		Content:   content,
-		Links:     links,
-		URL:       "about:manage-subscriptions",
-		Width:     termW,
-		Mediatype: structs.TextGemini,
+		Raw:        rawPage,
+		Content:    content,
+		MaxPreCols: maxPreCols,
+		Links:      links,
+		URL:        "about:manage-subscriptions",
+		TermWidth:  termW,
+		Mediatype:  structs.TextGemini,
 	}
 	go cache.AddPage(&page)
 	setPage(t, &page)

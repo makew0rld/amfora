@@ -25,10 +25,11 @@ type Page struct {
 	RawMediatype string    // The actual mediatype sent by the server
 	Raw          string    // The raw response, as received over the network
 	Content      string    // The processed content, NOT raw. Uses cview color tags. It will also have a left margin.
+	MaxPreCols   int       // The amount of the terminal columns the longest preformatted line in Raw takes up, used for #197. -1 means infinite length lines, AKA always allow scrolling.
 	Links        []string  // URLs, for each region in the content.
-	Row          int       // Scroll position
-	Column       int       // ditto
-	Width        int       // The terminal width when the Content was set, to know when reformatting should happen.
+	Row          int       // Vertical scroll position
+	Column       int       // Horizontal scroll position - does not map exactly to a cview.TextView because it includes left margin size changes, see #197
+	TermWidth    int       // The terminal width when the Content was set, to know when reformatting should happen.
 	Selected     string    // The current text or link selected
 	SelectedID   string    // The cview region ID for the selected text/link
 	Mode         PageMode

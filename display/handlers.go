@@ -337,7 +337,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			return ret("", false)
 		}
 
-		page.Width = termW
+		page.TermWidth = termW
 
 		if !client.HasClientCert(parsed.Host) {
 			// Don't cache pages with client certs

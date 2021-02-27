@@ -23,6 +23,8 @@ type xbelBookmark struct {
 // xbelFolder is unused as folders aren't supported by the UI yet.
 // Follow #56 for details.
 // https://github.com/makeworld-the-better-one/amfora/issues/56
+//
+//nolint:unused
 type xbelFolder struct {
 	XMLName   xml.Name        `xml:"folder"`
 	Version   string          `xml:"version,attr"`

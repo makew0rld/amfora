@@ -157,7 +157,6 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [ ] Stream support
 - [ ] Table of contents for pages
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>
-- [ ] Support Markdown rendering
 - [ ] Persistent history
 
 

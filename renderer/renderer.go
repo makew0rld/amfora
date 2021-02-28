@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/config"
-	"github.com/mattn/go-runewidth"
 	"github.com/spf13/viper"
 	"gitlab.com/tslocum/cview"
 )
@@ -268,19 +267,18 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 }
 
 // RenderGemini converts text/gemini into a cview displayable format.
-// It also returns a slice of link URLs, and the Page.MaxPreCols value.
+// It also returns a slice of link URLs.
 //
 // width is the number of columns to wrap to.
 // leftMargin is the number of blank spaces to prepend to each line.
 //
 // proxied is whether the request is through the gemini:// scheme.
 // If it's not a gemini:// page, set this to true.
-func RenderGemini(s string, width int, proxied bool) (string, []string, int) {
+func RenderGemini(s string, width int, proxied bool) (string, []string) {
 	s = cview.Escape(s)
 
 	lines := strings.Split(s, "\n")
 	links := make([]string, 0)
-	maxPreCols := 0
 
 	// Process and wrap non preformatted lines
 	rendered := "" // Final result
@@ -289,10 +287,6 @@ func RenderGemini(s string, width int, proxied bool) (string, []string, int) {
 
 	// processPre is for rendering preformatted blocks
 	processPre := func() {
-		lineWidth := runewidth.StringWidth(buf)
-		if lineWidth > maxPreCols {
-			maxPreCols = lineWidth
-		}
 
 		// Support ANSI color codes in preformatted blocks - see #59
 		if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
@@ -354,5 +348,5 @@ func RenderGemini(s string, width int, proxied bool) (string, []string, int) {
 		processRegular()
 	}
 
-	return rendered, links, maxPreCols
+	return rendered, links
 }

@@ -34,14 +34,13 @@ func aboutInit(version, commit, builtBy string) {
 }
 
 func createAboutPage(url string, content string) structs.Page {
-	renderContent, links, maxPreCols := renderer.RenderGemini(content, textWidth(), false)
+	renderContent, links := renderer.RenderGemini(content, textWidth(), false)
 	return structs.Page{
-		Raw:        content,
-		Content:    renderContent,
-		MaxPreCols: maxPreCols,
-		Links:      links,
-		URL:        url,
-		TermWidth:  -1, // Force reformatting on first display
-		Mediatype:  structs.TextGemini,
+		Raw:       content,
+		Content:   renderContent,
+		Links:     links,
+		URL:       url,
+		TermWidth: -1, // Force reformatting on first display
+		Mediatype: structs.TextGemini,
 	}
 }

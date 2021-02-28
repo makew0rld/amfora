@@ -122,8 +122,7 @@ func makeNewTab() *tab {
 		}
 	})
 	t.view.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		// Capture left/right scrolling and change the left margin size accordingly
-		// See #197
+		// Capture left/right scrolling and change the left margin size accordingly, see #197
 		// Up/down scrolling is saved in this func to keep them in sync, but the keys
 		// are passed and no extra behaviour happens.
 
@@ -131,12 +130,33 @@ func makeNewTab() *tab {
 		mod := event.Modifiers()
 		ru := event.Rune()
 
-		oldCol := t.page.Column
+		width, height := t.view.TextDimensions()
+		_, _, boxW, boxH := t.view.GetInnerRect()
+
+		// Make boxW accurate by subtracting one if a scrollbar is covering the last
+		// column of text
+		if config.ScrollBar == cview.ScrollBarAlways ||
+			(config.ScrollBar == cview.ScrollBarAuto && height > boxH) {
+			boxW--
+		}
 
 		if (key == tcell.KeyRight && mod == tcell.ModNone) ||
 			(key == tcell.KeyRune && mod == tcell.ModNone && ru == 'l') {
 			// Scrolling to the right
-			// TODO check if already scrolled to the end
+
+			if t.page.Column >= leftMargin() {
+				// Scrolled right far enought that no left margin is needed
+				if (t.page.Column-leftMargin())+boxW >= width {
+					// And scrolled as far as possible to the right
+					return nil
+				}
+			} else {
+				// Left margin still exists
+				if boxW-(leftMargin()-t.page.Column) >= width {
+					// But still scrolled as far as possible
+					return nil
+				}
+			}
 			t.page.Column++
 		} else if (key == tcell.KeyLeft && mod == tcell.ModNone) ||
 			(key == tcell.KeyRune && mod == tcell.ModNone && ru == 'h') {
@@ -156,17 +176,13 @@ func makeNewTab() *tab {
 		} else if (key == tcell.KeyDown && mod == tcell.ModNone) ||
 			(key == tcell.KeyRune && mod == tcell.ModNone && ru == 'j') {
 			// Scrolling down
-			// TODO need to check for max vertical scroll before doing this
+			if t.page.Row < height {
+				t.page.Row++
+			}
 			return event
 		} else {
 			// Some other key, stop processing it
 			return event
-		}
-
-		if t.page.MaxPreCols <= termW && t.page.MaxPreCols > -1 {
-			// No scrolling is actually necessary
-			t.page.Column = oldCol // Reset
-			return nil             // Ignore keys
 		}
 
 		t.applyHorizontalScroll()

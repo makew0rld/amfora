@@ -132,15 +132,14 @@ func Bookmarks(t *tab) {
 		bkmkPageRaw += fmt.Sprintf("=> %s %s\r\n", keys[i], m[keys[i]])
 	}
 	// Render and display
-	content, links, maxPreCols := renderer.RenderGemini(bkmkPageRaw, textWidth(), false)
+	content, links := renderer.RenderGemini(bkmkPageRaw, textWidth(), false)
 	page := structs.Page{
-		Raw:        bkmkPageRaw,
-		Content:    content,
-		MaxPreCols: maxPreCols,
-		Links:      links,
-		URL:        "about:bookmarks",
-		TermWidth:  termW,
-		Mediatype:  structs.TextGemini,
+		Raw:       bkmkPageRaw,
+		Content:   content,
+		Links:     links,
+		URL:       "about:bookmarks",
+		TermWidth: termW,
+		Mediatype: structs.TextGemini,
 	}
 	setPage(t, &page)
 	t.applyBottomBar()

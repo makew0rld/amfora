@@ -64,7 +64,7 @@ func reformatPage(p *structs.Page) {
 			strings.HasPrefix(p.URL, "file") {
 			proxied = false
 		}
-		rendered, _, _ = renderer.RenderGemini(p.Raw, textWidth(), proxied)
+		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), proxied)
 	case structs.TextPlain:
 		rendered = renderer.RenderPlainText(p.Raw)
 	case structs.TextAnsi:

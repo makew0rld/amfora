@@ -249,15 +249,14 @@ func Init(version, commit, builtBy string) {
 	// Render the default new tab content ONCE and store it for later
 	// This code is repeated in Reload()
 	newTabContent := getNewTabContent()
-	renderedNewTabContent, newTabLinks, maxPreCols := renderer.RenderGemini(newTabContent, textWidth(), false)
+	renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), false)
 	newTabPage = structs.Page{
-		Raw:        newTabContent,
-		Content:    renderedNewTabContent,
-		MaxPreCols: maxPreCols,
-		Links:      newTabLinks,
-		URL:        "about:newtab",
-		TermWidth:  -1, // Force reformatting on first display
-		Mediatype:  structs.TextGemini,
+		Raw:       newTabContent,
+		Content:   renderedNewTabContent,
+		Links:     newTabLinks,
+		URL:       "about:newtab",
+		TermWidth: -1, // Force reformatting on first display
+		Mediatype: structs.TextGemini,
 	}
 
 	modalInit()
@@ -532,15 +531,14 @@ func Reload() {
 		// Re-render new tab, similar to Init()
 		newTabContent := getNewTabContent()
 		tmpTermW := termW
-		renderedNewTabContent, newTabLinks, maxPreCols := renderer.RenderGemini(newTabContent, textWidth(), false)
+		renderedNewTabContent, newTabLinks := renderer.RenderGemini(newTabContent, textWidth(), false)
 		newTabPage = structs.Page{
-			Raw:        newTabContent,
-			Content:    renderedNewTabContent,
-			MaxPreCols: maxPreCols,
-			Links:      newTabLinks,
-			URL:        "about:newtab",
-			TermWidth:  tmpTermW,
-			Mediatype:  structs.TextGemini,
+			Raw:       newTabContent,
+			Content:   renderedNewTabContent,
+			Links:     newTabLinks,
+			URL:       "about:newtab",
+			TermWidth: tmpTermW,
+			Mediatype: structs.TextGemini,
 		}
 		temp := newTabPage // Copy
 		setPage(tabs[curTab], &temp)

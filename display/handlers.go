@@ -12,7 +12,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
-	"github.com/makeworld-the-better-one/amfora/renderer"
+	"github.com/makeworld-the-better-one/amfora/render"
 	"github.com/makeworld-the-better-one/amfora/rr"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
@@ -309,14 +309,14 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	// Fetch happened successfully, use RestartReader to buffer read data
 	res.Body = rr.NewRestartReader(res.Body)
 
-	if renderer.CanDisplay(res) {
-		page, err := renderer.MakePage(u, res, textWidth(), usingProxy)
+	if render.CanDisplay(res) {
+		page, err := render.MakePage(u, res, textWidth(), usingProxy)
 		// Rendering may have taken a while, make sure tab is still valid
 		if !isValidTab(t) {
 			return ret("", false)
 		}
 
-		if errors.Is(err, renderer.ErrTooLarge) {
+		if errors.Is(err, render.ErrTooLarge) {
 			// Downloading now
 			// Disable read timeout and go back to start
 			res.SetReadTimeout(0) //nolint: errcheck
@@ -324,7 +324,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			go dlChoice("That page is too large. What would you like to do?", u, res)
 			return ret("", false)
 		}
-		if errors.Is(err, renderer.ErrTimedOut) {
+		if errors.Is(err, render.ErrTimedOut) {
 			// Downloading now
 			// Disable read timeout and go back to start
 			res.SetReadTimeout(0) //nolint: errcheck

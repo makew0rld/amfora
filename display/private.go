@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/makeworld-the-better-one/amfora/renderer"
+	"github.com/makeworld-the-better-one/amfora/render"
 	"github.com/makeworld-the-better-one/amfora/structs"
 )
 
@@ -52,7 +52,7 @@ func reformatPage(p *structs.Page) {
 		return
 	}
 
-	// TODO: Setup a renderer.RenderFromMediatype func so this isn't needed
+	// TODO: Setup a render.RenderFromMediatype func so this isn't needed
 
 	var rendered string
 	switch p.Mediatype {
@@ -64,11 +64,11 @@ func reformatPage(p *structs.Page) {
 			strings.HasPrefix(p.URL, "file") {
 			proxied = false
 		}
-		rendered, _ = renderer.RenderGemini(p.Raw, textWidth(), proxied)
+		rendered, _ = render.RenderGemini(p.Raw, textWidth(), proxied)
 	case structs.TextPlain:
-		rendered = renderer.RenderPlainText(p.Raw)
+		rendered = render.RenderPlainText(p.Raw)
 	case structs.TextAnsi:
-		rendered = renderer.RenderANSI(p.Raw)
+		rendered = render.RenderANSI(p.Raw)
 	default:
 		// Rendering this type is not implemented
 		return

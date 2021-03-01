@@ -1,8 +1,8 @@
-// Package renderer provides functions to convert various data into a cview primitive.
+// Package render provides functions to convert various data into a cview primitive.
 // Example objects include a Gemini response, and an error.
 //
 // Rendered lines always end with \r\n, in an effort to be Window compatible.
-package renderer
+package render
 
 import (
 	"fmt"

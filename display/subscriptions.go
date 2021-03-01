@@ -12,7 +12,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
-	"github.com/makeworld-the-better-one/amfora/renderer"
+	"github.com/makeworld-the-better-one/amfora/render"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
 	"github.com/makeworld-the-better-one/go-gemini"
@@ -149,7 +149,7 @@ func Subscriptions(t *tab, u string) string {
 		}
 	}
 
-	content, links := renderer.RenderGemini(rawPage, textWidth(), false)
+	content, links := render.RenderGemini(rawPage, textWidth(), false)
 	page := structs.Page{
 		Raw:       rawPage,
 		Content:   content,
@@ -191,7 +191,7 @@ func ManageSubscriptions(t *tab, u string) {
 		)
 	}
 
-	content, links := renderer.RenderGemini(rawPage, textWidth(), false)
+	content, links := render.RenderGemini(rawPage, textWidth(), false)
 	page := structs.Page{
 		Raw:       rawPage,
 		Content:   content,

@@ -41,7 +41,7 @@ func RenderPlainText(s string) string {
 	// It used to add a left margin, now this is done elsewhere.
 	// The function is kept for convenience and in case rendering
 	// is needed in the future.
-	return s
+	return cview.Escape(s)
 }
 
 // wrapLine wraps a line to the provided width, and adds the provided prefix and suffix to each wrapped line.

@@ -41,7 +41,7 @@ func RenderPlainText(s string) string {
 	// It used to add a left margin, now this is done elsewhere.
 	// The function is kept for convenience and in case rendering
 	// is needed in the future.
-	return s
+	return cview.Escape(s)
 }
 
 // wrapLine wraps a line to the provided width, and adds the provided prefix and suffix to each wrapped line.
@@ -270,7 +270,6 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 // It also returns a slice of link URLs.
 //
 // width is the number of columns to wrap to.
-// leftMargin is the number of blank spaces to prepend to each line.
 //
 // proxied is whether the request is through the gemini:// scheme.
 // If it's not a gemini:// page, set this to true.

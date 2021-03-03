@@ -70,6 +70,7 @@ func helpInit() {
 			App.Draw()
 		}
 	})
+	helpTable.SetScrollBarColor(config.GetColor("scrollbar"))
 
 	tabKeys := fmt.Sprintf("%s to %s", strings.Split(config.GetKeyBinding(config.CmdTab1), ",")[0],
 		strings.Split(config.GetKeyBinding(config.CmdTab9), ",")[0])

@@ -8,12 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Favicon support removed (#199)
 - Bookmarks are stored using XML in the XBEL format, old bookmarks are transferred (#68)
-- Text no longer disappears under the left margin when scrolling like in the previous release (#197)
+- Text no longer disappears under the left margin when scrolling (regression from v1.8.0) (#197)
 
 ### Fixed
 - Help text is now the same color as `regular_text` in the theme config
 - Non-ASCII (multibyte) characters can now be used as keybindings (#198, #200)
 - Possible subscription update race condition on startup
+- Plaintext documents are escaped properly (regression from v1.8.0)
+- Help page scrollbar color matches what's in the theme config
 
 
 ## [1.8.0] - 2021-02-17

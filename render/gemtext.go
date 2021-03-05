@@ -311,5 +311,5 @@ func (ren *GemtextRenderer) Read(p []byte) (n int, err error) {
 }
 
 func (ren *GemtextRenderer) Links() <-chan string {
-	return r.links
+	return ren.links
 }

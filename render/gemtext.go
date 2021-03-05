@@ -72,9 +72,9 @@ func NewGemtextRenderer(width int, proxied bool) *GemtextRenderer {
 
 // renderLine handles all lines except preformatted markings. The input line
 // should not end with any line delimiters, but the output line does.
-func (r *GemtextRenderer) renderLine(line string) string {
-	if r.pre {
-		if r.ansiEnabled {
+func (ren *GemtextRenderer) renderLine(line string) string {
+	if ren.pre {
+		if ren.ansiEnabled {
 			line = cview.TranslateANSI(line)
 			// The TranslateANSI function injects tags like [-:-:-]
 			// but this will reset the background to use the user's terminal color.
@@ -113,10 +113,10 @@ func (r *GemtextRenderer) renderLine(line string) string {
 			} else if strings.HasPrefix(line, "#") {
 				tag = fmt.Sprintf("[%s::b]", config.GetColorString("hdg_1"))
 			}
-			wrappedLines = append(wrappedLines, wrapLine(line, r.width, tag, "[-::-]", true)...)
+			wrappedLines = append(wrappedLines, wrapLine(line, ren.width, tag, "[-::-]", true)...)
 		} else {
 			// Just bold, no colors
-			wrappedLines = append(wrappedLines, wrapLine(line, r.width, "[::b]", "[-::-]", true)...)
+			wrappedLines = append(wrappedLines, wrapLine(line, ren.width, "[::b]", "[-::-]", true)...)
 		}
 
 		// Links
@@ -146,9 +146,9 @@ func (r *GemtextRenderer) renderLine(line string) string {
 			return "=>\n"
 		}
 
-		r.links <- url
-		r.numLinks++
-		num := r.numLinks // Visible link number, one-indexed
+		ren.links <- url
+		ren.numLinks++
+		num := ren.numLinks // Visible link number, one-indexed
 
 		var indent int
 		if num > 99 {
@@ -178,13 +178,13 @@ func (r *GemtextRenderer) renderLine(line string) string {
 
 		if viper.GetBool("a-general.color") {
 			pU, err := urlPkg.Parse(url)
-			if !r.proxied && err == nil &&
+			if !ren.proxied && err == nil &&
 				(pU.Scheme == "" || pU.Scheme == "gemini" || pU.Scheme == "about") {
 				// A gemini link
 				// Add the link text in blue (in a region), and a gray link number to the left of it
 				// Those are the default colors, anyway
 
-				wrappedLink = wrapLine(linkText, r.width,
+				wrappedLink = wrapLine(linkText, ren.width,
 					strings.Repeat(" ", indent)+
 						`["`+strconv.Itoa(num-1)+`"][`+config.GetColorString("amfora_link")+`]`,
 					`[-][""]`,
@@ -199,7 +199,7 @@ func (r *GemtextRenderer) renderLine(line string) string {
 			} else {
 				// Not a gemini link
 
-				wrappedLink = wrapLine(linkText, r.width,
+				wrappedLink = wrapLine(linkText, ren.width,
 					strings.Repeat(" ", indent)+
 						`["`+strconv.Itoa(num-1)+`"][`+config.GetColorString("foreign_link")+`]`,
 					`[-][""]`,
@@ -214,7 +214,7 @@ func (r *GemtextRenderer) renderLine(line string) string {
 		} else {
 			// No colors allowed
 
-			wrappedLink = wrapLine(linkText, r.width,
+			wrappedLink = wrapLine(linkText, ren.width,
 				strings.Repeat(" ", len(strconv.Itoa(num))+4)+ // +4 for spaces and brackets
 					`["`+strconv.Itoa(num-1)+`"]`,
 				`[""]`,
@@ -232,7 +232,7 @@ func (r *GemtextRenderer) renderLine(line string) string {
 	} else if strings.HasPrefix(line, "* ") {
 		if viper.GetBool("a-general.bullets") {
 			// Wrap list item, and indent wrapped lines past the bullet
-			wrappedItem := wrapLine(line[1:], r.width,
+			wrappedItem := wrapLine(line[1:], ren.width,
 				fmt.Sprintf("    [%s]", config.GetColorString("list_text")),
 				"[-]", false)
 			// Add bullet
@@ -252,7 +252,7 @@ func (r *GemtextRenderer) renderLine(line string) string {
 			line = strings.TrimPrefix(line, ">")
 			line = strings.TrimPrefix(line, " ")
 			wrappedLines = append(wrappedLines,
-				wrapLine(line, r.width, fmt.Sprintf("[%s::i]> ", config.GetColorString("quote_text")),
+				wrapLine(line, ren.width, fmt.Sprintf("[%s::i]> ", config.GetColorString("quote_text")),
 					"[-::-]", true)...,
 			)
 		}
@@ -262,7 +262,7 @@ func (r *GemtextRenderer) renderLine(line string) string {
 		wrappedLines = append(wrappedLines, "")
 	} else {
 		// Regular line, just wrap it
-		wrappedLines = append(wrappedLines, wrapLine(line, r.width,
+		wrappedLines = append(wrappedLines, wrapLine(line, ren.width,
 			fmt.Sprintf("[%s]", config.GetColorString("regular_text")),
 			"[-]", true)...)
 	}
@@ -299,17 +299,17 @@ func (ren *GemtextRenderer) ReadFrom(r io.Reader) (int64, error) {
 }
 
 // Write will panic, use ReadFrom instead.
-func (r *GemtextRenderer) Write(p []byte) (n int, err error) {
+func (ren *GemtextRenderer) Write(p []byte) (n int, err error) {
 	// This renderer is line based, and so it can't process arbitrary bytes.
 	// One solution would be to handle rendering on the other end of the pipe,
 	// the Read call, but it's simpler to just implement ReadFrom.
 	panic("func Write not allowed for GemtextRenderer")
 }
 
-func (r *GemtextRenderer) Read(p []byte) (n int, err error) {
-	return r.r.Read(p)
+func (ren *GemtextRenderer) Read(p []byte) (n int, err error) {
+	return ren.r.Read(p)
 }
 
-func (r *GemtextRenderer) Links() <-chan string {
+func (ren *GemtextRenderer) Links() <-chan string {
 	return r.links
 }

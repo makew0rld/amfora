@@ -78,18 +78,18 @@ func (ren *PlaintextRenderer) ReadFrom(r io.Reader) (int64, error) {
 }
 
 // Write will panic, use ReadFrom instead.
-func (r *PlaintextRenderer) Write(p []byte) (n int, err error) {
+func (ren *PlaintextRenderer) Write(p []byte) (n int, err error) {
 	// This function would normally use cview.EscapeBytes
 	// But the escaping will fail if the Write bytes end in the middle of a tag
 	// So instead it just panics, because it should never be used.
 	panic("func Write not allowed for PlaintextRenderer")
 }
 
-func (r *PlaintextRenderer) Read(p []byte) (n int, err error) {
-	return r.r.Read(p)
+func (ren *PlaintextRenderer) Read(p []byte) (n int, err error) {
+	return ren.r.Read(p)
 }
 
-func (r *PlaintextRenderer) Links() <-chan string {
+func (ren *PlaintextRenderer) Links() <-chan string {
 	ch := make(chan string)
 	close(ch)
 	return ch
@@ -118,7 +118,7 @@ func NewANSIRenderer() *ANSIRenderer {
 }
 
 // Write will panic, use ReadFrom instead.
-func (r *ANSIRenderer) Write(p []byte) (n int, err error) {
+func (ren *ANSIRenderer) Write(p []byte) (n int, err error) {
 	// This function would normally use cview.EscapeBytes among other things.
 	// But the escaping will fail if the Write bytes end in the middle of a tag
 	// So instead it just panics, because it should never be used.
@@ -165,11 +165,11 @@ func (ren *ANSIRenderer) ReadFrom(r io.Reader) (int64, error) {
 	return n, scanner.Err()
 }
 
-func (r *ANSIRenderer) Read(p []byte) (n int, err error) {
-	return r.r.Read(p)
+func (ren *ANSIRenderer) Read(p []byte) (n int, err error) {
+	return ren.r.Read(p)
 }
 
-func (r *ANSIRenderer) Links() <-chan string {
+func (ren *ANSIRenderer) Links() <-chan string {
 	ch := make(chan string)
 	close(ch)
 	return ch

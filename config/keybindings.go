@@ -52,6 +52,8 @@ const (
 	CmdHelp
 	CmdSub
 	CmdAddSub
+	CmdLinkNext
+	CmdLinkPrev
 )
 
 type keyBinding struct {
@@ -176,6 +178,8 @@ func KeyInit() {
 		CmdHelp:        "keybindings.bind_help",
 		CmdSub:         "keybindings.bind_sub",
 		CmdAddSub:      "keybindings.bind_add_sub",
+		CmdLinkNext:    "keybindings.bind_link_next",
+		CmdLinkPrev:    "keybindings.bind_link_prev",
 	}
 	// This is split off to allow shift_numbers to override bind_tab[1-90]
 	// (This is needed for older configs so that the default bind_tab values

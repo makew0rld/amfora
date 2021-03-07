@@ -87,17 +87,7 @@ func makeNewTab() *tab {
 			return
 		}
 		if len(currentSelection) == 0 && (key == tcell.KeyEnter || key == tcell.KeyTab) {
-			// They've started link highlighting
-			tabs[tab].page.Mode = structs.ModeLinkSelect
-
-			tabs[tab].view.Highlight("0")
-			tabs[tab].view.ScrollToHighlight()
-			// Display link URL in bottomBar
-			bottomBar.SetLabel("[::b]Link: [::-]")
-			bottomBar.SetText(tabs[tab].page.Links[0])
-			tabs[tab].saveBottomBar()
-			tabs[tab].page.Selected = tabs[tab].page.Links[0]
-			tabs[tab].page.SelectedID = "0"
+			tabs[tab].StartHighlightLinks()
 		}
 
 		if len(currentSelection) > 0 {
@@ -111,14 +101,7 @@ func makeNewTab() *tab {
 			} else {
 				return
 			}
-			tabs[tab].view.Highlight(strconv.Itoa(index))
-			tabs[tab].view.ScrollToHighlight()
-			// Display link URL in bottomBar
-			bottomBar.SetLabel("[::b]Link: [::-]")
-			bottomBar.SetText(tabs[tab].page.Links[index])
-			tabs[tab].saveBottomBar()
-			tabs[tab].page.Selected = tabs[tab].page.Links[index]
-			tabs[tab].page.SelectedID = strconv.Itoa(index)
+			tabs[tab].HighlightIndex(index)
 		}
 	})
 	t.view.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -322,4 +305,46 @@ func (t *tab) applyAll() {
 	if t == tabs[curTab] {
 		t.applyBottomBar()
 	}
+}
+
+func (t *tab) StartHighlightLinks() {
+	// They've started link highlighting
+	t.page.Mode = structs.ModeLinkSelect
+	t.HighlightIndex(0)
+}
+
+func (t *tab) HighlightIndex(index int) {
+	t.view.Highlight(strconv.Itoa(index))
+	t.view.ScrollToHighlight()
+	// Display link URL in bottomBar
+	bottomBar.SetLabel("[::b]Link: [::-]")
+	bottomBar.SetText(t.page.Links[index])
+	t.saveBottomBar()
+	t.page.Selected = t.page.Links[index]
+	t.page.SelectedID = strconv.Itoa(index)
+}
+
+func (t *tab) HighlightLinksNext() {
+	currentSelection := t.view.GetHighlights()
+	if len(currentSelection) == 0 {
+		t.StartHighlightLinks()
+		return
+	}
+	numSelections := len(t.page.Links)
+	index, _ := strconv.Atoi(currentSelection[0])
+	index = (index + 1) % numSelections
+
+	t.HighlightIndex(index)
+}
+func (t *tab) HighlightLinksPrev() {
+	currentSelection := t.view.GetHighlights()
+	if len(currentSelection) == 0 {
+		t.StartHighlightLinks()
+		return
+	}
+	numSelections := len(t.page.Links)
+	index, _ := strconv.Atoi(currentSelection[0])
+	index = (index - 1 + numSelections) % numSelections
+
+	t.HighlightIndex(index)
 }

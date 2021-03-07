@@ -154,6 +154,8 @@ scrollbar = "auto"
 # bind_close_tab
 # bind_next_tab
 # bind_prev_tab
+# bind_link_next
+# bind_link_prev
 # bind_quit
 # bind_help
 # bind_sub: for viewing the subscriptions page

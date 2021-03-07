@@ -298,6 +298,12 @@ func Init(version, commit, builtBy string) {
 			case config.CmdReload:
 				Reload()
 				return nil
+			case config.CmdLinkNext:
+				tabs[curTab].HighlightLinksNext()
+				return nil
+			case config.CmdLinkPrev:
+				tabs[curTab].HighlightLinksPrev()
+				return nil
 			case config.CmdHome:
 				URL(viper.GetString("a-general.home"))
 				return nil

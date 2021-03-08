@@ -48,7 +48,6 @@ type GemtextRenderer struct {
 // If it's not a gemini:// page, set this to true.
 func NewGemtextRenderer(width int, proxied bool) *GemtextRenderer {
 	pr, pw := io.Pipe()
-	links := make(chan string, 10)
 
 	ansiEnabled := false
 	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
@@ -62,7 +61,7 @@ func NewGemtextRenderer(width int, proxied bool) *GemtextRenderer {
 	return &GemtextRenderer{
 		r:            pr,
 		w:            pw,
-		links:        links,
+		links:        make(chan string, 10),
 		width:        width,
 		proxied:      proxied,
 		ansiEnabled:  ansiEnabled,
@@ -272,7 +271,6 @@ func (ren *GemtextRenderer) renderLine(line string) string {
 
 func (ren *GemtextRenderer) ReadFrom(r io.Reader) (int64, error) {
 	// Go through lines, render, and write each line
-	// TODO: Should writes be buffered?
 
 	var n int64
 	scanner := bufio.NewScanner(r)
@@ -281,6 +279,8 @@ func (ren *GemtextRenderer) ReadFrom(r io.Reader) (int64, error) {
 	for scanner.Scan() {
 		n += int64(len(scanner.Bytes()))
 		line := scanner.Text()
+
+		// Process the one possibly invisible line
 
 		if strings.HasPrefix(line, "```") {
 			ren.pre = !ren.pre
@@ -295,6 +295,10 @@ func (ren *GemtextRenderer) ReadFrom(r io.Reader) (int64, error) {
 		))
 
 	}
+
+	// Everything has been read, no more links
+	close(ren.links)
+
 	return n, scanner.Err()
 }
 

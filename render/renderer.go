@@ -22,9 +22,8 @@ type Renderer interface {
 	io.ReadWriter
 	io.ReaderFrom
 
-	// Links returns a channel that yields Link URLs as they are parsed.
-	// It is buffered. The channel might be closed to indicate links aren't supported
-	// for this renderer.
+	// Links returns a channel that yields link URLs as they are parsed.
+	// It is buffered. The channel will be closed when there won't be anymore links.
 	Links() <-chan string
 }
 
@@ -62,7 +61,6 @@ func NewPlaintextRenderer() *PlaintextRenderer {
 
 func (ren *PlaintextRenderer) ReadFrom(r io.Reader) (int64, error) {
 	// Go through lines and escape bytes and write each line
-	// TODO: Should writes be buffered?
 
 	var n int64
 	scanner := bufio.NewScanner(r)
@@ -127,7 +125,6 @@ func (ren *ANSIRenderer) Write(p []byte) (n int, err error) {
 
 func (ren *ANSIRenderer) ReadFrom(r io.Reader) (int64, error) {
 	// Go through lines, render, and write each line
-	// TODO: Should writes be buffered?
 
 	var n int64
 	scanner := bufio.NewScanner(r)

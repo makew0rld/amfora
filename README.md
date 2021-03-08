@@ -136,7 +136,7 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Basic forward/backward history, for each tab
 - [x] Input (Status Code 10 & 11)
 - [x] Multiple charset support (over 55)
-- [x] Built-in search (uses GUS by default)
+- [x] Built-in search (uses geminispace.info by default)
 - [x] Bookmarks
 - [x] Download pages and arbitrary data
 - [x] Theming

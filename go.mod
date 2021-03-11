@@ -31,4 +31,4 @@ replace github.com/mmcdole/gofeed => github.com/makeworld-the-better-one/gofeed 
 
 replace github.com/schollz/progressbar/v3 => github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20201220005701-b036c4d38568
 
-replace gitlab.com/tslocum/cview => gitlab.com/makeworld-the-better-one/cview v1.5.4-0.20210228021109-c74ebf14710b
+replace gitlab.com/tslocum/cview => gitlab.com/makeworld-the-better-one/cview v1.5.4-0.20210311000504-17ca6d403b7f

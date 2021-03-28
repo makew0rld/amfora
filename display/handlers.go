@@ -85,7 +85,7 @@ func handleOther(u string) {
 			Error("URL Error", "URL contains semicolon, which could indicate malicious intent")
 		} else {
 			for i, field := range fields[1:] {
-				fields[i+1] = strings.Replace(field, "{{url}}", u, -1)
+				fields[i+1] = strings.ReplaceAll(field, "{{url}}", u, -1)
 			}
 			err := exec.Command(fields[0], fields[1:]...).Start()
 			if err != nil {

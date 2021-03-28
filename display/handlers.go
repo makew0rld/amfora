@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os/exec"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/cache"
@@ -78,9 +79,18 @@ func handleOther(u string) {
 	default:
 		// The config has a custom command to execute for URLs
 		fields := strings.Fields(handler)
-		err := exec.Command(fields[0], append(fields[1:], u)...).Start()
-		if err != nil {
-			Error("URL Error", "Error executing custom command: "+err.Error())
+		// safety check for semicolon to prevent url from escaping out of custom command
+		re := regexp.MustCompile(string(';'))
+		if re.MatchString(u) {
+			Error("URL Error", "URL contains semicolon, which could indicate malicious intent")
+		} else {
+			for i, field := range fields[1:] {
+				fields[i+1] = strings.Replace(field, "{{url}}", u, -1)
+			}
+			err := exec.Command(fields[0], fields[1:]...).Start()
+			if err != nil {
+				Error("URL Error", "Error executing custom command: "+err.Error())
+			}
 		}
 	}
 	App.Draw()

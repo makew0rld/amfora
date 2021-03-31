@@ -1,18 +1,15 @@
 # Amfora
 
-<center>  <!-- I know, that's not how you usually do it :) -->
 <img src="logo.png" alt="amphora logo" width="30%">
 <h6>Image modified from: amphora by Alvaro Cabrera from the Noun Project</h6>
-</center>
+
 
 [![go reportcard](https://goreportcard.com/badge/github.com/makeworld-the-better-one/amfora)](https://goreportcard.com/report/github.com/makeworld-the-better-one/amfora)
 [![license GPLv3](https://img.shields.io/github/license/makeworld-the-better-one/amfora)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-<center>  <!-- I know, that's not how you usually do it :) -->
 <a href="https://raw.githubusercontent.com/makeworld-the-better-one/amfora/master/demo-large.gif">
 <img src="demo-large.gif" alt="Demo GIF" width="80%">
 </a>
-</center>
 
 ###### Recording of v1.0.0
 
@@ -39,21 +36,13 @@ update-desktop-database ~/.local/share/applications
 Make sure to click "Watch" in the top right, then "Custom" > "Releases" to get notified about new releases!
 
 
-### Arch Linux
+## Linux
 
-Arch Linux users can install Amfora using pacman.
+Amfora is packaged in many Linux distros. It's also on [Scoop](https://scoop.sh/) for Windows users.
 
-```
-sudo pacman -S amfora
-```
-
-### Void Linux
-
-Void Linux users can install Amfora using xbps.
-
-```
-sudo xbps-install amfora
-```
+<a href="https://repology.org/project/amfora/versions">
+    <img src="https://repology.org/badge/vertical-allrepos/amfora.svg" alt="Packaging status" align="right">
+</a>
 
 ### Homebrew
 
@@ -65,22 +54,6 @@ brew install amfora
 You can update it with:
 ```
 brew upgrade amfora
-```
-
-### KISS Linux
-
-[KISS](https://k1ss.org) Linux users can install Amfora from jedahan's repository.
-
-Add jedahan's kiss repository:
-```
-git clone https://github.com/jedahan/kiss-repo.git repo-jedahan
-export KISS_PATH="$KISS_PATH:$PWD/repo-jedahan"
-```
-
-Build and install Amfora:
-```
-kiss build amfora
-kiss install amfora
 ```
 
 ### From Source
@@ -136,7 +109,7 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Basic forward/backward history, for each tab
 - [x] Input (Status Code 10 & 11)
 - [x] Multiple charset support (over 55)
-- [x] Built-in search (uses GUS by default)
+- [x] Built-in search (uses geminispace.info by default)
 - [x] Bookmarks
 - [x] Download pages and arbitrary data
 - [x] Theming
@@ -166,7 +139,7 @@ Please see [the wiki](https://github.com/makeworld-the-better-one/amfora/wiki) f
 ## Libraries
 Amfora ❤️ open source!
 
-- My [cview fork](https://gitlab.com/makeworld-the-better-one/cview/) for the TUI - pull request [here](https://gitlab.com/tslocum/cview/-/merge_requests/14)
+- [cview](https://gitlab.com/tslocum/cview/) for the TUI
   - It's a fork of [tview](https://github.com/rivo/tview) with PRs merged and active support
   - It uses [tcell](https://github.com/gdamore/tcell) for low level terminal operations
 - [Viper](https://github.com/spf13/viper) for configuration and TOFU storing

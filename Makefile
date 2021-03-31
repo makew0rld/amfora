@@ -21,8 +21,10 @@ clean:
 
 .PHONY: install
 install: amfora amfora.desktop
-	install -m 755 amfora $(PREFIX)/bin/amfora
-	install -m 644 amfora.desktop $(PREFIX)/share/applications/amfora.desktop
+	$(INSTALL) -d $(PREFIX)/bin/
+	$(INSTALL) -m 755 amfora $(PREFIX)/bin/amfora
+	$(INSTALL) -d $(PREFIX)/share/applications/
+	$(INSTALL) -m 644 amfora.desktop $(PREFIX)/share/applications/amfora.desktop
 
 .PHONY: uninstall
 uninstall:
@@ -32,4 +34,4 @@ uninstall:
 # Development helpers
 .PHONY: fmt
 fmt:
-	go fmt ./...
+	$(GO) fmt ./...

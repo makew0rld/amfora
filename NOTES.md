@@ -14,5 +14,3 @@
 
 
 ## Upstream PRs
-- [Add TextDimensions](https://gitlab.com/tslocum/cview/-/merge_requests/14)
-  - For #197

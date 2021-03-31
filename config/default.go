@@ -39,7 +39,7 @@ auto_redirect = false
 http = 'default'
 
 # Any URL that will accept a query string can be put here
-search = "gemini://gus.guru/search"
+search = "gemini://geminispace.info/search"
 
 # Whether colors will be used in the terminal
 color = true

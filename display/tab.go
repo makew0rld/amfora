@@ -130,7 +130,7 @@ func makeNewTab() *tab {
 		mod := event.Modifiers()
 		ru := event.Rune()
 
-		width, height := t.view.TextDimensions()
+		width, height := t.view.GetBufferSize()
 		_, _, boxW, boxH := t.view.GetInnerRect()
 
 		// Make boxW accurate by subtracting one if a scrollbar is covering the last

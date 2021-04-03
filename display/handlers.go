@@ -80,8 +80,8 @@ func handleOther(u string) {
 		// The config has a custom command to execute for URLs
 		fields := strings.Fields(handler)
 		re := regexp.MustCompile("{{url}}")
-		fields_str := strings.Join(fields, " ")
-		if re.MatchString(fields_str) {
+		strfields := strings.Join(fields, " ")
+		if re.MatchString(strfields) {
 			for i, field := range fields[1:] {
 				fields[i+1] = strings.ReplaceAll(field, "{{url}}", u)
 			}

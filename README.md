@@ -38,11 +38,11 @@ Make sure to click "Watch" in the top right, then "Custom" > "Releases" to get n
 
 ## Linux
 
-Amfora is packaged in many Linux distros. It's also on [Scoop](https://scoop.sh/) for Windows users.
-
 <a href="https://repology.org/project/amfora/versions">
     <img src="https://repology.org/badge/vertical-allrepos/amfora.svg" alt="Packaging status" align="right">
 </a>
+
+Amfora is packaged in many Linux distros. It's also on [Scoop](https://scoop.sh/) for Windows users.
 
 ### Homebrew
 

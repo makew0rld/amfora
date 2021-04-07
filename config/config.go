@@ -11,13 +11,13 @@ import (
 	"runtime"
 	"strings"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/rkoesters/xdg/basedir"
 	"github.com/rkoesters/xdg/userdirs"
 	"github.com/spf13/viper"
-	"code.rocketnine.space/tslocum/cview"
 )
 
 var amforaAppData string // Where amfora files are stored on Windows - cached here

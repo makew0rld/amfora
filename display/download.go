@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/structs"
@@ -21,7 +22,6 @@ import (
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/schollz/progressbar/v3"
 	"github.com/spf13/viper"
-	"code.rocketnine.space/tslocum/cview"
 )
 
 // For choosing between download and the portal - copy of YesNo basically

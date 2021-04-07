@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
@@ -15,7 +16,6 @@ import (
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/spf13/viper"
-	"code.rocketnine.space/tslocum/cview"
 )
 
 var tabs []*tab // Slice of all the current browser tabs

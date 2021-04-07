@@ -5,9 +5,9 @@ import (
 	"net/url"
 	"strings"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/spf13/viper"
-	"code.rocketnine.space/tslocum/cview"
 	"golang.org/x/text/unicode/norm"
 )
 

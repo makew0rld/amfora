@@ -5,9 +5,9 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/config"
-	"code.rocketnine.space/tslocum/cview"
 )
 
 var helpCells = strings.TrimSpace(

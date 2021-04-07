@@ -3,13 +3,13 @@ package display
 import (
 	"fmt"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/spf13/viper"
-	"code.rocketnine.space/tslocum/cview"
 )
 
 // For adding and removing bookmarks, basically a clone of the input modal.

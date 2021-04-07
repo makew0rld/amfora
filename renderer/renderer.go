@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/spf13/viper"
-	"code.rocketnine.space/tslocum/cview"
 )
 
 // Regex for identifying ANSI color codes

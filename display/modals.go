@@ -5,11 +5,11 @@ import (
 	"strings"
 	"time"
 
+	"code.rocketnine.space/tslocum/cview"
 	humanize "github.com/dustin/go-humanize"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/spf13/viper"
-	"code.rocketnine.space/tslocum/cview"
 )
 
 // This file contains code for the popups / modals used in the display.

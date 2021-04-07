@@ -21,7 +21,7 @@ import (
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/schollz/progressbar/v3"
 	"github.com/spf13/viper"
-	"gitlab.com/tslocum/cview"
+	"code.rocketnine.space/tslocum/cview"
 )
 
 // For choosing between download and the portal - copy of YesNo basically

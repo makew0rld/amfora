@@ -9,7 +9,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/spf13/viper"
-	"gitlab.com/tslocum/cview"
+	"code.rocketnine.space/tslocum/cview"
 )
 
 // For adding and removing bookmarks, basically a clone of the input modal.

@@ -9,7 +9,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/spf13/viper"
-	"gitlab.com/tslocum/cview"
+	"code.rocketnine.space/tslocum/cview"
 )
 
 // This file contains code for the popups / modals used in the display.

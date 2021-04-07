@@ -143,7 +143,7 @@ Please see [the wiki](https://github.com/makeworld-the-better-one/amfora/wiki) f
 ## Libraries
 Amfora ❤️ open source!
 
-- [cview](https://gitlab.com/tslocum/cview/) for the TUI
+- [cview](https://code.rocketnine.space/tslocum/cview) for the TUI
   - It's a fork of [tview](https://github.com/rivo/tview) with PRs merged and active support
   - It uses [tcell](https://github.com/gdamore/tcell) for low level terminal operations
 - [Viper](https://github.com/spf13/viper) for configuration and TOFU storing

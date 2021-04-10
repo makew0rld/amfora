@@ -1,0 +1,52 @@
+[theme]
+
+# atelier forest
+
+bg =                        "#1b1918"
+fg =                        "#a8a19f"
+tab_num =                   "#a8a19f"
+tab_divider =               "#2c2421"
+bottombar_label =           "#3d97b8"
+bottombar_text =            "#a8a19f"
+bottombar_bg =              "#1b1918"
+scrollbar =                 "#a8a19f"
+
+hdg_1 =                     "#f22c40"
+hdg_2 =                     "#7b9726"
+hdg_3 =                     "#c33ff3"
+amfora_link =               "#407ee7"
+foreign_link =              "#f22c40"
+link_number =               "#a8a19f"
+regular_text =              "#a8a19f"
+quote_text =                "#a8a19f"
+preformatted_text =         "#a8a19f"
+list_text =                 "#a8a19f"
+
+btn_bg =                    "#407ee7"
+btn_text =                  "#1b1918"
+
+dl_choice_modal_bg =        "#2c2421"
+dl_choice_modal_text =      "#a8a19f"
+dl_modal_bg =               "#2c2421"
+dl_modal_text =             "#a8a19f"
+info_modal_bg =             "#2c2421"
+info_modal_text =           "#a8a19f"
+error_modal_bg =            "#2c2421"
+error_modal_text =          "#f22c40"
+yesno_modal_bg =            "#2c2421"
+yesno_modal_text =          "#a8a19f"
+tofu_modal_bg =             "#2c2421"
+tofu_modal_text =           "#a8a19f"
+subscription_modal_bg =     "#2c2421"
+subscription_modal_text =   "#a8a19f"
+
+input_modal_bg =            "#2c2421"
+input_modal_text =          "#a8a19f"
+input_modal_field_bg =      "#1b1918"
+input_modal_field_text =    "#a8a19f"
+
+bkmk_modal_bg =             "#2c2421"
+bkmk_modal_text =           "#a8a19f"
+bkmk_modal_label =          "#3d97b8"
+bkmk_modal_field_bg =       "#1b1918"
+bkmk_modal_field_text =     "#a8a19f"

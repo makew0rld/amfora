@@ -69,7 +69,7 @@ Contributed by **[@bnthor](https://github.com/bnthor)**.
 </details>
 
 
-### One Dark
+## One Dark
 
 Contributed by **[@sergetymo](https://github.com/sergetymo)**.
 
@@ -81,6 +81,18 @@ Contributed by **[@sergetymo](https://github.com/sergetymo)**.
 ![screenshot of bookmark modal](https://user-images.githubusercontent.com/65758149/101183267-f8410f00-3657-11eb-97fa-10f88a9d8de4.png)
 ![screenshot of error modal](https://user-images.githubusercontent.com/65758149/101183206-da73aa00-3657-11eb-8733-5040c8aefb99.png)
 </details>
+
+## Atelier Forest
+
+Contributed by **[@joyalicegu](https://github.com/joyalicegu)**.
+
+### Dark
+
+![screenshot of atelier forest dark theme](https://user-images.githubusercontent.com/16532904/114287117-35a81580-9a19-11eb-8515-a4fa5fee00b8.png)
+
+### Light
+
+![screenshot of atelier forest light theme](https://user-images.githubusercontent.com/16532904/114287105-22954580-9a19-11eb-8c09-2bce083286b2.png)
 
 ## Yours?
 

@@ -86,10 +86,6 @@ Contributed by **[@sergetymo](https://github.com/sergetymo)**.
 
 Contributed by **[@joyalicegu](https://github.com/joyalicegu)**.
 
-### Slimey
-
-Contributed by **[@lee2sman](https://github.com/lee2sman)**.
-
 ![screenshot of Slimey theme](https://user-images.githubusercontent.com/7377908/114319350-212e5080-9adf-11eb-9d41-d4e800c6570f.png)
 
 ### Dark
@@ -99,6 +95,11 @@ Contributed by **[@lee2sman](https://github.com/lee2sman)**.
 ### Light
 
 ![screenshot of atelier forest light theme](https://user-images.githubusercontent.com/16532904/114287105-22954580-9a19-11eb-8c09-2bce083286b2.png)
+
+
+## Slimey
+
+Contributed by **[@lee2sman](https://github.com/lee2sman)**.
 
 ## Yours?
 

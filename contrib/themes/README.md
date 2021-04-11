@@ -1,6 +1,6 @@
 # User Contributed Themes
 
-You can use these themes by replacing the `[theme]` section of your config with their contents. Some themes won't display properly on terminals that do not have truecolor support.
+You can use these themes by replacing the `[theme]` section of your [config](https://github.com/makeworld-the-better-one/amfora/wiki/Configuration) with their contents. Some themes won't display properly on terminals that do not have truecolor support.
 
 ## Nord
 
@@ -85,6 +85,12 @@ Contributed by **[@sergetymo](https://github.com/sergetymo)**.
 ## Atelier Forest
 
 Contributed by **[@joyalicegu](https://github.com/joyalicegu)**.
+
+### Slimey
+
+Contributed by **[@lee2sman](https://github.com/lee2sman)**.
+
+![screenshot of Slimey theme](https://user-images.githubusercontent.com/7377908/114319350-212e5080-9adf-11eb-9d41-d4e800c6570f.png)
 
 ### Dark
 

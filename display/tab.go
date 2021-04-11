@@ -128,7 +128,8 @@ func makeNewTab() *tab {
 
 		key := event.Key()
 		mod := event.Modifiers()
-		ru := event.Rune()
+		// ru := event.Rune()
+		cmd := config.TranslateKeyEvent(event)
 
 		height, width := t.view.GetBufferSize()
 		_, _, boxW, boxH := t.view.GetInnerRect()
@@ -141,7 +142,7 @@ func makeNewTab() *tab {
 		}
 
 		if (key == tcell.KeyRight && mod == tcell.ModNone) ||
-			(key == tcell.KeyRune && mod == tcell.ModNone && ru == 'l') {
+			(key == tcell.KeyRune && mod == tcell.ModNone && cmd == config.CmdMoveRight) {
 			// Scrolling to the right
 
 			if t.page.Column >= leftMargin() {
@@ -158,26 +159,30 @@ func makeNewTab() *tab {
 				}
 			}
 			t.page.Column++
+			t.view.ScrollTo(t.page.Row, t.page.Column)
 		} else if (key == tcell.KeyLeft && mod == tcell.ModNone) ||
-			(key == tcell.KeyRune && mod == tcell.ModNone && ru == 'h') {
+			(key == tcell.KeyRune && mod == tcell.ModNone && cmd == config.CmdMoveLeft) {
 			// Scrolling to the left
 			if t.page.Column == 0 {
 				// Can't scroll to the left anymore
 				return nil
 			}
 			t.page.Column--
+			t.view.ScrollTo(t.page.Row, t.page.Column)
 		} else if (key == tcell.KeyUp && mod == tcell.ModNone) ||
-			(key == tcell.KeyRune && mod == tcell.ModNone && ru == 'k') {
+			(key == tcell.KeyRune && mod == tcell.ModNone && cmd == config.CmdMoveup) {
 			// Scrolling up
 			if t.page.Row > 0 {
 				t.page.Row--
+				t.view.ScrollTo(t.page.Row, t.page.Column)
 			}
 			return event
 		} else if (key == tcell.KeyDown && mod == tcell.ModNone) ||
-			(key == tcell.KeyRune && mod == tcell.ModNone && ru == 'j') {
+			(key == tcell.KeyRune && mod == tcell.ModNone && cmd == config.CmdMovedn) {
 			// Scrolling down
 			if t.page.Row < height {
 				t.page.Row++
+				t.view.ScrollTo(t.page.Row, t.page.Column)
 			}
 			return event
 		} else {

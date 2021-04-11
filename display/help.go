@@ -78,6 +78,10 @@ func helpInit() {
 		strings.Split(config.GetKeyBinding(config.CmdLink0), ",")[0])
 
 	helpCells = fmt.Sprintf(helpCells,
+		config.GetKeyBinding(config.CmdMoveup),
+		config.GetKeyBinding(config.CmdMovedn),
+		config.GetKeyBinding(config.CmdMoveLeft),
+		config.GetKeyBinding(config.CmdMoveRight),
 		config.GetKeyBinding(config.CmdPgup),
 		config.GetKeyBinding(config.CmdPgdn),
 		config.GetKeyBinding(config.CmdBack),

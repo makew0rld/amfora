@@ -42,6 +42,10 @@ const (
 	CmdReload
 	CmdBack
 	CmdForward
+	CmdMoveup
+	CmdMovedn
+	CmdMoveLeft
+	CmdMoveRight
 	CmdPgup
 	CmdPgdn
 	CmdNewTab
@@ -166,6 +170,10 @@ func KeyInit() {
 		CmdReload:      "keybindings.bind_reload",
 		CmdBack:        "keybindings.bind_back",
 		CmdForward:     "keybindings.bind_forward",
+		CmdMoveup:      "keybindings.bind_moveup",
+		CmdMovedn:      "keybindings.bind_movedn",
+		CmdMoveLeft:    "keybindings.bind_moveleft",
+		CmdMoveRight:   "keybindings.bind_moveright",
 		CmdPgup:        "keybindings.bind_pgup",
 		CmdPgdn:        "keybindings.bind_pgdn",
 		CmdNewTab:      "keybindings.bind_new_tab",

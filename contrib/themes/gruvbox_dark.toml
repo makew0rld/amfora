@@ -1,0 +1,120 @@
+[theme]
+# This section is for changing the COLORS used in Amfora.
+# These colors only apply if 'color' is enabled above.
+# Colors can be set using a W3C color name, or a hex value such as "#ffffff".
+
+# Note that not all colors will work on terminals that do not have truecolor support.
+# If you want to stick to the standard 16 or 256 colors, you can get
+# a list of those here: https://jonasjacek.github.io/colors/
+# DO NOT use the names from that site, just the hex codes.
+
+# Definitions:
+#   bg = background
+#   fg = foreground
+#   dl = download
+#   btn = button
+#   hdg = heading
+#   bkmk = bookmark
+#   modal = a popup window/box in the middle of the screen
+
+# EXAMPLES:
+# hdg_1 = "green"
+# hdg_2 = "#5f0000"
+
+# Available keys to set:
+
+# bg: background for pages, tab row, app in general
+# tab_num: The number/highlight of the tabs at the top
+# tab_divider: The color of the divider character between tab numbers: |
+# bottombar_label: The color of the prompt that appears when you press space
+# bottombar_text: The color of the text you type
+# bottombar_bg
+
+# hdg_1
+# hdg_2
+# hdg_3
+# amfora_link: A link that Amfora supports viewing. For now this is only gemini://
+# foreign_link: HTTP(S), Gopher, etc
+# link_number: The silver number that appears to the left of a link
+# regular_text: Normal gemini text, and plaintext documents
+# quote_text
+# preformatted_text
+# list_text
+
+# btn_bg: The bg color for all modal buttons
+# btn_text: The text color for all modal buttons
+
+# dl_choice_modal_bg
+# dl_choice_modal_text
+# dl_modal_bg
+# dl_modal_text
+# info_modal_bg
+# info_modal_text
+# error_modal_bg
+# error_modal_text
+# yesno_modal_bg
+# yesno_modal_text
+# tofu_modal_bg
+# tofu_modal_text
+
+# input_modal_bg
+# input_modal_text
+# input_modal_field_bg: The bg of the input field, where you type the text
+# input_modal_field_text: The color of the text you type
+
+# bkmk_modal_bg
+# bkmk_modal_text
+# bkmk_modal_label
+# bkmk_modal_field_bg
+# bkmk_modal_field_text
+
+# Gruvbox Dark theme
+
+bg =                      "#282828"
+fg =                      "#32302f"
+tab_num =                 "#7c6f64"
+tab_divider =             "#d5c4a1"
+bottombar_label =         "#8f3f71"
+bottombar_text =          "#bdae93"
+bottombar_bg =            "#282828"
+scrollbar =               "#504945"
+
+hdg_1 =                   "#cc241d"
+hdg_2 =                   "#fabd2f"
+hdg_3 =                   "#d65d0e"
+amfora_link =             "#8ec073"
+foreign_link =            "#458588"
+link_number =             "#504945"
+regular_text =            "#f9f5d7"
+quote_text =              "#d3869b"
+preformatted_text =       "#d3869b"
+list_text =               "#bdae93"
+
+btn_bg =                  "#3c3836"
+btn_text =                "#ebdbb2"
+
+dl_choice_modal_bg =      "#3c3836"
+dl_choice_modal_text =    "#ebdbb2"
+dl_modal_bg =             "#3c3836"
+dl_modal_text =           "#ebdbb2"
+info_modal_bg =           "#3c3836"
+info_modal_text =         "#ebdbb2"
+error_modal_bg =          "#3c3836"
+error_modal_text =        "#fe8019"
+yesno_modal_bg =          "#3c3836"
+yesno_modal_text =        "#ebdbb2"
+tofu_modal_bg =           "#3c3836"
+tofu_modal_text =         "#ebdbb2"
+subscription_modal_bg =   "#3c3836"
+subscription_modal_text = "#ebdbb2"
+
+input_modal_bg =          "#3c3836"
+input_modal_text =        "#ebdbb2"
+input_modal_field_bg =    "#1d2021"
+input_modal_field_text =  "#ebdbb2"
+
+bkmk_modal_bg =           "#3c3836"
+bkmk_modal_text =         "#ebdbb2"
+bkmk_modal_label =        "#ebdbb2"
+bkmk_modal_field_bg =     "#1d2021"
+bkmk_modal_field_text =   "#f9f5d7"

@@ -242,6 +242,8 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_tab8", "*")
 	viper.SetDefault("keybindings.bind_tab9", "(")
 	viper.SetDefault("keybindings.bind_tab0", ")")
+	viper.SetDefault("keybindings.bind_yank_page_uri", "Y")
+	viper.SetDefault("keybindings.bind_yank_target_uri", "y")
 	viper.SetDefault("keybindings.shift_numbers", "")
 	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)

@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"code.rocketnine.space/tslocum/cview"
+	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
@@ -352,6 +353,26 @@ func Init(version, commit, builtBy string) {
 			case config.CmdAddSub:
 				go addSubscription()
 				return nil
+			case config.CmdYankPageURI:
+				currentURI := tabs[curTab].page.URL
+				addToClipboard(currentURI)
+				return nil
+			case config.CmdYankTargetURI:
+				currentURI := tabs[curTab].page.URL
+				selectedURI := GetCurrentURI()
+				// Handle absolute URIs
+				if strings.HasPrefix(selectedURI, "gemini") || strings.HasPrefix(selectedURI, "http") {
+					addToClipboard(selectedURI)
+					return nil
+				} else if strings.HasPrefix(selectedURI, "/") {
+					// Handle relative URIs
+					u, _ := url.Parse(currentURI)
+					addToClipboard(u.Scheme + "://" + u.Host + selectedURI)
+					return nil
+				} else {
+					addToClipboard(currentURI + selectedURI)
+					return nil
+				}
 			}
 
 			// Number key: 1-9, 0, LINK1-LINK10
@@ -575,4 +596,11 @@ func URL(u string) {
 
 func NumTabs() int {
 	return len(tabs)
+}
+
+func addToClipboard(text string) {
+	err := clipboard.WriteAll(text)
+	if err != nil {
+		return
+	}
 }

@@ -323,3 +323,15 @@ func (t *tab) applyAll() {
 		t.applyBottomBar()
 	}
 }
+
+// GetCurrentURI returns the currently selected URI
+func GetCurrentURI() string {
+	currentSelection := tabs[curTab].view.GetHighlights()
+
+	if len(currentSelection) > 0 {
+		linkN, _ := strconv.Atoi(currentSelection[0])
+		selectedURI := tabs[curTab].page.Links[linkN]
+		return selectedURI
+	}
+	return ""
+}

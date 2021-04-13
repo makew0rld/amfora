@@ -158,6 +158,8 @@ scrollbar = "auto"
 # bind_help
 # bind_sub: for viewing the subscriptions page
 # bind_add_sub
+# bind_yank_page_uri
+# bind_yank_target_uri
 
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.

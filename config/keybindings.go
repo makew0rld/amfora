@@ -52,8 +52,8 @@ const (
 	CmdHelp
 	CmdSub
 	CmdAddSub
-	CmdYankPageURI
-	CmdYankTargetURI
+	CmdCopyPageURL
+	CmdCopyTargetURL
 )
 
 type keyBinding struct {
@@ -178,8 +178,8 @@ func KeyInit() {
 		CmdHelp:          "keybindings.bind_help",
 		CmdSub:           "keybindings.bind_sub",
 		CmdAddSub:        "keybindings.bind_add_sub",
-		CmdYankPageURI:   "keybindings.bind_yank_page_uri",
-		CmdYankTargetURI: "keybindings.bind_yank_target_uri",
+		CmdCopyPageURL:   "keybindings.bind_copy_page_url",
+		CmdCopyTargetURL: "keybindings.bind_copy_target_url",
 	}
 	// This is split off to allow shift_numbers to override bind_tab[1-90]
 	// (This is needed for older configs so that the default bind_tab values

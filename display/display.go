@@ -353,24 +353,40 @@ func Init(version, commit, builtBy string) {
 			case config.CmdAddSub:
 				go addSubscription()
 				return nil
-			case config.CmdYankPageURI:
-				currentURI := tabs[curTab].page.URL
-				addToClipboard(currentURI)
-				return nil
-			case config.CmdYankTargetURI:
-				currentURI := tabs[curTab].page.URL
-				selectedURI := GetCurrentURI()
-				// Handle absolute URIs
-				if strings.HasPrefix(selectedURI, "gemini") || strings.HasPrefix(selectedURI, "http") {
-					addToClipboard(selectedURI)
+			case config.CmdCopyPageURL:
+				currentURL := tabs[curTab].page.URL
+				err := clipboard.WriteAll(currentURL)
+				if err != nil {
+					Error("Copy Error", err.Error())
 					return nil
-				} else if strings.HasPrefix(selectedURI, "/") {
-					// Handle relative URIs
-					u, _ := url.Parse(currentURI)
-					addToClipboard(u.Scheme + "://" + u.Host + selectedURI)
+				}
+				return nil
+			case config.CmdCopyTargetURL:
+				currentURL := tabs[curTab].page.URL
+				selectedURL := tabs[curTab].HighlightedURL()
+				// Handle absolute URLs
+				if strings.HasPrefix(selectedURL, "gemini") || strings.HasPrefix(selectedURL, "http") {
+					err := clipboard.WriteAll(selectedURL)
+					if err != nil {
+						Error("Copy Error", err.Error())
+						return nil
+					}
+					return nil
+				} else if strings.HasPrefix(selectedURL, "/") {
+					// Handle relative URLs
+					u, _ := url.Parse(currentURL)
+					err := clipboard.WriteAll(u.Scheme + "://" + u.Host + selectedURL)
+					if err != nil {
+						Error("Copy Error", err.Error())
+						return nil
+					}
 					return nil
 				} else {
-					addToClipboard(currentURI + selectedURI)
+					err := clipboard.WriteAll(currentURL + selectedURL)
+					if err != nil {
+						Error("Copy Error", err.Error())
+						return nil
+					}
 					return nil
 				}
 			}
@@ -596,11 +612,4 @@ func URL(u string) {
 
 func NumTabs() int {
 	return len(tabs)
-}
-
-func addToClipboard(text string) {
-	err := clipboard.WriteAll(text)
-	if err != nil {
-		return
-	}
 }

@@ -324,14 +324,14 @@ func (t *tab) applyAll() {
 	}
 }
 
-// GetCurrentURI returns the currently selected URI
-func GetCurrentURI() string {
+// HighlightedURL returns the currently selected URL
+func (t *tab) HighlightedURL() string {
 	currentSelection := tabs[curTab].view.GetHighlights()
 
 	if len(currentSelection) > 0 {
 		linkN, _ := strconv.Atoi(currentSelection[0])
-		selectedURI := tabs[curTab].page.Links[linkN]
-		return selectedURI
+		selectedURL := tabs[curTab].page.Links[linkN]
+		return selectedURL
 	}
 	return ""
 }

@@ -364,31 +364,25 @@ func Init(version, commit, builtBy string) {
 			case config.CmdCopyTargetURL:
 				currentURL := tabs[curTab].page.URL
 				selectedURL := tabs[curTab].HighlightedURL()
-				// Handle absolute URLs
-				if strings.HasPrefix(selectedURL, "gemini") || strings.HasPrefix(selectedURL, "http") {
+				if selectedURL == "" {
+					return nil
+				}
+				u, _ := url.Parse(currentURL)
+				copiedURL, err := u.Parse(selectedURL)
+				if err != nil {
 					err := clipboard.WriteAll(selectedURL)
 					if err != nil {
 						Error("Copy Error", err.Error())
 						return nil
 					}
 					return nil
-				} else if strings.HasPrefix(selectedURL, "/") {
-					// Handle relative URLs
-					u, _ := url.Parse(currentURL)
-					err := clipboard.WriteAll(u.Scheme + "://" + u.Host + selectedURL)
-					if err != nil {
-						Error("Copy Error", err.Error())
-						return nil
-					}
-					return nil
-				} else {
-					err := clipboard.WriteAll(currentURL + selectedURL)
-					if err != nil {
-						Error("Copy Error", err.Error())
-						return nil
-					}
+				}
+				err = clipboard.WriteAll(copiedURL.String())
+				if err != nil {
+					Error("Copy Error", err.Error())
 					return nil
 				}
+				return nil
 			}
 
 			// Number key: 1-9, 0, LINK1-LINK10

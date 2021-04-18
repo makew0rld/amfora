@@ -14,7 +14,7 @@ require (
 	github.com/mmcdole/gofeed v1.1.0
 	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/rkoesters/xdg v0.0.0-20181125232953-edd15b846f9b
-	github.com/schollz/progressbar/v3 v3.7.2
+	github.com/schollz/progressbar/v3 v3.8.0
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
@@ -28,5 +28,3 @@ require (
 )
 
 replace github.com/mmcdole/gofeed => github.com/makeworld-the-better-one/gofeed v1.1.1-0.20210412225217-d407d33eb43a
-
-replace github.com/schollz/progressbar/v3 => github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20210412211336-a11e9756c4d2

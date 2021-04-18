@@ -138,8 +138,8 @@ github.com/magiconair/properties v1.8.1 h1:ZC2Vc7/ZFkGmsVC9KvOjumD+G5lXy2RtTKyzR
 github.com/magiconair/properties v1.8.1/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/makeworld-the-better-one/go-gemini v0.11.0 h1:MNGiULJFvcqls9oCy40tE897hDeKvNmEK9i5kRucgQk=
 github.com/makeworld-the-better-one/go-gemini v0.11.0/go.mod h1:F+3x+R1xeYK90jMtBq+U+8Sh64r2dHleDZ/en3YgSmg=
-github.com/makeworld-the-better-one/gofeed v1.1.1-0.20201123002655-c0c6354134fe h1:i3b9Qy5z23DcXRnrsMYcM5s9Ng5VIidM1xZd+szuTsY=
-github.com/makeworld-the-better-one/gofeed v1.1.1-0.20201123002655-c0c6354134fe/go.mod h1:QQO3maftbOu+hiVOGOZDRLymqGQCos4zxbA4j89gMrE=
+github.com/makeworld-the-better-one/gofeed v1.1.1-0.20210412225217-d407d33eb43a h1:nFn7wCBHpxImHihAlPWCDXofutuA2bypy4gtFwlQmX0=
+github.com/makeworld-the-better-one/gofeed v1.1.1-0.20210412225217-d407d33eb43a/go.mod h1:QQO3maftbOu+hiVOGOZDRLymqGQCos4zxbA4j89gMrE=
 github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20201220005701-b036c4d38568 h1:fod4pD+rsU73WIUxl8Kpo35LDuOx0uxzlprBKbm84vw=
 github.com/makeworld-the-better-one/progressbar/v3 v3.3.5-0.20201220005701-b036c4d38568/go.mod h1:CG/f0JmacksUc6TkZToO7tVq4t03zIQSQUtTd7F9GR4=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=

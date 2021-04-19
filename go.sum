@@ -138,8 +138,6 @@ github.com/magiconair/properties v1.8.1 h1:ZC2Vc7/ZFkGmsVC9KvOjumD+G5lXy2RtTKyzR
 github.com/magiconair/properties v1.8.1/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/makeworld-the-better-one/go-gemini v0.11.0 h1:MNGiULJFvcqls9oCy40tE897hDeKvNmEK9i5kRucgQk=
 github.com/makeworld-the-better-one/go-gemini v0.11.0/go.mod h1:F+3x+R1xeYK90jMtBq+U+8Sh64r2dHleDZ/en3YgSmg=
-github.com/makeworld-the-better-one/gofeed v1.1.1-0.20210412225217-d407d33eb43a h1:nFn7wCBHpxImHihAlPWCDXofutuA2bypy4gtFwlQmX0=
-github.com/makeworld-the-better-one/gofeed v1.1.1-0.20210412225217-d407d33eb43a/go.mod h1:QQO3maftbOu+hiVOGOZDRLymqGQCos4zxbA4j89gMrE=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-isatty v0.0.3/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
@@ -161,6 +159,8 @@ github.com/mitchellh/mapstructure v0.0.0-20160808181253-ca63d7c062ee/go.mod h1:F
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/mitchellh/mapstructure v1.3.1 h1:cCBH2gTD2K0OtLlv/Y5H01VQCqmlDxz30kS5Y5bqfLA=
 github.com/mitchellh/mapstructure v1.3.1/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
+github.com/mmcdole/gofeed v1.1.2 h1:7I5su6dO5/Rg2LEKS5ofPISVbi2vfxO2SNVSA/QN1y4=
+github.com/mmcdole/gofeed v1.1.2/go.mod h1:QQO3maftbOu+hiVOGOZDRLymqGQCos4zxbA4j89gMrE=
 github.com/mmcdole/goxpp v0.0.0-20181012175147-0068e33feabf h1:sWGE2v+hO0Nd4yFU/S/mDBM5plIU8v/Qhfz41hkDIAI=
 github.com/mmcdole/goxpp v0.0.0-20181012175147-0068e33feabf/go.mod h1:pasqhqstspkosTneA62Nc+2p9SOBBYAPbnmRRWPQ0V8=
 github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=

@@ -8,7 +8,7 @@ Other projects are encouraged to copy this code if it's useful to them, and this
 
 ## License
 
-If you prefer, you can consider the code in this package, and this package only, to be licensed under the MIT license instead.
+If you prefer, you can consider the code in this package, and this package only, to be licensed under the MIT license instead. So the code in this package is dual-licensed. You can use the LICENSE file in the root of this repo, or the license text below.
 
 <details>
 <summary>Click to see MIT license terms</summary>

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Support for version 1.1 JSON feeds
+- Copy current URL or selected URL to clipboard (#220, #225)
+  - Uses <kbd>C</kbd> and <kbd>c</kbd> by default
 
 ### Changed
 - Favicon support removed (#199)

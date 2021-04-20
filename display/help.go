@@ -29,7 +29,7 @@ var helpCells = strings.TrimSpace(
 		"%s\tGo to links 1-10 respectively.\n" +
 		"%s\tEdit current URL\n" +
 		"%s\tCopy current page URL\n" +
-		"%s\tCopy current target URL\n" +
+		"%s\tCopy current selected URL\n" +
 		"Enter, Tab\tOn a page this will start link highlighting.\n" +
 		"\tPress Tab and Shift-Tab to pick different links.\n" +
 		"\tPress Enter again to go to one, or Esc to stop.\n" +

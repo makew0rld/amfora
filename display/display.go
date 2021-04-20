@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"code.rocketnine.space/tslocum/cview"
+	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
@@ -351,6 +352,36 @@ func Init(version, commit, builtBy string) {
 				return nil
 			case config.CmdAddSub:
 				go addSubscription()
+				return nil
+			case config.CmdCopyPageURL:
+				currentURL := tabs[curTab].page.URL
+				err := clipboard.WriteAll(currentURL)
+				if err != nil {
+					Error("Copy Error", err.Error())
+					return nil
+				}
+				return nil
+			case config.CmdCopyTargetURL:
+				currentURL := tabs[curTab].page.URL
+				selectedURL := tabs[curTab].HighlightedURL()
+				if selectedURL == "" {
+					return nil
+				}
+				u, _ := url.Parse(currentURL)
+				copiedURL, err := u.Parse(selectedURL)
+				if err != nil {
+					err := clipboard.WriteAll(selectedURL)
+					if err != nil {
+						Error("Copy Error", err.Error())
+						return nil
+					}
+					return nil
+				}
+				err = clipboard.WriteAll(copiedURL.String())
+				if err != nil {
+					Error("Copy Error", err.Error())
+					return nil
+				}
 				return nil
 			}
 

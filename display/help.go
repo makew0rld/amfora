@@ -28,6 +28,8 @@ var helpCells = strings.TrimSpace(
 		"\tinstead of the current one.\n" +
 		"%s\tGo to links 1-10 respectively.\n" +
 		"%s\tEdit current URL\n" +
+		"%s\tCopy current page URL\n" +
+		"%s\tCopy current selected URL\n" +
 		"Enter, Tab\tOn a page this will start link highlighting.\n" +
 		"\tPress Tab and Shift-Tab to pick different links.\n" +
 		"\tPress Enter again to go to one, or Esc to stop.\n" +
@@ -85,6 +87,8 @@ func helpInit() {
 		config.GetKeyBinding(config.CmdBottom),
 		linkKeys,
 		config.GetKeyBinding(config.CmdEdit),
+		config.GetKeyBinding(config.CmdCopyPageURL),
+		config.GetKeyBinding(config.CmdCopyTargetURL),
 		tabKeys,
 		config.GetKeyBinding(config.CmdTab0),
 		config.GetKeyBinding(config.CmdPrevTab),

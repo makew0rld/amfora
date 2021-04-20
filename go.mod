@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	code.rocketnine.space/tslocum/cview v1.5.4
+	github.com/atotto/clipboard v0.1.4
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gdamore/tcell/v2 v2.2.1-0.20210305060500-f4d402906fa3

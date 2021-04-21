@@ -155,7 +155,6 @@ func makeNewTab() *tab {
 				}
 			}
 			t.page.Column++
-			t.view.ScrollTo(t.page.Row, t.page.Column)
 		} else if cmd == config.CmdMoveLeft {
 			// Scrolling to the left
 			if t.page.Column == 0 {
@@ -163,21 +162,6 @@ func makeNewTab() *tab {
 				return nil
 			}
 			t.page.Column--
-			t.view.ScrollTo(t.page.Row, t.page.Column)
-		} else if cmd == config.CmdMoveup {
-			// Scrolling up
-			if t.page.Row > 0 {
-				t.page.Row--
-				t.view.ScrollTo(t.page.Row, t.page.Column)
-			}
-			return event
-		} else if cmd == config.CmdMovedn {
-			// Scrolling down
-			if t.page.Row < height {
-				t.page.Row++
-				t.view.ScrollTo(t.page.Row, t.page.Column)
-			}
-			return event
 		} else {
 			// Some other key, stop processing it
 			return event
@@ -185,7 +169,7 @@ func makeNewTab() *tab {
 
 		t.applyHorizontalScroll()
 		App.Draw()
-		return nil
+		return event
 	})
 
 	return &t

@@ -3,6 +3,7 @@ package config
 import (
 	"strings"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/spf13/viper"
 )
@@ -206,6 +207,11 @@ func KeyInit() {
 	for k, kname := range tcell.KeyNames {
 		tcellKeys[kname] = k
 	}
+
+	cview.Keys.MoveUp2 = viper.GetStringSlice(configBindings[CmdMoveup])
+	cview.Keys.MoveDown2 = viper.GetStringSlice(configBindings[CmdMovedn])
+	cview.Keys.MoveLeft2 = viper.GetStringSlice(configBindings[CmdMoveLeft])
+	cview.Keys.MoveRight2 = viper.GetStringSlice(configBindings[CmdMoveRight])
 
 	for c, allb := range configBindings {
 		for _, b := range viper.GetStringSlice(allb) {

@@ -57,6 +57,8 @@ const (
 	CmdHelp
 	CmdSub
 	CmdAddSub
+	CmdCopyPageURL
+	CmdCopyTargetURL
 )
 
 type keyBinding struct {
@@ -152,39 +154,41 @@ func parseBinding(cmd Command, binding string) {
 // Called by config.Init()
 func KeyInit() {
 	configBindings := map[Command]string{
-		CmdLink1:       "keybindings.bind_link1",
-		CmdLink2:       "keybindings.bind_link2",
-		CmdLink3:       "keybindings.bind_link3",
-		CmdLink4:       "keybindings.bind_link4",
-		CmdLink5:       "keybindings.bind_link5",
-		CmdLink6:       "keybindings.bind_link6",
-		CmdLink7:       "keybindings.bind_link7",
-		CmdLink8:       "keybindings.bind_link8",
-		CmdLink9:       "keybindings.bind_link9",
-		CmdLink0:       "keybindings.bind_link0",
-		CmdBottom:      "keybindings.bind_bottom",
-		CmdEdit:        "keybindings.bind_edit",
-		CmdHome:        "keybindings.bind_home",
-		CmdBookmarks:   "keybindings.bind_bookmarks",
-		CmdAddBookmark: "keybindings.bind_add_bookmark",
-		CmdSave:        "keybindings.bind_save",
-		CmdReload:      "keybindings.bind_reload",
-		CmdBack:        "keybindings.bind_back",
-		CmdForward:     "keybindings.bind_forward",
-		CmdMoveUp:      "keybindings.bind_moveup",
-		CmdMoveDown:    "keybindings.bind_movedown",
-		CmdMoveLeft:    "keybindings.bind_moveleft",
-		CmdMoveRight:   "keybindings.bind_moveright",
-		CmdPgup:        "keybindings.bind_pgup",
-		CmdPgdn:        "keybindings.bind_pgdn",
-		CmdNewTab:      "keybindings.bind_new_tab",
-		CmdCloseTab:    "keybindings.bind_close_tab",
-		CmdNextTab:     "keybindings.bind_next_tab",
-		CmdPrevTab:     "keybindings.bind_prev_tab",
-		CmdQuit:        "keybindings.bind_quit",
-		CmdHelp:        "keybindings.bind_help",
-		CmdSub:         "keybindings.bind_sub",
-		CmdAddSub:      "keybindings.bind_add_sub",
+		CmdLink1:         "keybindings.bind_link1",
+		CmdLink2:         "keybindings.bind_link2",
+		CmdLink3:         "keybindings.bind_link3",
+		CmdLink4:         "keybindings.bind_link4",
+		CmdLink5:         "keybindings.bind_link5",
+		CmdLink6:         "keybindings.bind_link6",
+		CmdLink7:         "keybindings.bind_link7",
+		CmdLink8:         "keybindings.bind_link8",
+		CmdLink9:         "keybindings.bind_link9",
+		CmdLink0:         "keybindings.bind_link0",
+		CmdBottom:        "keybindings.bind_bottom",
+		CmdEdit:          "keybindings.bind_edit",
+		CmdHome:          "keybindings.bind_home",
+		CmdBookmarks:     "keybindings.bind_bookmarks",
+		CmdAddBookmark:   "keybindings.bind_add_bookmark",
+		CmdSave:          "keybindings.bind_save",
+		CmdReload:        "keybindings.bind_reload",
+		CmdBack:          "keybindings.bind_back",
+		CmdForward:       "keybindings.bind_forward",
+    CmdMoveUp:        "keybindings.bind_moveup",
+		CmdMoveDown:      "keybindings.bind_movedown",
+		CmdMoveLeft:      "keybindings.bind_moveleft",
+		CmdMoveRight:     "keybindings.bind_moveright",
+		CmdPgup:          "keybindings.bind_pgup",
+		CmdPgdn:          "keybindings.bind_pgdn",
+		CmdNewTab:        "keybindings.bind_new_tab",
+		CmdCloseTab:      "keybindings.bind_close_tab",
+		CmdNextTab:       "keybindings.bind_next_tab",
+		CmdPrevTab:       "keybindings.bind_prev_tab",
+		CmdQuit:          "keybindings.bind_quit",
+		CmdHelp:          "keybindings.bind_help",
+		CmdSub:           "keybindings.bind_sub",
+		CmdAddSub:        "keybindings.bind_add_sub",
+		CmdCopyPageURL:   "keybindings.bind_copy_page_url",
+		CmdCopyTargetURL: "keybindings.bind_copy_target_url",
 	}
 	// This is split off to allow shift_numbers to override bind_tab[1-90]
 	// (This is needed for older configs so that the default bind_tab values

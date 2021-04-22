@@ -32,6 +32,11 @@ uninstall:
 	$(RM) -f $(PREFIX)/share/applications/amfora.desktop
 
 # Development helpers
+
 .PHONY: fmt
 fmt:
 	$(GO) fmt ./...
+
+.PHONY: gen
+gen:
+	$(GO) generate ./...

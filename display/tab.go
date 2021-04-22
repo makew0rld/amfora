@@ -305,3 +305,15 @@ func (t *tab) applyAll() {
 		t.applyBottomBar()
 	}
 }
+
+// HighlightedURL returns the currently selected URL
+func (t *tab) HighlightedURL() string {
+	currentSelection := tabs[curTab].view.GetHighlights()
+
+	if len(currentSelection) > 0 {
+		linkN, _ := strconv.Atoi(currentSelection[0])
+		selectedURL := tabs[curTab].page.Links[linkN]
+		return selectedURL
+	}
+	return ""
+}

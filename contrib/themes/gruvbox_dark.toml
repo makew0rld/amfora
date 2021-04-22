@@ -1,0 +1,52 @@
+[theme]
+
+# Gruvbox Dark theme
+
+bg =                      "#282828"
+fg =                      "#32302f"
+tab_num =                 "#7c6f64"
+tab_divider =             "#d5c4a1"
+bottombar_label =         "#8f3f71"
+bottombar_text =          "#bdae93"
+bottombar_bg =            "#282828"
+scrollbar =               "#504945"
+
+hdg_1 =                   "#cc241d"
+hdg_2 =                   "#fabd2f"
+hdg_3 =                   "#d65d0e"
+amfora_link =             "#8ec073"
+foreign_link =            "#458588"
+link_number =             "#504945"
+regular_text =            "#f9f5d7"
+quote_text =              "#d3869b"
+preformatted_text =       "#d3869b"
+list_text =               "#bdae93"
+
+btn_bg =                  "#3c3836"
+btn_text =                "#ebdbb2"
+
+dl_choice_modal_bg =      "#3c3836"
+dl_choice_modal_text =    "#ebdbb2"
+dl_modal_bg =             "#3c3836"
+dl_modal_text =           "#ebdbb2"
+info_modal_bg =           "#3c3836"
+info_modal_text =         "#ebdbb2"
+error_modal_bg =          "#3c3836"
+error_modal_text =        "#fe8019"
+yesno_modal_bg =          "#3c3836"
+yesno_modal_text =        "#ebdbb2"
+tofu_modal_bg =           "#3c3836"
+tofu_modal_text =         "#ebdbb2"
+subscription_modal_bg =   "#3c3836"
+subscription_modal_text = "#ebdbb2"
+
+input_modal_bg =          "#3c3836"
+input_modal_text =        "#ebdbb2"
+input_modal_field_bg =    "#1d2021"
+input_modal_field_text =  "#ebdbb2"
+
+bkmk_modal_bg =           "#3c3836"
+bkmk_modal_text =         "#ebdbb2"
+bkmk_modal_label =        "#ebdbb2"
+bkmk_modal_field_bg =     "#1d2021"
+bkmk_modal_field_text =   "#f9f5d7"

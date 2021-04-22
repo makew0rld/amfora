@@ -1,6 +1,6 @@
 # User Contributed Themes
 
-You can use these themes by replacing the `[theme]` section of your config with their contents. Some themes won't display properly on terminals that do not have truecolor support.
+You can use these themes by replacing the `[theme]` section of your [config](https://github.com/makeworld-the-better-one/amfora/wiki/Configuration) with their contents. Some themes won't display properly on terminals that do not have truecolor support.
 
 ## Nord
 
@@ -93,6 +93,27 @@ Contributed by **[@joyalicegu](https://github.com/joyalicegu)**.
 ### Light
 
 ![screenshot of atelier forest light theme](https://user-images.githubusercontent.com/16532904/114287105-22954580-9a19-11eb-8c09-2bce083286b2.png)
+
+
+## Slimey
+
+Contributed by **[@lee2sman](https://github.com/lee2sman)**.
+
+![screenshot of Slimey theme](https://user-images.githubusercontent.com/7377908/114319350-212e5080-9adf-11eb-9d41-d4e800c6570f.png)
+
+## Gruvbox Dark
+
+Contributed by **[@thumb](https://github.com/thumbfighter)**.
+
+![screenshot of Gruvbox Dark theme](https://user-images.githubusercontent.com/19327775/114431954-b97f1080-9b85-11eb-9da5-e1ebf06beba9.png)
+
+<details>
+<summary>More screenshots</summary>
+  
+![screenshot of makeworld.space home page](https://user-images.githubusercontent.com/19327775/114432099-f0552680-9b85-11eb-9b4f-629d62d971b4.png)
+![screenshot of error](https://user-images.githubusercontent.com/19327775/114432066-e4696480-9b85-11eb-8ed0-c454f37fe9cf.png)
+![screenshot of add bookmark](https://user-images.githubusercontent.com/19327775/114432084-e8958200-9b85-11eb-9813-9982c3c0effa.png)
+</details>
 
 ## Yours?
 

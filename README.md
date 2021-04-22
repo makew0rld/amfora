@@ -148,9 +148,9 @@ Amfora ❤️ open source!
   - It uses [tcell](https://github.com/gdamore/tcell) for low level terminal operations
 - [Viper](https://github.com/spf13/viper) for configuration and TOFU storing
 - [go-gemini](https://github.com/makeworld-the-better-one/go-gemini), my forked and updated Gemini client/server library
-- My [progressbar fork](https://github.com/makeworld-the-better-one/progressbar) - pull request [here](https://github.com/schollz/progressbar/pull/69)
+- [progressbar](https://github.com/schollz/progressbar)
 - [go-humanize](https://github.com/dustin/go-humanize)
-- My [gofeed fork](https://github.com/makeworld-the-better-one/gofeed) - pull request [here](https://github.com/mmcdole/gofeed/pull/164)
+- [gofeed](https://github.com/mmcdole/gofeed)
 
 ## License
 This project is licensed under the GPL v3.0. See the [LICENSE](./LICENSE) file for details.

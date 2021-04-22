@@ -149,7 +149,7 @@ scrollbar = "auto"
 # bind_back
 # bind_forward
 # bind_moveup
-# bind_movedn
+# bind_movedown
 # bind_moveleft
 # bind_moveright
 # bind_pgup

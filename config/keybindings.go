@@ -43,8 +43,8 @@ const (
 	CmdReload
 	CmdBack
 	CmdForward
-	CmdMoveup
-	CmdMovedn
+	CmdMoveUp
+	CmdMoveDown
 	CmdMoveLeft
 	CmdMoveRight
 	CmdPgup
@@ -171,8 +171,8 @@ func KeyInit() {
 		CmdReload:      "keybindings.bind_reload",
 		CmdBack:        "keybindings.bind_back",
 		CmdForward:     "keybindings.bind_forward",
-		CmdMoveup:      "keybindings.bind_moveup",
-		CmdMovedn:      "keybindings.bind_movedn",
+		CmdMoveUp:      "keybindings.bind_moveup",
+		CmdMoveDown:    "keybindings.bind_movedown",
 		CmdMoveLeft:    "keybindings.bind_moveleft",
 		CmdMoveRight:   "keybindings.bind_moveright",
 		CmdPgup:        "keybindings.bind_pgup",
@@ -208,8 +208,8 @@ func KeyInit() {
 		tcellKeys[kname] = k
 	}
 
-	cview.Keys.MoveUp2 = viper.GetStringSlice(configBindings[CmdMoveup])
-	cview.Keys.MoveDown2 = viper.GetStringSlice(configBindings[CmdMovedn])
+	cview.Keys.MoveUp2 = viper.GetStringSlice(configBindings[CmdMoveUp])
+	cview.Keys.MoveDown2 = viper.GetStringSlice(configBindings[CmdMoveDown])
 	cview.Keys.MoveLeft2 = viper.GetStringSlice(configBindings[CmdMoveLeft])
 	cview.Keys.MoveRight2 = viper.GetStringSlice(configBindings[CmdMoveRight])
 

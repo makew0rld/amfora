@@ -79,8 +79,8 @@ func helpInit() {
 
 	helpCells = fmt.Sprintf(helpCells,
 		config.GetKeyBinding(config.CmdMoveLeft),
-		config.GetKeyBinding(config.CmdMovedn),
-		config.GetKeyBinding(config.CmdMoveup),
+		config.GetKeyBinding(config.CmdMoveDown),
+		config.GetKeyBinding(config.CmdMoveUp),
 		config.GetKeyBinding(config.CmdMoveRight),
 		config.GetKeyBinding(config.CmdPgup),
 		config.GetKeyBinding(config.CmdPgdn),

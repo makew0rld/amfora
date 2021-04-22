@@ -173,7 +173,7 @@ func KeyInit() {
 		CmdReload:        "keybindings.bind_reload",
 		CmdBack:          "keybindings.bind_back",
 		CmdForward:       "keybindings.bind_forward",
-    CmdMoveUp:        "keybindings.bind_moveup",
+		CmdMoveUp:        "keybindings.bind_moveup",
 		CmdMoveDown:      "keybindings.bind_movedown",
 		CmdMoveLeft:      "keybindings.bind_moveleft",
 		CmdMoveRight:     "keybindings.bind_moveright",

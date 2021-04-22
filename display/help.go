@@ -13,7 +13,7 @@ import (
 var helpCells = strings.TrimSpace(
 	"?\tBring up this help. You can scroll!\n" +
 		"Esc\tLeave the help\n" +
-		"Arrow keys, h/j/k/l\tScroll and move a page.\n" +
+		"Arrow keys, %s(left)/%s(down)/%s(up)/%s(right)\tScroll and move a page.\n" +
 		"%s\tGo up a page in document\n" +
 		"%s\tGo down a page in document\n" +
 		"g\tGo to top of document\n" +
@@ -80,6 +80,10 @@ func helpInit() {
 		strings.Split(config.GetKeyBinding(config.CmdLink0), ",")[0])
 
 	helpCells = fmt.Sprintf(helpCells,
+		config.GetKeyBinding(config.CmdMoveLeft),
+		config.GetKeyBinding(config.CmdMoveDown),
+		config.GetKeyBinding(config.CmdMoveUp),
+		config.GetKeyBinding(config.CmdMoveRight),
 		config.GetKeyBinding(config.CmdPgup),
 		config.GetKeyBinding(config.CmdPgdn),
 		config.GetKeyBinding(config.CmdBack),

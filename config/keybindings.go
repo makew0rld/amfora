@@ -3,6 +3,7 @@ package config
 import (
 	"strings"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/spf13/viper"
 )
@@ -42,6 +43,10 @@ const (
 	CmdReload
 	CmdBack
 	CmdForward
+	CmdMoveUp
+	CmdMoveDown
+	CmdMoveLeft
+	CmdMoveRight
 	CmdPgup
 	CmdPgdn
 	CmdNewTab
@@ -168,6 +173,10 @@ func KeyInit() {
 		CmdReload:        "keybindings.bind_reload",
 		CmdBack:          "keybindings.bind_back",
 		CmdForward:       "keybindings.bind_forward",
+		CmdMoveUp:        "keybindings.bind_moveup",
+		CmdMoveDown:      "keybindings.bind_movedown",
+		CmdMoveLeft:      "keybindings.bind_moveleft",
+		CmdMoveRight:     "keybindings.bind_moveright",
 		CmdPgup:          "keybindings.bind_pgup",
 		CmdPgdn:          "keybindings.bind_pgdn",
 		CmdNewTab:        "keybindings.bind_new_tab",
@@ -202,6 +211,11 @@ func KeyInit() {
 	for k, kname := range tcell.KeyNames {
 		tcellKeys[kname] = k
 	}
+
+	cview.Keys.MoveUp2 = viper.GetStringSlice(configBindings[CmdMoveUp])
+	cview.Keys.MoveDown2 = viper.GetStringSlice(configBindings[CmdMoveDown])
+	cview.Keys.MoveLeft2 = viper.GetStringSlice(configBindings[CmdMoveLeft])
+	cview.Keys.MoveRight2 = viper.GetStringSlice(configBindings[CmdMoveRight])
 
 	for c, allb := range configBindings {
 		for _, b := range viper.GetStringSlice(allb) {

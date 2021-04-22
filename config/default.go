@@ -148,6 +148,10 @@ scrollbar = "auto"
 # bind_reload
 # bind_back
 # bind_forward
+# bind_moveup
+# bind_movedown
+# bind_moveleft
+# bind_moveright
 # bind_pgup
 # bind_pgdn
 # bind_new_tab

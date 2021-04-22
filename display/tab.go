@@ -122,10 +122,11 @@ func makeNewTab() *tab {
 		}
 	})
 	t.view.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		// Capture left/right scrolling and change the left margin size accordingly, see #197
-		// Up/down scrolling is saved in this func to keep them in sync, but the keys
-		// are passed and no extra behaviour happens.
+		// Capture scrolling and change the left margin size accordingly, see #197
+		// This was also touched by #222
 
+		key := event.Key()
+		mod := event.Modifiers()
 		cmd := config.TranslateKeyEvent(event)
 
 		height, width := t.view.GetBufferSize()
@@ -138,7 +139,7 @@ func makeNewTab() *tab {
 			boxW--
 		}
 
-		if cmd == config.CmdMoveRight {
+		if cmd == config.CmdMoveRight || (key == tcell.KeyRight && mod == tcell.ModNone) {
 			// Scrolling to the right
 
 			if t.page.Column >= leftMargin() {
@@ -155,13 +156,25 @@ func makeNewTab() *tab {
 				}
 			}
 			t.page.Column++
-		} else if cmd == config.CmdMoveLeft {
+		} else if cmd == config.CmdMoveLeft || (key == tcell.KeyLeft && mod == tcell.ModNone) {
 			// Scrolling to the left
 			if t.page.Column == 0 {
 				// Can't scroll to the left anymore
 				return nil
 			}
 			t.page.Column--
+		} else if cmd == config.CmdMoveUp || (key == tcell.KeyUp && mod == tcell.ModNone) {
+			// Scrolling up
+			if t.page.Row > 0 {
+				t.page.Row--
+			}
+			return event
+		} else if cmd == config.CmdMoveDown || (key == tcell.KeyDown && mod == tcell.ModNone) {
+			// Scrolling down
+			if t.page.Row < height {
+				t.page.Row++
+			}
+			return event
 		} else {
 			// Some other key, stop processing it
 			return event
@@ -169,7 +182,7 @@ func makeNewTab() *tab {
 
 		t.applyHorizontalScroll()
 		App.Draw()
-		return event
+		return nil
 	})
 
 	return &t

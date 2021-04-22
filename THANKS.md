@@ -18,3 +18,4 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 * Peter Steinberg (@objectliteral)
 * Thomas Adam (@ThomasAdam)
 * @lostleonardo
+* Himanshu (@singalhimanshu)

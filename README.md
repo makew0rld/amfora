@@ -36,7 +36,7 @@ update-desktop-database ~/.local/share/applications
 Make sure to click "Watch" in the top right, then "Custom" > "Releases" to get notified about new releases!
 
 
-## Linux
+### Linux
 
 <a href="https://repology.org/project/amfora/versions">
     <img src="https://repology.org/badge/vertical-allrepos/amfora.svg" alt="Packaging status" align="right">
@@ -56,7 +56,7 @@ You can update it with:
 brew upgrade amfora
 ```
 
-## Termux
+### Termux
 
 If you're using [Termux](https://termux.com/) on Android you can't just run Amfora like normal. After installing Amfora, run `pkg install proot`. Then run `termux-chroot` before running the Amfora binary. You can exit out of the chroot after closing Amfora. See [here](https://stackoverflow.com/q/38959067/7361270) for why this is needed.
 

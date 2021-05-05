@@ -234,6 +234,15 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 				wrappedItem[0] = fmt.Sprintf(" [%s]\u2022", config.GetColorString("list_text")) +
 					wrappedItem[0] + "[-]"
 				wrappedLines = append(wrappedLines, wrappedItem...)
+			} else {
+				wrappedItem := wrapLine(lines[i][1:], width,
+					fmt.Sprintf("    [%s]", config.GetColorString("list_text")),
+					"[-]", false)
+				// Add "*"
+				wrappedItem[0] = fmt.Sprintf(" [%s]*", config.GetColorString("list_text")) +
+					wrappedItem[0] + "[-]"
+				wrappedLines = append(wrappedLines, wrappedItem...)
+
 			}
 			// Optionally list lines could be colored here too, if color is enabled
 		} else if strings.HasPrefix(lines[i], ">") {

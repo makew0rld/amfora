@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Possible subscription update race condition on startup
 - Plaintext documents are escaped properly (regression from v1.8.0)
 - Help page scrollbar color matches what's in the theme config
+- Regression where lists would not appear if `bullets = false` (#234, #235)
 
 
 ## [1.8.0] - 2021-02-17

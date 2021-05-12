@@ -321,8 +321,15 @@ func downloadPage(p *structs.Page) (string, error) {
 func downloadNameFromURL(dir, u, ext string) (string, error) {
 	var name string
 	var err error
+
 	parsed, _ := url.Parse(u)
-	if parsed.Path == "" || path.Base(parsed.Path) == "/" {
+	if strings.HasPrefix(parsed.String(), "about:") {
+		// Is an about page, use the entire page url since there is no hostname
+		name, err = getSafeDownloadName(dir, parsed.String()+ext, true, 0)
+		if err != nil {
+			return "", err
+		}
+	} else if parsed.Path == "" || path.Base(parsed.Path) == "/" {
 		// No file, just the root domain
 		name, err = getSafeDownloadName(dir, parsed.Hostname()+ext, true, 0)
 		if err != nil {
@@ -340,6 +347,7 @@ func downloadNameFromURL(dir, u, ext string) (string, error) {
 			return "", err
 		}
 	}
+
 	return filepath.Join(dir, name), nil
 }
 

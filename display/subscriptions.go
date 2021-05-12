@@ -304,7 +304,7 @@ func addSubscription() {
 	t := tabs[curTab]
 	p := t.page
 
-	if !t.hasContent() {
+	if !t.hasContent() || t.isAnAboutPage() {
 		// It's an about: page, or a malformed one
 		return
 	}

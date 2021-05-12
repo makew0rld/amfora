@@ -23,7 +23,7 @@ func followLink(t *tab, prev, next string) {
 		return
 	}
 
-	if t.hasContent() {
+	if t.hasContent() && !t.isAnAboutPage() {
 		nextURL, err := resolveRelLink(t, prev, next)
 		if err != nil {
 			Error("URL Error", err.Error())

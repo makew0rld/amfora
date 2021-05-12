@@ -155,7 +155,7 @@ func Init(version, commit, builtBy string) {
 				reset()
 				return
 			}
-			if query[0] == '.' && tabs[tab].hasContent() {
+			if query[0] == '.' && tabs[tab].hasContent() && !tabs[tab].isAnAboutPage() {
 				// Relative url
 				current, err := url.Parse(tabs[tab].page.URL)
 				if err != nil {
@@ -576,7 +576,7 @@ func Reload() {
 		return
 	}
 
-	if !tabs[curTab].hasContent() {
+	if !tabs[curTab].hasContent() || tabs[curTab].isAnAboutPage() {
 		return
 	}
 

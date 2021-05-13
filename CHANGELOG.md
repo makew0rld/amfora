@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Copy current URL or selected URL to clipboard (#220, #225)
   - Uses <kbd>C</kbd> and <kbd>c</kbd> by default
 - Configurable keybindings for scrolling on pages (#211, #222)
+- Ability to save `about:` pages (#210, #236)
 
 ### Changed
 - Favicon support removed (#199)

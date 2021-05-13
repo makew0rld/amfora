@@ -20,3 +20,4 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 * @lostleonardo
 * Himanshu (@singalhimanshu)
 * @regr4
+* Anas Mohamed (@amohamed11)

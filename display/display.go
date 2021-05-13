@@ -576,7 +576,7 @@ func Reload() {
 		return
 	}
 
-	if !tabs[curTab].hasContent() || tabs[curTab].isAnAboutPage() {
+	if !tabs[curTab].hasContent() {
 		return
 	}
 

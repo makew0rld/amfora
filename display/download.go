@@ -324,9 +324,7 @@ func downloadNameFromURL(dir, u, ext string) (string, error) {
 
 	parsed, _ := url.Parse(u)
 	if strings.HasPrefix(u, "about:") {
-		// Is an about page, trim out 'about:' for the filename to be saved.
-		pagePath := strings.TrimPrefix(u, "about:")
-		name, err = getSafeDownloadName(dir, pagePath+ext, true, 0)
+		name, err = getSafeDownloadName(dir, parsed.Opaque+ext, true, 0)
 		if err != nil {
 			return "", err
 		}

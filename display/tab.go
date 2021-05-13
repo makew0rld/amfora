@@ -213,7 +213,7 @@ func (t *tab) pageDown() {
 }
 
 // hasContent returns false when the tab's page is malformed,
-// has no content or URL, or if it's an 'about:' page.
+// has no content or URL.
 func (t *tab) hasContent() bool {
 	if t.page == nil || t.view == nil {
 		return false
@@ -221,13 +221,15 @@ func (t *tab) hasContent() bool {
 	if t.page.URL == "" {
 		return false
 	}
-	if strings.HasPrefix(t.page.URL, "about:") {
-		return false
-	}
 	if t.page.Content == "" {
 		return false
 	}
 	return true
+}
+
+// isAnAboutPage returns true when the tab's page is an about page
+func (t *tab) isAnAboutPage() bool {
+	return strings.HasPrefix(t.page.URL, "about:")
 }
 
 // applyHorizontalScroll handles horizontal scroll logic including left margin resizing,

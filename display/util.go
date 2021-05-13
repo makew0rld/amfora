@@ -90,7 +90,7 @@ func textWidth() int {
 // It also returns an error if it could not resolve the links, which should be displayed
 // to the user.
 func resolveRelLink(t *tab, prev, next string) (string, error) {
-	if !t.hasContent() {
+	if !t.hasContent() || t.isAnAboutPage() {
 		return next, nil
 	}
 

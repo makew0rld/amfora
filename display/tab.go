@@ -1,10 +1,13 @@
 package display
 
 import (
+	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 
 	"code.rocketnine.space/tslocum/cview"
+	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/structs"
@@ -124,11 +127,96 @@ func makeNewTab() *tab {
 	t.view.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		// Capture scrolling and change the left margin size accordingly, see #197
 		// This was also touched by #222
+		// This also captures any tab-specific events now
+
+		if t.mode != tabModeDone {
+			// Any events that should be caught when the tab is loading is handled in display.go
+			return nil
+		}
+
+		cmd := config.TranslateKeyEvent(event)
+
+		// Cmds that aren't single row/column scrolling
+		switch cmd {
+		case config.CmdBookmarks:
+			Bookmarks(&t)
+			t.addToHistory("about:bookmarks")
+			return nil
+		case config.CmdAddBookmark:
+			go addBookmark()
+			return nil
+		case config.CmdPgup:
+			t.pageUp()
+			return nil
+		case config.CmdPgdn:
+			t.pageDown()
+			return nil
+		case config.CmdSave:
+			if t.hasContent() {
+				savePath, err := downloadPage(t.page)
+				if err != nil {
+					Error("Download Error", fmt.Sprintf("Error saving page content: %v", err))
+				} else {
+					Info(fmt.Sprintf("Page content saved to %s. ", savePath))
+				}
+			} else {
+				Info("The current page has no content, so it couldn't be downloaded.")
+			}
+			return nil
+		case config.CmdBack:
+			histBack(&t)
+			return nil
+		case config.CmdForward:
+			histForward(&t)
+			return nil
+		case config.CmdSub:
+			Subscriptions(&t, "about:subscriptions")
+			tabs[curTab].addToHistory("about:subscriptions")
+			return nil
+		case config.CmdCopyPageURL:
+			currentURL := tabs[curTab].page.URL
+			err := clipboard.WriteAll(currentURL)
+			if err != nil {
+				Error("Copy Error", err.Error())
+				return nil
+			}
+			return nil
+		case config.CmdCopyTargetURL:
+			currentURL := t.page.URL
+			selectedURL := t.HighlightedURL()
+			if selectedURL == "" {
+				return nil
+			}
+			u, _ := url.Parse(currentURL)
+			copiedURL, err := u.Parse(selectedURL)
+			if err != nil {
+				err := clipboard.WriteAll(selectedURL)
+				if err != nil {
+					Error("Copy Error", err.Error())
+					return nil
+				}
+				return nil
+			}
+			err = clipboard.WriteAll(copiedURL.String())
+			if err != nil {
+				Error("Copy Error", err.Error())
+				return nil
+			}
+			return nil
+		}
+		// Number key: 1-9, 0, LINK1-LINK10
+		if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
+			if int(cmd) <= len(t.page.Links) {
+				// It's a valid link number
+				followLink(&t, t.page.URL, t.page.Links[cmd-1])
+				return nil
+			}
+		}
+
+		// Scrolling stuff
 
 		key := event.Key()
 		mod := event.Modifiers()
-		cmd := config.TranslateKeyEvent(event)
-
 		height, width := t.view.GetBufferSize()
 		_, _, boxW, boxH := t.view.GetInnerRect()
 
@@ -175,6 +263,18 @@ func makeNewTab() *tab {
 				t.page.Row++
 			}
 			return event
+		} else if cmd == config.CmdBeginning {
+			t.page.Row = 0
+			// This is required because cview will also set the column (incorrectly)
+			// if it handles this event itself
+			t.applyScroll()
+			App.Draw()
+			return nil
+		} else if cmd == config.CmdEnd {
+			t.page.Row = height
+			t.applyScroll()
+			App.Draw()
+			return nil
 		} else {
 			// Some other key, stop processing it
 			return event
@@ -202,14 +302,23 @@ func (t *tab) addToHistory(u string) {
 
 // pageUp scrolls up 75% of the height of the terminal, like Bombadillo.
 func (t *tab) pageUp() {
-	row, col := t.view.GetScrollOffset()
-	t.view.ScrollTo(row-(termH/4)*3, col)
+	t.page.Row -= (termH / 4) * 3
+	if t.page.Row < 0 {
+		t.page.Row = 0
+	}
+	t.applyScroll()
 }
 
 // pageDown scrolls down 75% of the height of the terminal, like Bombadillo.
 func (t *tab) pageDown() {
-	row, col := t.view.GetScrollOffset()
-	t.view.ScrollTo(row+(termH/4)*3, col)
+	height, _ := t.view.GetBufferSize()
+
+	t.page.Row += (termH / 4) * 3
+	if t.page.Row > height {
+		t.page.Row = height
+	}
+
+	t.applyScroll()
 }
 
 // hasContent returns false when the tab's page is malformed,

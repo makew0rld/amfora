@@ -16,8 +16,8 @@ var helpCells = strings.TrimSpace(
 		"Arrow keys, %s(left)/%s(down)/%s(up)/%s(right)\tScroll and move a page.\n" +
 		"%s\tGo up a page in document\n" +
 		"%s\tGo down a page in document\n" +
-		"g\tGo to top of document\n" +
-		"G\tGo to bottom of document\n" +
+		"%s\tGo to top of document\n" +
+		"%s\tGo to bottom of document\n" +
 		"Tab\tNavigate to the next item in a popup.\n" +
 		"Shift-Tab\tNavigate to the previous item in a popup.\n" +
 		"%s\tGo back in the history\n" +
@@ -86,6 +86,8 @@ func helpInit() {
 		config.GetKeyBinding(config.CmdMoveRight),
 		config.GetKeyBinding(config.CmdPgup),
 		config.GetKeyBinding(config.CmdPgdn),
+		config.GetKeyBinding(config.CmdBeginning),
+		config.GetKeyBinding(config.CmdEnd),
 		config.GetKeyBinding(config.CmdBack),
 		config.GetKeyBinding(config.CmdForward),
 		config.GetKeyBinding(config.CmdBottom),

@@ -59,6 +59,8 @@ const (
 	CmdAddSub
 	CmdCopyPageURL
 	CmdCopyTargetURL
+	CmdBeginning
+	CmdEnd
 )
 
 type keyBinding struct {
@@ -189,6 +191,8 @@ func KeyInit() {
 		CmdAddSub:        "keybindings.bind_add_sub",
 		CmdCopyPageURL:   "keybindings.bind_copy_page_url",
 		CmdCopyTargetURL: "keybindings.bind_copy_target_url",
+		CmdBeginning:     "keybindings.bind_beginning",
+		CmdEnd:           "keybindings.bind_end",
 	}
 	// This is split off to allow shift_numbers to override bind_tab[1-90]
 	// (This is needed for older configs so that the default bind_tab values
@@ -212,10 +216,15 @@ func KeyInit() {
 		tcellKeys[kname] = k
 	}
 
+	// Set cview navigation keys to use user-set ones
 	cview.Keys.MoveUp2 = viper.GetStringSlice(configBindings[CmdMoveUp])
 	cview.Keys.MoveDown2 = viper.GetStringSlice(configBindings[CmdMoveDown])
 	cview.Keys.MoveLeft2 = viper.GetStringSlice(configBindings[CmdMoveLeft])
 	cview.Keys.MoveRight2 = viper.GetStringSlice(configBindings[CmdMoveRight])
+	cview.Keys.MoveFirst = viper.GetStringSlice(configBindings[CmdBeginning])
+	cview.Keys.MoveFirst2 = nil
+	cview.Keys.MoveLast = viper.GetStringSlice(configBindings[CmdEnd])
+	cview.Keys.MoveLast2 = nil
 
 	for c, allb := range configBindings {
 		for _, b := range viper.GetStringSlice(allb) {

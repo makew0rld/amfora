@@ -248,6 +248,8 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_tab0", ")")
 	viper.SetDefault("keybindings.bind_copy_page_url", "C")
 	viper.SetDefault("keybindings.bind_copy_target_url", "c")
+	viper.SetDefault("keybindings.bind_beginning", []string{"Home", "g"})
+	viper.SetDefault("keybindings.bind_end", []string{"End", "G"})
 	viper.SetDefault("keybindings.shift_numbers", "")
 	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)

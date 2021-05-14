@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	"code.rocketnine.space/tslocum/cview"
-	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
@@ -302,31 +301,6 @@ func Init(version, commit, builtBy string) {
 			case config.CmdHome:
 				URL(viper.GetString("a-general.home"))
 				return nil
-			case config.CmdBookmarks:
-				Bookmarks(tabs[curTab])
-				tabs[curTab].addToHistory("about:bookmarks")
-				return nil
-			case config.CmdAddBookmark:
-				go addBookmark()
-				return nil
-			case config.CmdPgup:
-				tabs[curTab].pageUp()
-				return nil
-			case config.CmdPgdn:
-				tabs[curTab].pageDown()
-				return nil
-			case config.CmdSave:
-				if tabs[curTab].hasContent() {
-					savePath, err := downloadPage(tabs[curTab].page)
-					if err != nil {
-						Error("Download Error", fmt.Sprintf("Error saving page content: %v", err))
-					} else {
-						Info(fmt.Sprintf("Page content saved to %s. ", savePath))
-					}
-				} else {
-					Info("The current page has no content, so it couldn't be downloaded.")
-				}
-				return nil
 			case config.CmdBottom:
 				// Space starts typing, like Bombadillo
 				bottomBar.SetLabel("[::b]URL/Num./Search: [::-]")
@@ -340,58 +314,9 @@ func Init(version, commit, builtBy string) {
 				bottomBar.SetText(tabs[curTab].page.URL)
 				App.SetFocus(bottomBar)
 				return nil
-			case config.CmdBack:
-				histBack(tabs[curTab])
-				return nil
-			case config.CmdForward:
-				histForward(tabs[curTab])
-				return nil
-			case config.CmdSub:
-				Subscriptions(tabs[curTab], "about:subscriptions")
-				tabs[curTab].addToHistory("about:subscriptions")
-				return nil
 			case config.CmdAddSub:
 				go addSubscription()
 				return nil
-			case config.CmdCopyPageURL:
-				currentURL := tabs[curTab].page.URL
-				err := clipboard.WriteAll(currentURL)
-				if err != nil {
-					Error("Copy Error", err.Error())
-					return nil
-				}
-				return nil
-			case config.CmdCopyTargetURL:
-				currentURL := tabs[curTab].page.URL
-				selectedURL := tabs[curTab].HighlightedURL()
-				if selectedURL == "" {
-					return nil
-				}
-				u, _ := url.Parse(currentURL)
-				copiedURL, err := u.Parse(selectedURL)
-				if err != nil {
-					err := clipboard.WriteAll(selectedURL)
-					if err != nil {
-						Error("Copy Error", err.Error())
-						return nil
-					}
-					return nil
-				}
-				err = clipboard.WriteAll(copiedURL.String())
-				if err != nil {
-					Error("Copy Error", err.Error())
-					return nil
-				}
-				return nil
-			}
-
-			// Number key: 1-9, 0, LINK1-LINK10
-			if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
-				if int(cmd) <= len(tabs[curTab].page.Links) {
-					// It's a valid link number
-					followLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Links[cmd-1])
-					return nil
-				}
 			}
 		}
 

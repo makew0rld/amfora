@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Uses <kbd>C</kbd> and <kbd>c</kbd> by default
 - Configurable keybindings for scrolling on pages (#211, #222)
 - Ability to save `about:` pages (#210, #236)
+- `bind_beginning` and `bind_end` keybindings
 
 ### Changed
 - Favicon support removed (#199)

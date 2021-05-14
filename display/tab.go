@@ -137,6 +137,7 @@ func makeNewTab() *tab {
 		cmd := config.TranslateKeyEvent(event)
 
 		// Cmds that aren't single row/column scrolling
+		//nolint:exhaustive
 		switch cmd {
 		case config.CmdBookmarks:
 			Bookmarks(&t)

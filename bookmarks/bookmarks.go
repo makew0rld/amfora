@@ -159,27 +159,35 @@ func Remove(url string) {
 	}
 }
 
-// All returns all the bookmarks in a map of URLs to names.
-// It also returns a slice of map keys, sorted so that the map *values*
-// are in alphabetical order, with case ignored.
-func All() (map[string]string, []string) {
-	bkmksMap := make(map[string]string)
+// bkmkNameSlice is used for sorting bookmarks alphabetically.
+// It implements sort.Interface.
+type bkmkNameSlice struct {
+	names []string
+	urls  []string
+}
 
-	inverted := make(map[string]string)          // Holds inverted map, name->URL
-	names := make([]string, len(data.Bookmarks)) // Holds bookmark names, for sorting
-	keys := make([]string, len(data.Bookmarks))  // Final sorted keys (URLs), for returning at the end
+func (b *bkmkNameSlice) Len() int {
+	return len(b.names)
+}
+func (b *bkmkNameSlice) Less(i, j int) bool {
+	return b.names[i] < b.names[j]
+}
+func (b *bkmkNameSlice) Swap(i, j int) {
+	b.names[i], b.names[j] = b.names[j], b.names[i]
+	b.urls[i], b.urls[j] = b.urls[j], b.urls[i]
+}
 
+// All returns all the bookmarks, as two arrays, one for names and one for URLs.
+// They are sorted alphabetically.
+func All() ([]string, []string) {
+	b := bkmkNameSlice{
+		make([]string, len(data.Bookmarks)),
+		make([]string, len(data.Bookmarks)),
+	}
 	for i, bkmk := range data.Bookmarks {
-		bkmksMap[bkmk.URL] = bkmk.Name
-		inverted[bkmk.Name] = bkmk.URL
-		names[i] = bkmk.Name
+		b.names[i] = bkmk.Name
+		b.urls[i] = bkmk.URL
 	}
-
-	// Sort, then turn back into URL keys
-	sort.Strings(names)
-	for i, name := range names {
-		keys[i] = inverted[name]
-	}
-
-	return bkmksMap, keys
+	sort.Sort(&b)
+	return b.names, b.urls
 }

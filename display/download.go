@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/structs"
@@ -21,7 +22,6 @@ import (
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/schollz/progressbar/v3"
 	"github.com/spf13/viper"
-	"gitlab.com/tslocum/cview"
 )
 
 // For choosing between download and the portal - copy of YesNo basically
@@ -321,8 +321,14 @@ func downloadPage(p *structs.Page) (string, error) {
 func downloadNameFromURL(dir, u, ext string) (string, error) {
 	var name string
 	var err error
+
 	parsed, _ := url.Parse(u)
-	if parsed.Path == "" || path.Base(parsed.Path) == "/" {
+	if strings.HasPrefix(u, "about:") {
+		name, err = getSafeDownloadName(dir, parsed.Opaque+ext, true, 0)
+		if err != nil {
+			return "", err
+		}
+	} else if parsed.Path == "" || path.Base(parsed.Path) == "/" {
 		// No file, just the root domain
 		name, err = getSafeDownloadName(dir, parsed.Hostname()+ext, true, 0)
 		if err != nil {
@@ -340,6 +346,7 @@ func downloadNameFromURL(dir, u, ext string) (string, error) {
 			return "", err
 		}
 	}
+
 	return filepath.Join(dir, name), nil
 }
 

@@ -21,4 +21,8 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 * Stephen Robinson (@sudobash1)
 * Peter Steinberg (@objectliteral)
 * Thomas Adam (@ThomasAdam)
+* @lostleonardo
+* Himanshu (@singalhimanshu)
+* @regr4
+* Anas Mohamed (@amohamed11)
 `)

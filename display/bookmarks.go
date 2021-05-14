@@ -3,13 +3,13 @@ package display
 import (
 	"fmt"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/render"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/spf13/viper"
-	"gitlab.com/tslocum/cview"
 )
 
 // For adding and removing bookmarks, basically a clone of the input modal.
@@ -127,9 +127,9 @@ func Bookmarks(t *tab) {
 	bkmkPageRaw := "# Bookmarks\r\n\r\n"
 
 	// Gather bookmarks
-	m, keys := bookmarks.All()
-	for i := range keys {
-		bkmkPageRaw += fmt.Sprintf("=> %s %s\r\n", keys[i], m[keys[i]])
+	names, urls := bookmarks.All()
+	for i := range names {
+		bkmkPageRaw += fmt.Sprintf("=> %s %s\r\n", urls[i], names[i])
 	}
 	// Render and display
 	content, links := render.RenderGemini(bkmkPageRaw, textWidth(), false)
@@ -152,7 +152,7 @@ func addBookmark() {
 	t := tabs[curTab]
 	p := t.page
 
-	if !t.hasContent() {
+	if !t.hasContent() || t.isAnAboutPage() {
 		// It's an about: page, or a malformed one
 		return
 	}

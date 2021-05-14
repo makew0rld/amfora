@@ -5,19 +5,19 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/config"
-	"gitlab.com/tslocum/cview"
 )
 
 var helpCells = strings.TrimSpace(
 	"?\tBring up this help. You can scroll!\n" +
 		"Esc\tLeave the help\n" +
-		"Arrow keys, h/j/k/l\tScroll and move a page.\n" +
+		"Arrow keys, %s(left)/%s(down)/%s(up)/%s(right)\tScroll and move a page.\n" +
 		"%s\tGo up a page in document\n" +
 		"%s\tGo down a page in document\n" +
-		"g\tGo to top of document\n" +
-		"G\tGo to bottom of document\n" +
+		"%s\tGo to top of document\n" +
+		"%s\tGo to bottom of document\n" +
 		"Tab\tNavigate to the next item in a popup.\n" +
 		"Shift-Tab\tNavigate to the previous item in a popup.\n" +
 		"%s\tGo back in the history\n" +
@@ -28,6 +28,8 @@ var helpCells = strings.TrimSpace(
 		"\tinstead of the current one.\n" +
 		"%s\tGo to links 1-10 respectively.\n" +
 		"%s\tEdit current URL\n" +
+		"%s\tCopy current page URL\n" +
+		"%s\tCopy current selected URL\n" +
 		"Enter, Tab\tOn a page this will start link highlighting.\n" +
 		"\tPress Tab and Shift-Tab to pick different links.\n" +
 		"\tPress Enter again to go to one, or Esc to stop.\n" +
@@ -78,13 +80,21 @@ func helpInit() {
 		strings.Split(config.GetKeyBinding(config.CmdLink0), ",")[0])
 
 	helpCells = fmt.Sprintf(helpCells,
+		config.GetKeyBinding(config.CmdMoveLeft),
+		config.GetKeyBinding(config.CmdMoveDown),
+		config.GetKeyBinding(config.CmdMoveUp),
+		config.GetKeyBinding(config.CmdMoveRight),
 		config.GetKeyBinding(config.CmdPgup),
 		config.GetKeyBinding(config.CmdPgdn),
+		config.GetKeyBinding(config.CmdBeginning),
+		config.GetKeyBinding(config.CmdEnd),
 		config.GetKeyBinding(config.CmdBack),
 		config.GetKeyBinding(config.CmdForward),
 		config.GetKeyBinding(config.CmdBottom),
 		linkKeys,
 		config.GetKeyBinding(config.CmdEdit),
+		config.GetKeyBinding(config.CmdCopyPageURL),
+		config.GetKeyBinding(config.CmdCopyTargetURL),
 		tabKeys,
 		config.GetKeyBinding(config.CmdTab0),
 		config.GetKeyBinding(config.CmdPrevTab),

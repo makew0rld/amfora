@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Support for version 1.1 JSON feeds
+- Copy current URL or selected URL to clipboard (#220, #225)
+  - Uses <kbd>C</kbd> and <kbd>c</kbd> by default
+- Configurable keybindings for scrolling on pages (#211, #222)
+- Ability to save `about:` pages (#210, #236)
+- `bind_beginning` and `bind_end` keybindings
+
 ### Changed
 - Favicon support removed (#199)
 - Bookmarks are stored using XML in the XBEL format, old bookmarks are transferred (#68)
@@ -17,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Possible subscription update race condition on startup
 - Plaintext documents are escaped properly (regression from v1.8.0)
 - Help page scrollbar color matches what's in the theme config
+- Regression where lists would not appear if `bullets = false` (#234, #235)
+- Support multiple bookmarks with the same name
 
 
 ## [1.8.0] - 2021-02-17

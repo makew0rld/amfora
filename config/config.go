@@ -11,13 +11,13 @@ import (
 	"runtime"
 	"strings"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/rkoesters/xdg/basedir"
 	"github.com/rkoesters/xdg/userdirs"
 	"github.com/spf13/viper"
-	"gitlab.com/tslocum/cview"
 )
 
 var amforaAppData string // Where amfora files are stored on Windows - cached here
@@ -210,6 +210,10 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_sub", "Ctrl-A")
 	viper.SetDefault("keybindings.bind_add_sub", "Ctrl-X")
 	viper.SetDefault("keybindings.bind_save", "Ctrl-S")
+	viper.SetDefault("keybindings.bind_moveup", "k")
+	viper.SetDefault("keybindings.bind_movedown", "j")
+	viper.SetDefault("keybindings.bind_moveleft", "h")
+	viper.SetDefault("keybindings.bind_moveright", "l")
 	viper.SetDefault("keybindings.bind_pgup", []string{"PgUp", "u"})
 	viper.SetDefault("keybindings.bind_pgdn", []string{"PgDn", "d"})
 	viper.SetDefault("keybindings.bind_bottom", "Space")
@@ -242,6 +246,10 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_tab8", "*")
 	viper.SetDefault("keybindings.bind_tab9", "(")
 	viper.SetDefault("keybindings.bind_tab0", ")")
+	viper.SetDefault("keybindings.bind_copy_page_url", "C")
+	viper.SetDefault("keybindings.bind_copy_target_url", "c")
+	viper.SetDefault("keybindings.bind_beginning", []string{"Home", "g"})
+	viper.SetDefault("keybindings.bind_end", []string{"End", "G"})
 	viper.SetDefault("keybindings.shift_numbers", "")
 	viper.SetDefault("url-handlers.other", "off")
 	viper.SetDefault("cache.max_size", 0)

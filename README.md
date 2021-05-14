@@ -36,13 +36,13 @@ update-desktop-database ~/.local/share/applications
 Make sure to click "Watch" in the top right, then "Custom" > "Releases" to get notified about new releases!
 
 
-## Linux
-
-Amfora is packaged in many Linux distros. It's also on [Scoop](https://scoop.sh/) for Windows users.
+### Linux
 
 <a href="https://repology.org/project/amfora/versions">
     <img src="https://repology.org/badge/vertical-allrepos/amfora.svg" alt="Packaging status" align="right">
 </a>
+
+Amfora is packaged in many Linux distros. It's also on [Scoop](https://scoop.sh/) for Windows users.
 
 ### Homebrew
 
@@ -55,6 +55,10 @@ You can update it with:
 ```
 brew upgrade amfora
 ```
+
+### Termux
+
+If you're using [Termux](https://termux.com/) on Android you can't just run Amfora like normal. After installing Amfora, run `pkg install proot`. Then run `termux-chroot` before running the Amfora binary. You can exit out of the chroot after closing Amfora. See [here](https://stackoverflow.com/q/38959067/7361270) for why this is needed.
 
 ### From Source
 
@@ -139,14 +143,14 @@ Please see [the wiki](https://github.com/makeworld-the-better-one/amfora/wiki) f
 ## Libraries
 Amfora ❤️ open source!
 
-- [cview](https://gitlab.com/tslocum/cview/) for the TUI
+- [cview](https://code.rocketnine.space/tslocum/cview) for the TUI
   - It's a fork of [tview](https://github.com/rivo/tview) with PRs merged and active support
   - It uses [tcell](https://github.com/gdamore/tcell) for low level terminal operations
 - [Viper](https://github.com/spf13/viper) for configuration and TOFU storing
 - [go-gemini](https://github.com/makeworld-the-better-one/go-gemini), my forked and updated Gemini client/server library
-- My [progressbar fork](https://github.com/makeworld-the-better-one/progressbar) - pull request [here](https://github.com/schollz/progressbar/pull/69)
+- [progressbar](https://github.com/schollz/progressbar)
 - [go-humanize](https://github.com/dustin/go-humanize)
-- My [gofeed fork](https://github.com/makeworld-the-better-one/gofeed) - pull request [here](https://github.com/mmcdole/gofeed/pull/164)
+- [gofeed](https://github.com/mmcdole/gofeed)
 
 ## License
 This project is licensed under the GPL v3.0. See the [LICENSE](./LICENSE) file for details.

@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"io"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/spf13/viper"
-	"gitlab.com/tslocum/cview"
 )
 
 // Renderer renderers network bytes into something that can be displayed on a

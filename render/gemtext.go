@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
+	"code.rocketnine.space/tslocum/cview"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/spf13/viper"
-	"gitlab.com/tslocum/cview"
 )
 
 // Renderer for gemtext. Other Renderers are in renderer.go.

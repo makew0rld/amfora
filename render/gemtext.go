@@ -238,6 +238,15 @@ func (ren *GemtextRenderer) renderLine(line string) string {
 			wrappedItem[0] = fmt.Sprintf(" [%s]\u2022", config.GetColorString("list_text")) +
 				wrappedItem[0] + "[-]"
 			wrappedLines = append(wrappedLines, wrappedItem...)
+		} else {
+			wrappedItem := wrapLine(line[1:], ren.width,
+				fmt.Sprintf("    [%s]", config.GetColorString("list_text")),
+				"[-]", false)
+			// Add "*"
+			wrappedItem[0] = fmt.Sprintf(" [%s]*", config.GetColorString("list_text")) +
+				wrappedItem[0] + "[-]"
+			wrappedLines = append(wrappedLines, wrappedItem...)
+
 		}
 		// Optionally list lines could be colored here too, if color is enabled
 	} else if strings.HasPrefix(line, ">") {
@@ -281,7 +290,6 @@ func (ren *GemtextRenderer) ReadFrom(r io.Reader) (int64, error) {
 		line := scanner.Text()
 
 		// Process the one possibly invisible line
-
 		if strings.HasPrefix(line, "```") {
 			ren.pre = !ren.pre
 			continue

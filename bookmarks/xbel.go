@@ -2,6 +2,7 @@ package bookmarks
 
 // Structs and code for the XBEL XML bookmark format.
 // https://github.com/makeworld-the-better-one/amfora/issues/68
+// http://xbel.sourceforge.net/
 
 import (
 	"encoding/xml"
@@ -38,7 +39,7 @@ type xbel struct {
 	XMLName   xml.Name        `xml:"xbel"`
 	Version   string          `xml:"version,attr"`
 	Bookmarks []*xbelBookmark `xml:"bookmark"`
-	// Later: Folders []*xbelFolder
+	// Folders []*xbelFolder // Use later for #56
 }
 
 // Instance of xbel - loaded from bookmarks file

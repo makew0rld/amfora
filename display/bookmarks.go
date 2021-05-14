@@ -127,9 +127,9 @@ func Bookmarks(t *tab) {
 	bkmkPageRaw := "# Bookmarks\r\n\r\n"
 
 	// Gather bookmarks
-	m, keys := bookmarks.All()
-	for i := range keys {
-		bkmkPageRaw += fmt.Sprintf("=> %s %s\r\n", keys[i], m[keys[i]])
+	names, urls := bookmarks.All()
+	for i := range names {
+		bkmkPageRaw += fmt.Sprintf("=> %s %s\r\n", urls[i], names[i])
 	}
 	// Render and display
 	content, links := renderer.RenderGemini(bkmkPageRaw, textWidth(), false)

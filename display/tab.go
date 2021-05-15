@@ -331,9 +331,6 @@ func (t *tab) hasContent() bool {
 	if t.page.URL == "" {
 		return false
 	}
-	if t.page.Content == "" {
-		return false
-	}
 	return true
 }
 

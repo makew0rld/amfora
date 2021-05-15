@@ -3,7 +3,9 @@ package display
 import (
 	"errors"
 	"net/url"
+	"reflect"
 	"strings"
+	"unsafe"
 
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/makeworld-the-better-one/go-gemini"
@@ -178,4 +180,11 @@ func fixUserURL(u string) string {
 		u = "gemini://" + u
 	}
 	return u
+}
+
+func stringToBytes(s string) []byte {
+	// Sources:
+	// https://stackoverflow.com/a/59210739
+	// https://groups.google.com/g/golang-nuts/c/Zsfk-VMd_fU/m/O1ru4fO-BgAJ
+	return (*[0x7fff0000]byte)(unsafe.Pointer((*reflect.StringHeader)(unsafe.Pointer(&s)).Data))[:len(s):len(s)]
 }

@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/makeworld-the-better-one/amfora/render"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/spf13/viper"
 )
@@ -59,22 +58,17 @@ func handleFile(u string) (*structs.Page, bool) {
 		}
 
 		if mimetype == "text/gemini" {
-			rendered, links := render.RenderGemini(string(content), textWidth(), false)
 			page = &structs.Page{
 				Mediatype: structs.TextGemini,
 				URL:       u,
-				Raw:       string(content),
-				Content:   rendered,
-				Links:     links,
+				Raw:       content,
 				TermWidth: termW,
 			}
 		} else {
 			page = &structs.Page{
 				Mediatype: structs.TextPlain,
 				URL:       u,
-				Raw:       string(content),
-				Content:   render.RenderPlainText(string(content)),
-				Links:     []string{},
+				Raw:       content,
 				TermWidth: termW,
 			}
 		}
@@ -107,13 +101,10 @@ func createDirectoryListing(u string) (*structs.Page, bool) {
 		content += fmt.Sprintf("=> %s%s %s%s\n", f.Name(), separator, f.Name(), separator)
 	}
 
-	rendered, links := render.RenderGemini(content, textWidth(), false)
 	page = &structs.Page{
 		Mediatype: structs.TextGemini,
 		URL:       u,
-		Raw:       content,
-		Content:   rendered,
-		Links:     links,
+		Raw:       stringToBytes(content),
 		TermWidth: termW,
 	}
 	return page, true

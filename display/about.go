@@ -3,7 +3,6 @@ package display
 import (
 	"fmt"
 
-	"github.com/makeworld-the-better-one/amfora/render"
 	"github.com/makeworld-the-better-one/amfora/structs"
 )
 
@@ -34,11 +33,8 @@ func aboutInit(version, commit, builtBy string) {
 }
 
 func createAboutPage(url string, content string) structs.Page {
-	renderContent, links := render.RenderGemini(content, textWidth(), false)
 	return structs.Page{
-		Raw:       content,
-		Content:   renderContent,
-		Links:     links,
+		Raw:       stringToBytes(content),
 		URL:       url,
 		TermWidth: -1, // Force reformatting on first display
 		Mediatype: structs.TextGemini,

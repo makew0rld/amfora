@@ -12,7 +12,6 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
-	"github.com/makeworld-the-better-one/amfora/render"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/spf13/viper"
@@ -249,11 +248,8 @@ func Init(version, commit, builtBy string) {
 	// Render the default new tab content ONCE and store it for later
 	// This code is repeated in Reload()
 	newTabContent := getNewTabContent()
-	renderedNewTabContent, newTabLinks := render.RenderGemini(newTabContent, textWidth(), false)
 	newTabPage = structs.Page{
 		Raw:       newTabContent,
-		Content:   renderedNewTabContent,
-		Links:     newTabLinks,
 		URL:       "about:newtab",
 		TermWidth: -1, // Force reformatting on first display
 		Mediatype: structs.TextGemini,
@@ -487,11 +483,8 @@ func Reload() {
 		// Re-render new tab, similar to Init()
 		newTabContent := getNewTabContent()
 		tmpTermW := termW
-		renderedNewTabContent, newTabLinks := render.RenderGemini(newTabContent, textWidth(), false)
 		newTabPage = structs.Page{
 			Raw:       newTabContent,
-			Content:   renderedNewTabContent,
-			Links:     newTabLinks,
 			URL:       "about:newtab",
 			TermWidth: tmpTermW,
 			Mediatype: structs.TextGemini,

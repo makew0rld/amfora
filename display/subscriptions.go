@@ -1,18 +1,17 @@
 package display
 
 import (
+	"bytes"
 	"fmt"
 	"net/url"
 	"path"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
-	"github.com/makeworld-the-better-one/amfora/render"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
 	"github.com/makeworld-the-better-one/go-gemini"
@@ -149,11 +148,8 @@ func Subscriptions(t *tab, u string) string {
 		}
 	}
 
-	content, links := render.RenderGemini(rawPage, textWidth(), false)
 	page := structs.Page{
-		Raw:       rawPage,
-		Content:   content,
-		Links:     links,
+		Raw:       stringToBytes(rawPage),
 		URL:       u,
 		TermWidth: termW,
 		Mediatype: structs.TextGemini,
@@ -191,11 +187,8 @@ func ManageSubscriptions(t *tab, u string) {
 		)
 	}
 
-	content, links := render.RenderGemini(rawPage, textWidth(), false)
 	page := structs.Page{
-		Raw:       rawPage,
-		Content:   content,
-		Links:     links,
+		Raw:       stringToBytes(rawPage),
 		URL:       "about:manage-subscriptions",
 		TermWidth: termW,
 		Mediatype: structs.TextGemini,
@@ -276,7 +269,7 @@ func openSubscriptionModal(validFeed, subscribed bool) bool {
 func getFeedFromPage(p *structs.Page) (*gofeed.Feed, bool) {
 	parsed, _ := url.Parse(p.URL)
 	filename := path.Base(parsed.Path)
-	r := strings.NewReader(p.Raw)
+	r := bytes.NewReader(p.Raw)
 	return subscriptions.GetFeed(p.RawMediatype, filename, r)
 }
 
@@ -318,7 +311,7 @@ func addSubscription() {
 		if isFeed {
 			err = subscriptions.AddFeed(p.URL, feed)
 		} else {
-			err = subscriptions.AddPage(p.URL, strings.NewReader(p.Raw))
+			err = subscriptions.AddPage(p.URL, bytes.NewReader(p.Raw))
 		}
 
 		if err != nil {

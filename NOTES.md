@@ -1,5 +1,12 @@
 # Notes
 
+## Stream (#9)
+- Work out page.go and other stuff in render/
+- Then make handlers and stuff part of `tab`
+- Go through process of loading a page from the very beginning and line up all the parts
+- Also handle non-network pages like `about:` pages, where `Raw` already exists and just needs to be rendered
+
+
 ## Issues
 - URL for each tab should not be stored as a string - in the current code there's lots of reparsing the URL
 

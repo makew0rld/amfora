@@ -24,8 +24,7 @@ type Page struct {
 	URL          string
 	Mediatype    Mediatype // Used for rendering purposes, generalized
 	RawMediatype string    // The actual mediatype sent by the server
-	Raw          string    // The raw response, as received over the network
-	Content      string    // The processed content, NOT raw. Uses cview color tags. It will also have a left margin.
+	Raw          []byte    // The raw response, as received over the network. Never modify it, only set and read.
 	Links        []string  // URLs, for each region in the content.
 	Row          int       // Vertical scroll position
 	Column       int       // Horizontal scroll position - does not map exactly to a cview.TextView because it includes left margin size changes, see #197
@@ -38,7 +37,7 @@ type Page struct {
 
 // Size returns an approx. size of a Page in bytes.
 func (p *Page) Size() int {
-	n := len(p.Raw) + len(p.Content) + len(p.URL) + len(p.Selected) + len(p.SelectedID)
+	n := len(p.Raw) + len(p.URL) + len(p.Selected) + len(p.SelectedID)
 	for i := range p.Links {
 		n += len(p.Links[i])
 	}

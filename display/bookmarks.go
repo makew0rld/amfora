@@ -7,7 +7,6 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
 	"github.com/makeworld-the-better-one/amfora/config"
-	"github.com/makeworld-the-better-one/amfora/render"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/spf13/viper"
 )
@@ -131,12 +130,8 @@ func Bookmarks(t *tab) {
 	for i := range names {
 		bkmkPageRaw += fmt.Sprintf("=> %s %s\r\n", urls[i], names[i])
 	}
-	// Render and display
-	content, links := render.RenderGemini(bkmkPageRaw, textWidth(), false)
 	page := structs.Page{
-		Raw:       bkmkPageRaw,
-		Content:   content,
-		Links:     links,
+		Raw:       stringToBytes(bkmkPageRaw),
 		URL:       "about:bookmarks",
 		TermWidth: termW,
 		Mediatype: structs.TextGemini,

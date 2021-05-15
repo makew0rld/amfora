@@ -59,8 +59,8 @@ list_text = "#84a0c6"
 
 # btn_bg: The bg color for all modal buttons
 # btn_text: The text color for all modal buttons
-btn_bg = "#e2a478"
-btn_text = "#89b8c2"
+btn_bg = "#e27878"
+btn_text = "#d2d4de"
 
 # dl_choice_modal_bg
 # dl_choice_modal_text
@@ -76,37 +76,37 @@ btn_text = "#89b8c2"
 # tofu_modal_text
 # subscription_modal_bg
 # subscription_modal_text
-dl_choice_modal_bg = "#e27878"
-dl_choice_modal_text = "#89b8c2"
-dl_modal_bg = "#e27878"
-dl_modal_text = "#89b8c2"
-info_modal_bg = "#e27878"
-info_modal_text = "#89b8c2"
+dl_choice_modal_bg = "#84a0c6"
+dl_choice_modal_text = "#161821"
+dl_modal_bg = "#84a0c6"
+dl_modal_text = "#161821"
+info_modal_bg = "#84a0c6"
+info_modal_text = "#161821"
 error_modal_bg = "#e98989"
-error_modal_text = "#c6c8d1"
-yesno_modal_bg = "#e27878"
-yesno_modal_text = "#89b8c2"
-tofu_modal_bg = "#e27878"
-tofu_modal_text = "#89b8c2"
-subscription_modal_bg = "#e27878"
-subscription_modal_text = "#89b8c2"
+error_modal_text = "#161821"
+yesno_modal_bg = "#84a0c6"
+yesno_modal_text = "#161821"
+tofu_modal_bg = "#84a0c6"
+tofu_modal_text = "#161821"
+subscription_modal_bg = "#84a0c6"
+subscription_modal_text = "#161821"
 
 # input_modal_bg
 # input_modal_text
 # input_modal_field_bg: The bg of the input field, where you type the text
 # input_modal_field_text: The color of the text you type
-input_modal_bg = "#e27878"
-input_modal_text = "#89b8c2"
-input_modal_field_bg = "#e2a478"
-input_modal_field_text = "#89b8c2"
+input_modal_bg = "#161821"
+input_modal_text = "#c6c8d1"
+input_modal_field_bg = "#d2d4de"
+input_modal_field_text = "#6b7089"
 
 # bkmk_modal_bg
 # bkmk_modal_text
 # bkmk_modal_label
 # bkmk_modal_field_bg
 # bkmk_modal_field_text
-bkmk_modal_bg = "#e27878"
-bkmk_modal_text = "#89b8c2"
-bkmk_modal_label = "#89b8c2"
-bkmk_modal_field_bg = "#e2a478"
-bkmk_modal_field_text = "#89b8c2"
+bkmk_modal_bg = "#161821"
+bkmk_modal_text = "#c6c8d1"
+bkmk_modal_label = "#c6c8d1"
+bkmk_modal_field_bg = "#d2d4de"
+bkmk_modal_field_text = "#6b7089"

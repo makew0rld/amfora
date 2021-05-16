@@ -40,6 +40,38 @@ type GemtextRenderer struct {
 	numLinks int
 }
 
+// wrapLine wraps a line to the provided width, and adds the provided prefix and suffix to each wrapped line.
+// It recovers from wrapping panics and should never cause a panic.
+// It returns a slice of lines, without newlines at the end.
+//
+// Set includeFirst to true if the prefix and suffix should be applied to the first wrapped line as well
+func wrapLine(line string, width int, prefix, suffix string, includeFirst bool) []string {
+	// Anonymous function to allow recovery from potential WordWrap panic
+	var ret []string
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				// Use unwrapped line instead
+				if includeFirst {
+					ret = []string{prefix + line + suffix}
+				} else {
+					ret = []string{line}
+				}
+			}
+		}()
+
+		wrapped := cview.WordWrap(line, width)
+		for i := range wrapped {
+			if !includeFirst && i == 0 {
+				continue
+			}
+			wrapped[i] = prefix + wrapped[i] + suffix
+		}
+		ret = wrapped
+	}()
+	return ret
+}
+
 // NewGemtextRenderer.
 //
 // width is the number of columns to wrap to.

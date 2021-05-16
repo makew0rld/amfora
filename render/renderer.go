@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"regexp"
 
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/makeworld-the-better-one/amfora/config"
@@ -101,6 +102,9 @@ type ANSIRenderer struct {
 	ansiWriter io.Writer    // cview.ANSIWriter
 	buf        bytes.Buffer // Where ansiWriter writes to
 }
+
+// Regex for identifying ANSI color codes
+var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 func NewANSIRenderer() *ANSIRenderer {
 	pr, pw := io.Pipe()

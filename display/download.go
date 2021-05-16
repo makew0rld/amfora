@@ -306,7 +306,7 @@ func downloadPage(p *structs.Page) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	err = ioutil.WriteFile(savePath, []byte(p.Raw), 0644)
+	err = ioutil.WriteFile(savePath, p.Raw, 0644)
 	if err != nil {
 		// Just in case
 		os.Remove(savePath)

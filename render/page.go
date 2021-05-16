@@ -1,7 +1,6 @@
 package render
 
 import (
-	"bytes"
 	"errors"
 	"io"
 	"mime"
@@ -80,8 +79,13 @@ func MakePage(url string, res *gemini.Response, width int, proxied bool) (*struc
 		return nil, ErrCantDisplay
 	}
 
-	buf := new(bytes.Buffer)
-	_, err := io.CopyN(buf, res.Body, viper.GetInt64("a-general.page_max_size")+1)
+	// Create page with initial known values
+	page := structs.Page{
+		URL:    url,
+		MadeAt: time.Now(),
+	}
+
+	_, err := io.CopyN(&structs.BytesWriter{&page.Raw}, res.Body, viper.GetInt64("a-general.page_max_size")+1)
 
 	if err == nil {
 		// Content was larger than max size
@@ -101,58 +105,35 @@ func MakePage(url string, res *gemini.Response, width int, proxied bool) (*struc
 
 	mediatype, params, _ := decodeMeta(res.Meta)
 
+	page.RawMediatype = mediatype
+
 	// Convert content first
-	var utfText string
-	if isUTF8(params["charset"]) {
-		utfText = buf.String()
-	} else {
+	if !isUTF8(params["charset"]) {
 		encoding, err := ianaindex.MIME.Encoding(params["charset"])
 		if encoding == nil || err != nil {
 			// Some encoding doesn't exist and wasn't caught in CanDisplay()
 			return nil, ErrBadEncoding
 		}
-		utfText, err = encoding.NewDecoder().String(buf.String())
+		page.Raw, err = encoding.NewDecoder().Bytes(page.Raw)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if mediatype == "text/gemini" {
-		rendered, links := RenderGemini(utfText, width, proxied)
-		return &structs.Page{
-			Mediatype:    structs.TextGemini,
-			RawMediatype: mediatype,
-			URL:          url,
-			Raw:          utfText,
-			Content:      rendered,
-			Links:        links,
-			MadeAt:       time.Now(),
-		}, nil
+		page.Mediatype = structs.TextGemini
 	} else if strings.HasPrefix(mediatype, "text/") {
 		if mediatype == "text/x-ansi" || strings.HasSuffix(url, ".ans") || strings.HasSuffix(url, ".ansi") {
 			// ANSI
-			return &structs.Page{
-				Mediatype:    structs.TextAnsi,
-				RawMediatype: mediatype,
-				URL:          url,
-				Raw:          utfText,
-				Content:      RenderANSI(utfText),
-				Links:        []string{},
-				MadeAt:       time.Now(),
-			}, nil
+			page.Mediatype = structs.TextAnsi
 		}
 
 		// Treated as plaintext
-		return &structs.Page{
-			Mediatype:    structs.TextPlain,
-			RawMediatype: mediatype,
-			URL:          url,
-			Raw:          utfText,
-			Content:      RenderPlainText(utfText),
-			Links:        []string{},
-			MadeAt:       time.Now(),
-		}, nil
+		page.Mediatype = structs.TextPlain
+	} else {
+		// Not text
+		return nil, ErrBadMediatype
 	}
 
-	return nil, ErrBadMediatype
+	return &page, nil
 }

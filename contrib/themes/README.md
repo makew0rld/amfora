@@ -1,4 +1,3 @@
-![17:05:21:15:09:19](https://user-images.githubusercontent.com/69134168/118543219-007e9980-b722-11eb-9a09-6aff127b5131.png)
 # User Contributed Themes
 
 You can use these themes by replacing the `[theme]` section of your [config](https://github.com/makeworld-the-better-one/amfora/wiki/Configuration) with their contents. Some themes won't display properly on terminals that do not have truecolor support.

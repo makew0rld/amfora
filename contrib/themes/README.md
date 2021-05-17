@@ -118,6 +118,7 @@ Contributed by **[@thumb](https://github.com/thumbfighter)**.
 ## Iceberg Dark
 
 Contributed by **[@knix3](https://github.com/knix3)**
+
 ![screenshot of Iceberg Dark theme](https://user-images.githubusercontent.com/69134168/118542790-7b938000-b721-11eb-81e1-ae45cdfbe546.png)
 <details>
 <summary>More screenshots</summary>

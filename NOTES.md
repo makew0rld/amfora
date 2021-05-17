@@ -1,7 +1,6 @@
 # Notes
 
 ## Stream (#9)
-- Refactor renderers to work with `Write`, maybe drop `ReadFrom` entirely
 - Then make handlers and stuff part of `tab`
 - Go through process of loading a page from the very beginning and line up all the parts
 - Also handle non-network pages like `about:` pages, where `Raw` already exists and just needs to be rendered

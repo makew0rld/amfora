@@ -18,9 +18,11 @@ import (
 type GemtextRenderer struct {
 	// Buffers and I/O
 
-	r     *io.PipeReader
-	w     *io.PipeWriter
-	links chan string
+	readOut  *io.PipeReader
+	readIn   *io.PipeWriter
+	writeIn  *io.PipeWriter
+	writeOut *io.PipeReader
+	links    chan string
 
 	// Configurable options
 
@@ -79,7 +81,8 @@ func wrapLine(line string, width int, prefix, suffix string, includeFirst bool) 
 // proxied is whether the request is through the gemini:// scheme.
 // If it's not a gemini:// page, set this to true.
 func NewGemtextRenderer(width int, proxied bool) *GemtextRenderer {
-	pr, pw := io.Pipe()
+	pr1, pw1 := io.Pipe()
+	pr2, pw2 := io.Pipe()
 
 	ansiEnabled := false
 	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
@@ -90,14 +93,52 @@ func NewGemtextRenderer(width int, proxied bool) *GemtextRenderer {
 		colorEnabled = true
 	}
 
-	return &GemtextRenderer{
-		r:            pr,
-		w:            pw,
+	ren := GemtextRenderer{
+		readOut:      pr1,
+		readIn:       pw1,
+		writeIn:      pw2,
+		writeOut:     pr2,
 		links:        make(chan string, 10),
 		width:        width,
 		proxied:      proxied,
 		ansiEnabled:  ansiEnabled,
 		colorEnabled: colorEnabled,
+	}
+	go ren.handler()
+	return &ren
+}
+
+// handler is supposed to run in a goroutine as soon as the renderer is created.
+// It handles the buffering and parsing in the background.
+func (ren *GemtextRenderer) handler() {
+	// Go through lines, render, and write each line
+
+	// Splits on lines and drops terminators, unlike the other renderers
+	scanner := bufio.NewScanner(ren.writeOut)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		// Process the one possibly invisible line
+		if strings.HasPrefix(line, "```") {
+			ren.pre = !ren.pre
+			continue
+		}
+
+		// Render line and write it
+
+		//nolint:errcheck
+		ren.readIn.Write([]byte(ren.renderLine(line)))
+
+	}
+
+	// Everything has been read, no more links
+	close(ren.links)
+
+	if err := scanner.Err(); err != nil {
+		// Close the ends this func touches, shouldn't matter really
+		ren.writeOut.CloseWithError(err)
+		ren.readIn.CloseWithError(err)
 	}
 }
 
@@ -310,48 +351,19 @@ func (ren *GemtextRenderer) renderLine(line string) string {
 	return strings.Join(wrappedLines, "\n") + "\n"
 }
 
-func (ren *GemtextRenderer) ReadFrom(r io.Reader) (int64, error) {
-	// Go through lines, render, and write each line
-
-	var n int64
-	scanner := bufio.NewScanner(r)
-	scanner.Split(ScanLines)
-
-	for scanner.Scan() {
-		n += int64(len(scanner.Bytes()))
-		line := scanner.Text()
-
-		// Process the one possibly invisible line
-		if strings.HasPrefix(line, "```") {
-			ren.pre = !ren.pre
-			continue
-		}
-
-		// Render line and write it
-
-		//nolint:errcheck
-		ren.w.Write([]byte(
-			ren.renderLine(strings.TrimRight(line, "\r\n")),
-		))
-
-	}
-
-	// Everything has been read, no more links
-	close(ren.links)
-
-	return n, scanner.Err()
-}
-
-// Write will panic, use ReadFrom instead.
 func (ren *GemtextRenderer) Write(p []byte) (n int, err error) {
-	// This renderer is line based, and so it can't process arbitrary bytes.
-	// One solution would be to handle rendering on the other end of the pipe,
-	// the Read call, but it's simpler to just implement ReadFrom.
-	panic("func Write not allowed for GemtextRenderer")
+	return ren.writeIn.Write(p)
 }
 
 func (ren *GemtextRenderer) Read(p []byte) (n int, err error) {
-	return ren.r.Read(p)
+	return ren.readOut.Read(p)
+}
+
+func (ren *GemtextRenderer) Close() error {
+	// Close user-facing ends of the pipes. Shouldn't matter which ends though
+	ren.writeIn.Close()
+	ren.readOut.Close()
+	return nil
 }
 
 func (ren *GemtextRenderer) Links() <-chan string {

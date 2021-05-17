@@ -16,7 +16,8 @@ import (
 // cview.TextView.
 //
 // Calling Close when all writing is done is not a no-op, it will stop the the
-// goroutine that runs for each Renderer.
+// goroutine that runs for each Renderer, and will also allow the Links channel
+// to be closed. Close should be called once all the data has been copied
 //
 // Write calls may block if the Lines channel buffer is full.
 type Renderer interface {

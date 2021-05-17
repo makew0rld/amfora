@@ -15,13 +15,12 @@ import (
 // Renderer renderers network bytes into something that can be displayed on a
 // cview.TextView.
 //
-// Write calls may block if the Lines channel buffer is full.
+// Calling Close when all writing is done is not a no-op, it will stop the the
+// goroutine that runs for each Renderer.
 //
-// Current implementations don't actually implement io.Writer, and calling Write
-// will panic. ReadFrom should be used instead.
+// Write calls may block if the Lines channel buffer is full.
 type Renderer interface {
-	io.ReadWriter
-	io.ReaderFrom
+	io.ReadWriteCloser
 
 	// Links returns a channel that yields link URLs as they are parsed.
 	// It is buffered. The channel will be closed when there won't be anymore links.
@@ -51,41 +50,55 @@ func ScanLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 // PlaintextRenderer escapes text for cview usage and does nothing else.
 type PlaintextRenderer struct {
-	r *io.PipeReader
-	w *io.PipeWriter
+	readOut  *io.PipeReader
+	readIn   *io.PipeWriter
+	writeIn  *io.PipeWriter
+	writeOut *io.PipeReader
 }
 
 func NewPlaintextRenderer() *PlaintextRenderer {
-	pr, pw := io.Pipe()
-	return &PlaintextRenderer{pr, pw}
+	pr1, pw1 := io.Pipe()
+	pr2, pw2 := io.Pipe()
+	ren := PlaintextRenderer{
+		readOut:  pr1,
+		readIn:   pw1,
+		writeIn:  pw2,
+		writeOut: pr2,
+	}
+	go ren.handler()
+	return &ren
 }
 
-func (ren *PlaintextRenderer) ReadFrom(r io.Reader) (int64, error) {
-	// Go through lines and escape bytes and write each line
-
-	var n int64
-	scanner := bufio.NewScanner(r)
+// handler is supposed to run in a goroutine as soon as the renderer is created.
+// It handles the buffering and parsing in the background.
+func (ren *PlaintextRenderer) handler() {
+	scanner := bufio.NewScanner(ren.writeOut)
 	scanner.Split(ScanLines)
 
 	for scanner.Scan() {
-		n += int64(len(scanner.Bytes()))
-
 		//nolint:errcheck
-		ren.w.Write(cview.EscapeBytes(scanner.Bytes()))
+		ren.readIn.Write(cview.EscapeBytes(scanner.Bytes()))
 	}
-	return n, scanner.Err()
+	if err := scanner.Err(); err != nil {
+		// Close the ends this func touches, shouldn't matter really
+		ren.writeOut.CloseWithError(err)
+		ren.readIn.CloseWithError(err)
+	}
 }
 
-// Write will panic, use ReadFrom instead.
 func (ren *PlaintextRenderer) Write(p []byte) (n int, err error) {
-	// This function would normally use cview.EscapeBytes
-	// But the escaping will fail if the Write bytes end in the middle of a tag
-	// So instead it just panics, because it should never be used.
-	panic("func Write not allowed for PlaintextRenderer")
+	return ren.writeIn.Write(p)
 }
 
 func (ren *PlaintextRenderer) Read(p []byte) (n int, err error) {
-	return ren.r.Read(p)
+	return ren.readOut.Read(p)
+}
+
+func (ren *PlaintextRenderer) Close() error {
+	// Close user-facing ends of the pipes. Shouldn't matter which ends though
+	ren.writeIn.Close()
+	ren.readOut.Close()
+	return nil
 }
 
 func (ren *PlaintextRenderer) Links() <-chan string {
@@ -97,18 +110,20 @@ func (ren *PlaintextRenderer) Links() <-chan string {
 // ANSIRenderer escapes text for cview usage, as well as converting ANSI codes
 // into cview tags if the config allows it.
 type ANSIRenderer struct {
-	r          *io.PipeReader
-	w          *io.PipeWriter
-	ansiWriter io.Writer    // cview.ANSIWriter
-	buf        bytes.Buffer // Where ansiWriter writes to
+	readOut    *io.PipeReader
+	readIn     *io.PipeWriter
+	writeIn    *io.PipeWriter
+	writeOut   *io.PipeReader
+	ansiWriter io.Writer     // cview.ANSIWriter
+	buf        *bytes.Buffer // Where ansiWriter writes to
 }
 
 // Regex for identifying ANSI color codes
 var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 func NewANSIRenderer() *ANSIRenderer {
-	pr, pw := io.Pipe()
-
+	pr1, pw1 := io.Pipe()
+	pr2, pw2 := io.Pipe()
 	var ansiWriter io.Writer = nil // When ANSI is disabled
 	var buf bytes.Buffer
 
@@ -116,26 +131,27 @@ func NewANSIRenderer() *ANSIRenderer {
 		// ANSI enabled
 		ansiWriter = cview.ANSIWriter(&buf)
 	}
-	return &ANSIRenderer{pr, pw, ansiWriter, buf}
+	ren := ANSIRenderer{
+		readOut:    pr1,
+		readIn:     pw1,
+		writeIn:    pw2,
+		writeOut:   pr2,
+		ansiWriter: ansiWriter,
+		buf:        &buf,
+	}
+	go ren.handler()
+	return &ren
 }
 
-// Write will panic, use ReadFrom instead.
-func (ren *ANSIRenderer) Write(p []byte) (n int, err error) {
-	// This function would normally use cview.EscapeBytes among other things.
-	// But the escaping will fail if the Write bytes end in the middle of a tag
-	// So instead it just panics, because it should never be used.
-	panic("func Write not allowed for ANSIRenderer")
-}
-
-func (ren *ANSIRenderer) ReadFrom(r io.Reader) (int64, error) {
+// handler is supposed to run in a goroutine as soon as the renderer is created.
+// It handles the buffering and parsing in the background.
+func (ren *ANSIRenderer) handler() {
 	// Go through lines, render, and write each line
 
-	var n int64
-	scanner := bufio.NewScanner(r)
+	scanner := bufio.NewScanner(ren.writeOut)
 	scanner.Split(ScanLines)
 
 	for scanner.Scan() {
-		n += int64(len(scanner.Bytes()))
 		line := scanner.Bytes()
 		line = cview.EscapeBytes(line)
 
@@ -160,14 +176,29 @@ func (ren *ANSIRenderer) ReadFrom(r io.Reader) (int64, error) {
 			)
 		}
 
-		ren.w.Write(line) //nolint:errcheck
+		ren.readIn.Write(line) //nolint:errcheck
 	}
 
-	return n, scanner.Err()
+	if err := scanner.Err(); err != nil {
+		// Close the ends this func touches, shouldn't matter really
+		ren.writeOut.CloseWithError(err)
+		ren.readIn.CloseWithError(err)
+	}
+}
+
+func (ren *ANSIRenderer) Write(p []byte) (n int, err error) {
+	return ren.writeIn.Write(p)
 }
 
 func (ren *ANSIRenderer) Read(p []byte) (n int, err error) {
-	return ren.r.Read(p)
+	return ren.readOut.Read(p)
+}
+
+func (ren *ANSIRenderer) Close() error {
+	// Close user-facing ends of the pipes. Shouldn't matter which ends though
+	ren.writeIn.Close()
+	ren.readOut.Close()
+	return nil
 }
 
 func (ren *ANSIRenderer) Links() <-chan string {

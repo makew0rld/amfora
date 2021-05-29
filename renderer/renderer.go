@@ -25,11 +25,6 @@ func RenderANSI(s string) string {
 	s = cview.Escape(s)
 	if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
 		s = cview.TranslateANSI(s)
-		// The TranslateANSI function injects tags like [-:-:-]
-		// but this will reset the background to use the user's terminal color.
-		// These tags need to be replaced with resets that use the theme color.
-		s = strings.ReplaceAll(s, "[-:-:-]",
-			fmt.Sprintf("[-:%s:-]", config.GetColorString("bg")))
 	} else {
 		s = ansiRegex.ReplaceAllString(s, "")
 	}
@@ -300,11 +295,15 @@ func RenderGemini(s string, width int, proxied bool) (string, []string) {
 		// Support ANSI color codes in preformatted blocks - see #59
 		if viper.GetBool("a-general.color") && viper.GetBool("a-general.ansi") {
 			buf = cview.TranslateANSI(buf)
-			// The TranslateANSI function injects tags like [-:-:-]
-			// but this will reset the background to use the user's terminal color.
-			// These tags need to be replaced with resets that use the theme color.
-			buf = strings.ReplaceAll(buf, "[-:-:-]",
-				fmt.Sprintf("[%s:%s:-]", config.GetColorString("preformatted_text"), config.GetColorString("bg")))
+			// The TranslateANSI function will reset the colors when it encounters
+			// an ANSI reset code, injecting a full reset tag: [-:-:-]
+			// This uses the default foreground and background colors of the
+			// application, but in this case we want it to use the preformatted text
+			// color as the foreground, as we're still in a preformat block.
+			buf = strings.ReplaceAll(
+				buf, "[-:-:-]",
+				fmt.Sprintf("[%s:-:-]", config.GetColorString("preformatted_text")),
+			)
 		} else {
 			buf = ansiRegex.ReplaceAllString(buf, "")
 		}

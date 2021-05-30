@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"bytes"
 
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
@@ -27,6 +28,12 @@ var termH int
 
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField()
+
+var original_text []byte
+var searchBar = cview.NewInputField()
+var search_string = ""
+var matches = 0
+var cur_match = 0
 
 // When the bottom bar string has a space, this regex decides whether it's
 // a non-encoded URL or a search string.
@@ -246,6 +253,65 @@ func Init(version, commit, builtBy string) {
 		// Other potential keys are Tab and Backtab, they are ignored
 	})
 
+	searchBar.SetDoneFunc(func(key tcell.Key) {
+		tab := curTab
+
+		reset := func() {
+			searchBar.SetLabel("")
+			tabs[tab].applyAll()
+			App.SetFocus(tabs[tab].view)
+			layout.RemoveItem(searchBar)
+			tabs[tab].mode = tabModeDone
+		}
+
+		//nolint:exhaustive
+		switch key {
+		case tcell.KeyEnter:
+			// Figure out whether it's a URL, link number, or search
+			// And send out a request
+
+			search_string = searchBar.GetText()
+			search_bytes := []byte(search_string)
+
+			if strings.TrimSpace(search_string) == "" {
+				// Ignore
+				reset()
+				return
+			}
+
+			if tabs[tab].mode != tabModeSearch {
+				original_text = tabs[curTab].view.GetBytes(false)
+			}
+			tabs[tab].mode = tabModeSearch
+
+			text := []byte("")
+			matches = bytes.Count(original_text, search_bytes)
+			first_index := 0
+			suffix := append(search_bytes, []byte("[\"\"]")...)
+			for i := 0; i < matches; i++ {
+				last_index := bytes.Index(original_text[first_index:], search_bytes) + len(search_bytes) + first_index
+				replacement := append([]byte(fmt.Sprint("[\"", search_string, i, "\"]")), suffix... )
+				text = append(text, bytes.ReplaceAll(original_text[first_index:last_index], search_bytes, replacement)...)
+				first_index = last_index
+			}
+			text = append(text, original_text[first_index:]...)
+
+			tabs[curTab].view.SetBytes(text)
+
+			cur_match = 0
+			tabs[curTab].view.Highlight(fmt.Sprint(search_string, "0"))
+			tabs[curTab].view.ScrollToHighlight()
+			App.SetFocus(tabs[tab].view)
+
+		case tcell.KeyEsc:
+			// Set back to what it was
+			reset()
+			return
+		}
+		// Other potential keys are Tab and Backtab, they are ignored
+	})
+
+
 	// Render the default new tab content ONCE and store it for later
 	// This code is repeated in Reload()
 	newTabContent := getNewTabContent()
@@ -291,6 +357,32 @@ func Init(version, commit, builtBy string) {
 		// keybinding in config/config.go and update the help panel in display/help.go
 
 		cmd := config.TranslateKeyEvent(event)
+		if tabs[curTab].mode == tabModeSearch {
+			switch cmd {
+				case config.CmdNextMatch:
+					if cur_match < (matches - 1) {
+						cur_match += 1
+						tabs[curTab].view.Highlight(fmt.Sprint(search_string, cur_match))
+					}
+					tabs[curTab].view.ScrollToHighlight()
+					return nil
+				case config.CmdPrevMatch:
+					if cur_match > 0 {
+						cur_match -= 1
+						tabs[curTab].view.Highlight(fmt.Sprint(search_string, cur_match))
+					}
+					tabs[curTab].view.ScrollToHighlight()
+					return nil
+			}
+			if event.Key() == tcell.KeyEsc {
+				tabs[curTab].mode = tabModeDone
+				tabs[curTab].view.SetBytes(original_text)
+				layout.RemoveItem(searchBar)
+				return nil
+			}
+			return event
+		}
+
 		if tabs[curTab].mode == tabModeDone {
 			// All the keys and operations that can only work while NOT loading
 			//nolint:exhaustive
@@ -307,6 +399,12 @@ func Init(version, commit, builtBy string) {
 				bottomBar.SetText("")
 				// Don't save bottom bar, so that whenever you switch tabs, it's not in that mode
 				App.SetFocus(bottomBar)
+				return nil
+			case config.CmdSearch:
+				layout.AddItem(searchBar, 2, 1, false)
+				searchBar.SetLabel("")
+				searchBar.SetText("")
+				App.SetFocus(searchBar)
 				return nil
 			case config.CmdEdit:
 				// Letter e allows to edit current URL

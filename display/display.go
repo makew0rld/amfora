@@ -529,6 +529,11 @@ func URL(u string) {
 	go goURL(t, fixUserURL(u))
 }
 
+func RenderPageFromString(content string) {
+    t := tabs[curTab]
+    HandleFile(t, content)
+}
+
 func NumTabs() int {
 	return len(tabs)
 }

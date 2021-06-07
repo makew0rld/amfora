@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 
@@ -68,6 +69,16 @@ func main() {
 	display.NewTab()
 	if len(os.Args[1:]) > 0 {
 		display.URL(os.Args[1])
+	}
+
+	s := bufio.NewScanner(os.Stdin)
+	t := ""
+	for s.Scan() {
+		t += s.Text() + "\n"
+	}
+	display.RenderPageFromString(t)
+	if err := s.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "reading standard input:", err)
 	}
 
 	// Start

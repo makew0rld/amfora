@@ -14,6 +14,19 @@ import (
 	"github.com/spf13/viper"
 )
 
+func HandleStdin(content string) (*structs.Page, bool) {
+    rendered, links := renderer.RenderGemini(string(content), textWidth(), false)
+    page := &structs.Page{
+        Mediatype: structs.TextGemini,
+        Raw:       string(content),
+        Content:   rendered,
+        Links:     links,
+        TermWidth: termW,
+    }
+
+	return page, true
+}
+
 // handleFile handles urls using file:// protocol
 func handleFile(u string) (*structs.Page, bool) {
 	page := &structs.Page{}

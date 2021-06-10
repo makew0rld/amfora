@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
 	"github.com/makeworld-the-better-one/amfora/client"
@@ -71,14 +72,19 @@ func main() {
 		display.URL(os.Args[1])
 	}
 
-	s := bufio.NewScanner(os.Stdin)
-	t := ""
-	for s.Scan() {
-		t += s.Text() + "\n"
+	stdinScanner := bufio.NewScanner(os.Stdin)
+	stdinText := ""
+	for stdinScanner.Scan() {
+		stdinText += stdinScanner.Text() + "\n"
 	}
-	display.RenderPageFromString(t)
-	if err := s.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "reading standard input:", err)
+
+	if err := stdinScanner.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "error reading from standard input: %v\n", err)
+		os.Exit(1)
+	}
+
+	if len(strings.TrimSpace(stdinText)) > 0 {
+		display.RenderFromString(stdinText)
 	}
 
 	// Start

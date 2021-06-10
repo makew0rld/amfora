@@ -148,15 +148,6 @@ func handleAbout(t *tab, u string) (string, bool) {
 	return "", false
 }
 
-func HandleFile(t *tab, content string) (string, bool) {
-    page, ok := HandleStdin(content)
-    if !ok {
-        return "", false
-    }
-    setPage(t, page)
-    return content, true
-}
-
 // handleURL displays whatever action is needed for the provided URL,
 // and applies it to the current tab.
 // It loads documents, handles errors, brings up a download prompt, etc.

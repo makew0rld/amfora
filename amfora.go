@@ -70,8 +70,22 @@ func main() {
 	display.NewTab()
 	if len(os.Args[1:]) > 0 {
 		display.URL(os.Args[1])
+	} else if !isStdinEmpty() {
+		renderFromStdin()
 	}
 
+	// Start
+	if err = display.App.Run(); err != nil {
+		panic(err)
+	}
+}
+
+func isStdinEmpty() bool {
+	stat, _ := os.Stdin.Stat()
+	return (stat.Mode() & os.ModeCharDevice) != 0
+}
+
+func renderFromStdin() {
 	stdinScanner := bufio.NewScanner(os.Stdin)
 	stdinText := ""
 	for stdinScanner.Scan() {
@@ -85,10 +99,5 @@ func main() {
 
 	if len(strings.TrimSpace(stdinText)) > 0 {
 		display.RenderFromString(stdinText)
-	}
-
-	// Start
-	if err = display.App.Run(); err != nil {
-		panic(err)
 	}
 }

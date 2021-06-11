@@ -531,10 +531,7 @@ func URL(u string) {
 
 func RenderFromString(str string) {
     t := tabs[curTab]
-    page, ok := renderPageFromString(str)
-    if !ok {
-        return
-    }
+    page, _ := renderPageFromString(str)
     setPage(t, page)
 }
 

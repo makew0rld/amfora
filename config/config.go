@@ -349,9 +349,15 @@ func Init() error {
 			if !ok {
 				return fmt.Errorf(`value for "%s" is not a string: %v`, k, v)
 			}
-			color := tcell.GetColor(strings.ToLower(colorStr))
-			if color == tcell.ColorDefault {
-				return fmt.Errorf(`invalid color format for "%s": %s`, k, colorStr)
+			colorStr = strings.ToLower(colorStr)
+			var color tcell.Color
+			if colorStr == "none" {
+				color = tcell.ColorDefault
+			} else {
+				color = tcell.GetColor(colorStr)
+				if color == tcell.ColorDefault {
+					return fmt.Errorf(`invalid color format for "%s": %s`, k, colorStr)
+				}
 			}
 			SetColor(k, color)
 		}

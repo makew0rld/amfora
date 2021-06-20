@@ -84,5 +84,9 @@ func GetColor(key string) tcell.Color {
 func GetColorString(key string) string {
 	themeMu.RLock()
 	defer themeMu.RUnlock()
-	return fmt.Sprintf("#%06x", theme[key].TrueColor().Hex())
+	color := theme[key].TrueColor()
+	if color == tcell.ColorDefault {
+		return "-"
+	}
+	return fmt.Sprintf("#%06x", color.Hex())
 }

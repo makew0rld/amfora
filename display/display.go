@@ -536,10 +536,10 @@ func RenderFromString(str string) {
 }
 
 func renderPageFromString(str string) (*structs.Page, bool) {
-	rendered, links := renderer.RenderGemini(string(str), textWidth(), false)
+	rendered, links := renderer.RenderGemini(str, textWidth(), false)
 	page := &structs.Page{
 		Mediatype: structs.TextGemini,
-		Raw:       string(str),
+		Raw:       str,
 		Content:   rendered,
 		Links:     links,
 		TermWidth: termW,

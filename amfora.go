@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -86,17 +86,14 @@ func isStdinEmpty() bool {
 }
 
 func renderFromStdin() {
-	stdinScanner := bufio.NewScanner(os.Stdin)
-	stdinText := ""
-	for stdinScanner.Scan() {
-		stdinText += stdinScanner.Text() + "\n"
-	}
-
-	if err := stdinScanner.Err(); err != nil {
+	stdinTextBuilder := new(strings.Builder)
+	_, err := io.Copy(stdinTextBuilder, os.Stdin)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "error reading from standard input: %v\n", err)
 		os.Exit(1)
 	}
 
+	stdinText := stdinTextBuilder.String()
 	if len(strings.TrimSpace(stdinText)) > 0 {
 		display.RenderFromString(stdinText)
 	}

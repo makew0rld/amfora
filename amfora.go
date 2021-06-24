@@ -94,7 +94,5 @@ func renderFromStdin() {
 	}
 
 	stdinText := stdinTextBuilder.String()
-	if len(strings.TrimSpace(stdinText)) > 0 {
-		display.RenderFromString(stdinText)
-	}
+	display.RenderFromString(stdinText)
 }

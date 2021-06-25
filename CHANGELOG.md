@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurable keybindings for scrolling on pages (#211, #222)
 - Ability to save `about:` pages (#210, #236)
 - `bind_beginning` and `bind_end` keybindings
+- Display gemtext from stdin (#205, #242)
 
 ### Changed
 - Favicon support removed (#199)

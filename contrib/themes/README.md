@@ -115,6 +115,18 @@ Contributed by **[@thumb](https://github.com/thumbfighter)**.
 ![screenshot of add bookmark](https://user-images.githubusercontent.com/19327775/114432084-e8958200-9b85-11eb-9813-9982c3c0effa.png)
 </details>
 
+## Iceberg Dark
+
+Contributed by **[@knix3](https://github.com/knix3)**
+
+![screenshot of Iceberg Dark theme](https://user-images.githubusercontent.com/69134168/118542790-7b938000-b721-11eb-81e1-ae45cdfbe546.png)
+<details>
+<summary>More screenshots</summary>
+
+![screenshot of add bookmark](https://user-images.githubusercontent.com/69134168/118543243-07a5a780-b722-11eb-848a-95aa1de30044.png)
+![screenshot of error](https://user-images.githubusercontent.com/69134168/118543250-096f6b00-b722-11eb-9dca-d2b1bd6a8885.png)
+</details>
+
 ## Yours?
 
 Contribute your own theme by opening a PR.

@@ -522,6 +522,25 @@ func URL(u string) {
 	go t.goURL(fixUserURL(u))
 }
 
+func RenderFromString(str string) {
+	t := tabs[curTab]
+	page, _ := renderPageFromString(str)
+	setPage(t, page)
+}
+
+func renderPageFromString(str string) (*structs.Page, bool) {
+	rendered, links := renderer.RenderGemini(str, textWidth(), false)
+	page := &structs.Page{
+		Mediatype: structs.TextGemini,
+		Raw:       str,
+		Content:   rendered,
+		Links:     links,
+		TermWidth: termW,
+	}
+
+	return page, true
+}
+
 func NumTabs() int {
 	return len(tabs)
 }

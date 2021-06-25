@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
 	"github.com/makeworld-the-better-one/amfora/client"
@@ -68,10 +70,29 @@ func main() {
 	display.NewTab()
 	if len(os.Args[1:]) > 0 {
 		display.URL(os.Args[1])
+	} else if !isStdinEmpty() {
+		renderFromStdin()
 	}
 
 	// Start
 	if err = display.App.Run(); err != nil {
 		panic(err)
 	}
+}
+
+func isStdinEmpty() bool {
+	stat, _ := os.Stdin.Stat()
+	return (stat.Mode() & os.ModeCharDevice) != 0
+}
+
+func renderFromStdin() {
+	stdinTextBuilder := new(strings.Builder)
+	_, err := io.Copy(stdinTextBuilder, os.Stdin)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error reading from standard input: %v\n", err)
+		os.Exit(1)
+	}
+
+	stdinText := stdinTextBuilder.String()
+	display.RenderFromString(stdinText)
 }

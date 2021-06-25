@@ -430,11 +430,11 @@ func (t *tab) applyAll() {
 
 // HighlightedURL returns the currently selected URL
 func (t *tab) HighlightedURL() string {
-	currentSelection := tabs[curTab].view.GetHighlights()
+	currentSelection := t.view.GetHighlights()
 
 	if len(currentSelection) > 0 {
 		linkN, _ := strconv.Atoi(currentSelection[0])
-		selectedURL := tabs[curTab].page.Links[linkN]
+		selectedURL := t.page.Links[linkN]
 		return selectedURL
 	}
 	return ""

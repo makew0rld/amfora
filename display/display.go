@@ -12,6 +12,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
+	"github.com/makeworld-the-better-one/amfora/render"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/spf13/viper"
@@ -522,17 +523,17 @@ func URL(u string) {
 	go t.goURL(fixUserURL(u))
 }
 
-func RenderFromString(str string) {
+func RenderFromBytes(b []byte) {
 	t := tabs[curTab]
-	page, _ := renderPageFromString(str)
-	setPage(t, page)
+	page, _ := renderPageFromBytes(b)
+	t.setPage(page)
 }
 
-func renderPageFromString(str string) (*structs.Page, bool) {
-	rendered, links := renderer.RenderGemini(str, textWidth(), false)
+func renderPageFromBytes(b []byte) (*structs.Page, bool) {
+	rendered, links := render.RenderGemini(b, textWidth(), false)
 	page := &structs.Page{
 		Mediatype: structs.TextGemini,
-		Raw:       str,
+		Raw:       b,
 		Content:   rendered,
 		Links:     links,
 		TermWidth: termW,

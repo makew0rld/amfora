@@ -3,12 +3,10 @@ package render
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io"
 	"regexp"
 
 	"code.rocketnine.space/tslocum/cview"
-	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/spf13/viper"
 )
 
@@ -166,15 +164,6 @@ func (ren *ANSIRenderer) handler() {
 
 			// Shouldn't error because everything it writes to are all bytes.Buffer
 			ren.ansiWriter.Write(line) //nolint:errcheck
-
-			// The ANSIWriter injects tags like [-:-:-]
-			// but this will reset the background to use the user's terminal color.
-			// These tags need to be replaced with resets that use the theme color.
-			line = bytes.ReplaceAll(
-				ren.buf.Bytes(),
-				[]byte("[-:-:-]"),
-				[]byte(fmt.Sprintf("[-:%s:-]", config.GetColorString("bg"))),
-			)
 		}
 
 		ren.readIn.Write(line) //nolint:errcheck

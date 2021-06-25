@@ -148,11 +148,14 @@ func (ren *GemtextRenderer) renderLine(line string) string {
 	if ren.pre {
 		if ren.ansiEnabled {
 			line = cview.TranslateANSI(line)
-			// The TranslateANSI function injects tags like [-:-:-]
-			// but this will reset the background to use the user's terminal color.
-			// These tags need to be replaced with resets that use the theme color.
-			line = strings.ReplaceAll(line, "[-:-:-]",
-				fmt.Sprintf("[%s:%s:-]", config.GetColorString("preformatted_text"), config.GetColorString("bg")),
+			// The TranslateANSI function will reset the colors when it encounters
+			// an ANSI reset code, injecting a full reset tag: [-:-:-]
+			// This uses the default foreground and background colors of the
+			// application, but in this case we want it to use the preformatted text
+			// color as the foreground, as we're still in a preformat block.
+			line = strings.ReplaceAll(
+				line, "[-:-:-]",
+				fmt.Sprintf("[%s:-:-]", config.GetColorString("preformatted_text")),
 			)
 
 			// Set color at beginning and end of line to prevent background glitches

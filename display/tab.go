@@ -86,7 +86,7 @@ func makeNewTab() *tab {
 			linkN, _ := strconv.Atoi(currentSelection[0])
 			tabs[tab].page.Selected = tabs[tab].page.Links[linkN]
 			tabs[tab].page.SelectedID = currentSelection[0]
-			followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[linkN])
+			tabs[tab].followLink(tabs[tab].page.Links[linkN])
 			return
 		}
 		if len(currentSelection) == 0 && (key == tcell.KeyEnter || key == tcell.KeyTab) {
@@ -165,10 +165,10 @@ func makeNewTab() *tab {
 			}
 			return nil
 		case config.CmdBack:
-			histBack(&t)
+			t.histBack()
 			return nil
 		case config.CmdForward:
-			histForward(&t)
+			t.histForward()
 			return nil
 		case config.CmdSub:
 			Subscriptions(&t, "about:subscriptions")
@@ -209,7 +209,7 @@ func makeNewTab() *tab {
 		if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
 			if int(cmd) <= len(t.page.Links) {
 				// It's a valid link number
-				followLink(&t, t.page.URL, t.page.Links[cmd-1])
+				t.followLink(t.page.Links[cmd-1])
 				return nil
 			}
 		}

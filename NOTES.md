@@ -1,7 +1,8 @@
 # Notes
 
 ## Stream (#9)
-- Then make handlers and stuff part of `tab`
+- Change tab funcs that rely on that tab being the "current tab"
+- Fix compile errors
 - Go through process of loading a page from the very beginning and line up all the parts
 - Also handle non-network pages like `about:` pages, where `Raw` already exists and just needs to be rendered
 

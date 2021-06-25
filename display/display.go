@@ -78,7 +78,7 @@ func Init(version, commit, builtBy string) {
 				)
 				if tabs[i] == t {
 					// Reformat page ASAP, in the middle of loop
-					reformatPageAndSetView(t, t.page)
+					t.reformatPageAndSetView()
 				}
 			}
 			App.Draw()
@@ -230,7 +230,7 @@ func Init(version, commit, builtBy string) {
 			}
 			if i <= len(tabs[tab].page.Links) && i > 0 {
 				// It's a valid link number
-				followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[i-1])
+				tabs[tab].followLink(tabs[tab].page.Links[i-1])
 				return
 			}
 			// Invalid link number, don't do anything
@@ -321,7 +321,7 @@ func Init(version, commit, builtBy string) {
 		switch cmd {
 		case config.CmdNewTab:
 			if tabs[curTab].page.Mode == structs.ModeLinkSelect {
-				next, err := resolveRelLink(tabs[curTab], tabs[curTab].page.URL, tabs[curTab].page.Selected)
+				next, err := tabs[curTab].resolveRelLink(tabs[curTab].page.Selected)
 				if err != nil {
 					Error("URL Error", err.Error())
 					return nil
@@ -392,7 +392,7 @@ func NewTab() {
 
 	tabs = append(tabs, makeNewTab())
 	temp := newTabPage // Copy
-	setPage(tabs[curTab], &temp)
+	tabs[curTab].setPage(&temp)
 	tabs[curTab].addToHistory("about:newtab")
 	tabs[curTab].history.pos = 0 // Manually set as first page
 
@@ -468,7 +468,7 @@ func SwitchTab(tab int) {
 	curTab = tab % NumTabs()
 
 	// Display tab
-	reformatPageAndSetView(tabs[curTab], tabs[curTab].page)
+	tabs[curTab].reformatPageAndSetView()
 	browser.SetCurrentTab(strconv.Itoa(curTab))
 	tabs[curTab].applyAll()
 
@@ -490,7 +490,7 @@ func Reload() {
 			Mediatype: structs.TextGemini,
 		}
 		temp := newTabPage // Copy
-		setPage(tabs[curTab], &temp)
+		tabs[curTab].setPage(&temp)
 		return
 	}
 
@@ -500,7 +500,7 @@ func Reload() {
 
 	go func(t *tab) {
 		cache.RemovePage(tabs[curTab].page.URL)
-		handleURL(t, t.page.URL, 0) // goURL is not used bc history shouldn't be added to
+		t.handleURL(t.page.URL, 0) // goURL is not used bc history shouldn't be added to
 		if t == tabs[curTab] {
 			// Display the bottomBar state that handleURL set
 			t.applyBottomBar()
@@ -513,13 +513,13 @@ func Reload() {
 func URL(u string) {
 	t := tabs[curTab]
 	if strings.HasPrefix(u, "about:") {
-		if final, ok := handleAbout(t, u); ok {
+		if final, ok := t.handleAbout(u); ok {
 			t.addToHistory(final)
 		}
 		return
 	}
 
-	go goURL(t, fixUserURL(u))
+	go t.goURL(fixUserURL(u))
 }
 
 func NumTabs() int {

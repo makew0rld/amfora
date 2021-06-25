@@ -65,7 +65,7 @@ func Subscriptions(t *tab, u string) string {
 	// Retrieve cached version if there hasn't been any updates
 	p, ok := cache.GetPage(u)
 	if subscriptionPageUpdated[pageN].After(subscriptions.LastUpdated) && ok {
-		setPage(t, p)
+		t.setPage(p)
 		t.applyBottomBar()
 		return u
 	}
@@ -155,7 +155,7 @@ func Subscriptions(t *tab, u string) string {
 		Mediatype: structs.TextGemini,
 	}
 	go cache.AddPage(&page)
-	setPage(t, &page)
+	t.setPage(&page)
 	t.applyBottomBar()
 
 	subscriptionPageUpdated[pageN] = time.Now()
@@ -194,7 +194,7 @@ func ManageSubscriptions(t *tab, u string) {
 		Mediatype: structs.TextGemini,
 	}
 	go cache.AddPage(&page)
-	setPage(t, &page)
+	t.setPage(&page)
 	t.applyBottomBar()
 }
 

@@ -88,15 +88,15 @@ func textWidth() int {
 	return viper.GetInt("a-general.max_width")
 }
 
-// resolveRelLink returns an absolute link for the given absolute link and relative one.
+// resolveRelLink returns an absolute link for the given relative link.
 // It also returns an error if it could not resolve the links, which should be displayed
 // to the user.
-func resolveRelLink(t *tab, prev, next string) (string, error) {
+func (t *tab) resolveRelLink(next string) (string, error) {
 	if !t.hasContent() || t.isAnAboutPage() {
 		return next, nil
 	}
 
-	prevParsed, _ := url.Parse(prev)
+	prevParsed, _ := url.Parse(t.page.URL)
 	nextParsed, err := url.Parse(next)
 	if err != nil {
 		return "", errors.New("link URL could not be parsed") //nolint:goerr113

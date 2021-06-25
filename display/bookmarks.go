@@ -136,7 +136,7 @@ func Bookmarks(t *tab) {
 		TermWidth: termW,
 		Mediatype: structs.TextGemini,
 	}
-	setPage(t, &page)
+	t.setPage(&page)
 	t.applyBottomBar()
 }
 

@@ -95,7 +95,7 @@ func handleOther(u string) {
 // It returns the URL displayed, and a bool indicating if the provided
 // URL could be handled. The string returned will always be empty
 // if the bool is false.
-func handleAbout(t *tab, u string) (string, bool) {
+func (t *tab) handleAbout(u string) (string, bool) {
 	if !strings.HasPrefix(u, "about:") {
 		return "", false
 	}
@@ -106,27 +106,27 @@ func handleAbout(t *tab, u string) (string, bool) {
 		return u, true
 	case "about:newtab":
 		temp := newTabPage // Copy
-		setPage(t, &temp)
+		t.setPage(&temp)
 		t.applyBottomBar()
 		return u, true
 	case "about:version":
 		temp := versionPage
-		setPage(t, &temp)
+		t.setPage(&temp)
 		t.applyBottomBar()
 		return u, true
 	case "about:license":
 		temp := licensePage
-		setPage(t, &temp)
+		t.setPage(&temp)
 		t.applyBottomBar()
 		return u, true
 	case "about:thanks":
 		temp := thanksPage
-		setPage(t, &temp)
+		t.setPage(&temp)
 		t.applyBottomBar()
 		return u, true
 	case "about:about":
 		temp := aboutPage
-		setPage(t, &temp)
+		t.setPage(&temp)
 		t.applyBottomBar()
 		return u, true
 	}
@@ -163,7 +163,7 @@ func handleAbout(t *tab, u string) (string, bool) {
 //
 // numRedirects is the number of redirects that resulted in the provided URL.
 // It should typically be 0.
-func handleURL(t *tab, u string, numRedirects int) (string, bool) {
+func (t *tab) handleURL(u string, numRedirects int) (string, bool) {
 	defer App.Draw() // Just in case
 
 	// Save for resetting on error
@@ -201,7 +201,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	App.SetFocus(t.view)
 
 	if strings.HasPrefix(u, "about:") {
-		return ret(handleAbout(t, u))
+		return ret(t.handleAbout(u))
 	}
 
 	u = normalizeURL(u)
@@ -237,7 +237,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		if !ok {
 			return ret("", false)
 		}
-		setPage(t, page)
+		t.setPage(page)
 		return ret(u, true)
 	}
 
@@ -258,7 +258,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	if numRedirects == 0 {
 		page, ok := cache.GetPage(u)
 		if ok {
-			setPage(t, page)
+			t.setPage(page)
 			return ret(u, true)
 		}
 	}
@@ -344,7 +344,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			go cache.AddPage(page)
 		}
 
-		setPage(t, page)
+		t.setPage(page)
 		return ret(u, true)
 	}
 	// Not displayable
@@ -370,7 +370,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 				Error("Input Error", "URL for that input would be too long.")
 				return ret("", false)
 			}
-			return ret(handleURL(t, parsed.String(), 0))
+			return ret(t.handleURL(parsed.String(), 0))
 		}
 		return ret("", false)
 	case 30, 31:
@@ -395,7 +395,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			if res.Status == gemini.StatusRedirectPermanent {
 				go cache.AddRedir(u, redir)
 			}
-			return ret(handleURL(t, redir, numRedirects+1))
+			return ret(t.handleURL(redir, numRedirects+1))
 		}
 		return ret("", false)
 	case 40:

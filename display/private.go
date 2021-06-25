@@ -15,21 +15,21 @@ import (
 // followLink should be used when the user "clicks" a link on a page.
 // Not when a URL is opened on a new tab for the first time.
 // It will handle setting the bottomBar.
-func followLink(t *tab, prev, next string) {
+func (t *tab) followLink(next string) {
 	if strings.HasPrefix(next, "about:") {
-		if final, ok := handleAbout(t, next); ok {
+		if final, ok := t.handleAbout(next); ok {
 			t.addToHistory(final)
 		}
 		return
 	}
 
 	if t.hasContent() && !t.isAnAboutPage() {
-		nextURL, err := resolveRelLink(t, prev, next)
+		nextURL, err := t.resolveRelLink(next)
 		if err != nil {
 			Error("URL Error", err.Error())
 			return
 		}
-		go goURL(t, nextURL)
+		go t.goURL(nextURL)
 		return
 	}
 	// No content on current tab, so the "prev" URL is not valid.
@@ -39,7 +39,7 @@ func followLink(t *tab, prev, next string) {
 		Error("URL Error", "Link URL could not be parsed")
 		return
 	}
-	go goURL(t, next)
+	go t.goURL(next)
 }
 
 // reformatPage will take the raw page content and reformat it according to the current terminal dimensions.
@@ -79,13 +79,13 @@ func reformatPage(p *structs.Page) {
 
 // reformatPageAndSetView is for reformatting a page that is already being displayed.
 // setPage should be used when a page is being loaded for the first time.
-func reformatPageAndSetView(t *tab, p *structs.Page) {
-	if p.TermWidth == termW {
+func (t *tab) reformatPageAndSetView() {
+	if t.page.TermWidth == termW {
 		// No changes to make
 		return
 	}
-	reformatPage(p)
-	t.view.SetText(p.Content)
+	reformatPage(t.page)
+	t.view.SetText(t.page.Content)
 	t.applyScroll() // Go back to where you were, roughly
 
 	App.Draw()
@@ -93,7 +93,7 @@ func reformatPageAndSetView(t *tab, p *structs.Page) {
 
 // setPage displays a Page on the passed tab number.
 // The bottomBar is not actually changed in this func
-func setPage(t *tab, p *structs.Page) {
+func (t *tab) setPage(p *structs.Page) {
 	if !isValidTab(t) {
 		// Don't waste time reformatting an invalid tab
 		return
@@ -130,8 +130,8 @@ func setPage(t *tab, p *structs.Page) {
 // It has no return values to be processed.
 //
 // It should be called in a goroutine.
-func goURL(t *tab, u string) {
-	final, displayed := handleURL(t, u, 0)
+func (t *tab) goURL(u string) {
+	final, displayed := t.handleURL(u, 0)
 	if displayed {
 		t.addToHistory(final)
 	}

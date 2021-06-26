@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"bytes"
 
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
@@ -270,8 +269,8 @@ func Init(version, commit, builtBy string) {
 			// Figure out whether it's a URL, link number, or search
 			// And send out a request
 
-			search_string = searchBar.GetText()
-			search_bytes := []byte(search_string)
+			// Escape the search string to not find regexp symbols
+			search_string = regexp.QuoteMeta(searchBar.GetText())
 
 			if strings.TrimSpace(search_string) == "" {
 				// Ignore
@@ -284,22 +283,47 @@ func Init(version, commit, builtBy string) {
 			}
 			tabs[tab].mode = tabModeSearch
 
+			// find all positions of the search string
+			search_regex := regexp.MustCompile(search_string)
+			search_idx := search_regex.FindAllIndex(original_text, -1)
+
+			// find all positions of tags
+			tags_regex := regexp.MustCompile(`\[.*?[^\[]\]`)
+			tags_idx := tags_regex.FindAllIndex(original_text, -1)
+
 			text := []byte("")
-			matches = bytes.Count(original_text, search_bytes)
-			first_index := 0
-			suffix := append(search_bytes, []byte("[\"\"]")...)
-			for i := 0; i < matches; i++ {
-				last_index := bytes.Index(original_text[first_index:], search_bytes) + len(search_bytes) + first_index
-				replacement := append([]byte(fmt.Sprint("[\"", search_string, i, "\"]")), suffix... )
-				text = append(text, bytes.ReplaceAll(original_text[first_index:last_index], search_bytes, replacement)...)
-				first_index = last_index
+			matches = 0
+			last_match := 0
+			isMatch := true
+
+			// loops through all occurrences and check if they
+			// discard if they lie within tags.
+			// []byte text is build from the original text buffer
+			// with the actual search strings replaced by tagged regions
+			// to highlight.
+			for i, match := range search_idx {
+				isMatch = true
+				for _, tag := range tags_idx {
+					if match[0] >= tag[0] && match[1] <= tag[1] {
+						isMatch = false
+						break
+					}
+				}
+
+				if isMatch {
+					matches += 1
+					text = append(text, original_text[last_match:match[0]]...)
+					replacement := []byte(fmt.Sprint("[\"search-", i, "\"]", search_string, "[\"\"]"))
+					text = append(text, replacement...)
+					last_match = match[0] + len(search_string)
+				}
 			}
-			text = append(text, original_text[first_index:]...)
+			text = append(text, original_text[last_match:]...)
 
 			tabs[curTab].view.SetBytes(text)
 
 			cur_match = 0
-			tabs[curTab].view.Highlight(fmt.Sprint(search_string, "0"))
+			tabs[curTab].view.Highlight(fmt.Sprint("search-", "0"))
 			tabs[curTab].view.ScrollToHighlight()
 			App.SetFocus(tabs[tab].view)
 
@@ -362,14 +386,14 @@ func Init(version, commit, builtBy string) {
 				case config.CmdNextMatch:
 					if cur_match < (matches - 1) {
 						cur_match += 1
-						tabs[curTab].view.Highlight(fmt.Sprint(search_string, cur_match))
+						tabs[curTab].view.Highlight(fmt.Sprint("search-", cur_match))
 					}
 					tabs[curTab].view.ScrollToHighlight()
 					return nil
 				case config.CmdPrevMatch:
 					if cur_match > 0 {
 						cur_match -= 1
-						tabs[curTab].view.Highlight(fmt.Sprint(search_string, cur_match))
+						tabs[curTab].view.Highlight(fmt.Sprint("search-", cur_match))
 					}
 					tabs[curTab].view.ScrollToHighlight()
 					return nil

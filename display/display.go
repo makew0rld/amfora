@@ -28,11 +28,11 @@ var termH int
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField()
 
-var original_text []byte
+var originalText []byte
 var searchBar = cview.NewInputField()
-var search_string = ""
+var searchString = ""
 var matches = 0
-var cur_match = 0
+var curMatch = 0
 
 // When the bottom bar string has a space, this regex decides whether it's
 // a non-encoded URL or a search string.
@@ -270,40 +270,40 @@ func Init(version, commit, builtBy string) {
 			// And send out a request
 
 			// Escape the search string to not find regexp symbols
-			search_string = regexp.QuoteMeta(searchBar.GetText())
+			searchString = regexp.QuoteMeta(searchBar.GetText())
 
-			if strings.TrimSpace(search_string) == "" {
+			if strings.TrimSpace(searchString) == "" {
 				// Ignore
 				reset()
 				return
 			}
 
 			if tabs[tab].mode != tabModeSearch {
-				original_text = tabs[curTab].view.GetBytes(false)
+				originalText = tabs[curTab].view.GetBytes(false)
 			}
 			tabs[tab].mode = tabModeSearch
 
 			// find all positions of the search string
-			search_regex := regexp.MustCompile(search_string)
-			search_idx := search_regex.FindAllIndex(original_text, -1)
+			searchRegex := regexp.MustCompile(searchString)
+			searchIdx := searchRegex.FindAllIndex(originalText, -1)
 
 			// find all positions of tags
-			tags_regex := regexp.MustCompile(`\[.*?[^\[]\]`)
-			tags_idx := tags_regex.FindAllIndex(original_text, -1)
+			tagsRegex := regexp.MustCompile(`\[.*?[^\[]\]`)
+			tagsIdx := tagsRegex.FindAllIndex(originalText, -1)
 
 			text := []byte("")
 			matches = 0
-			last_match := 0
-			isMatch := true
+			lastMatch := 0
+			var isMatch bool
 
 			// loops through all occurrences and check if they
 			// discard if they lie within tags.
 			// []byte text is build from the original text buffer
 			// with the actual search strings replaced by tagged regions
 			// to highlight.
-			for i, match := range search_idx {
+			for i, match := range searchIdx {
 				isMatch = true
-				for _, tag := range tags_idx {
+				for _, tag := range tagsIdx {
 					if match[0] >= tag[0] && match[1] <= tag[1] {
 						isMatch = false
 						break
@@ -311,18 +311,18 @@ func Init(version, commit, builtBy string) {
 				}
 
 				if isMatch {
-					matches += 1
-					text = append(text, original_text[last_match:match[0]]...)
-					replacement := []byte(fmt.Sprint("[\"search-", i, "\"]", search_string, "[\"\"]"))
+					matches++
+					text = append(text, originalText[lastMatch:match[0]]...)
+					replacement := []byte(fmt.Sprint("[\"search-", i, "\"]", searchString, "[\"\"]"))
 					text = append(text, replacement...)
-					last_match = match[0] + len(search_string)
+					lastMatch = match[0] + len(searchString)
 				}
 			}
-			text = append(text, original_text[last_match:]...)
+			text = append(text, originalText[lastMatch:]...)
 
 			tabs[curTab].view.SetBytes(text)
 
-			cur_match = 0
+			curMatch = 0
 			tabs[curTab].view.Highlight(fmt.Sprint("search-", "0"))
 			tabs[curTab].view.ScrollToHighlight()
 			App.SetFocus(tabs[tab].view)
@@ -334,7 +334,6 @@ func Init(version, commit, builtBy string) {
 		}
 		// Other potential keys are Tab and Backtab, they are ignored
 	})
-
 
 	// Render the default new tab content ONCE and store it for later
 	// This code is repeated in Reload()
@@ -383,24 +382,26 @@ func Init(version, commit, builtBy string) {
 		cmd := config.TranslateKeyEvent(event)
 		if tabs[curTab].mode == tabModeSearch {
 			switch cmd {
-				case config.CmdNextMatch:
-					if cur_match < (matches - 1) {
-						cur_match += 1
-						tabs[curTab].view.Highlight(fmt.Sprint("search-", cur_match))
-					}
-					tabs[curTab].view.ScrollToHighlight()
-					return nil
-				case config.CmdPrevMatch:
-					if cur_match > 0 {
-						cur_match -= 1
-						tabs[curTab].view.Highlight(fmt.Sprint("search-", cur_match))
-					}
-					tabs[curTab].view.ScrollToHighlight()
-					return nil
+			case config.CmdNextMatch:
+				if curMatch < (matches - 1) {
+					curMatch++
+					tabs[curTab].view.Highlight(fmt.Sprint("search-", curMatch))
+				}
+				tabs[curTab].view.ScrollToHighlight()
+				return nil
+			case config.CmdPrevMatch:
+				if curMatch > 0 {
+					curMatch--
+					tabs[curTab].view.Highlight(fmt.Sprint("search-", curMatch))
+				}
+				tabs[curTab].view.ScrollToHighlight()
+				return nil
+			case config.CmdInvalid:
+				return nil
 			}
 			if event.Key() == tcell.KeyEsc {
 				tabs[curTab].mode = tabModeDone
-				tabs[curTab].view.SetBytes(original_text)
+				tabs[curTab].view.SetBytes(originalText)
 				layout.RemoveItem(searchBar)
 				return nil
 			}

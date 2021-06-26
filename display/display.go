@@ -397,13 +397,12 @@ func Init(version, commit, builtBy string) {
 				tabs[curTab].view.ScrollToHighlight()
 				return nil
 			case config.CmdInvalid:
-				return nil
-			}
-			if event.Key() == tcell.KeyEsc {
-				tabs[curTab].mode = tabModeDone
-				tabs[curTab].view.SetBytes(originalText)
-				layout.RemoveItem(searchBar)
-				return nil
+				if event.Key() == tcell.KeyEsc {
+					tabs[curTab].mode = tabModeDone
+					tabs[curTab].view.SetBytes(originalText)
+					layout.RemoveItem(searchBar)
+					return nil
+				}
 			}
 			return event
 		}

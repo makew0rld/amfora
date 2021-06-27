@@ -381,17 +381,7 @@ func (t *tab) applyScroll() {
 // scrollTo scrolls the current tab to specified position. Like
 // cview.TextView.ScrollTo but using the custom scrolling logic required by #196.
 func (t *tab) scrollTo(row, col int) {
-	// Logic copied from scrolling stuff around line 217.
-
 	height, width := t.view.GetBufferSize()
-	_, _, boxW, boxH := t.view.GetInnerRect()
-
-	// Make boxW accurate by subtracting one if a scrollbar is covering the last
-	// column of text
-	if config.ScrollBar == cview.ScrollBarAlways ||
-		(config.ScrollBar == cview.ScrollBarAuto && height > boxH) {
-		boxW--
-	}
 
 	// Keep row and col within limits
 

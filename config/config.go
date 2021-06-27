@@ -351,8 +351,12 @@ func Init() error {
 			}
 			colorStr = strings.ToLower(colorStr)
 			var color tcell.Color
-			if colorStr == "none" {
-				color = tcell.ColorDefault
+			if colorStr == "default" {
+				if strings.HasSuffix(k, "bg") {
+					color = tcell.ColorDefault
+				} else {
+					return fmt.Errorf(`"default" is only valid for a background color (color ending in "bg"), not "%s"`, k)
+				}
 			} else {
 				color = tcell.GetColor(colorStr)
 				if color == tcell.ColorDefault {

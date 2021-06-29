@@ -94,7 +94,7 @@ func makeNewTab() *tab {
 			tabs[tab].page.Mode = structs.ModeLinkSelect
 
 			tabs[tab].view.Highlight("0")
-			tabs[tab].view.ScrollToHighlight()
+			tabs[tab].scrollToHighlight()
 			// Display link URL in bottomBar
 			bottomBar.SetLabel("[::b]Link: [::-]")
 			bottomBar.SetText(tabs[tab].page.Links[0])
@@ -115,7 +115,7 @@ func makeNewTab() *tab {
 				return
 			}
 			tabs[tab].view.Highlight(strconv.Itoa(index))
-			tabs[tab].view.ScrollToHighlight()
+			tabs[tab].scrollToHighlight()
 			// Display link URL in bottomBar
 			bottomBar.SetLabel("[::b]Link: [::-]")
 			bottomBar.SetText(tabs[tab].page.Links[index])
@@ -184,7 +184,7 @@ func makeNewTab() *tab {
 			return nil
 		case config.CmdCopyTargetURL:
 			currentURL := t.page.URL
-			selectedURL := t.HighlightedURL()
+			selectedURL := t.highlightedURL()
 			if selectedURL == "" {
 				return nil
 			}
@@ -215,6 +215,7 @@ func makeNewTab() *tab {
 		}
 
 		// Scrolling stuff
+		// Copied in scrollTo
 
 		key := event.Key()
 		mod := event.Modifiers()
@@ -377,6 +378,39 @@ func (t *tab) applyScroll() {
 	t.applyHorizontalScroll()
 }
 
+// scrollTo scrolls the current tab to specified position. Like
+// cview.TextView.ScrollTo but using the custom scrolling logic required by #196.
+func (t *tab) scrollTo(row, col int) {
+	height, width := t.view.GetBufferSize()
+
+	// Keep row and col within limits
+
+	if row < 0 {
+		row = 0
+	} else if row > height {
+		row = height
+	}
+	if col < 0 {
+		col = 0
+	} else if col > width {
+		col = width
+	}
+
+	t.page.Row = row
+	t.page.Column = col
+	t.applyScroll()
+	App.Draw()
+}
+
+// scrollToHighlight scrolls the current tab to specified position. Like
+// cview.TextView.ScrollToHighlight but using the custom scrolling logic
+// required by #196.
+func (t *tab) scrollToHighlight() {
+	t.view.ScrollToHighlight()
+	App.Draw()
+	t.scrollTo(t.view.GetScrollOffset())
+}
+
 // saveBottomBar saves the current bottomBar values in the tab.
 func (t *tab) saveBottomBar() {
 	t.barLabel = bottomBar.GetLabel()
@@ -431,8 +465,8 @@ func (t *tab) applyAll() {
 	}
 }
 
-// HighlightedURL returns the currently selected URL
-func (t *tab) HighlightedURL() string {
+// highlightedURL returns the currently selected URL
+func (t *tab) highlightedURL() string {
 	currentSelection := tabs[curTab].view.GetHighlights()
 
 	if len(currentSelection) > 0 {

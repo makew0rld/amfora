@@ -91,7 +91,7 @@ func GetColorString(key string) string {
 	return fmt.Sprintf("#%06x", color.Hex())
 }
 
-// Returns ColorBlack if the color is brighter than gray
+// GetReadableColor Returns ColorBlack if the color is brighter than gray
 // otherwise returns ColorWhite
 func GetReadableColor(bg tcell.Color) tcell.Color {
 	if bg == tcell.ColorDefault {
@@ -101,12 +101,11 @@ func GetReadableColor(bg tcell.Color) tcell.Color {
 	const gray = 0x88 + 0x88 + 0x88 // The sum of gray's R, G, and B
 	if r+g+b > gray {
 		return tcell.ColorBlack
-	} else {
-		return tcell.ColorWhite
 	}
+	return tcell.ColorWhite
 }
 
-// Same as GetColor, unless the key is "default".
+// GetTextColor is the Same as GetColor, unless the key is "default".
 // This happens on focus of a UI element which has a bg of default, in which case
 // It return tcell.ColorBlack or tcell.ColorWhite, depending on which is more readable
 func GetTextColor(key, bg string) tcell.Color {
@@ -119,7 +118,7 @@ func GetTextColor(key, bg string) tcell.Color {
 	return GetReadableColor(theme[bg].TrueColor())
 }
 
-// Same as GetColorString, unless the key is "default".
+// GetTextColorString is the Same as GetColorString, unless the key is "default".
 // This happens on focus of a UI element which has a bg of default, in which case
 // It return tcell.ColorBlack or tcell.ColorWhite, depending on which is more readable
 func GetTextColorString(key, bg string) string {

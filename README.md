@@ -91,7 +91,6 @@ yay -S amfora-git
 MacOS users can also use [Homebrew](https://brew.sh/) to install the latest commit of Amfora:
 
 ```
-brew tap makeworld-the-better-one/tap
 brew install --HEAD amfora
 ```
 You can update it with:

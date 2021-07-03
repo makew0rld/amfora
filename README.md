@@ -46,9 +46,8 @@ Amfora is packaged in many Linux distros. It's also on [Scoop](https://scoop.sh/
 
 ### Homebrew
 
-If you use [Homebrew](https://brew.sh/), you can install Amfora through my personal tap.
+If you use [Homebrew](https://brew.sh/), you can install Amfora with:
 ```
-brew tap makeworld-the-better-one/tap
 brew install amfora
 ```
 You can update it with:

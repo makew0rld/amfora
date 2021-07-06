@@ -98,8 +98,9 @@ func GetReadableColor(bg tcell.Color) tcell.Color {
 		return tcell.ColorWhite
 	}
 	r, g, b := bg.RGB()
-	const gray = 0x88 + 0x88 + 0x88 // The sum of gray's R, G, and B
-	if r+g+b > gray {
+	luminance := 77*r + 150*g + 29*b + (1<<7)>>8
+	const gray = 0x77 + 0x77 + 0x77 // The sum of gray's R, G, and B
+	if luminance > gray {
 		return tcell.ColorBlack
 	}
 	return tcell.ColorWhite

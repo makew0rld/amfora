@@ -98,7 +98,7 @@ func GetReadableColor(bg tcell.Color) tcell.Color {
 		return tcell.ColorWhite
 	}
 	r, g, b := bg.RGB()
-	luminance := 77*r + 150*g + 29*b + (1<<7)>>8
+	luminance := (77*r + 150*g + 29*b + 1<<7) >> 8
 	const gray = 119 // The middle gray
 	if luminance > gray {
 		return tcell.ColorBlack

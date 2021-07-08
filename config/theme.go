@@ -91,13 +91,18 @@ func GetColorString(key string) string {
 	return fmt.Sprintf("#%06x", color.Hex())
 }
 
-// GetReadableColor Returns ColorBlack if the color is brighter than gray
-// otherwise returns ColorWhite
-func GetReadableColor(bg tcell.Color) tcell.Color {
-	if bg == tcell.ColorDefault {
-		return tcell.ColorWhite
+// GetContrastingColor returns ColorBlack if color is brighter than gray
+// otherwise returns ColorWhite if color is dimmer than gray
+// if color is ColorDefault (undefined luminance) this returns ColorDefault
+func GetContrastingColor(color tcell.Color) tcell.Color {
+	if color == tcell.ColorDefault {
+		// color should never be tcell.ColorDefault
+		// only config keys which end in bg are allowed to be set to default
+		// and the only way the argument of this function is set to ColorDefault
+		// is if both the text and bg of an element in the UI are set to default
+		return tcell.ColorDefault
 	}
-	r, g, b := bg.RGB()
+	r, g, b := color.RGB()
 	luminance := (77*r + 150*g + 29*b + 1<<7) >> 8
 	const gray = 119 // The middle gray
 	if luminance > gray {
@@ -116,7 +121,7 @@ func GetTextColor(key, bg string) tcell.Color {
 	if color != tcell.ColorDefault {
 		return color
 	}
-	return GetReadableColor(theme[bg].TrueColor())
+	return GetContrastingColor(theme[bg].TrueColor())
 }
 
 // GetTextColorString is the Same as GetColorString, unless the key is "default".

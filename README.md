@@ -44,7 +44,7 @@ Make sure to click "Watch" in the top right, then "Custom" > "Releases" to get n
 
 Amfora is packaged in many Linux distros. It's also on [Scoop](https://scoop.sh/) for Windows users.
 
-### Homebrew
+### macOS (Homebrew)
 
 If you use [Homebrew](https://brew.sh/), you can install Amfora with:
 ```
@@ -54,6 +54,19 @@ You can update it with:
 ```
 brew upgrade amfora
 ```
+
+### macOS (MacPorts)
+
+On macOS, Amfora can also be installed through [MacPorts](https://www.macports.org):
+```
+sudo port install amfora
+```
+You can update it with:
+```
+sudo port selfupdate
+sudo port upgrade amfora
+```
+**NOTE:** this installation source is community-maintained. More information [here](https://ports.macports.org/port/amfora/).
 
 ### Termux
 

@@ -127,6 +127,12 @@ Contributed by **[@knix3](https://github.com/knix3)**
 ![screenshot of error](https://user-images.githubusercontent.com/69134168/118543250-096f6b00-b722-11eb-9dca-d2b1bd6a8885.png)
 </details>
 
+## Tokyo Night
+
+Contributed by **[@luetage](https://github.com/luetage)**
+
+![screenshot of Tokyo Night theme](https://user-images.githubusercontent.com/13988217/129796992-af289d10-3c2b-4cbc-99ba-648bcb24bcbb.png)
+
 ## Yours?
 
 Contribute your own theme by opening a PR.

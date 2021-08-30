@@ -121,6 +121,7 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Tabbed browsing
 - [x] Support ANSI color codes on pages, even for Windows
 - [x] Styled page content (headings, links)
+- [x] Highlighting of preformatted code blocks that list a language in the alt text
 - [x] Basic forward/backward history, for each tab
 - [x] Input (Status Code 10 & 11)
 - [x] Multiple charset support (over 55)
@@ -162,6 +163,8 @@ Amfora ❤️ open source!
 - [progressbar](https://github.com/schollz/progressbar)
 - [go-humanize](https://github.com/dustin/go-humanize)
 - [gofeed](https://github.com/mmcdole/gofeed)
+- [chroma](https://github.com/alecthomas/chroma) for source code syntax highlighting
+- [go-supportscolor](https://github.com/jwalton/go-supportscolor)
 
 ## License
 This project is licensed under the GPL v3.0. See the [LICENSE](./LICENSE) file for details.

@@ -4,11 +4,13 @@ go 1.14
 
 require (
 	code.rocketnine.space/tslocum/cview v1.5.6-0.20210525194531-92dca67ac283
+	github.com/alecthomas/chroma v0.9.2
 	github.com/atotto/clipboard v0.1.4
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gdamore/tcell/v2 v2.3.3
 	github.com/google/go-cmp v0.5.0 // indirect
+	github.com/jwalton/go-supportscolor v1.1.0
 	github.com/makeworld-the-better-one/go-gemini v0.11.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.1 // indirect

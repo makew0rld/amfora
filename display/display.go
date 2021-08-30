@@ -10,6 +10,7 @@ import (
 
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
+	"github.com/jwalton/go-supportscolor"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
@@ -59,6 +60,18 @@ var App = cview.NewApplication()
 
 func Init(version, commit, builtBy string) {
 	aboutInit(version, commit, builtBy)
+
+	// Detect terminal colors for syntax highlighting
+	switch supportscolor.Stdout().Level {
+	case supportscolor.Ansi16m:
+		renderer.TermColor = "terminal16m"
+	case supportscolor.Ansi256:
+		renderer.TermColor = "terminal256"
+	case supportscolor.Basic:
+		renderer.TermColor = "terminal16"
+	default:
+		renderer.TermColor = "terminal8"
+	}
 
 	App.EnableMouse(false)
 	App.SetRoot(layout, true)

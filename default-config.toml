@@ -44,6 +44,12 @@ color = true
 # Whether ANSI color codes from the page content should be rendered
 ansi = true
 
+# Whether or not to support source code highlighting in preformatted blocks based on alt text
+highlight_code = true
+
+# Which highlighting style to use (see https://xyproto.github.io/splash/docs/)
+highlight_style = "swapoff"
+
 # Whether to replace list asterisks with unicode bullets
 bullets = true
 

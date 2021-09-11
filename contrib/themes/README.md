@@ -25,15 +25,15 @@ Contributed by **[@crdpa](https://github.com/crdpa)**.
 
 Contributed by **[@marcransome](https://github.com/marcransome)**.
 
-<img width="1354" alt="screenshot-1" src="https://user-images.githubusercontent.com/679401/132952330-316f59cc-ffa1-495c-ab66-264ef7182795.png">
+![screenshot of dracula variant theme](https://user-images.githubusercontent.com/679401/132952433-563501ef-4d98-4d43-988e-f15bab7cb155.png)
 
 <details>
 <summary>More screenshots</summary>
 
-<img width="1354" alt="screenshot-2" src="https://user-images.githubusercontent.com/679401/132952340-96840ad8-fb78-499d-bf6b-3fcdf659edc7.png">
-<img width="1354" alt="screenshot-3" src="https://user-images.githubusercontent.com/679401/132952347-6b93d985-afc8-47b4-9569-1775ce4f37e7.png">
-<img width="1354" alt="screenshot-4" src="https://user-images.githubusercontent.com/679401/132952348-ffcbcc7a-f9ad-41c6-a7d2-5c870754c4c9.png">
-<img width="1354" alt="screenshot-5" src="https://user-images.githubusercontent.com/679401/132952352-50ca16f3-d255-4a1d-a25b-ccf53116957d.png">
+![screenshot of dracula variant theme](https://user-images.githubusercontent.com/679401/132952340-96840ad8-fb78-499d-bf6b-3fcdf659edc7.png)
+![screenshot of dracula variant theme](https://user-images.githubusercontent.com/679401/132952347-6b93d985-afc8-47b4-9569-1775ce4f37e7.png)
+![screenshot of dracula variant theme](https://user-images.githubusercontent.com/679401/132952348-ffcbcc7a-f9ad-41c6-a7d2-5c870754c4c9.png)
+![screenshot of dracula variant theme](https://user-images.githubusercontent.com/679401/132952352-50ca16f3-d255-4a1d-a25b-ccf53116957d.png)
 
 </details>
 

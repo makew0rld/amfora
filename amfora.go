@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
@@ -68,8 +69,25 @@ func main() {
 	// Initialize Amfora's settings
 	display.Init(version, commit, builtBy)
 	display.NewTab()
+
+	// Load a URL, file, or render from stdin
 	if len(os.Args[1:]) > 0 {
-		display.URL(os.Args[1])
+		url := os.Args[1]
+		if !strings.Contains(url, "://") || strings.HasPrefix(url, "../") || strings.HasPrefix(url, "./") {
+			fileName := url
+			if _, err := os.Stat(fileName); err == nil {
+				if !strings.HasPrefix(fileName, "/") {
+					cwd, err := os.Getwd()
+					if err != nil {
+						fmt.Fprintf(os.Stderr, "error getting working directory path: %v\n", err)
+						os.Exit(1)
+					}
+					fileName = filepath.Join(cwd, fileName)
+				}
+				url = "file://" + fileName
+			}
+		}
+		display.URL(url)
 	} else if !isStdinEmpty() {
 		renderFromStdin()
 	}

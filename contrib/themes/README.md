@@ -157,6 +157,18 @@ Contributed by **[@luetage](https://github.com/luetage)**
 
 ![screenshot of Tokyo Night theme](https://user-images.githubusercontent.com/13988217/130348393-69986b51-ddd7-4310-90ae-382461502535.png)
 
+## omni by day
+
+Contributed by **[@omnivagant](https://github.com/omnivagant)**
+
+![screenshot of omni-by-day v0.23](https://user-image.githubusercontent.com/omnivagant/cant-figure-out-how-to-do-this.png)
+
+## omni by night
+
+Contributed by **[@omnivagant](https://github.com/omnivagant)**
+
+![screenshot of omni-by-night v0.23](https://user-image.githubusercontent.com/omnivagant/cant-figure-out-how-to-do-this.png)
+
 ## Yours?
 
 Contribute your own theme by opening a PR.

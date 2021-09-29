@@ -1,0 +1,23 @@
+[theme]
+
+# omni by day v0.23
+
+#bg =                        "#f8eec8" # override "default"
+fg =                        "#5c5c5c"
+tab_num =                   "#dddddd"
+tab_divider =               "#424242"
+bottombar_label =           "#5c5c5c"
+bottombar_text =            "#777777"
+bottombar_bg =              "#dddddd"
+scrollbar =                 "#dddddd"
+
+hdg_1 =                     "#af3a03"
+hdg_2 =                     "#d65f0e"
+hdg_3 =                     "#d79921"
+amfora_link =               "#42cc00"
+foreign_link =              "#0f51ec"
+link_number =               "#a8a19f"
+regular_text =              "#5c5c5c"
+quote_text =                "#777777"
+preformatted_text =         "#777777"
+list_text =                 "#a8a19f"

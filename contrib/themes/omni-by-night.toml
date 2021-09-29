@@ -1,0 +1,23 @@
+[theme]
+
+# omni by night v0.23
+
+#bg =                        "#322825" # override "default"
+fg =                        "#a8a19f"
+tab_num =                   "#5c5c5c"
+tab_divider =               "#9c9c9c"
+bottombar_label =           "#7cfc00"
+bottombar_text =            "#ff9000"
+bottombar_bg =              "#333333"
+scrollbar =                 "#dddddd"
+
+hdg_1 =                     "#ff6000"
+hdg_2 =                     "#ff9000"
+hdg_3 =                     "#ffb000"
+amfora_link =               "#7cfc00"
+foreign_link =              "#f723ee"
+link_number =               "#dfbf8e"
+regular_text =              "#ebdbb2"
+quote_text =                "#ebdbb2"
+preformatted_text =         "#ebdbb2"
+list_text =                 "#ebdbb2"

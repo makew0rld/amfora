@@ -9,7 +9,17 @@ Source: https://github.com/makeworld-the-better-one/amfora/archive/v%{version}.t
 BuildRequires: make
 BuildRequires: git
 BuildRequires: gcc
+# suse package: go
+# fedora/rhel package: golang
+%if 0%{?suse_version}
+BuildRequires: go
+%endif
+%if 0%{?fedora}
 BuildRequires: golang
+%endif
+%if 0%{?rhel}
+BuildRequires: golang
+%endif
 
 Requires: ncurses-base
 

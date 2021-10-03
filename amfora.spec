@@ -32,7 +32,7 @@ Amfora aims to be the best looking Gemini client with the most features... all i
 %setup -q
 
 %build
-%make_build %{?_smp_mflags} PREFIX=%{_prefix}
+%make_build BUILDER="official-rpm" %{?_smp_mflags} PREFIX=%{_prefix}
 
 %install
 mkdir -p %{buildroot}%{_prefix}

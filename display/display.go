@@ -89,7 +89,7 @@ func Init(version, commit, builtBy string) {
 
 	panels.AddPanel(PanelBrowser, browser, true, true)
 
-    helpInit()
+	helpInit()
 
 	layout.SetDirection(cview.FlexRow)
 	layout.AddItem(panels, 0, 1, true)
@@ -279,11 +279,11 @@ func Init(version, commit, builtBy string) {
 			// It's focused on a modal right now, nothing should interrupt
 			return event
 		}
-        frontPanelName, _ := panels.GetFrontPanel()
-        if frontPanelName == PanelHelp {
+		frontPanelName, _ := panels.GetFrontPanel()
+		if frontPanelName == PanelHelp {
 			// It's focused on help right now
-            return event
-        }
+			return event
+		}
 
 		// To add a configurable global key command, you'll need to update one of
 		// the two switch statements here.  You'll also need to add an enum entry in

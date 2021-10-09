@@ -11,6 +11,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/display"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
+	"github.com/makeworld-the-better-one/amfora/logger"
 )
 
 var (
@@ -20,10 +21,15 @@ var (
 )
 
 func main() {
-	// err := logger.Init()
-	// if err != nil {
-	// 	panic(err)
-	// }
+    debugModeEnabled := os.Getenv("DEBUG")
+    if debugModeEnabled != "" {
+        err := logger.Init()
+        if err != nil {
+        	panic(err)
+        }
+
+        logger.Log.Println("Debug mode enabled")
+    }
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--version" || os.Args[1] == "-v" {

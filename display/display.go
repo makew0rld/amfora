@@ -87,7 +87,7 @@ func Init(version, commit, builtBy string) {
 		}(tabs[curTab])
 	})
 
-	panels.AddPanel("browser", browser, true, true)
+	panels.AddPanel(PanelBrowser, browser, true, true)
 
     helpInit()
 
@@ -280,7 +280,7 @@ func Init(version, commit, builtBy string) {
 			return event
 		}
         frontPanelName, _ := panels.GetFrontPanel()
-        if frontPanelName == "help" {
+        if frontPanelName == PanelHelp {
 			// It's focused on help right now
             return event
         }

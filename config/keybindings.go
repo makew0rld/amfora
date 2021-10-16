@@ -8,33 +8,54 @@ import (
 	"github.com/spf13/viper"
 )
 
-// NOTE: CmdLink[1-90] and CmdTab[1-90] need to be in-order and consecutive
-// This property is used to simplify key handling in display/display.go
+// NOTE: CmdLink[1-90], CmdTab[1-90], and CmdCommand[1-90] need to be
+// in-order and consecutive. This property is used to simplify key
+// handling in display/display.go and display/tab.go
 type Command int
 
 const (
-	CmdInvalid Command = 0
-	CmdLink1           = 1
-	CmdLink2           = 2
-	CmdLink3           = 3
-	CmdLink4           = 4
-	CmdLink5           = 5
-	CmdLink6           = 6
-	CmdLink7           = 7
-	CmdLink8           = 8
-	CmdLink9           = 9
-	CmdLink0           = 10
-	CmdTab1            = 11
-	CmdTab2            = 12
-	CmdTab3            = 13
-	CmdTab4            = 14
-	CmdTab5            = 15
-	CmdTab6            = 16
-	CmdTab7            = 17
-	CmdTab8            = 18
-	CmdTab9            = 19
-	CmdTab0            = 20
-	CmdBottom          = iota
+	CmdInvalid        Command = 0
+	CmdLink1                  = 1
+	CmdLink2                  = 2
+	CmdLink3                  = 3
+	CmdLink4                  = 4
+	CmdLink5                  = 5
+	CmdLink6                  = 6
+	CmdLink7                  = 7
+	CmdLink8                  = 8
+	CmdLink9                  = 9
+	CmdLink0                  = 10
+	CmdTab1                   = 11
+	CmdTab2                   = 12
+	CmdTab3                   = 13
+	CmdTab4                   = 14
+	CmdTab5                   = 15
+	CmdTab6                   = 16
+	CmdTab7                   = 17
+	CmdTab8                   = 18
+	CmdTab9                   = 19
+	CmdTab0                   = 20
+	CmdCommand1               = 21
+	CmdCommand2               = 22
+	CmdCommand3               = 23
+	CmdCommand4               = 24
+	CmdCommand5               = 25
+	CmdCommand6               = 26
+	CmdCommand7               = 27
+	CmdCommand8               = 28
+	CmdCommand9               = 29
+	CmdCommand0               = 30
+	CmdCommandTarget1         = 31
+	CmdCommandTarget2         = 32
+	CmdCommandTarget3         = 33
+	CmdCommandTarget4         = 34
+	CmdCommandTarget5         = 35
+	CmdCommandTarget6         = 36
+	CmdCommandTarget7         = 37
+	CmdCommandTarget8         = 38
+	CmdCommandTarget9         = 39
+	CmdCommandTarget0         = 40
+	CmdBottom                 = iota
 	CmdEdit
 	CmdHome
 	CmdBookmarks
@@ -156,43 +177,63 @@ func parseBinding(cmd Command, binding string) {
 // Called by config.Init()
 func KeyInit() {
 	configBindings := map[Command]string{
-		CmdLink1:         "keybindings.bind_link1",
-		CmdLink2:         "keybindings.bind_link2",
-		CmdLink3:         "keybindings.bind_link3",
-		CmdLink4:         "keybindings.bind_link4",
-		CmdLink5:         "keybindings.bind_link5",
-		CmdLink6:         "keybindings.bind_link6",
-		CmdLink7:         "keybindings.bind_link7",
-		CmdLink8:         "keybindings.bind_link8",
-		CmdLink9:         "keybindings.bind_link9",
-		CmdLink0:         "keybindings.bind_link0",
-		CmdBottom:        "keybindings.bind_bottom",
-		CmdEdit:          "keybindings.bind_edit",
-		CmdHome:          "keybindings.bind_home",
-		CmdBookmarks:     "keybindings.bind_bookmarks",
-		CmdAddBookmark:   "keybindings.bind_add_bookmark",
-		CmdSave:          "keybindings.bind_save",
-		CmdReload:        "keybindings.bind_reload",
-		CmdBack:          "keybindings.bind_back",
-		CmdForward:       "keybindings.bind_forward",
-		CmdMoveUp:        "keybindings.bind_moveup",
-		CmdMoveDown:      "keybindings.bind_movedown",
-		CmdMoveLeft:      "keybindings.bind_moveleft",
-		CmdMoveRight:     "keybindings.bind_moveright",
-		CmdPgup:          "keybindings.bind_pgup",
-		CmdPgdn:          "keybindings.bind_pgdn",
-		CmdNewTab:        "keybindings.bind_new_tab",
-		CmdCloseTab:      "keybindings.bind_close_tab",
-		CmdNextTab:       "keybindings.bind_next_tab",
-		CmdPrevTab:       "keybindings.bind_prev_tab",
-		CmdQuit:          "keybindings.bind_quit",
-		CmdHelp:          "keybindings.bind_help",
-		CmdSub:           "keybindings.bind_sub",
-		CmdAddSub:        "keybindings.bind_add_sub",
-		CmdCopyPageURL:   "keybindings.bind_copy_page_url",
-		CmdCopyTargetURL: "keybindings.bind_copy_target_url",
-		CmdBeginning:     "keybindings.bind_beginning",
-		CmdEnd:           "keybindings.bind_end",
+		CmdLink1:          "keybindings.bind_link1",
+		CmdLink2:          "keybindings.bind_link2",
+		CmdLink3:          "keybindings.bind_link3",
+		CmdLink4:          "keybindings.bind_link4",
+		CmdLink5:          "keybindings.bind_link5",
+		CmdLink6:          "keybindings.bind_link6",
+		CmdLink7:          "keybindings.bind_link7",
+		CmdLink8:          "keybindings.bind_link8",
+		CmdLink9:          "keybindings.bind_link9",
+		CmdLink0:          "keybindings.bind_link0",
+		CmdBottom:         "keybindings.bind_bottom",
+		CmdEdit:           "keybindings.bind_edit",
+		CmdHome:           "keybindings.bind_home",
+		CmdBookmarks:      "keybindings.bind_bookmarks",
+		CmdAddBookmark:    "keybindings.bind_add_bookmark",
+		CmdSave:           "keybindings.bind_save",
+		CmdReload:         "keybindings.bind_reload",
+		CmdBack:           "keybindings.bind_back",
+		CmdForward:        "keybindings.bind_forward",
+		CmdMoveUp:         "keybindings.bind_moveup",
+		CmdMoveDown:       "keybindings.bind_movedown",
+		CmdMoveLeft:       "keybindings.bind_moveleft",
+		CmdMoveRight:      "keybindings.bind_moveright",
+		CmdPgup:           "keybindings.bind_pgup",
+		CmdPgdn:           "keybindings.bind_pgdn",
+		CmdNewTab:         "keybindings.bind_new_tab",
+		CmdCloseTab:       "keybindings.bind_close_tab",
+		CmdNextTab:        "keybindings.bind_next_tab",
+		CmdPrevTab:        "keybindings.bind_prev_tab",
+		CmdQuit:           "keybindings.bind_quit",
+		CmdHelp:           "keybindings.bind_help",
+		CmdSub:            "keybindings.bind_sub",
+		CmdAddSub:         "keybindings.bind_add_sub",
+		CmdCopyPageURL:    "keybindings.bind_copy_page_url",
+		CmdCopyTargetURL:  "keybindings.bind_copy_target_url",
+		CmdBeginning:      "keybindings.bind_beginning",
+		CmdEnd:            "keybindings.bind_end",
+		CmdCommand1:       "keybindings.bind_command1",
+		CmdCommand2:       "keybindings.bind_command2",
+		CmdCommand3:       "keybindings.bind_command3",
+		CmdCommand4:       "keybindings.bind_command4",
+		CmdCommand5:       "keybindings.bind_command5",
+		CmdCommand6:       "keybindings.bind_command6",
+		CmdCommand7:       "keybindings.bind_command7",
+		CmdCommand8:       "keybindings.bind_command8",
+		CmdCommand9:       "keybindings.bind_command9",
+		CmdCommand0:       "keybindings.bind_command0",
+		CmdCommandTarget1: "keybindings.bind_command_target1",
+		CmdCommandTarget2: "keybindings.bind_command_target2",
+		CmdCommandTarget3: "keybindings.bind_command_target3",
+		CmdCommandTarget4: "keybindings.bind_command_target4",
+		CmdCommandTarget5: "keybindings.bind_command_target5",
+		CmdCommandTarget6: "keybindings.bind_command_target6",
+		CmdCommandTarget7: "keybindings.bind_command_target7",
+		CmdCommandTarget8: "keybindings.bind_command_target8",
+		CmdCommandTarget9: "keybindings.bind_command_target9",
+		CmdCommandTarget0: "keybindings.bind_command_target0",
 	}
 	// This is split off to allow shift_numbers to override bind_tab[1-90]
 	// (This is needed for older configs so that the default bind_tab values

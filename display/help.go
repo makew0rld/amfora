@@ -48,6 +48,10 @@ var helpCells = strings.TrimSpace(
 		"%s\tSave the current page to your downloads.\n" +
 		"%s\tView subscriptions\n" +
 		"%s\tAdd or update a subscription\n" +
+		"%s\tExecute a custom command using the current page URL as an argument.\n" +
+		"\t(Default: Alt-Shift-NUMBER)\n" +
+		"%s\tExecute a custom command using the selected URL as an argument.\n" +
+		"\t(Default: Alt-NUMBER)\n" +
 		"%s\tQuit\n")
 
 var helpTable = cview.NewTextView()
@@ -78,6 +82,10 @@ func helpInit() {
 		strings.Split(config.GetKeyBinding(config.CmdTab9), ",")[0])
 	linkKeys := fmt.Sprintf("%s to %s", strings.Split(config.GetKeyBinding(config.CmdLink1), ",")[0],
 		strings.Split(config.GetKeyBinding(config.CmdLink0), ",")[0])
+	commandKeys := fmt.Sprintf("%s to %s", strings.Split(config.GetKeyBinding(config.CmdCommand1), ",")[0],
+		strings.Split(config.GetKeyBinding(config.CmdCommand0), ",")[0])
+	commandTargetKeys := fmt.Sprintf("%s to %s", strings.Split(config.GetKeyBinding(config.CmdCommandTarget1), ",")[0],
+		strings.Split(config.GetKeyBinding(config.CmdCommandTarget0), ",")[0])
 
 	helpCells = fmt.Sprintf(helpCells,
 		config.GetKeyBinding(config.CmdMoveLeft),
@@ -108,6 +116,8 @@ func helpInit() {
 		config.GetKeyBinding(config.CmdSave),
 		config.GetKeyBinding(config.CmdSub),
 		config.GetKeyBinding(config.CmdAddSub),
+		commandKeys,
+		commandTargetKeys,
 		config.GetKeyBinding(config.CmdQuit),
 	)
 

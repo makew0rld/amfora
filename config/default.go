@@ -90,6 +90,26 @@ scrollbar = "auto"
 # "example.com" = 'mycert.key'
 
 
+[commands]
+# Define up to 10 custom commands to execute on the corresponding hotkey press.
+# Commands are run in a new process and will not terminate when Amfora is closed.
+# If you need your command to accept additional input, it is recommended to open
+# a GUI or use a terminal multiplexer like screen or tmux. The string ${url} will
+# be replaced with the current or selected URL. Note that pipes and redirections
+# are not allowed, if these are needed then you should set up a script. Use only
+# absolute paths and/or reference executables in your $PATH.
+# command1 = "my-script -a -b -c ${url}"
+# command2 = ""
+# command3 = ""
+# command4 = ""
+# command5 = ""
+# command6 = ""
+# command7 = ""
+# command8 = ""
+# command9 = ""
+# command0 = ""
+
+
 [keybindings]
 # If you have a non-US keyboard, use bind_tab1 through bind_tab0 to
 # setup the shift-number bindings: Eg, for US keyboards (the default):
@@ -136,6 +156,32 @@ scrollbar = "auto"
 # bind_link8 = "8"
 # bind_link9 = "9"
 # bind_link0 = "0"
+
+# The bind_command[0-9] options are for the command hotkeys. This will pass the URL of the
+# current tab as an argument.
+# bind_command1 = "Alt-!"
+# bind_command2 = "Alt-@"
+# bind_command3 = "Alt-#"
+# bind_command4 = "Alt-$"
+# bind_command5 = "Alt-%"
+# bind_command6 = "Alt-^"
+# bind_command7 = "Alt-&"
+# bind_command8 = "Alt-*"
+# bind_command9 = "Alt-("
+# bind_command0 = "Alt-)"
+
+# The bind_commandtarget[0-9] options are for command hotkeys that operate on the currently
+# highlighted link. This will pass the URL of the highlighted link as an argument.
+# bind_command_target1 = "Alt-1"
+# bind_command_target2 = "Alt-2"
+# bind_command_target3 = "Alt-3"
+# bind_command_target4 = "Alt-4"
+# bind_command_target5 = "Alt-5"
+# bind_command_target6 = "Alt-6"
+# bind_command_target7 = "Alt-7"
+# bind_command_target8 = "Alt-8"
+# bind_command_target9 = "Alt-9"
+# bind_command_target0 = "Alt-0"
 
 # All keybindings:
 #

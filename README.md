@@ -142,6 +142,7 @@ Features in *italics* are in the master branch, but not in the latest release.
   - So is subscribing to a page, to know when it changes
 - [x] Open non-text files in another application
   - [x] Ability to stream content instead of downloading it first
+- [x] Run custom commands using the current or selected URL as an argument
 - [ ] Stream support
 - [ ] Table of contents for pages
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>

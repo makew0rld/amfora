@@ -21,14 +21,14 @@ var (
 )
 
 func main() {
-	debugModeEnabled := os.Getenv("DEBUG")
-	if debugModeEnabled != "" {
-		err := logger.Init()
-		if err != nil {
-			panic(err)
-		}
+	log, err := logger.GetLogger()
+	if err != nil {
+		panic(err)
+	}
 
-		logger.Log.Println("Debug mode enabled")
+	debugModeEnabled := os.Getenv("DEBUG") == "1"
+	if debugModeEnabled {
+		log.Println("Debug mode enabled")
 	}
 
 	if len(os.Args) > 1 {
@@ -48,7 +48,7 @@ func main() {
 		}
 	}
 
-	err := config.Init()
+	err = config.Init()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Config error: %v\n", err)
 		os.Exit(1)

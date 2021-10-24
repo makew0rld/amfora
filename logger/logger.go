@@ -3,18 +3,42 @@ package logger
 // For debugging
 
 import (
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
 )
 
-var Log *log.Logger
+var logger *log.Logger
 
-func Init() error {
-	f, err := os.Create("debug.log")
-	if err != nil {
-		return err
+func GetLogger() (*log.Logger, error) {
+	if logger != nil {
+		return logger, nil
 	}
-	Log = log.New(f, "", log.LstdFlags)
-	Log.Println("Started Log")
-	return nil
+
+	var writer io.Writer
+	var err error
+
+	debugModeEnabled := os.Getenv("DEBUG") == "1"
+	if debugModeEnabled {
+		writer, err = os.Create("debug.log")
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// Suppress all logging output if debug mode is disabled
+		writer = ioutil.Discard
+	}
+
+	logger = log.New(writer, "", log.LstdFlags)
+
+	if !debugModeEnabled {
+		// Clear all flags to skip log output formatting step to increase
+		// performance somewhat if we're not logging anything
+		logger.SetFlags(0)
+	}
+
+	logger.Println("Started logger")
+
+	return logger, nil
 }

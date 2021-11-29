@@ -130,6 +130,11 @@ func parseBinding(cmd Command, binding string) {
 		binding = binding[4:]
 	}
 
+	if strings.HasPrefix(binding, "Shift-") {
+		m += tcell.ModShift
+		binding = binding[6:]
+	}
+
 	if len([]rune(binding)) == 1 {
 		k = tcell.KeyRune
 		r = []rune(binding)[0]

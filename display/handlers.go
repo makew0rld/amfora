@@ -46,7 +46,7 @@ func handleHTTP(u string, showInfo bool) bool {
 	}
 
 	// Custom command
-	var err error = nil
+	var err error
 	if len(config.HTTPCommand) > 1 {
 		err = exec.Command(config.HTTPCommand[0], append(config.HTTPCommand[1:], u)...).Start()
 	} else {

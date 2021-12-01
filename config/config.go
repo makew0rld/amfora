@@ -119,6 +119,7 @@ func Init() error {
 		// In APPDATA beside other Amfora files
 		subscriptionDir = amforaAppData
 	} else {
+		//nolint:revive
 		// XDG data dir on POSIX systems
 		xdg_data, ok := os.LookupEnv("XDG_DATA_HOME")
 		if ok && strings.TrimSpace(xdg_data) != "" {

@@ -80,7 +80,7 @@ var tcellKeys map[string]tcell.Key
 // a string in the format used by the configuration file.  Support
 // function for GetKeyBinding(), used to make the help panel helpful.
 func keyBindingToString(kb keyBinding) (string, bool) {
-	var prefix string = ""
+	var prefix string
 
 	if kb.mod&tcell.ModAlt == tcell.ModAlt {
 		prefix = "Alt-"
@@ -103,7 +103,7 @@ func keyBindingToString(kb keyBinding) (string, bool) {
 // Used by the help panel so bindable keys display with their
 // bound values rather than hardcoded defaults.
 func GetKeyBinding(cmd Command) string {
-	var s string = ""
+	var s string
 	for kb, c := range bindings {
 		if c == cmd {
 			t, ok := keyBindingToString(kb)
@@ -122,8 +122,8 @@ func GetKeyBinding(cmd Command) string {
 // Parse a single keybinding string and add it to the binding map
 func parseBinding(cmd Command, binding string) {
 	var k tcell.Key
-	var m tcell.ModMask = 0
-	var r rune = 0
+	var m tcell.ModMask
+	var r rune
 
 	if strings.HasPrefix(binding, "Alt-") {
 		m = tcell.ModAlt

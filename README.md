@@ -80,7 +80,7 @@ This section is for advanced users who want to install the latest (possibly unst
 <summary>Click to expand</summary>
 
 **Requirements:**
-- Go 1.14 or later
+- Go 1.15 or later
 - GNU Make
 
 Please note the Makefile does not intend to support Windows, and so there may be issues.

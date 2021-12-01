@@ -1,6 +1,6 @@
 module github.com/makeworld-the-better-one/amfora
 
-go 1.14
+go 1.15
 
 require (
 	code.rocketnine.space/tslocum/cview v1.5.6-0.20210525194531-92dca67ac283

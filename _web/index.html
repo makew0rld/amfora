@@ -1,0 +1,736 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>🏺 Amfora</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
+	<script src="node_modules/xterm/lib/xterm.js"></script>
+	<script src="node_modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+</head>
+
+<body>
+	<style>
+		* { box-sizing: border-box; padding: 0px; margin: 0px; }
+
+		:root, body, #terminal {
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+
+			background: #000;
+			color: #eeeeee;
+		}
+
+		.xterm {
+			cursor: default;
+		}
+	</style>
+
+	<div id="terminal"></div>
+
+	<script src="wasm_exec.js"></script>
+	<script>
+		const goStubFS = globalThis.fs; // defined in wasm_exec.js
+
+		const termFD = 69;   // used for /dev/tty
+		const fds = {};
+
+		let nextFD = 100;
+
+		const files = {
+			"/cache/amfora/tofu.toml": "",
+			"/data/.config/amfora/config.toml": `
+				[a-general]
+				home = "gemini://gemini.circumlunar.space"
+				underline = false
+				[keybindings]
+				bind_new_tab = "T"
+				bind_close_tab = "W"
+				bind_next_tab = "Shift-Right"
+				bind_prev_tab = "Shift-Left"
+			`,
+		};
+
+		const amforaFS = {
+			open(path, flags, mode, callback) {
+				console.info('fs open', path, flags, mode, callback);
+				if (path == '/dev/tty')
+					return callback(null, termFD);
+				else if (!(path in files))
+					return callback({code: "ENOENT"});
+
+				const fd = nextFD++;
+				fds[fd] = {path, flags, mode, position: 0};
+
+				callback(null, fd);
+			},
+			stat(path, callback) {
+				console.info('fs stat', path);
+				callback({code: "ENOSYS"});
+			},
+			async read(fd, buffer, offset, length, position, callback) {
+				let numBytes = 0;
+
+				if (fd === termFD) { // read any input from xterm.js
+					await waitReadAvailable();
+
+					numBytes = Math.min(readBuffer.length, position+length);
+					buffer.set(readBuffer.slice(position, position+numBytes), offset);
+
+					resetReadBuffer();
+					return callback(null, numBytes, buffer);
+				}
+
+				const desc = fds[fd];
+				if (position != null)
+					desc.position = position;
+
+				const data = new TextEncoder().encode(files[desc.path]);
+
+				numBytes = length;
+				if (desc.position + numBytes > data.length)
+					numBytes = Math.max(0, data.length - desc.position);
+
+				buffer.set(data.slice(desc.position, desc.position+numBytes), offset);
+				desc.position += numBytes;
+
+				callback(null, numBytes, buffer);
+			},
+			writeSync(fd, buf) {
+				if (fd == 1 || fd == 2) { // stdout, stderr
+					return goStubFS.writeSync(fd, buf);
+				} else if (fd == termFD) { // for xterm.js tty
+					term.write(buf);
+				} else {
+					console.error("Unhandled write to fd", "|", fd, buf);
+				}
+				return buf.length;
+			},
+			mkdir: (path, perm, callback) => callback(null),
+		};
+
+		globalThis.fs = Object.assign({}, goStubFS, amforaFS);
+	</script>
+
+	<script>
+		globalThis["golang.org/x/term"] = {
+			isTerminal: (fd) => true,
+			getSize: (fd) => ({width: term.cols, height: term.rows}),
+			makeRaw: (fd) => false,
+			getState: (fd) => {},
+			restore: (fd, state) => null,
+		};
+	</script>
+
+	<script>
+		const term = new Terminal({ scrollback: 0, fontSize: 16 });
+		const fitAddon = new FitAddon.FitAddon();
+
+		term.loadAddon(fitAddon);
+
+		function fit() {
+			fitAddon.fit();
+		}
+
+		window.addEventListener('resize', fit);
+		setTimeout(fit, 0);
+
+		term.open(document.querySelector('#terminal'));
+		term.focus();
+
+		// xterm.js hacks Alt+arrow to be the same as Ctrl+arrow
+		// let's undo that...
+		term.attachCustomKeyEventHandler(ev => {
+			if (!(ev.altKey && ev.type === "keydown"))
+				return;
+
+			if (ev.key === "ArrowLeft" || ev.key === "ArrowUp")
+				pushReadBuffer(new TextEncoder().encode("\x1b[1;3D"));
+			else if (ev.key === "ArrowRight" || ev.key === "ArrowDown")
+				pushReadBuffer(new TextEncoder().encode("\x1b[1;3C"));
+			else
+				return true;
+
+			ev.preventDefault();
+			return false;
+		});
+
+		// let the browser handle Ctrl+l
+		term.attachCustomKeyEventHandler(ev => {
+			if (ev.ctrlKey && ev.key == "l")
+				return false;
+		});
+
+		let readBuffer = new Uint8Array;
+		let _readAvailable;
+
+		function waitReadAvailable() {
+			if (readBuffer.length)
+				return Promise.resolve();
+
+			return new Promise(resolve => _readAvailable = resolve);
+		}
+
+		function pushReadBuffer(bytes) {
+			readBuffer = new Uint8Array([...readBuffer, ...bytes]);
+			_readAvailable?.();
+		}
+
+		function resetReadBuffer() {
+			readBuffer = new Uint8Array;
+		}
+
+		term.onData(data => {
+			pushReadBuffer(new TextEncoder().encode(data));
+		});
+
+		term.onBinary(pushReadBuffer);
+	</script>
+
+	<script>
+		const startUrl = location.hash.slice(1); // || "gemini://gemini.circumlunar.space/";
+
+		const go = new Go();
+		go.argv = startUrl ? ["amfora", startUrl] : ["amfora"];
+
+		go.env.LC_ALL = "UTF-8";
+		go.env.TERM = "xterm-256color";
+		go.env.COLORTERM = "truecolor";
+
+		go.env.HOME = "/data";
+		go.env.XDG_CACHE_HOME = "/cache";
+		go.env.WEBSOCKET_PROXY = "wss://cyberspace.baby/kepler";
+
+		(async () => {
+			const blob = await fetch('amfora.wasm');
+
+			const {module, instance} = await WebAssembly.instantiateStreaming(blob, go.importObject);
+
+			globalThis.amfora = module;
+			globalThis.instance = instance;
+
+			go.run(instance);
+		})();
+	</script>
+
+	<script>
+		let currentUrl = startUrl;
+
+		// Navigate when user changes hash fragment
+		addEventListener("hashchange", () => {
+			const newUrl = location.hash.slice(1);
+
+			if (newUrl === currentUrl)
+				return;
+
+			console.info('Navigating to', newUrl);
+			if (globalThis.amforaAPI)
+				amforaAPI.navigateTo(newUrl);
+		});
+
+		function observeURL(url) {
+			if (url === startUrl)
+				return;
+
+			currentUrl = url;
+
+			if (url)
+				location.hash = `#${url}`;
+		}
+	</script>
+
+	<template id="theme-gruvbox-dark">
+		[theme]
+		bg =                      "#282828"
+		fg =                      "#32302f"
+		tab_num =                 "#7c6f64"
+		tab_divider =             "#d5c4a1"
+		bottombar_label =         "#8f3f71"
+		bottombar_text =          "#bdae93"
+		bottombar_bg =            "#282828"
+		scrollbar =               "#504945"
+
+		hdg_1 =                   "#cc241d"
+		hdg_2 =                   "#fabd2f"
+		hdg_3 =                   "#d65d0e"
+		amfora_link =             "#8ec073"
+		foreign_link =            "#458588"
+		link_number =             "#707975"
+		regular_text =            "#f9f5d7"
+		quote_text =              "#d3869b"
+		preformatted_text =       "#d3869b"
+		list_text =               "#bdae93"
+
+		btn_bg =                  "#3c3836"
+		btn_text =                "#ebdbb2"
+
+		dl_choice_modal_bg =      "#3c3836"
+		dl_choice_modal_text =    "#ebdbb2"
+		dl_modal_bg =             "#3c3836"
+		dl_modal_text =           "#ebdbb2"
+		info_modal_bg =           "#3c3836"
+		info_modal_text =         "#ebdbb2"
+		error_modal_bg =          "#3c3836"
+		error_modal_text =        "#fe8019"
+		yesno_modal_bg =          "#3c3836"
+		yesno_modal_text =        "#ebdbb2"
+		tofu_modal_bg =           "#3c3836"
+		tofu_modal_text =         "#ebdbb2"
+		subscription_modal_bg =   "#3c3836"
+		subscription_modal_text = "#ebdbb2"
+
+		input_modal_bg =          "#3c3836"
+		input_modal_text =        "#ebdbb2"
+		input_modal_field_bg =    "#1d2021"
+		input_modal_field_text =  "#ebdbb2"
+
+		bkmk_modal_bg =           "#3c3836"
+		bkmk_modal_text =         "#ebdbb2"
+		bkmk_modal_label =        "#ebdbb2"
+		bkmk_modal_field_bg =     "#1d2021"
+		bkmk_modal_field_text =   "#f9f5d7"
+	</template>
+
+	<template id="theme-nord">
+		[theme]
+		# This section is for changing the COLORS used in Amfora.
+		# These colors only apply if 'color' is enabled above.
+		# Colors can be set using a W3C color name, or a hex value such as "#ffffff".
+
+		# Note that not all colors will work on terminals that do not have truecolor support.
+		# If you want to stick to the standard 16 or 256 colors, you can get
+		# a list of those here: https://jonasjacek.github.io/colors/
+		# DO NOT use the names from that site, just the hex codes.
+
+		# Definitions:
+		#   bg = background
+		#   fg = foreground
+		#   dl = download
+		#   btn = button
+		#   hdg = heading
+		#   bkmk = bookmark
+		#   modal = a popup window/box in the middle of the screen
+
+		# EXAMPLES:
+		# hdg_1 = "green"
+		# hdg_2 = "#5f0000"
+
+		# Available keys to set:
+
+		# bg: background for pages, tab row, app in general
+		# tab_num: The number/highlight of the tabs at the top
+		# tab_divider: The color of the divider character between tab numbers: |
+		# bottombar_label: The color of the prompt that appears when you press space
+		# bottombar_text: The color of the text you type
+		# bottombar_bg
+		bg = "#2e3440"
+		tab_num = "#88c0d0"
+		tab_divider = "#4c566a"
+		bottombar_label = "#88c0d0"
+		bottombar_text = "#eceff4"
+		bottombar_bg = "#3b4252"
+
+		# hdg_1
+		# hdg_2
+		# hdg_3
+		# amfora_link: A link that Amfora supports viewing. For now this is only gemini://
+		# foreign_link: HTTP(S), Gopher, etc
+		# link_number: The silver number that appears to the left of a link
+		# regular_text: Normal gemini text, and plaintext documents
+		# quote_text
+		# preformatted_text
+		# list_text
+		hdg_1 = "#5e81ac"
+		hdg_2 = "#81a1c1"
+		hdg_3 = "#8fbcbb"
+		amfora_link = "#88c0d0"
+		foreign_link = "#b48ead"
+		link_number = "#a3be8c"
+		regular_text = "#eceff4"
+		quote_text = "#81a1c1"
+		preformatted_text = "#8fbcbb"
+		list_text = "#d8dee9"
+
+		# btn_bg: The bg color for all modal buttons
+		# btn_text: The text color for all modal buttons
+		btn_bg = "#4c566a"
+		btn_text = "#eceff4"
+
+		# dl_choice_modal_bg
+		# dl_choice_modal_text
+		# dl_modal_bg
+		# dl_modal_text
+		# info_modal_bg
+		# info_modal_text
+		# error_modal_bg
+		# error_modal_text
+		# yesno_modal_bg
+		# yesno_modal_text
+		# tofu_modal_bg
+		# tofu_modal_text
+		# subscription_modal_bg
+		# subscription_modal_text
+		dl_choice_modal_bg = "#3b4252"
+		dl_choice_modal_text = "#eceff4"
+		dl_modal_bg = "#3b4252"
+		dl_modal_text = "#eceff4"
+		info_modal_bg = "#3b4252"
+		info_modal_text = "#eceff4"
+		error_modal_bg = "#bf616a"
+		error_modal_text = "#eceff4"
+		yesno_modal_bg = "#3b4252"
+		yesno_modal_text = "#eceff4"
+		tofu_modal_bg = "#3b4252"
+		tofu_modal_text = "#eceff4"
+		subscription_modal_bg = "#3b4252"
+		subscription_modal_text = "#eceff4"
+
+		# input_modal_bg
+		# input_modal_text
+		# input_modal_field_bg: The bg of the input field, where you type the text
+		# input_modal_field_text: The color of the text you type
+		input_modal_bg = "#3b4252"
+		input_modal_text = "#eceff4"
+		input_modal_field_bg = "#4c566a"
+		input_modal_field_text = "#eceff4"
+
+		# bkmk_modal_bg
+		# bkmk_modal_text
+		# bkmk_modal_label
+		# bkmk_modal_field_bg
+		# bkmk_modal_field_text
+		bkmk_modal_bg = "#3b4252"
+		bkmk_modal_text = "#eceff4"
+		bkmk_modal_label = "#eceff4"
+		bkmk_modal_field_bg = "#4c566a"
+		bkmk_modal_field_text = "#eceff4"
+	</template>
+
+	<template id="theme-cyberspace">
+		[theme]
+		bottombar_bg = "#1c1c2c"
+		bottombar_text = "#dcdcdc"
+		bottombar_label = "#ff00ff"
+	</template>
+
+	<template id="theme-one-dark">
+		# Atom One Dark theme ported to Amfora
+		# by Serge Tymoshenko (serge@tymo.name)
+
+		[theme]
+		# This section is for changing the COLORS used in Amfora.
+		# These colors only apply if 'color' is enabled above.
+		# Colors can be set using a W3C color name, or a hex value such as "#ffffff".
+
+		# Note that not all colors will work on terminals that do not have truecolor support.
+		# If you want to stick to the standard 16 or 256 colors, you can get
+		# a list of those here: https://jonasjacek.github.io/colors/
+		# DO NOT use the names from that site, just the hex codes.
+
+		# Definitions:
+		#   bg = background
+		#   fg = foreground
+		#   dl = download
+		#   btn = button
+		#   hdg = heading
+		#   bkmk = bookmark
+		#   modal = a popup window/box in the middle of the screen
+
+		# EXAMPLES:
+		# hdg_1 = "green"
+		# hdg_2 = "#5f0000"
+
+		# Available keys to set:
+
+		# bg: background for pages, tab row, app in general
+		# tab_num: The number/highlight of the tabs at the top
+		# tab_divider: The color of the divider character between tab numbers: |
+		# bottombar_label: The color of the prompt that appears when you press space
+		# bottombar_text: The color of the text you type
+		# bottombar_bg
+
+		bg = "#282c34"
+		fg = "#abb2bf"
+		tab_num = "#abb2bf"
+		tab_divider = "#abb2bf"
+		bottombar_bg = "#abb2bf"
+		bottombar_text = "#282c34"
+		bottombar_label = "#282c34"
+
+		# hdg_1
+		# hdg_2
+		# hdg_3
+		# amfora_link: A link that Amfora supports viewing. For now this is only gemini://
+		# foreign_link: HTTP(S), Gopher, etc
+		# link_number: The silver number that appears to the left of a link
+		# regular_text: Normal gemini text, and plaintext documents
+		# quote_text
+		# preformatted_text
+		# list_text
+
+		hdg_1 = "#e06c75"
+		hdg_2 = "#c678dd"
+		hdg_3 = "#c678dd"
+		amfora_link = "#61afef"
+		foreign_link = "#56b6c2"
+		link_number = "#abb2bf"
+		regular_text = "#abb2bf"
+		quote_text = "#98c379"
+		preformatted_text = "#e5c07b"
+		list_text = "#abb2bf"
+
+		# btn_bg: The bg color for all modal buttons
+		# btn_text: The text color for all modal buttons
+
+		btn_bg = "#282c34"
+		btn_text = "#abb2bf"
+
+		# dl_choice_modal_bg
+		# dl_choice_modal_text
+		# dl_modal_bg
+		# dl_modal_text
+		# info_modal_bg
+		# info_modal_text
+		# error_modal_bg
+		# error_modal_text
+		# yesno_modal_bg
+		# yesno_modal_text
+		# tofu_modal_bg
+		# tofu_modal_text
+
+		dl_choice_modal_bg = "#98c379"
+		dl_choice_modal_text = "#282c34"
+
+		dl_modal_bg = "#98c379"
+		dl_modal_text = "#282c34"
+
+		info_modal_bg = "#98c379"
+		info_modal_text = "#282c34"
+
+		error_modal_bg = "#e06c75"
+		error_modal_text = "#282c34"
+
+		yesno_modal_bg = "#e5c07b"
+		yesno_modal_text = "#282c34"
+
+		tofu_modal_bg = "#e5c07b"
+		tofu_modal_text = "#282c34"
+
+		# input_modal_bg
+		# input_modal_text
+		# input_modal_field_bg: The bg of the input field, where you type the text
+		# input_modal_field_text: The color of the text you type
+
+		input_modal_bg = "#98c379"
+		input_modal_text = "#282c34"
+		input_modal_field_bg = "#282c34"
+		input_modal_field_text = "#abb2bf"
+
+		# bkmk_modal_bg
+		# bkmk_modal_text
+		# bkmk_modal_label
+		# bkmk_modal_field_bg
+		# bkmk_modal_field_text
+
+		bkmk_modal_bg = "#98c379"
+		bkmk_modal_text = "#282c34"
+		bkmk_modal_label = "#282c34"
+		bkmk_modal_field_bg = "#282c34"
+		bkmk_modal_field_text = "#abb2bf"
+
+		# subscription_modal_bg
+		# subscription_modal_text
+		subscription_modal_bg = "#c678dd"
+		subscription_modal_text = "#282c34"
+	</template>
+
+	<template id="theme-iceberg">
+		[theme]
+		bg = "#161821"
+		tab_num = "#6b7089"
+		tab_divider = "#e2a478"
+		bottombar_label = "#6b7089"
+		bottombar_text = "#89b8c2"
+		bottombar_bg = "#161821"
+
+		# hdg_1
+		# hdg_2
+		# hdg_3
+		# amfora_link: A link that Amfora supports viewing. For now this is only gemini://
+		# foreign_link: HTTP(S), Gopher, etc
+		# link_number: The silver number that appears to the left of a link
+		# regular_text: Normal gemini text, and plaintext documents
+		# quote_text
+		# preformatted_text
+		# list_text
+		hdg_1 = "#c0ca8e"
+		hdg_2 = "#e98989"
+		hdg_3 = "#c6c8d1"
+		amfora_link = "#6b7089"
+		foreign_link = "#d2d4de"
+		kink_number = "#95c4ce"
+		regular_text = "#c6c8d1"
+		quote_text = "#e98989"
+		preformatted_text = "#c6c8d1"
+		list_text = "#84a0c6"
+
+		# btn_bg: The bg color for all modal buttons
+		# btn_text: The text color for all modal buttons
+		btn_bg = "#e27878"
+		btn_text = "#d2d4de"
+
+		# dl_choice_modal_bg
+		# dl_choice_modal_text
+		# dl_modal_bg
+		# dl_modal_text
+		# info_modal_bg
+		# info_modal_text
+		# error_modal_bg
+		# error_modal_text
+		# yesno_modal_bg
+		# yesno_modal_text
+		# tofu_modal_bg
+		# tofu_modal_text
+		# subscription_modal_bg
+		# subscription_modal_text
+		dl_choice_modal_bg = "#84a0c6"
+		dl_choice_modal_text = "#161821"
+		dl_modal_bg = "#84a0c6"
+		dl_modal_text = "#161821"
+		info_modal_bg = "#84a0c6"
+		info_modal_text = "#161821"
+		error_modal_bg = "#e98989"
+		error_modal_text = "#161821"
+		yesno_modal_bg = "#84a0c6"
+		yesno_modal_text = "#161821"
+		tofu_modal_bg = "#84a0c6"
+		tofu_modal_text = "#161821"
+		subscription_modal_bg = "#84a0c6"
+		subscription_modal_text = "#161821"
+
+		# input_modal_bg
+		# input_modal_text
+		# input_modal_field_bg: The bg of the input field, where you type the text
+		# input_modal_field_text: The color of the text you type
+		input_modal_bg = "#161821"
+		input_modal_text = "#c6c8d1"
+		input_modal_field_bg = "#d2d4de"
+		input_modal_field_text = "#6b7089"
+
+		# bkmk_modal_bg
+		# bkmk_modal_text
+		# bkmk_modal_label
+		# bkmk_modal_field_bg
+		# bkmk_modal_field_text
+		bkmk_modal_bg = "#161821"
+		bkmk_modal_text = "#c6c8d1"
+		bkmk_modal_label = "#c6c8d1"
+		bkmk_modal_field_bg = "#d2d4de"
+		bkmk_modal_field_text = "#6b7089"
+	</template>
+
+	<template id="theme-gruvbox">
+		[theme]
+		bg = "#1d2021"
+		fg = "#ebdbb2"
+		tab_num = "#928374"
+		tab_divider = "#928374"
+		bottombar_bg = "#1d2021"
+		bottombar_text = "#ebdbb2"
+		bottombar_label = "#ebdbb2"
+
+		# EXAMPLES:
+		# hdg_1 = "green"
+		# hdg_2 = "#5f0000"
+
+		# Available keys to set:
+
+		# bg: background for pages, tab row, app in general
+		# tab_num: The number/highlight of the tabs at the top
+		# tab_divider: The color of the divider character between tab numbers: |
+		# bottombar_label: The color of the prompt that appears when you press space
+		# bottombar_text: The color of the text you type
+		# bottombar_bg
+
+		# hdg_1
+		# hdg_2
+		# hdg_3
+		# amfora_link: A link that Amfora supports viewing. For now this is only gemini://
+		# foreign_link: HTTP(S), Gopher, etc
+		# link_number: The silver number that appears to the left of a link
+		# regular_text: Normal gemini text, and plaintext documents
+		# quote_text
+		# preformatted_text
+		# list_text
+		hdg_1 = "#b8bb26"
+		hdg_2 = "#8ec07c"
+		hdg_3 = "#689d6a"
+		amfora_link =	"#ebdbb2"
+		foreign_link = "#bdae93"
+		link_number =	"#83a598"
+		regular_text = "#ebdbb2"
+		quote_text = "#928374"
+		preformatted_text = "#ebdbb2"
+		list_text = "#ebdbb2"
+
+
+		# btn_bg: The bg color for all modal buttons
+		# btn_text: The text color for all modal buttons
+
+		btn_bg = "#3c3836"
+		btn_text = "#ebdbb2"
+
+		dl_choice_modal_bg = "#3c3836"
+		dl_choice_modal_text = "#ebdbb2"
+		dl_modal_bg =	"#3c3836"
+		dl_modal_text = "#ebdbb2"
+		info_modal_bg = "#3c3836"
+		info_modal_text = "#ebdbb2"
+		error_modal_bg = "#3c3836"
+		error_modal_text = "#fb4934"
+		yesno_modal_bg = "#3c3836"
+		yesno_modal_text = "#ebdbb2"
+		tofu_modal_bg = "#3c3836"
+		tofu_modal_text = "#ebdbb2"
+
+		# input_modal_bg
+		# input_modal_text
+		# input_modal_field_bg: The bg of the input field, where you type the text
+		# input_modal_field_text: The color of the text you type
+
+		input_modal_bg = "#3c3836"
+		input_modal_text = "#ebdbb2"
+		input_modal_field_bg = "#1d2021"
+		input_modal_field_text = "#ebdbb2"
+
+		# bkmk_modal_bg
+		# bkmk_modal_text
+		# bkmk_modal_label
+		# bkmk_modal_field_bg
+		# bkmk_modal_field_text
+
+		bkmk_modal_bg = "#3c3836"
+		bkmk_modal_text = "#ebdbb2"
+		bkmk_modal_label = "#ebdbb2"
+		bkmk_modal_field_bg = "#1d2021"
+		bkmk_modal_field_text = "#f8f8f2"
+	</template>
+
+	<script>
+		const themes = [...document.querySelectorAll("template")].map(el => el.id.replace(/^theme-/, ''));
+		const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+
+		const theme = localStorage.amforaTheme || "gruvbox-dark";
+
+		if (theme)
+			files["/data/.config/amfora/config.toml"] += document.getElementById(`theme-${theme}`).innerHTML;
+	</script>
+</body>
+
+</html>

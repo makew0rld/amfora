@@ -14,8 +14,6 @@ import (
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
-	homedir "github.com/mitchellh/go-homedir"
-	"github.com/muesli/termenv"
 	"github.com/rkoesters/xdg/basedir"
 	"github.com/rkoesters/xdg/userdirs"
 	"github.com/spf13/viper"
@@ -69,7 +67,7 @@ func Init() error {
 
 	// *** Set paths ***
 
-	home, err := homedir.Dir()
+	home, err := os.UserHomeDir()
 	if err != nil {
 		return err
 	}
@@ -383,8 +381,6 @@ func Init() error {
 		cview.Styles.PrimitiveBackgroundColor = tcell.ColorBlack
 		themeMu.Unlock()
 	}
-
-	hasDarkTerminalBackground = termenv.HasDarkBackground()
 
 	// Parse HTTP command
 	HTTPCommand = viper.GetStringSlice("a-general.http")

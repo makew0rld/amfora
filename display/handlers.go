@@ -263,8 +263,10 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		}
 	}
 	// Otherwise download it
-	bottomBar.SetText("Loading...")
-	t.barText = "Loading..." // Save it too, in case the tab switches during loading
+	bottomBar.SetLabel("Loading...")
+	bottomBar.SetText("")
+	t.barLabel = "Loading..." // Save it too, in case the tab switches during loading
+	t.barText = ""
 	t.mode = tabModeLoading
 	App.Draw()
 

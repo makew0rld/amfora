@@ -23,8 +23,12 @@
 			height: 100%;
 			overflow: hidden;
 
-			background: #000;
+			background: var(--background-color);
 			color: #eeeeee;
+		}
+
+		:root {
+			--background-color: #000;
 		}
 
 		.xterm {
@@ -729,8 +733,20 @@
 
 		const theme = localStorage.amforaTheme || "gruvbox-dark";
 
-		if (theme)
-			files["/data/.config/amfora/config.toml"] += document.getElementById(`theme-${theme}`).innerHTML;
+		if (theme) {
+			const themeEl = document.getElementById(`theme-${theme}`);
+			const themeConfig = themeEl.innerHTML;
+
+			files["/data/.config/amfora/config.toml"] += themeConfig;
+
+			const themeBgColor = themeEl.innerHTML.split("\n")
+				.find(l => l.trim().startsWith('bg '))?.trim().match(/"(\#.*)"/)?.[1]; // yeuch
+
+			if (themeBgColor) {
+				// update --background-color variable so there's no visible border
+				document.documentElement.style.setProperty('--background-color', themeBgColor);
+			}
+		}
 	</script>
 </body>
 

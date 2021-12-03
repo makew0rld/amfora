@@ -380,7 +380,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			return ret("", false)
 		}
 		redir := parsed.ResolveReference(parsedMeta).String()
-		justAddsSlash := (redir == u + "/")
+		justAddsSlash := (redir == u+"/")
 		// Prompt before redirecting to non-Gemini protocol
 		redirect := false
 		if !justAddsSlash && !strings.HasPrefix(redir, "gemini") {

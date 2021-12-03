@@ -2,5 +2,7 @@
 
 package display
 
-func observeURL(u string) {}
+import "github.com/makeworld-the-better-one/amfora/structs"
+
+func observePage(p *structs.Page) {}
 

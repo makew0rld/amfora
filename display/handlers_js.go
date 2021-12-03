@@ -1,17 +1,10 @@
 package display
 
+import "github.com/makeworld-the-better-one/amfora/structs"
 import "syscall/js"
 
 func init() {
 	js.Global().Set("amforaAPI", makeJSAPI())
-}
-
-func observeURL(u string) {
-	if js.Global().Get("observeURL").IsNull() {
-		return
-	}
-
-	js.Global().Call("observeURL", u)
 }
 
 func makeJSAPI() js.Value {
@@ -27,6 +20,12 @@ func makeJSAPI() js.Value {
 	}
 
 	return js.ValueOf(api)
+}
+
+func observePage(page *structs.Page) {
+	if jsFunc := js.Global().Get("observePage"); js.TypeFunction == jsFunc.Type() {
+		jsFunc.Invoke(page.URL, page.Title())
+	}
 }
 
 func jsError(msg string) js.Value {

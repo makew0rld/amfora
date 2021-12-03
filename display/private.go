@@ -80,6 +80,8 @@ func reformatPage(p *structs.Page) {
 // reformatPageAndSetView is for reformatting a page that is already being displayed.
 // setPage should be used when a page is being loaded for the first time.
 func reformatPageAndSetView(t *tab, p *structs.Page) {
+	observePage(p)
+
 	if p.TermWidth == termW {
 		// No changes to make
 		return
@@ -123,6 +125,8 @@ func setPage(t *tab, p *structs.Page) {
 	// Save bottom bar for the tab - other funcs will apply/display it
 	t.barLabel = ""
 	t.barText = p.URL
+
+	observePage(p)
 }
 
 // goURL is like handleURL, but takes care of history and the bottomBar.

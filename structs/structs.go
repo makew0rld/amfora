@@ -1,6 +1,7 @@
 //nolint:lll
 package structs
 
+import "strings"
 import "time"
 
 type Mediatype string
@@ -34,6 +35,8 @@ type Page struct {
 	SelectedID   string    // The cview region ID for the selected text/link
 	Mode         PageMode
 	MadeAt       time.Time // When the page was made. Zero value indicates it should stay in cache forever.
+
+	title        string
 }
 
 // Size returns an approx. size of a Page in bytes.
@@ -43,4 +46,22 @@ func (p *Page) Size() int {
 		n += len(p.Links[i])
 	}
 	return n
+}
+
+func (p *Page) Title() string {
+	if p.title == "" {
+		p.title = extractTitle(p.Raw)
+	}
+	return p.title
+}
+
+// ExtractTitle returns the text of the first "#" heading
+func extractTitle(text string) string {
+	for _, line := range strings.Split(text, "\n") {
+		line = strings.TrimSpace(line)
+		if len(line) > 1 && line[0] == '#' && line[1] != '#' {
+			return strings.TrimSpace(line[1:])
+		}
+	}
+	return ""
 }

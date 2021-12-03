@@ -95,8 +95,6 @@ func Init(version, commit, builtBy string) {
 	layout.AddItem(panels, 0, 1, true)
 	layout.AddItem(bottomBar, 1, 1, false)
 
-	bottomBar.SetChangedFunc(observeURL)
-
 	if viper.GetBool("a-general.color") {
 		bottomBar.SetBackgroundColor(config.GetColor("bottombar_bg"))
 		bottomBar.SetLabelColor(config.GetColor("bottombar_label"))

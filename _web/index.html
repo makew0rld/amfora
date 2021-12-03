@@ -194,7 +194,7 @@
 	</script>
 
 	<script>
-		const startUrl = location.hash.slice(1); // || "gemini://gemini.circumlunar.space/";
+		const startUrl = location.hash.slice(1) || "about:newtab"; // || "gemini://gemini.circumlunar.space/";
 
 		const go = new Go();
 		go.argv = startUrl ? ["amfora", startUrl] : ["amfora"];
@@ -219,12 +219,20 @@
 		})();
 	</script>
 
-	<script>
+	<script> // Integration of Amfora with the browser's address bar (hash fragment)
 		let currentUrl = startUrl;
+
+		// Called by Amfora when the page changes (e.g. navigating, switching tabs)
+		function observePage(url, title) {
+			currentUrl = url;
+
+			location.hash = url;
+			document.title = `🏺 ${title || 'Amfora'}`;
+		}
 
 		// Navigate when user changes hash fragment
 		addEventListener("hashchange", () => {
-			const newUrl = location.hash.slice(1);
+			const newUrl = location.hash.slice(1) || startUrl;
 
 			if (newUrl === currentUrl)
 				return;
@@ -233,16 +241,6 @@
 			if (globalThis.amforaAPI)
 				amforaAPI.navigateTo(newUrl);
 		});
-
-		function observeURL(url) {
-			if (url === startUrl)
-				return;
-
-			currentUrl = url;
-
-			if (url)
-				location.hash = `#${url}`;
-		}
 	</script>
 
 	<template id="theme-gruvbox-dark">

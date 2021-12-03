@@ -1,3 +1,4 @@
+//go:build js
 // +build js
 
 package webbrowser
@@ -13,4 +14,3 @@ func Open(url string) (string, error) {
 		return "", errors.New("Browser refused to open new tab")
 	}
 }
-

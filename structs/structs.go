@@ -1,8 +1,10 @@
 //nolint:lll
 package structs
 
-import "strings"
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 type Mediatype string
 
@@ -36,7 +38,7 @@ type Page struct {
 	Mode         PageMode
 	MadeAt       time.Time // When the page was made. Zero value indicates it should stay in cache forever.
 
-	title        string
+	title string
 }
 
 // Size returns an approx. size of a Page in bytes.

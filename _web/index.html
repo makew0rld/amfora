@@ -727,11 +727,66 @@
 		bkmk_modal_field_text = "#f8f8f2"
 	</template>
 
+	<template id="theme-tokyo-night">
+		[theme]
+
+		# Tokyo Night
+
+		bg = "#1a1b26"
+		fg = "#a9b1d6"
+		tab_num = "#565f89"
+		tab_divider = "#3b4261"
+		bottombar_label = "#7aa2f7"
+		bottombar_text = "#7aa2f7"
+		bottombar_bg = "#1f2335"
+		scrollbar = "#565f89"
+
+		hdg_1 = "#f7768e"
+		hdg_2 = "#7dcfff"
+		hdg_3 = "#bb9af7"
+		amfora_link = "#73daca"
+		foreign_link = "#b4f9f8"
+		link_number = "#ff9e64"
+		regular_text = "#a9b1d6"
+		quote_text = "#e0af68"
+		preformatted_text = "#2ac3de"
+		list_text = "#a9b1d6"
+
+		btn_bg = "#414868"
+		btn_text = "#7aa2f7"
+
+		dl_choice_modal_bg = "#414868"
+		dl_choice_modal_text = "#c0caf5"
+		dl_modal_bg = "#414868"
+		dl_modal_text = "#c0caf5"
+		info_modal_bg = "#414868"
+		info_modal_text = "#c0caf5"
+		error_modal_bg = "#414868"
+		error_modal_text = "#f7768e"
+		yesno_modal_bg = "#414868"
+		yesno_modal_text = "#e0af68"
+		tofu_modal_bg = "#414868"
+		tofu_modal_text = "#2ac3de"
+		subscription_modal_bg = "#414868"
+		subscription_modal_text = "#bb9af7"
+
+		input_modal_bg = "#414868"
+		input_modal_text = "#c0caf5"
+		input_modal_field_bg = "#33467c"
+		input_modal_field_text = "#a9b1d6"
+
+		bkmk_modal_bg = "#414868"
+		bkmk_modal_text = "#c0caf5"
+		bkmk_modal_label = "#c0caf5"
+		bkmk_modal_field_bg = "#33467c"
+		bkmk_modal_field_text = "#a9b1d6"
+	</template>
+
 	<script>
 		const themes = [...document.querySelectorAll("template")].map(el => el.id.replace(/^theme-/, ''));
 		const randomTheme = themes[Math.floor(Math.random() * themes.length)];
 
-		const theme = localStorage.amforaTheme || "gruvbox-dark";
+		const theme = localStorage.amforaTheme || /* randomTheme */ "gruvbox-dark";
 
 		if (theme) {
 			const themeEl = document.getElementById(`theme-${theme}`);

@@ -3,7 +3,7 @@ module github.com/makeworld-the-better-one/amfora
 go 1.15
 
 require (
-	code.rocketnine.space/tslocum/cview v1.5.6-0.20210525194531-92dca67ac283
+	code.rocketnine.space/tslocum/cview v1.5.6-0.20210530175404-7e8817f20bdc
 	github.com/atotto/clipboard v0.1.4
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect

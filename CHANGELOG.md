@@ -21,9 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bookmarks are stored using XML in the XBEL format, old bookmarks are transferred (#68)
 - Text no longer disappears under the left margin when scrolling (regression in v1.8.0) (#197)
 - Default search engine changed to geminispace.info from gus.guru
+- The user's terminal theme colors are used by default (#181)
 
 ## Removed
 - Favicon support removed (#199)
+- The default Amfora theme, get it back [here](https://github.com/makeworld-the-better-one/amfora/blob/master/contrib/themes/amfora.toml)
 
 ### Fixed
 - Help text is now the same color as `regular_text` in the theme config

@@ -322,6 +322,8 @@ entries_per_page = 20
 # Colors can be set using a W3C color name, or a hex value such as "#ffffff".
 # Setting a background to "default" keeps the terminal default
 # If your terminal has transparency, set any background to "default" to keep it transparent
+# The key "bg" is already set to "default", but this can be used on other backgrounds,
+# like for modals.
 
 # Note that not all colors will work on terminals that do not have truecolor support.
 # If you want to stick to the standard 16 or 256 colors, you can get

@@ -23,3 +23,4 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 * Anas Mohamed (@amohamed11)
 * David Jimenez (@dvejmz)
 * Michael McDonagh (@m-mcdonagh)
+* mooff (@awfulcooking)

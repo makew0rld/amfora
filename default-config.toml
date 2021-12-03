@@ -1,5 +1,16 @@
 # This is the default config file.
 # It also shows all the default values, if you don't create the file.
+# You can edit this file to set your own configuration for Amfora.
+
+# When Amfora updates, defaults may change, but this file on your drive will not.
+# You can always get the latest defaults on GitHub.
+# https://github.com/makeworld-the-better-one/amfora/blob/master/default-config.toml
+
+# Please also check out the Amfora Wiki for more help
+# https://github.com/makeworld-the-better-one/amfora/wiki
+# gemini://makeworld.space/amfora-wiki/
+
+
 
 # All URL values may omit the scheme and/or port, as well as the beginning double slash
 # Valid URL examples:
@@ -70,6 +81,10 @@ page_max_time = 10
 # When a scrollbar appears. "never", "auto", and "always" are the only valid values.
 # "auto" means the scrollbar only appears when the page is longer than the window.
 scrollbar = "auto"
+
+# Underline non-gemini URLs
+# This is done to help color blind users
+underline = true
 
 
 [auth]

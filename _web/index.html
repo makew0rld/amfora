@@ -168,9 +168,9 @@
 			return false;
 		});
 
-		// let the browser handle Ctrl+l
+		// let the browser handle Ctrl+l and Ctrl+v
 		term.attachCustomKeyEventHandler(ev => {
-			if (ev.ctrlKey && ev.key == "l")
+			if (ev.ctrlKey && (ev.key === "l" || ev.key === "v"))
 				return false;
 		});
 

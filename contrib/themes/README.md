@@ -7,7 +7,7 @@ You can use these themes by replacing the `[theme]` section of your [config](htt
 This is the original Amfora theme we all know and love. From v1.9.0 and onwards, the user's terminal theme is used by default. Use this theme to restore the original Amfora look.
 
 <a href="https://raw.githubusercontent.com/makeworld-the-better-one/amfora/master/demo-large.gif">
-<img src="demo-large.gif" alt="Demo GIF" width="80%">
+<img src="../../demo-large.gif" alt="Demo GIF" width="80%">
 </a>
 
 ## Nord

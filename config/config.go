@@ -377,7 +377,7 @@ func Init() error {
 	if viper.GetBool("a-general.color") {
 		cview.Styles.PrimitiveBackgroundColor = GetColor("bg")
 	} else {
-		// No colors allowed, set backgroud to black instead of default
+		// No colors allowed, set background to black instead of default
 		themeMu.Lock()
 		theme["bg"] = tcell.ColorBlack
 		cview.Styles.PrimitiveBackgroundColor = tcell.ColorBlack

@@ -136,6 +136,9 @@
 
 		function fit() {
 			fitAddon.fit();
+
+			if (amforaAPI)
+				setTimeout(amforaAPI.redraw, 0);
 		}
 
 		window.addEventListener('resize', fit);

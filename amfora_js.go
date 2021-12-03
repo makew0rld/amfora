@@ -20,6 +20,10 @@ func makeJSAPI() js.Value {
 			display.URL(args[0].String()) // does the navigation
 			return nil
 		}),
+		"redraw": js.FuncOf(func(js.Value, []js.Value) interface{} {
+			display.App.Draw()
+			return nil
+		}),
 	}
 
 	return js.ValueOf(api)

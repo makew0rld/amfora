@@ -11,27 +11,43 @@ import (
 // UI element tcell.Colors are mapped to a string key, such as "error" or "tab_bg"
 // These are the same keys used in the config file.
 
+// Special color with no real color value
+// Used for a default foreground color
+// White is the terminal background is black, black if the terminal background is white
+// Converted to a real color in this file before being sent out to other modules
+const ColorFg = tcell.ColorSpecial | 2
+
+// The same as ColorFg, but inverted
+const ColorBg = tcell.ColorSpecial | 3
+
 var themeMu = sync.RWMutex{}
 var theme = map[string]tcell.Color{
+	// Map these for special uses in code
+	"ColorBg": ColorBg,
+	"ColorFg": ColorFg,
+
 	// Default values below
 	// Only the 16 Xterm system tcell.Colors are used, because those are the tcell.Colors overrided
 	// by the user's default terminal theme
 
 	// Used for cview.Styles.PrimitiveBackgroundColor
 	// Set to tcell.ColorDefault because that allows transparent terminals to work
-	// The rest of this theme assumes that the background is equivalent to tcell.Color zero, or black.
+	// The rest of this theme assumes that the background is equivalent to black, but
+	// white colors switched to black later if the background is determined to be white.
+	//
+	// Also, this is set to tcell.ColorBlack in config.go if colors are disabled in the config.
 	"bg": tcell.ColorDefault,
 
 	"tab_num":         tcell.ColorTeal,
-	"tab_divider":     tcell.ColorWhite,
+	"tab_divider":     ColorFg,
 	"bottombar_label": tcell.ColorTeal,
-	"bottombar_text":  tcell.ColorBlack,
-	"bottombar_bg":    tcell.ColorWhite,
-	"scrollbar":       tcell.ColorWhite,
+	"bottombar_text":  ColorBg,
+	"bottombar_bg":    ColorFg,
+	"scrollbar":       ColorFg,
 
 	// Modals
-	"btn_bg":   tcell.ColorTeal, // All modal buttons
-	"btn_text": tcell.ColorWhite,
+	"btn_bg":   tcell.ColorTeal,  // All modal buttons
+	"btn_text": tcell.ColorWhite, // White instead of ColorFg because background is known to be Teal
 
 	"dl_choice_modal_bg":      tcell.ColorOlive,
 	"dl_choice_modal_text":    tcell.ColorWhite,
@@ -65,10 +81,10 @@ var theme = map[string]tcell.Color{
 	"amfora_link":       tcell.ColorBlue,
 	"foreign_link":      tcell.ColorPurple,
 	"link_number":       tcell.ColorSilver,
-	"regular_text":      tcell.ColorWhite,
-	"quote_text":        tcell.ColorWhite,
-	"preformatted_text": tcell.ColorWhite,
-	"list_text":         tcell.ColorWhite,
+	"regular_text":      ColorFg,
+	"quote_text":        ColorFg,
+	"preformatted_text": ColorFg,
+	"list_text":         ColorFg,
 }
 
 func SetColor(key string, color tcell.Color) {
@@ -83,13 +99,42 @@ func SetColor(key string, color tcell.Color) {
 func GetColor(key string) tcell.Color {
 	themeMu.RLock()
 	defer themeMu.RUnlock()
-	return theme[key]
+
+	color := theme[key]
+
+	if color == ColorFg {
+		if hasDarkTerminalBackground {
+			return tcell.ColorWhite
+		}
+		return tcell.ColorBlack
+	}
+	if color == ColorBg {
+		if hasDarkTerminalBackground {
+			return tcell.ColorBlack
+		}
+		return tcell.ColorWhite
+	}
+
+	return color
 }
 
 // colorToString converts a color to a string for use in a cview tag
 func colorToString(color tcell.Color) string {
 	if color == tcell.ColorDefault {
 		return "-"
+	}
+
+	if color == ColorFg {
+		if hasDarkTerminalBackground {
+			return "white"
+		}
+		return "black"
+	}
+	if color == ColorBg {
+		if hasDarkTerminalBackground {
+			return "black"
+		}
+		return "white"
 	}
 
 	if color&tcell.ColorIsRGB == 0 {
@@ -99,6 +144,7 @@ func colorToString(color tcell.Color) string {
 		return ColorToColorName[color]
 	}
 
+	// Color set by user, must be respected exactly so hex code is used
 	return fmt.Sprintf("#%06x", color.Hex())
 }
 

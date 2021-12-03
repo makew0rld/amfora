@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Specifying `default` in the theme config uses the terminal's default background color, including transparency (#244, #245)
 - Redirects occur automatically if it only adds a trailing slash (#271)
 - Non-gemini links are underlined by default to help color blind users (#189)
+- Text and element colors of default theme change to be black on white terminals (#181)
 
 ### Changed
 - Bookmarks are stored using XML in the XBEL format, old bookmarks are transferred (#68)
@@ -24,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The user's terminal theme colors are used by default (#181)
 
 ## Removed
-- Favicon support removed (#199)
+- Favicon support (#199)
 - The default Amfora theme, get it back [here](https://github.com/makeworld-the-better-one/amfora/blob/master/contrib/themes/amfora.toml)
 
 ### Fixed

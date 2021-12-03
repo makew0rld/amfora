@@ -15,6 +15,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/muesli/termenv"
 	"github.com/rkoesters/xdg/basedir"
 	"github.com/rkoesters/xdg/userdirs"
 	"github.com/spf13/viper"
@@ -58,6 +59,11 @@ var MediaHandlers = make(map[string]MediaHandler)
 // Controlled by "a-general.scrollbar" in config
 // Defaults to ScrollBarAuto on an invalid value
 var ScrollBar cview.ScrollBarVisibility
+
+// Whether the user's terminal is dark or light
+// Defaults to dark, but is determined in Init()
+// Used to prevent white text on a white background with the default theme
+var hasDarkTerminalBackground bool
 
 func Init() error {
 
@@ -370,7 +376,14 @@ func Init() error {
 	}
 	if viper.GetBool("a-general.color") {
 		cview.Styles.PrimitiveBackgroundColor = GetColor("bg")
-	} // Otherwise it's black by default
+	} else {
+		// No colors allowed, set backgroud to black instead of default
+		themeMu.Lock()
+		theme["bg"] = tcell.ColorBlack
+		cview.Styles.PrimitiveBackgroundColor = tcell.ColorBlack
+	}
+
+	hasDarkTerminalBackground = termenv.HasDarkBackground()
 
 	// Parse HTTP command
 	HTTPCommand = viper.GetStringSlice("a-general.http")

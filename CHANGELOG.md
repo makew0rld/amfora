@@ -16,7 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Specifying `default` in the theme config uses the terminal's default background color, including transparency (#244, #245)
 - Redirects occur automatically if it only adds a trailing slash (#271)
 - Non-gemini links are underlined by default to help color blind users (#189)
-- Default yellow for preformatted text was changed to orange, which is more visible with white terminal backgrounds (#189)
 
 ### Changed
 - Bookmarks are stored using XML in the XBEL format, old bookmarks are transferred (#68)

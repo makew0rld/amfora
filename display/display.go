@@ -434,20 +434,9 @@ func CloseTab() {
 	tabs = tabs[:len(tabs)-1]
 	browser.RemoveTab(strconv.Itoa(curTab))
 
-	if curTab <= 0 {
-		curTab = NumTabs() - 1
-	} else {
-		curTab--
-	}
+	curTab--
 
-	browser.SetCurrentTab(strconv.Itoa(curTab)) // Go to previous page
-	// Restore previous tab's state
-	tabs[curTab].applyAll()
-
-	App.SetFocus(tabs[curTab].view)
-
-	// Just in case
-	App.Draw()
+	SwitchTab(curTab)
 }
 
 // SwitchTab switches to a specific tab, using its number, 0-indexed.

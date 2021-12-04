@@ -162,7 +162,9 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 			// Underline non-gemini links if enabled
 			var linkTag string
 			if viper.GetBool("a-general.underline") {
-				linkTag = `[` + config.GetColorString("foreign_link") + linkTag + `::u]`
+				linkTag = `[` + config.GetColorString("foreign_link") + `::u]`
+			} else {
+				linkTag = `[` + config.GetColorString("foreign_link") + `]`
 			}
 
 			// Wrap and add link text

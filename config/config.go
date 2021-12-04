@@ -381,6 +381,7 @@ func Init() error {
 		themeMu.Lock()
 		theme["bg"] = tcell.ColorBlack
 		cview.Styles.PrimitiveBackgroundColor = tcell.ColorBlack
+		themeMu.Unlock()
 	}
 
 	hasDarkTerminalBackground = termenv.HasDarkBackground()

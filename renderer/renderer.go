@@ -162,7 +162,7 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 			// Underline non-gemini links if enabled
 			var linkTag string
 			if viper.GetBool("a-general.underline") {
-				linkTag = "::u"
+				linkTag = `[` + config.GetColorString("foreign_link") + linkTag + `::u]`
 			}
 
 			// Wrap and add link text
@@ -215,27 +215,27 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 
 					wrappedLink = wrapLine(linkText, width,
 						strings.Repeat(" ", indent)+
-							`["`+strconv.Itoa(num-1)+`"][`+config.GetColorString("foreign_link")+linkTag+`]`,
+							`["`+strconv.Itoa(num-1)+`"]`+linkTag,
 						`[-::-][""]`,
 						false, // Don't indent the first line, it's the one with link number
 					)
 
 					wrappedLink[0] = fmt.Sprintf(`[%s::b][`, config.GetColorString("link_number")) +
-						strconv.Itoa(num) + "[]" + "[-::-]" + spacing +
-						`["` + strconv.Itoa(num-1) + `"][` + config.GetColorString("foreign_link") + linkTag + `]` +
+						strconv.Itoa(num) + "[][-::-]" + spacing +
+						`["` + strconv.Itoa(num-1) + `"]` + linkTag +
 						wrappedLink[0] + `[-::-][""]`
 				} else {
 					// No color
 
 					wrappedLink = wrapLine(linkText, width,
-						strings.Repeat(" ", len(strconv.Itoa(num))+4)+ // +4 for spaces and brackets
-							`["`+strconv.Itoa(num-1)+`"][`+linkTag+`]`,
+						strings.Repeat(" ", indent)+
+							`["`+strconv.Itoa(num-1)+`"]`+linkTag,
 						`[::-][""]`,
 						false, // Don't indent the first line, it's the one with link number
 					)
 
-					wrappedLink[0] = `[::b][` + strconv.Itoa(num) + "[][::-]  " +
-						`["` + strconv.Itoa(num-1) + `"][` + linkTag + `]` +
+					wrappedLink[0] = `[::b][` + strconv.Itoa(num) + "[][::-]" + spacing +
+						`["` + strconv.Itoa(num-1) + `"]` + linkTag +
 						wrappedLink[0] + `[::-][""]`
 				}
 			}

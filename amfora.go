@@ -67,11 +67,13 @@ func main() {
 
 	// Initialize Amfora's settings
 	display.Init(version, commit, builtBy)
-	display.NewTab()
+
 	if len(os.Args[1:]) > 0 {
-		display.URL(os.Args[1])
+		display.NewTabWithURL(os.Args[1])
 	} else if !isStdinEmpty() {
 		renderFromStdin()
+	} else {
+		display.NewTab()
 	}
 
 	// Start

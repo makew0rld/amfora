@@ -302,7 +302,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			}
 		}
 	} else if err != nil {
-		Error("URL Fetch Error", err.Error())
+		<-Error("URL Fetch Error", err.Error())
 		return ret("", false)
 	}
 

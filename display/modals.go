@@ -153,10 +153,7 @@ func modalInit() {
 		panels.HidePanel("error")
 		App.SetFocus(tabs[curTab].view)
 		App.Draw()
-		select {
-		case errorModalDone <- struct{}{}:
-		default:
-		}
+		errorModalDone <- struct{}{}
 	})
 
 	inputModal.SetBorder(true)
@@ -187,7 +184,7 @@ func modalInit() {
 }
 
 // Error displays an error on the screen in a modal.
-func Error(title, text string) chan struct{} {
+func Error(title, text string) {
 	if text == "" {
 		text = "No additional information."
 	} else {
@@ -206,7 +203,7 @@ func Error(title, text string) chan struct{} {
 	App.SetFocus(errorModal)
 	App.Draw()
 
-	return errorModalDone
+	<-errorModalDone
 }
 
 // Info displays some info on the screen in a modal.

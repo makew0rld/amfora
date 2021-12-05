@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/bookmarks"
@@ -81,6 +82,9 @@ func main() {
 }
 
 func isStdinEmpty() bool {
+	if runtime.GOOS == "js" {
+		return true
+	}
 	stat, _ := os.Stdin.Stat()
 	return (stat.Mode() & os.ModeCharDevice) != 0
 }

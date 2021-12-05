@@ -1,0 +1,4 @@
+*.wasm
+*.swp
+*.sh
+node_modules/

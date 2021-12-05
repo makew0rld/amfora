@@ -15,6 +15,10 @@ RM      := rm
 amfora: go.mod go.sum $(SRC)
 	GO111MODULE=on CGO_ENABLED=0 $(GO) build -o $@ -ldflags="-s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.builtBy=$(BUILDER)"
 
+web:
+	cd _web && npm install --silent
+	GOOS=js GOARCH=wasm $(GO) build -o _web/amfora.wasm -ldflags="-s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.builtBy=$(BUILDER)"
+
 .PHONY: clean
 clean:
 	$(RM) -f amfora

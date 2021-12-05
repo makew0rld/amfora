@@ -239,10 +239,11 @@
 
 		// Navigate when user changes hash fragment
 		addEventListener("hashchange", () => {
-			const newUrl = location.hash.slice(1) || startUrl;
-
+			let newUrl = location.hash.slice(1);
 			if (newUrl === currentUrl)
 				return;
+
+			newUrl ||= startUrl;
 
 			console.info('Navigating to', newUrl);
 			if (globalThis.amforaAPI)

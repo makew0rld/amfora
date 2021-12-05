@@ -1,3 +1,4 @@
+//go:build !linux && !darwin && !windows && !freebsd && !netbsd && !openbsd
 // +build !linux,!darwin,!windows,!freebsd,!netbsd,!openbsd
 
 package sysopen

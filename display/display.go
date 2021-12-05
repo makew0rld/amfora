@@ -96,8 +96,6 @@ func Init(version, commit, builtBy string) {
 	layout.AddItem(bottomBar, 1, 1, false)
 
 	if viper.GetBool("a-general.color") {
-		layout.SetBackgroundColor(config.GetColor("bg"))
-
 		bottomBar.SetBackgroundColor(config.GetColor("bottombar_bg"))
 		bottomBar.SetLabelColor(config.GetColor("bottombar_label"))
 		bottomBar.SetFieldBackgroundColor(config.GetColor("bottombar_bg"))
@@ -106,7 +104,7 @@ func Init(version, commit, builtBy string) {
 		browser.SetTabBackgroundColor(config.GetColor("bg"))
 		browser.SetTabBackgroundColorFocused(config.GetColor("tab_num"))
 		browser.SetTabTextColor(config.GetColor("tab_num"))
-		browser.SetTabTextColorFocused(config.GetTextColor("bg", "tab_num"))
+		browser.SetTabTextColorFocused(config.GetColor("ColorBg"))
 		browser.SetTabSwitcherDivider(
 			"",
 			fmt.Sprintf("[%s:%s]|[-]", config.GetColorString("tab_divider"), config.GetColorString("bg")),

@@ -1,5 +1,16 @@
 # This is the default config file.
 # It also shows all the default values, if you don't create the file.
+# You can edit this file to set your own configuration for Amfora.
+
+# When Amfora updates, defaults may change, but this file on your drive will not.
+# You can always get the latest defaults on GitHub.
+# https://github.com/makeworld-the-better-one/amfora/blob/master/default-config.toml
+
+# Please also check out the Amfora Wiki for more help
+# https://github.com/makeworld-the-better-one/amfora/wiki
+# gemini://makeworld.space/amfora-wiki/
+
+
 
 # All URL values may omit the scheme and/or port, as well as the beginning double slash
 # Valid URL examples:
@@ -70,6 +81,10 @@ page_max_time = 10
 # When a scrollbar appears. "never", "auto", and "always" are the only valid values.
 # "auto" means the scrollbar only appears when the page is longer than the window.
 scrollbar = "auto"
+
+# Underline non-gemini URLs
+# This is done to help color blind users
+underline = true
 
 
 [auth]
@@ -304,6 +319,8 @@ entries_per_page = 20
 # Colors can be set using a W3C color name, or a hex value such as "#ffffff".
 # Setting a background to "default" keeps the terminal default
 # If your terminal has transparency, set any background to "default" to keep it transparent
+# The key "bg" is already set to "default", but this can be used on other backgrounds,
+# like for modals.
 
 # Note that not all colors will work on terminals that do not have truecolor support.
 # If you want to stick to the standard 16 or 256 colors, you can get

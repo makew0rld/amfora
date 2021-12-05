@@ -15,6 +15,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/muesli/termenv"
 	"github.com/rkoesters/xdg/basedir"
 	"github.com/rkoesters/xdg/userdirs"
 	"github.com/spf13/viper"
@@ -58,6 +59,11 @@ var MediaHandlers = make(map[string]MediaHandler)
 // Controlled by "a-general.scrollbar" in config
 // Defaults to ScrollBarAuto on an invalid value
 var ScrollBar cview.ScrollBarVisibility
+
+// Whether the user's terminal is dark or light
+// Defaults to dark, but is determined in Init()
+// Used to prevent white text on a white background with the default theme
+var hasDarkTerminalBackground bool
 
 func Init() error {
 
@@ -119,6 +125,7 @@ func Init() error {
 		// In APPDATA beside other Amfora files
 		subscriptionDir = amforaAppData
 	} else {
+		//nolint:revive
 		// XDG data dir on POSIX systems
 		xdg_data, ok := os.LookupEnv("XDG_DATA_HOME")
 		if ok && strings.TrimSpace(xdg_data) != "" {
@@ -203,6 +210,7 @@ func Init() error {
 	viper.SetDefault("a-general.page_max_size", 2097152)
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.scrollbar", "auto")
+	viper.SetDefault("a-general.underline", true)
 	viper.SetDefault("keybindings.bind_reload", []string{"R", "Ctrl-R"})
 	viper.SetDefault("keybindings.bind_home", "Backspace")
 	viper.SetDefault("keybindings.bind_bookmarks", "Ctrl-B")
@@ -368,7 +376,15 @@ func Init() error {
 	}
 	if viper.GetBool("a-general.color") {
 		cview.Styles.PrimitiveBackgroundColor = GetColor("bg")
-	} // Otherwise it's black by default
+	} else {
+		// No colors allowed, set background to black instead of default
+		themeMu.Lock()
+		theme["bg"] = tcell.ColorBlack
+		cview.Styles.PrimitiveBackgroundColor = tcell.ColorBlack
+		themeMu.Unlock()
+	}
+
+	hasDarkTerminalBackground = termenv.HasDarkBackground()
 
 	// Parse HTTP command
 	HTTPCommand = viper.GetStringSlice("a-general.http")

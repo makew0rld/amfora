@@ -46,7 +46,7 @@ func handleHTTP(u string, showInfo bool) bool {
 	}
 
 	// Custom command
-	var err error = nil
+	var err error
 	if len(config.HTTPCommand) > 1 {
 		err = exec.Command(config.HTTPCommand[0], append(config.HTTPCommand[1:], u)...).Start()
 	} else {
@@ -380,9 +380,10 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			return ret("", false)
 		}
 		redir := parsed.ResolveReference(parsedMeta).String()
+		justAddsSlash := (redir == u+"/")
 		// Prompt before redirecting to non-Gemini protocol
 		redirect := false
-		if !strings.HasPrefix(redir, "gemini") {
+		if !justAddsSlash && !strings.HasPrefix(redir, "gemini") {
 			if YesNo("Follow redirect to non-Gemini URL?\n" + redir) {
 				redirect = true
 			} else {
@@ -390,7 +391,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			}
 		}
 		// Prompt before redirecting
-		autoRedirect := viper.GetBool("a-general.auto_redirect")
+		autoRedirect := justAddsSlash || viper.GetBool("a-general.auto_redirect")
 		if redirect || (autoRedirect && numRedirects < 5) || YesNo("Follow redirect?\n"+redir) {
 			if res.Status == gemini.StatusRedirectPermanent {
 				go cache.AddRedir(u, redir)

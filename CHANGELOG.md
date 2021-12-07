@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Text no longer disappears under the left margin when scrolling (regression in v1.8.0) (#197)
 - Default search engine changed to geminispace.info from gus.guru
 - The user's terminal theme colors are used by default (#181)
+- By default, non-gemini URI schemes are opened in the default application. This requires a config change for previous users, see the [wiki](https://github.com/makeworld-the-better-one/amfora/wiki/Handling-Other-URL-Schemes) (#207)
 
 ## Removed
 - Favicon support (#199)

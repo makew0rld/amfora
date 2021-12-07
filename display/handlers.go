@@ -16,6 +16,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/rr"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
+	"github.com/makeworld-the-better-one/amfora/sysopen"
 	"github.com/makeworld-the-better-one/amfora/webbrowser"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/spf13/viper"
@@ -75,6 +76,13 @@ func handleOther(u string) {
 	switch handler {
 	case "", "off":
 		Error("URL Error", "Opening "+parsed.Scheme+" URLs is turned off.")
+	case "default":
+		_, err := sysopen.Open(u)
+		if err != nil {
+			Error("Application Error", err.Error())
+			return
+		}
+		Info("Opened in default application")
 	default:
 		// The config has a custom command to execute for URLs
 		fields := strings.Fields(handler)

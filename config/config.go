@@ -259,7 +259,7 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_beginning", []string{"Home", "g"})
 	viper.SetDefault("keybindings.bind_end", []string{"End", "G"})
 	viper.SetDefault("keybindings.shift_numbers", "")
-	viper.SetDefault("url-handlers.other", "off")
+	viper.SetDefault("url-handlers.other", "default")
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
 	viper.SetDefault("cache.timeout", 1800)

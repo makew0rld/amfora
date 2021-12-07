@@ -194,7 +194,9 @@ underline = true
 
 # This is a special key that defines the handler for all URL schemes for which
 # no handler is defined.
-other = 'off'
+# It uses the special value "default", which will try and use the default
+# application on your computer for opening this kind of URI.
+other = 'default'
 
 
 # [[mediatype-handlers]] section

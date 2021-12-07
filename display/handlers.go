@@ -57,6 +57,7 @@ func handleHTTP(u string, showInfo bool) bool {
 		Error("HTTP Error", "Error executing custom browser command: "+err.Error())
 		return false
 	}
+	Info("Opened with: " + config.HTTPCommand[0])
 
 	App.Draw()
 	return true
@@ -69,28 +70,49 @@ func handleOther(u string) {
 	parsed, _ := url.Parse(u)
 
 	// Search for a handler for the URL scheme
-	handler := strings.TrimSpace(viper.GetString("url-handlers." + parsed.Scheme))
+	handler := viper.GetStringSlice("url-handlers." + parsed.Scheme)
 	if len(handler) == 0 {
-		handler = strings.TrimSpace(viper.GetString("url-handlers.other"))
+		// A string and not a list of strings, use old method of parsing
+		// #214
+		handler = strings.Fields(viper.GetString("url-handlers." + parsed.Scheme))
+		if len(handler) == 0 {
+			handler = viper.GetStringSlice("url-handlers.other")
+			if len(handler) == 0 {
+				handler = strings.Fields(viper.GetString("url-handlers.other"))
+			}
+		}
 	}
-	switch handler {
-	case "", "off":
-		Error("URL Error", "Opening "+parsed.Scheme+" URLs is turned off.")
-	case "default":
-		_, err := sysopen.Open(u)
-		if err != nil {
-			Error("Application Error", err.Error())
+
+	if len(handler) == 1 {
+		// Maybe special key
+
+		switch strings.TrimSpace(handler[0]) {
+		case "", "off":
+			Error("URL Error", "Opening "+parsed.Scheme+" URLs is turned off.")
+			return
+		case "default":
+			_, err := sysopen.Open(u)
+			if err != nil {
+				Error("Application Error", err.Error())
+				return
+			}
+			Info("Opened in default application")
 			return
 		}
-		Info("Opened in default application")
-	default:
-		// The config has a custom command to execute for URLs
-		fields := strings.Fields(handler)
-		err := exec.Command(fields[0], append(fields[1:], u)...).Start()
-		if err != nil {
-			Error("URL Error", "Error executing custom command: "+err.Error())
-		}
 	}
+
+	// Custom application command
+
+	var err error
+	if len(handler) > 1 {
+		err = exec.Command(handler[0], append(handler[1:], u)...).Start()
+	} else {
+		err = exec.Command(handler[0], u).Start()
+	}
+	if err != nil {
+		Error("URL Error", "Error executing custom command: "+err.Error())
+	}
+	Info("Opened with: " + handler[0])
 	App.Draw()
 }
 

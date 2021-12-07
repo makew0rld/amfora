@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Redirects occur automatically if it only adds a trailing slash (#271)
 - Non-gemini links are underlined by default to help color blind users (#189)
 - Text and element colors of default theme change to be black on white terminals (#181)
+- Support paths with spaces in `[url-handlers]` config settings (#214)
+- Display info modal when opening URL with custom application
 
 ### Changed
 - Bookmarks are stored using XML in the XBEL format, old bookmarks are transferred (#68)

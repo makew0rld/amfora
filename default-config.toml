@@ -34,7 +34,7 @@ auto_redirect = false
 # If a command is set, than the URL will be added (in quotes) to the end of the command.
 # A space will be prepended to the URL.
 #
-# The best to define a command is using a string array.
+# The best way to define a command is using a string array.
 # Examples:
 # http = ['firefox']
 # http = ['custom-browser', '--flag', '--option=2']
@@ -182,19 +182,28 @@ underline = true
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.
 # E.g. to open FTP URLs with FileZilla set the following key:
-#   ftp = 'filezilla'
-# You can set any scheme to "off" or "" to disable handling it, or
+#   ftp = ['filezilla']
+# You can set any scheme to 'off' or '' to disable handling it, or
 # just leave the key unset.
 #
 # DO NOT use this for setting the HTTP command.
 # Use the http setting in the "a-general" section above.
 #
 # NOTE: These settings are overrided by the ones in the proxies section.
+#
+# The best way to define a command is using a string array.
+# Examples:
+# magnet = ['transmission']
+# foo = ['custom-browser', '--flag', '--option=2']
+# tel = ['/path/with spaces/in it/telephone']
+#
 # Note the use of single quotes, so that backslashes will not be escaped.
+# Using just a string will also work, but it is deprecated, and will degrade if
+# you use paths with spaces.
 
 # This is a special key that defines the handler for all URL schemes for which
 # no handler is defined.
-# It uses the special value "default", which will try and use the default
+# It uses the special value 'default', which will try and use the default
 # application on your computer for opening this kind of URI.
 other = 'default'
 

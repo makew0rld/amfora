@@ -68,6 +68,8 @@ var hasDarkTerminalBackground bool
 func Init() error {
 
 	// *** Set paths ***
+	// Windows uses paths under APPDATA, Unix systems use XDG paths
+	// Windows systems use XDG paths if variables are defined, see #255
 
 	home, err := homedir.Dir()
 	if err != nil {
@@ -84,10 +86,10 @@ func Init() error {
 	}
 
 	// Store config directory and file paths
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_CONFIG_HOME") == "" {
 		configDir = amforaAppData
 	} else {
-		// Unix / POSIX system
+		// Unix / POSIX system, or Windows with XDG_CONFIG_HOME defined
 		configDir = filepath.Join(basedir.ConfigHome, "amfora")
 	}
 	configPath = filepath.Join(configDir, "config.toml")
@@ -100,7 +102,7 @@ func Init() error {
 	}
 
 	// Store TOFU db directory and file paths
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_CACHE_HOME") == "" {
 		// Windows just stores it in APPDATA along with other stuff
 		tofuDBDir = amforaAppData
 	} else {
@@ -110,7 +112,7 @@ func Init() error {
 	tofuDBPath = filepath.Join(tofuDBDir, "tofu.toml")
 
 	// Store bookmarks dir and path
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_DATA_HOME") == "" {
 		// Windows just keeps it in APPDATA along with other Amfora files
 		bkmkDir = amforaAppData
 	} else {
@@ -121,19 +123,12 @@ func Init() error {
 	BkmkPath = filepath.Join(bkmkDir, "bookmarks.xml")
 
 	// Feeds dir and path
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_DATA_HOME") == "" {
 		// In APPDATA beside other Amfora files
 		subscriptionDir = amforaAppData
 	} else {
-		//nolint:revive
 		// XDG data dir on POSIX systems
-		xdg_data, ok := os.LookupEnv("XDG_DATA_HOME")
-		if ok && strings.TrimSpace(xdg_data) != "" {
-			subscriptionDir = filepath.Join(xdg_data, "amfora")
-		} else {
-			// Default to ~/.local/share/amfora
-			subscriptionDir = filepath.Join(home, ".local", "share", "amfora")
-		}
+		subscriptionDir = filepath.Join(basedir.DataHome, "amfora")
 	}
 	SubscriptionPath = filepath.Join(subscriptionDir, "subscriptions.json")
 

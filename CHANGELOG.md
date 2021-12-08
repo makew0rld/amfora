@@ -34,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Removed
 - Favicon support (#199)
-- The default Amfora theme, get it back [here](https://github.com/makeworld-the-better-one/amfora/blob/master/contrib/themes/amfora.toml)
+- The default Amfora theme, get it back [here](https://github.com/makeworld-the-better-one/amfora/blob/master/contrib/themes/amfora.toml) (#181)
 
 ### Fixed
 - Help text is now the same color as `regular_text` in the theme config

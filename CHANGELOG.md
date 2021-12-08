@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - By default, non-gemini URI schemes are opened in the default application. This requires a config change for previous users, see the [wiki](https://github.com/makeworld-the-better-one/amfora/wiki/Handling-Other-URL-Schemes) (#207)
 - Windows uses paths set by `XDG` variables over `APPDATA` if they are set (#255)
 - Treat status codes like 22 as equivalent to 20 as per the latest spec (#266)
+- Show minimal loading page instead of `about:newtab`  when loading a URL in a new tab (#272)
 
 ## Removed
 - Favicon support (#199)

@@ -168,9 +168,9 @@
 			return false;
 		});
 
-		// let the browser handle Ctrl+l and Ctrl+v
+		const passthroughCtrlKeys = ['l', 'v', 't', 'c', 'w', 'Tab']
 		term.attachCustomKeyEventHandler(ev => {
-			if (ev.ctrlKey && (ev.key === "l" || ev.key === "v"))
+			if (ev.ctrlKey && (passthroughCtrlKeys.includes(ev.key)))
 				return false;
 		});
 

@@ -1,5 +1,16 @@
 # This is the default config file.
 # It also shows all the default values, if you don't create the file.
+# You can edit this file to set your own configuration for Amfora.
+
+# When Amfora updates, defaults may change, but this file on your drive will not.
+# You can always get the latest defaults on GitHub.
+# https://github.com/makeworld-the-better-one/amfora/blob/master/default-config.toml
+
+# Please also check out the Amfora Wiki for more help
+# https://github.com/makeworld-the-better-one/amfora/wiki
+# gemini://makeworld.space/amfora-wiki/
+
+
 
 # All URL values may omit the scheme and/or port, as well as the beginning double slash
 # Valid URL examples:
@@ -23,7 +34,7 @@ auto_redirect = false
 # If a command is set, than the URL will be added (in quotes) to the end of the command.
 # A space will be prepended to the URL.
 #
-# The best to define a command is using a string array.
+# The best way to define a command is using a string array.
 # Examples:
 # http = ['firefox']
 # http = ['custom-browser', '--flag', '--option=2']
@@ -76,6 +87,10 @@ page_max_time = 10
 # When a scrollbar appears. "never", "auto", and "always" are the only valid values.
 # "auto" means the scrollbar only appears when the page is longer than the window.
 scrollbar = "auto"
+
+# Underline non-gemini URLs
+# This is done to help color blind users
+underline = true
 
 
 [auth]
@@ -173,19 +188,30 @@ scrollbar = "auto"
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.
 # E.g. to open FTP URLs with FileZilla set the following key:
-#   ftp = 'filezilla'
-# You can set any scheme to "off" or "" to disable handling it, or
+#   ftp = ['filezilla']
+# You can set any scheme to 'off' or '' to disable handling it, or
 # just leave the key unset.
 #
 # DO NOT use this for setting the HTTP command.
 # Use the http setting in the "a-general" section above.
 #
 # NOTE: These settings are overrided by the ones in the proxies section.
+#
+# The best way to define a command is using a string array.
+# Examples:
+# magnet = ['transmission']
+# foo = ['custom-browser', '--flag', '--option=2']
+# tel = ['/path/with spaces/in it/telephone']
+#
 # Note the use of single quotes, so that backslashes will not be escaped.
+# Using just a string will also work, but it is deprecated, and will degrade if
+# you use paths with spaces.
 
 # This is a special key that defines the handler for all URL schemes for which
 # no handler is defined.
-other = 'off'
+# It uses the special value 'default', which will try and use the default
+# application on your computer for opening this kind of URI.
+other = 'default'
 
 
 # [[mediatype-handlers]] section
@@ -310,6 +336,8 @@ entries_per_page = 20
 # Colors can be set using a W3C color name, or a hex value such as "#ffffff".
 # Setting a background to "default" keeps the terminal default
 # If your terminal has transparency, set any background to "default" to keep it transparent
+# The key "bg" is already set to "default", but this can be used on other backgrounds,
+# like for modals.
 
 # Note that not all colors will work on terminals that do not have truecolor support.
 # If you want to stick to the standard 16 or 256 colors, you can get

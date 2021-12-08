@@ -18,6 +18,7 @@ import (
 var infoModal = cview.NewModal()
 
 var errorModal = cview.NewModal()
+var errorModalDone = make(chan struct{})
 
 var inputModal = cview.NewModal()
 var inputCh = make(chan string)
@@ -35,10 +36,10 @@ func modalInit() {
 
 	yesNoModal.AddButtons([]string{"Yes", "No"})
 
-	panels.AddPanel("info", infoModal, false, false)
-	panels.AddPanel("error", errorModal, false, false)
-	panels.AddPanel("input", inputModal, false, false)
-	panels.AddPanel("yesno", yesNoModal, false, false)
+	panels.AddPanel(PanelInfoModal, infoModal, false, false)
+	panels.AddPanel(PanelErrorModal, errorModal, false, false)
+	panels.AddPanel(PanelInputModal, inputModal, false, false)
+	panels.AddPanel(PanelYesNoModal, yesNoModal, false, false)
 
 	// Color setup
 	if viper.GetBool("a-general.color") {
@@ -141,7 +142,7 @@ func modalInit() {
 	frame.SetTitleAlign(cview.AlignCenter)
 	frame.SetTitle(" Info ")
 	infoModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-		panels.HidePanel("info")
+		panels.HidePanel(PanelInfoModal)
 		App.SetFocus(tabs[curTab].view)
 		App.Draw()
 	})
@@ -149,9 +150,10 @@ func modalInit() {
 	errorModal.SetBorder(true)
 	errorModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 	errorModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-		panels.HidePanel("error")
+		panels.HidePanel(PanelErrorModal)
 		App.SetFocus(tabs[curTab].view)
 		App.Draw()
+		errorModalDone <- struct{}{}
 	})
 
 	inputModal.SetBorder(true)
@@ -196,17 +198,19 @@ func Error(title, text string) {
 
 	errorModal.GetFrame().SetTitle(title)
 	errorModal.SetText(text)
-	panels.ShowPanel("error")
-	panels.SendToFront("error")
+	panels.ShowPanel(PanelErrorModal)
+	panels.SendToFront(PanelErrorModal)
 	App.SetFocus(errorModal)
 	App.Draw()
+
+	<-errorModalDone
 }
 
 // Info displays some info on the screen in a modal.
 func Info(s string) {
 	infoModal.SetText(s)
-	panels.ShowPanel("info")
-	panels.SendToFront("info")
+	panels.ShowPanel(PanelInfoModal)
+	panels.SendToFront(PanelInfoModal)
 	App.SetFocus(infoModal)
 	App.Draw()
 }
@@ -236,14 +240,14 @@ func Input(prompt string, sensitive bool) (string, bool) {
 	}
 
 	inputModal.SetText(prompt + " ")
-	panels.ShowPanel("input")
-	panels.SendToFront("input")
+	panels.ShowPanel(PanelInputModal)
+	panels.SendToFront(PanelInputModal)
 	App.SetFocus(inputModal)
 	App.Draw()
 
 	resp := <-inputCh
 
-	panels.HidePanel("input")
+	panels.HidePanel(PanelInputModal)
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 
@@ -272,13 +276,13 @@ func YesNo(prompt string) bool {
 	}
 	yesNoModal.GetFrame().SetTitle("")
 	yesNoModal.SetText(prompt)
-	panels.ShowPanel("yesno")
-	panels.SendToFront("yesno")
+	panels.ShowPanel(PanelYesNoModal)
+	panels.SendToFront(PanelYesNoModal)
 	App.SetFocus(yesNoModal)
 	App.Draw()
 
 	resp := <-yesNoCh
-	panels.HidePanel("yesno")
+	panels.HidePanel(PanelYesNoModal)
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 	return resp
@@ -305,18 +309,18 @@ func Tofu(host string, expiry time.Time) bool {
 	frame.SetTitle(" TOFU ")
 	m.SetText(
 		//nolint:lll
-		fmt.Sprintf("%s's certificate has changed, possibly indicating an security issue. The certificate would have expired %s. Are you sure you want to continue? ",
+		fmt.Sprintf("%s's certificate has changed, possibly indicating a security issue. The certificate would have expired %s. Are you sure you want to continue? ",
 			host,
 			humanize.Time(expiry),
 		),
 	)
-	panels.ShowPanel("yesno")
-	panels.SendToFront("yesno")
+	panels.ShowPanel(PanelYesNoModal)
+	panels.SendToFront(PanelYesNoModal)
 	App.SetFocus(yesNoModal)
 	App.Draw()
 
 	resp := <-yesNoCh
-	panels.HidePanel("yesno")
+	panels.HidePanel(PanelYesNoModal)
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 	return resp

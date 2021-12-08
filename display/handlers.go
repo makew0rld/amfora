@@ -2,6 +2,7 @@ package display
 
 import (
 	"errors"
+	"fmt"
 	"mime"
 	"net"
 	"net/url"
@@ -16,6 +17,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/rr"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
+	"github.com/makeworld-the-better-one/amfora/sysopen"
 	"github.com/makeworld-the-better-one/amfora/webbrowser"
 	"github.com/makeworld-the-better-one/go-gemini"
 	"github.com/spf13/viper"
@@ -46,7 +48,7 @@ func handleHTTP(u string, showInfo bool) bool {
 	}
 
 	// Custom command
-	var err error = nil
+	var err error
 	if len(config.HTTPCommand) > 1 {
 		err = exec.Command(config.HTTPCommand[0], append(config.HTTPCommand[1:], u)...).Start()
 	} else {
@@ -56,6 +58,7 @@ func handleHTTP(u string, showInfo bool) bool {
 		Error("HTTP Error", "Error executing custom browser command: "+err.Error())
 		return false
 	}
+	Info("Opened with: " + config.HTTPCommand[0])
 
 	App.Draw()
 	return true
@@ -68,21 +71,49 @@ func handleOther(u string) {
 	parsed, _ := url.Parse(u)
 
 	// Search for a handler for the URL scheme
-	handler := strings.TrimSpace(viper.GetString("url-handlers." + parsed.Scheme))
+	handler := viper.GetStringSlice("url-handlers." + parsed.Scheme)
 	if len(handler) == 0 {
-		handler = strings.TrimSpace(viper.GetString("url-handlers.other"))
-	}
-	switch handler {
-	case "", "off":
-		Error("URL Error", "Opening "+parsed.Scheme+" URLs is turned off.")
-	default:
-		// The config has a custom command to execute for URLs
-		fields := strings.Fields(handler)
-		err := exec.Command(fields[0], append(fields[1:], u)...).Start()
-		if err != nil {
-			Error("URL Error", "Error executing custom command: "+err.Error())
+		// A string and not a list of strings, use old method of parsing
+		// #214
+		handler = strings.Fields(viper.GetString("url-handlers." + parsed.Scheme))
+		if len(handler) == 0 {
+			handler = viper.GetStringSlice("url-handlers.other")
+			if len(handler) == 0 {
+				handler = strings.Fields(viper.GetString("url-handlers.other"))
+			}
 		}
 	}
+
+	if len(handler) == 1 {
+		// Maybe special key
+
+		switch strings.TrimSpace(handler[0]) {
+		case "", "off":
+			Error("URL Error", "Opening "+parsed.Scheme+" URLs is turned off.")
+			return
+		case "default":
+			_, err := sysopen.Open(u)
+			if err != nil {
+				Error("Application Error", err.Error())
+				return
+			}
+			Info("Opened in default application")
+			return
+		}
+	}
+
+	// Custom application command
+
+	var err error
+	if len(handler) > 1 {
+		err = exec.Command(handler[0], append(handler[1:], u)...).Start()
+	} else {
+		err = exec.Command(handler[0], u).Start()
+	}
+	if err != nil {
+		Error("URL Error", "Error executing custom command: "+err.Error())
+	}
+	Info("Opened with: " + handler[0])
 	App.Draw()
 }
 
@@ -351,12 +382,14 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	// Could be a non 20 status code, or a different kind of document
 
 	// Handle each status code
-	switch res.Status {
+	// Except 20, that's handled after the switch
+	status := gemini.CleanStatus(res.Status)
+	switch status {
 	case 10, 11:
 		var userInput string
 		var ok bool
 
-		if res.Status == 10 {
+		if status == 10 {
 			// Regular input
 			userInput, ok = Input(res.Meta, false)
 		} else {
@@ -380,9 +413,10 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			return ret("", false)
 		}
 		redir := parsed.ResolveReference(parsedMeta).String()
+		justAddsSlash := (redir == u+"/")
 		// Prompt before redirecting to non-Gemini protocol
 		redirect := false
-		if !strings.HasPrefix(redir, "gemini") {
+		if !justAddsSlash && !strings.HasPrefix(redir, "gemini") {
 			if YesNo("Follow redirect to non-Gemini URL?\n" + redir) {
 				redirect = true
 			} else {
@@ -390,9 +424,9 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			}
 		}
 		// Prompt before redirecting
-		autoRedirect := viper.GetBool("a-general.auto_redirect")
+		autoRedirect := justAddsSlash || viper.GetBool("a-general.auto_redirect")
 		if redirect || (autoRedirect && numRedirects < 5) || YesNo("Follow redirect?\n"+redir) {
-			if res.Status == gemini.StatusRedirectPermanent {
+			if status == gemini.StatusRedirectPermanent {
 				go cache.AddRedir(u, redir)
 			}
 			return ret(handleURL(t, redir, numRedirects+1))
@@ -437,6 +471,12 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	case 62:
 		Error("Certificate Not Valid", escapeMeta(res.Meta))
 		return ret("", false)
+	default:
+		if !gemini.StatusInRange(status) {
+			// Status code not in a valid range
+			Error("Status Code Error", fmt.Sprintf("Out of range status code: %d", status))
+			return ret("", false)
+		}
 	}
 
 	// Status code 20, but not a document that can be displayed

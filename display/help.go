@@ -55,8 +55,8 @@ var helpTable = cview.NewTextView()
 // Help displays the help and keybindings.
 func Help() {
 	helpTable.ScrollToBeginning()
-	panels.ShowPanel("help")
-	panels.SendToFront("help")
+	panels.ShowPanel(PanelHelp)
+	panels.SendToFront(PanelHelp)
 	App.SetFocus(helpTable)
 }
 
@@ -67,7 +67,7 @@ func helpInit() {
 	helpTable.SetPadding(0, 0, 1, 1)
 	helpTable.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEsc || key == tcell.KeyEnter {
-			panels.HidePanel("help")
+			panels.HidePanel(PanelHelp)
 			App.SetFocus(tabs[curTab].view)
 			App.Draw()
 		}
@@ -122,5 +122,5 @@ func helpInit() {
 
 	w.Flush()
 
-	panels.AddPanel("help", helpTable, true, false)
+	panels.AddPanel(PanelHelp, helpTable, true, false)
 }

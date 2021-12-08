@@ -251,7 +251,9 @@ func getResource(url string) (string, *gemini.Response, error) {
 		return url, nil, err
 	}
 
-	if res.Status == gemini.StatusSuccess {
+	status := gemini.CleanStatus(res.Status)
+
+	if status == gemini.StatusSuccess {
 		// No redirects
 		return url, res, nil
 	}
@@ -266,8 +268,8 @@ func getResource(url string) (string, *gemini.Response, error) {
 	urls := make([]*urlPkg.URL, 0)
 
 	// Loop through redirects
-	for (res.Status == gemini.StatusRedirectPermanent || res.Status == gemini.StatusRedirectTemporary) && i < 5 {
-		redirs = append(redirs, res.Status)
+	for (status == gemini.StatusRedirectPermanent || status == gemini.StatusRedirectTemporary) && i < 5 {
+		redirs = append(redirs, status)
 		urls = append(urls, parsed)
 
 		tmp, err := parsed.Parse(res.Meta)
@@ -302,7 +304,7 @@ func getResource(url string) (string, *gemini.Response, error) {
 	if i < 5 {
 		// The server stopped redirecting after <5 redirects
 
-		if res.Status == gemini.StatusSuccess {
+		if status == gemini.StatusSuccess {
 			// It ended by succeeding
 
 			for j := range redirs {

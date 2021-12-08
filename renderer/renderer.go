@@ -172,6 +172,14 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 				spacing = "  "
 			}
 
+			// Underline non-gemini links if enabled
+			var linkTag string
+			if viper.GetBool("a-general.underline") {
+				linkTag = `[` + config.GetColorString("foreign_link") + `::u]`
+			} else {
+				linkTag = `[` + config.GetColorString("foreign_link") + `]`
+			}
+
 			// Wrap and add link text
 			// Wrap the link text, but add some spaces to indent the wrapped lines past the link number
 			// Set the style tags
@@ -179,11 +187,12 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 
 			var wrappedLink []string
 
-			if viper.GetBool("a-general.color") {
-				pU, err := urlPkg.Parse(url)
-				if !proxied && err == nil &&
-					(pU.Scheme == "" || pU.Scheme == "gemini" || pU.Scheme == "about") {
-					// A gemini link
+			pU, err := urlPkg.Parse(url)
+			if !proxied && err == nil &&
+				(pU.Scheme == "" || pU.Scheme == "gemini" || pU.Scheme == "about") {
+				// A gemini link
+
+				if viper.GetBool("a-general.color") {
 					// Add the link text in blue (in a region), and a gray link number to the left of it
 					// Those are the default colors, anyway
 
@@ -200,33 +209,50 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 						`["` + strconv.Itoa(num-1) + `"][` + config.GetColorString("amfora_link") + `]` +
 						wrappedLink[0] + `[-][""]`
 				} else {
-					// Not a gemini link
+					// No color
+
+					wrappedLink = wrapLine(linkText, width,
+						strings.Repeat(" ", len(strconv.Itoa(num))+4)+ // +4 for spaces and brackets
+							`["`+strconv.Itoa(num-1)+`"]`,
+						`[""]`,
+						false, // Don't indent the first line, it's the one with link number
+					)
+
+					wrappedLink[0] = `[::b][` + strconv.Itoa(num) + "[][::-]  " +
+						`["` + strconv.Itoa(num-1) + `"]` +
+						wrappedLink[0] + `[""]`
+				}
+			} else {
+				// Not a gemini link
+
+				if viper.GetBool("a-general.color") {
+					// Color
 
 					wrappedLink = wrapLine(linkText, width,
 						strings.Repeat(" ", indent)+
-							`["`+strconv.Itoa(num-1)+`"][`+config.GetColorString("foreign_link")+`]`,
-						`[-][""]`,
+							`["`+strconv.Itoa(num-1)+`"]`+linkTag,
+						`[-::-][""]`,
 						false, // Don't indent the first line, it's the one with link number
 					)
 
 					wrappedLink[0] = fmt.Sprintf(`[%s::b][`, config.GetColorString("link_number")) +
-						strconv.Itoa(num) + "[]" + "[-::-]" + spacing +
-						`["` + strconv.Itoa(num-1) + `"][` + config.GetColorString("foreign_link") + `]` +
-						wrappedLink[0] + `[-][""]`
+						strconv.Itoa(num) + "[][-::-]" + spacing +
+						`["` + strconv.Itoa(num-1) + `"]` + linkTag +
+						wrappedLink[0] + `[-::-][""]`
+				} else {
+					// No color
+
+					wrappedLink = wrapLine(linkText, width,
+						strings.Repeat(" ", indent)+
+							`["`+strconv.Itoa(num-1)+`"]`+linkTag,
+						`[::-][""]`,
+						false, // Don't indent the first line, it's the one with link number
+					)
+
+					wrappedLink[0] = `[::b][` + strconv.Itoa(num) + "[][::-]" + spacing +
+						`["` + strconv.Itoa(num-1) + `"]` + linkTag +
+						wrappedLink[0] + `[::-][""]`
 				}
-			} else {
-				// No colors allowed
-
-				wrappedLink = wrapLine(linkText, width,
-					strings.Repeat(" ", len(strconv.Itoa(num))+4)+ // +4 for spaces and brackets
-						`["`+strconv.Itoa(num-1)+`"]`,
-					`[""]`,
-					false, // Don't indent the first line, it's the one with link number
-				)
-
-				wrappedLink[0] = `[::b][` + strconv.Itoa(num) + "[][::-]  " +
-					`["` + strconv.Itoa(num-1) + `"]` +
-					wrappedLink[0] + `[""]`
 			}
 
 			wrappedLines = append(wrappedLines, wrappedLink...)

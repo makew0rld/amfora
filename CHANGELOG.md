@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.9.0] - 2021-12-07
 ### Added
 - Support for version 1.1 JSON feeds
 - Copy current URL or selected URL to clipboard (#220, #225)
@@ -14,21 +14,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `bind_beginning` and `bind_end` keybindings
 - Display gemtext from stdin (#205, #242)
 - Specifying `default` in the theme config uses the terminal's default background color, including transparency (#244, #245)
+- Redirects occur automatically if it only adds a trailing slash (#271)
+- Non-gemini links are underlined by default to help color blind users (#189)
+- Text and element colors of default theme change to be black on terminals with light backgrounds (#181)
+- Support paths with spaces in `[url-handlers]` config settings (#214)
+- Display info modal when opening URL with custom application
+- Files can be opened by relative path on the commandline (#231, #257)
+- Support keybindings that use <kbd>Shift</kbd> (#269)
 
 ### Changed
-- Favicon support removed (#199)
 - Bookmarks are stored using XML in the XBEL format, old bookmarks are transferred (#68)
-- Text no longer disappears under the left margin when scrolling (regression from v1.8.0) (#197)
+- Text no longer disappears under the left margin when scrolling (regression in v1.8.0) (#197)
 - Default search engine changed to geminispace.info from gus.guru
+- The user's terminal theme colors are used by default (#181)
+- By default, non-gemini URI schemes are opened in the default application. This requires a config change for previous users, see the [wiki](https://github.com/makeworld-the-better-one/amfora/wiki/Handling-Other-URL-Schemes) (#207)
+- Windows uses paths set by `XDG` variables over `APPDATA` if they are set (#255)
+- Treat status codes like 22 as equivalent to 20 as per the latest spec (#266)
+- Show minimal loading page instead of `about:newtab`  when loading a URL in a new tab (#272)
+
+## Removed
+- Favicon support (#199)
+- The default Amfora theme, get it back [here](https://github.com/makeworld-the-better-one/amfora/blob/master/contrib/themes/amfora.toml) (#181)
 
 ### Fixed
 - Help text is now the same color as `regular_text` in the theme config
 - Non-ASCII (multibyte) characters can now be used as keybindings (#198, #200)
 - Possible subscription update race condition on startup
-- Plaintext documents are escaped properly (regression from v1.8.0)
+- Plaintext documents are escaped properly (regression in v1.8.0)
 - Help page scrollbar color matches what's in the theme config
 - Regression where lists would not appear if `bullets = false` (#234, #235)
 - Support multiple bookmarks with the same name
+- Cert change message grammar: "an security" -> "a security" (#274)
+- Display an error modal for status codes that can't be handled
+- Prevent user from getting trapped in the help menu when keybindings are pressed (#241, #261)
 
 
 ## [1.8.0] - 2021-02-17

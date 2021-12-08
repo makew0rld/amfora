@@ -2,6 +2,14 @@
 
 You can use these themes by replacing the `[theme]` section of your [config](https://github.com/makeworld-the-better-one/amfora/wiki/Configuration) with their contents. Some themes won't display properly on terminals that do not have truecolor support.
 
+## Amfora
+
+This is the original Amfora theme we all know and love. From v1.9.0 and onwards, the user's terminal theme is used by default. Use this theme to restore the original Amfora look.
+
+<a href="https://raw.githubusercontent.com/makeworld-the-better-one/amfora/master/demo-large.gif">
+<img src="../../demo-large.gif" alt="Demo GIF" width="80%">
+</a>
+
 ## Nord
 
 Contributed by **[@lokesh-krishna](https://github.com/lokesh-krishna)**.
@@ -19,6 +27,22 @@ Contributed by **[@crdpa](https://github.com/crdpa)**.
 
 ![screenshot of dracula theme](https://user-images.githubusercontent.com/61637474/99983237-5e8d7e00-2d8a-11eb-8e22-3a3459ae560a.png)
 ![screenshot of dracula theme](https://user-images.githubusercontent.com/61637474/99983210-53d2e900-2d8a-11eb-9ab7-12dc10c2933a.png)
+</details>
+
+## Dracula variant
+
+Contributed by **[@marcransome](https://github.com/marcransome)**.
+
+![screenshot of dracula variant theme](https://user-images.githubusercontent.com/679401/132952433-563501ef-4d98-4d43-988e-f15bab7cb155.png)
+
+<details>
+<summary>More screenshots</summary>
+
+![screenshot of dracula variant theme](https://user-images.githubusercontent.com/679401/132952340-96840ad8-fb78-499d-bf6b-3fcdf659edc7.png)
+![screenshot of dracula variant theme](https://user-images.githubusercontent.com/679401/132952347-6b93d985-afc8-47b4-9569-1775ce4f37e7.png)
+![screenshot of dracula variant theme](https://user-images.githubusercontent.com/679401/132952348-ffcbcc7a-f9ad-41c6-a7d2-5c870754c4c9.png)
+![screenshot of dracula variant theme](https://user-images.githubusercontent.com/679401/132952352-50ca16f3-d255-4a1d-a25b-ccf53116957d.png)
+
 </details>
 
 ## Greyscale Light
@@ -126,6 +150,12 @@ Contributed by **[@knix3](https://github.com/knix3)**
 ![screenshot of add bookmark](https://user-images.githubusercontent.com/69134168/118543243-07a5a780-b722-11eb-848a-95aa1de30044.png)
 ![screenshot of error](https://user-images.githubusercontent.com/69134168/118543250-096f6b00-b722-11eb-9dca-d2b1bd6a8885.png)
 </details>
+
+## Tokyo Night
+
+Contributed by **[@luetage](https://github.com/luetage)**
+
+![screenshot of Tokyo Night theme](https://user-images.githubusercontent.com/13988217/130348393-69986b51-ddd7-4310-90ae-382461502535.png)
 
 ## Yours?
 

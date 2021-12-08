@@ -134,6 +134,9 @@ func goURL(t *tab, u string) {
 	final, displayed := handleURL(t, u, 0)
 	if displayed {
 		t.addToHistory(final)
+	} else if t.page.URL == "" {
+		// The tab is showing interstitial or no content. Let's go to about:newtab.
+		handleAbout(t, "about:newtab")
 	}
 	if t == tabs[curTab] {
 		// Display the bottomBar state that handleURL set

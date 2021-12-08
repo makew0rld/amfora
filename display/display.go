@@ -87,7 +87,7 @@ func Init(version, commit, builtBy string) {
 		}(tabs[curTab])
 	})
 
-	panels.AddPanel("browser", browser, true, true)
+	panels.AddPanel(PanelBrowser, browser, true, true)
 
 	helpInit()
 
@@ -276,9 +276,16 @@ func Init(version, commit, builtBy string) {
 			// It's focused on a modal right now, nothing should interrupt
 			return event
 		}
-		_, ok = App.GetFocus().(*cview.Table)
-		if ok {
+		frontPanelName, _ := panels.GetFrontPanel()
+		if frontPanelName == PanelHelp {
 			// It's focused on help right now
+			if config.TranslateKeyEvent(event) == config.CmdQuit {
+				// Allow quit key to work, but nothing else
+				Stop()
+				return nil
+			}
+			// Pass everything else directly, inhibiting other keybindings
+			// like for editing the URL
 			return event
 		}
 

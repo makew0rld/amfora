@@ -2,6 +2,7 @@ package display
 
 import (
 	"errors"
+	"fmt"
 	"mime"
 	"net"
 	"net/url"
@@ -381,12 +382,14 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	// Could be a non 20 status code, or a different kind of document
 
 	// Handle each status code
-	switch res.Status {
+	// Except 20, that's handled after the switch
+	status := gemini.CleanStatus(res.Status)
+	switch status {
 	case 10, 11:
 		var userInput string
 		var ok bool
 
-		if res.Status == 10 {
+		if status == 10 {
 			// Regular input
 			userInput, ok = Input(res.Meta, false)
 		} else {
@@ -423,7 +426,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		// Prompt before redirecting
 		autoRedirect := justAddsSlash || viper.GetBool("a-general.auto_redirect")
 		if redirect || (autoRedirect && numRedirects < 5) || YesNo("Follow redirect?\n"+redir) {
-			if res.Status == gemini.StatusRedirectPermanent {
+			if status == gemini.StatusRedirectPermanent {
 				go cache.AddRedir(u, redir)
 			}
 			return ret(handleURL(t, redir, numRedirects+1))
@@ -468,6 +471,12 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	case 62:
 		Error("Certificate Not Valid", escapeMeta(res.Meta))
 		return ret("", false)
+	default:
+		if !gemini.StatusInRange(status) {
+			// Status code not in a valid range
+			Error("Status Code Error", fmt.Sprintf("Out of range status code: %d", status))
+			return ret("", false)
+		}
 	}
 
 	// Status code 20, but not a document that can be displayed

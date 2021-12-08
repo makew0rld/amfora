@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The user's terminal theme colors are used by default (#181)
 - By default, non-gemini URI schemes are opened in the default application. This requires a config change for previous users, see the [wiki](https://github.com/makeworld-the-better-one/amfora/wiki/Handling-Other-URL-Schemes) (#207)
 - Windows uses paths set by `XDG` variables over `APPDATA` if they are set (#255)
+- Treat status codes like 22 as equivalent to 20 as per the latest spec (#266)
 
 ## Removed
 - Favicon support (#199)
@@ -41,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Regression where lists would not appear if `bullets = false` (#234, #235)
 - Support multiple bookmarks with the same name
 - Cert change message grammar: "an security" -> "a security" (#274)
+- Display an error modal for status codes that can't be handled
 
 
 ## [1.8.0] - 2021-02-17

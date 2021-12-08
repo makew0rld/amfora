@@ -62,7 +62,6 @@ func loadTofuEntry(domain string, port string) (string, time.Time, error) {
 	return id, expiry, nil
 }
 
-//nolint:errcheck
 // certID returns a generic string representing a cert or domain.
 func certID(cert *x509.Certificate) string {
 	h := sha256.New()
@@ -73,7 +72,7 @@ func certID(cert *x509.Certificate) string {
 // origCertID uses cert.Raw, which was used in v1.0.0 of the app.
 func origCertID(cert *x509.Certificate) string {
 	h := sha256.New()
-	h.Write(cert.Raw) //nolint:errcheck
+	h.Write(cert.Raw)
 	return fmt.Sprintf("%X", h.Sum(nil))
 }
 

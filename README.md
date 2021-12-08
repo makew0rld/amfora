@@ -13,7 +13,7 @@
 
 ###### Recording of v1.0.0
 
-Amfora aims to be the best looking [Gemini](https://gemini.circumlunar.space/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that.
+Amfora aims to be the best looking [Gemini](https://geminiquickst.art/) client with the most features... all in the terminal. It does not support Gopher or other non-Web protocols - check out [Bombadillo](http://bombadillo.colorfield.space/) for that.
 
 It also aims to be completely cross platform, with full Windows support. If you're on Windows, I would not recommend using the default terminal software. Use [Windows Terminal](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701) instead, and make sure it [works with UTF-8](https://akr.am/blog/posts/using-utf-8-in-the-windows-terminal). Note that some of the application colors might not display correctly on Windows, but all functionality will still work.
 
@@ -80,7 +80,7 @@ This section is for advanced users who want to install the latest (possibly unst
 <summary>Click to expand</summary>
 
 **Requirements:**
-- Go 1.14 or later
+- Go 1.15 or later
 - GNU Make
 
 Please note the Makefile does not intend to support Windows, and so there may be issues.
@@ -163,6 +163,8 @@ Amfora ❤️ open source!
 - [progressbar](https://github.com/schollz/progressbar)
 - [go-humanize](https://github.com/dustin/go-humanize)
 - [gofeed](https://github.com/mmcdole/gofeed)
+- [clipboard](https://github.com/atotto/clipboard)
+- [termenv](https://github.com/muesli/termenv)
 
 ## License
 This project is licensed under the GPL v3.0. See the [LICENSE](./LICENSE) file for details.

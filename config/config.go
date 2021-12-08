@@ -15,6 +15,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/muesli/termenv"
 	"github.com/rkoesters/xdg/basedir"
 	"github.com/rkoesters/xdg/userdirs"
 	"github.com/spf13/viper"
@@ -59,9 +60,16 @@ var MediaHandlers = make(map[string]MediaHandler)
 // Defaults to ScrollBarAuto on an invalid value
 var ScrollBar cview.ScrollBarVisibility
 
+// Whether the user's terminal is dark or light
+// Defaults to dark, but is determined in Init()
+// Used to prevent white text on a white background with the default theme
+var hasDarkTerminalBackground bool
+
 func Init() error {
 
 	// *** Set paths ***
+	// Windows uses paths under APPDATA, Unix systems use XDG paths
+	// Windows systems use XDG paths if variables are defined, see #255
 
 	home, err := homedir.Dir()
 	if err != nil {
@@ -78,10 +86,10 @@ func Init() error {
 	}
 
 	// Store config directory and file paths
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_CONFIG_HOME") == "" {
 		configDir = amforaAppData
 	} else {
-		// Unix / POSIX system
+		// Unix / POSIX system, or Windows with XDG_CONFIG_HOME defined
 		configDir = filepath.Join(basedir.ConfigHome, "amfora")
 	}
 	configPath = filepath.Join(configDir, "config.toml")
@@ -94,7 +102,7 @@ func Init() error {
 	}
 
 	// Store TOFU db directory and file paths
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_CACHE_HOME") == "" {
 		// Windows just stores it in APPDATA along with other stuff
 		tofuDBDir = amforaAppData
 	} else {
@@ -104,7 +112,7 @@ func Init() error {
 	tofuDBPath = filepath.Join(tofuDBDir, "tofu.toml")
 
 	// Store bookmarks dir and path
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_DATA_HOME") == "" {
 		// Windows just keeps it in APPDATA along with other Amfora files
 		bkmkDir = amforaAppData
 	} else {
@@ -115,18 +123,12 @@ func Init() error {
 	BkmkPath = filepath.Join(bkmkDir, "bookmarks.xml")
 
 	// Feeds dir and path
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_DATA_HOME") == "" {
 		// In APPDATA beside other Amfora files
 		subscriptionDir = amforaAppData
 	} else {
 		// XDG data dir on POSIX systems
-		xdg_data, ok := os.LookupEnv("XDG_DATA_HOME")
-		if ok && strings.TrimSpace(xdg_data) != "" {
-			subscriptionDir = filepath.Join(xdg_data, "amfora")
-		} else {
-			// Default to ~/.local/share/amfora
-			subscriptionDir = filepath.Join(home, ".local", "share", "amfora")
-		}
+		subscriptionDir = filepath.Join(basedir.DataHome, "amfora")
 	}
 	SubscriptionPath = filepath.Join(subscriptionDir, "subscriptions.json")
 
@@ -203,6 +205,7 @@ func Init() error {
 	viper.SetDefault("a-general.page_max_size", 2097152)
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.scrollbar", "auto")
+	viper.SetDefault("a-general.underline", true)
 	viper.SetDefault("commands.command1", "")
 	viper.SetDefault("commands.command2", "")
 	viper.SetDefault("commands.command3", "")
@@ -281,7 +284,7 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_beginning", []string{"Home", "g"})
 	viper.SetDefault("keybindings.bind_end", []string{"End", "G"})
 	viper.SetDefault("keybindings.shift_numbers", "")
-	viper.SetDefault("url-handlers.other", "off")
+	viper.SetDefault("url-handlers.other", "default")
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
 	viper.SetDefault("cache.timeout", 1800)
@@ -398,7 +401,15 @@ func Init() error {
 	}
 	if viper.GetBool("a-general.color") {
 		cview.Styles.PrimitiveBackgroundColor = GetColor("bg")
-	} // Otherwise it's black by default
+	} else {
+		// No colors allowed, set background to black instead of default
+		themeMu.Lock()
+		theme["bg"] = tcell.ColorBlack
+		cview.Styles.PrimitiveBackgroundColor = tcell.ColorBlack
+		themeMu.Unlock()
+	}
+
+	hasDarkTerminalBackground = termenv.HasDarkBackground()
 
 	// Parse HTTP command
 	HTTPCommand = viper.GetStringSlice("a-general.http")

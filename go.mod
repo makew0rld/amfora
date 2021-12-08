@@ -1,18 +1,19 @@
 module github.com/makeworld-the-better-one/amfora
 
-go 1.14
+go 1.15
 
 require (
-	code.rocketnine.space/tslocum/cview v1.5.6-0.20210525194531-92dca67ac283
+	code.rocketnine.space/tslocum/cview v1.5.6-0.20210530175404-7e8817f20bdc
 	github.com/atotto/clipboard v0.1.4
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gdamore/tcell/v2 v2.3.3
 	github.com/google/go-cmp v0.5.0 // indirect
-	github.com/makeworld-the-better-one/go-gemini v0.11.0
+	github.com/makeworld-the-better-one/go-gemini v0.12.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
 	github.com/mmcdole/gofeed v1.1.2
+	github.com/muesli/termenv v0.9.0
 	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/rkoesters/xdg v0.0.0-20181125232953-edd15b846f9b
 	github.com/schollz/progressbar/v3 v3.8.0

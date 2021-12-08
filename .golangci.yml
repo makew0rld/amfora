@@ -19,15 +19,13 @@ linters:
     - goerr113
     - gofmt
     - goimports
-    - golint
+    - revive
     - goprintffuncname
-    - interfacer
     - lll
-    - maligned
     - misspell
     - nolintlint
     - prealloc
-    - scopelint
+    - exportloopref
     - unconvert
     - unparam
 

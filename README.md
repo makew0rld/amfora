@@ -162,6 +162,8 @@ Amfora ❤️ open source!
 - [progressbar](https://github.com/schollz/progressbar)
 - [go-humanize](https://github.com/dustin/go-humanize)
 - [gofeed](https://github.com/mmcdole/gofeed)
+- [clipboard](https://github.com/atotto/clipboard)
+- [termenv](https://github.com/muesli/termenv)
 
 ## License
 This project is licensed under the GPL v3.0. See the [LICENSE](./LICENSE) file for details.

@@ -74,7 +74,6 @@ func main() {
 
 	// Initialize Amfora's settings
 	display.Init(version, commit, builtBy)
-	display.NewTab()
 
 	// Load a URL, file, or render from stdin
 	if len(os.Args[1:]) > 0 {
@@ -93,9 +92,11 @@ func main() {
 				url = "file://" + fileName
 			}
 		}
-		display.URL(url)
+		display.NewTabWithURL(url)
 	} else if !isStdinEmpty() {
 		renderFromStdin()
+	} else {
+		display.NewTab()
 	}
 
 	// Start

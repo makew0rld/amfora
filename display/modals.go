@@ -18,6 +18,7 @@ import (
 var infoModal = cview.NewModal()
 
 var errorModal = cview.NewModal()
+var errorModalDone = make(chan struct{})
 
 var inputModal = cview.NewModal()
 var inputCh = make(chan string)
@@ -152,6 +153,7 @@ func modalInit() {
 		panels.HidePanel("error")
 		App.SetFocus(tabs[curTab].view)
 		App.Draw()
+		errorModalDone <- struct{}{}
 	})
 
 	inputModal.SetBorder(true)
@@ -200,6 +202,8 @@ func Error(title, text string) {
 	panels.SendToFront("error")
 	App.SetFocus(errorModal)
 	App.Draw()
+
+	<-errorModalDone
 }
 
 // Info displays some info on the screen in a modal.

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Text and element colors of default theme change to be black on white terminals (#181)
 - Support paths with spaces in `[url-handlers]` config settings (#214)
 - Display info modal when opening URL with custom application
+- Files can be opened by relative path on the commandline (#231, #257)
 
 ### Changed
 - Bookmarks are stored using XML in the XBEL format, old bookmarks are transferred (#68)

@@ -94,6 +94,7 @@ func main() {
 		}
 		display.NewTabWithURL(url)
 	} else if !isStdinEmpty() {
+		display.NewTab()
 		renderFromStdin()
 	} else {
 		display.NewTab()

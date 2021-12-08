@@ -405,7 +405,7 @@ func NewTabWithURL(url string) {
 
 	var interstitial string
 	if !strings.HasPrefix(url, "about:") {
-		interstitial = "# Loading " + url + "..."
+		interstitial = "Loading " + url + "..."
 	}
 
 	setPage(tabs[curTab], renderPageFromString(interstitial))

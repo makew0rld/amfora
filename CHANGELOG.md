@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support multiple bookmarks with the same name
 - Cert change message grammar: "an security" -> "a security" (#274)
 - Display an error modal for status codes that can't be handled
+- Prevent user from getting trapped in the help menu when keybindings are pressed (#241, #261)
 
 
 ## [1.8.0] - 2021-02-17

@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support paths with spaces in `[url-handlers]` config settings (#214)
 - Display info modal when opening URL with custom application
 - Files can be opened by relative path on the commandline (#231, #257)
+- Support keybindings that use <kbd>Shift</kbd> (#269)
 
 ### Changed
 - Bookmarks are stored using XML in the XBEL format, old bookmarks are transferred (#68)

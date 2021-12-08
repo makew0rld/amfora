@@ -10,12 +10,12 @@ import (
 
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
-	"github.com/jwalton/go-supportscolor"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/go-gemini"
+	"github.com/muesli/termenv"
 	"github.com/spf13/viper"
 )
 
@@ -62,12 +62,12 @@ func Init(version, commit, builtBy string) {
 	aboutInit(version, commit, builtBy)
 
 	// Detect terminal colors for syntax highlighting
-	switch supportscolor.Stdout().Level {
-	case supportscolor.Ansi16m:
+	switch termenv.ColorProfile() {
+	case termenv.TrueColor:
 		renderer.TermColor = "terminal16m"
-	case supportscolor.Ansi256:
+	case termenv.ANSI256:
 		renderer.TermColor = "terminal256"
-	case supportscolor.Basic:
+	case termenv.ANSI:
 		renderer.TermColor = "terminal16"
 	default:
 		renderer.TermColor = "terminal8"

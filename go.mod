@@ -10,7 +10,6 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gdamore/tcell/v2 v2.3.3
 	github.com/google/go-cmp v0.5.0 // indirect
-	github.com/jwalton/go-supportscolor v1.1.0
 	github.com/makeworld-the-better-one/go-gemini v0.12.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.1 // indirect

@@ -351,11 +351,8 @@ func RenderGemini(s string, width int, proxied bool) (string, []string) {
 				lexer = lexers.Fallback
 			}
 
-			// Strip existing ANSI codes
-			strippedBuf := ansiRegex.ReplaceAllString(buf, "")
-
-			// Tokenize and format the text, replacing buffer if there are no errors
-			iterator, err := lexer.Tokenise(nil, strippedBuf)
+			// Tokenize and format the text after stripping ANSI codes, replacing buffer if there are no errors
+			iterator, err := lexer.Tokenise(nil, ansiRegex.ReplaceAllString(buf, ""))
 			if err == nil {
 				formattedBuffer := new(bytes.Buffer)
 				if formatter.Format(formattedBuffer, style, iterator) == nil {

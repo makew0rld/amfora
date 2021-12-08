@@ -62,7 +62,7 @@ ansi = true
 highlight_code = true
 
 # Which highlighting style to use (see https://xyproto.github.io/splash/docs/)
-highlight_style = "swapoff"
+highlight_style = "vim"
 
 # Whether to replace list asterisks with unicode bullets
 bullets = true

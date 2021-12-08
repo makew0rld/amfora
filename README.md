@@ -121,7 +121,6 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Tabbed browsing
 - [x] Support ANSI color codes on pages, even for Windows
 - [x] Styled page content (headings, links)
-- [x] Highlighting of preformatted code blocks that list a language in the alt text
 - [x] Basic forward/backward history, for each tab
 - [x] Input (Status Code 10 & 11)
 - [x] Multiple charset support (over 55)
@@ -143,6 +142,7 @@ Features in *italics* are in the master branch, but not in the latest release.
   - So is subscribing to a page, to know when it changes
 - [x] Open non-text files in another application
   - [x] Ability to stream content instead of downloading it first
+- [x] Highlighting of preformatted code blocks that list a language in the alt text
 - [ ] Stream support
 - [ ] Table of contents for pages
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>
@@ -164,7 +164,6 @@ Amfora ❤️ open source!
 - [go-humanize](https://github.com/dustin/go-humanize)
 - [gofeed](https://github.com/mmcdole/gofeed)
 - [chroma](https://github.com/alecthomas/chroma) for source code syntax highlighting
-- [go-supportscolor](https://github.com/jwalton/go-supportscolor)
 - [clipboard](https://github.com/atotto/clipboard)
 - [termenv](https://github.com/muesli/termenv)
 

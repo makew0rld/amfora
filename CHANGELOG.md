@@ -17,12 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Redirects occur automatically if it only adds a trailing slash (#271)
 - Non-gemini links are underlined by default to help color blind users (#189)
 - Text and element colors of default theme change to be black on white terminals (#181)
+- Support paths with spaces in `[url-handlers]` config settings (#214)
+- Display info modal when opening URL with custom application
+- Files can be opened by relative path on the commandline (#231, #257)
 
 ### Changed
 - Bookmarks are stored using XML in the XBEL format, old bookmarks are transferred (#68)
 - Text no longer disappears under the left margin when scrolling (regression in v1.8.0) (#197)
 - Default search engine changed to geminispace.info from gus.guru
 - The user's terminal theme colors are used by default (#181)
+- By default, non-gemini URI schemes are opened in the default application. This requires a config change for previous users, see the [wiki](https://github.com/makeworld-the-better-one/amfora/wiki/Handling-Other-URL-Schemes) (#207)
+- Windows uses paths set by `XDG` variables over `APPDATA` if they are set (#255)
+- Treat status codes like 22 as equivalent to 20 as per the latest spec (#266)
 
 ## Removed
 - Favicon support (#199)
@@ -36,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Help page scrollbar color matches what's in the theme config
 - Regression where lists would not appear if `bullets = false` (#234, #235)
 - Support multiple bookmarks with the same name
+- Cert change message grammar: "an security" -> "a security" (#274)
+- Display an error modal for status codes that can't be handled
 
 
 ## [1.8.0] - 2021-02-17

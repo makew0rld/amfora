@@ -309,7 +309,7 @@ func Tofu(host string, expiry time.Time) bool {
 	frame.SetTitle(" TOFU ")
 	m.SetText(
 		//nolint:lll
-		fmt.Sprintf("%s's certificate has changed, possibly indicating an security issue. The certificate would have expired %s. Are you sure you want to continue? ",
+		fmt.Sprintf("%s's certificate has changed, possibly indicating a security issue. The certificate would have expired %s. Are you sure you want to continue? ",
 			host,
 			humanize.Time(expiry),
 		),

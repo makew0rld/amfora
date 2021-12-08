@@ -19,7 +19,7 @@ func GetLogger() (*log.Logger, error) {
 	var writer io.Writer
 	var err error
 
-	debugModeEnabled := os.Getenv("DEBUG") == "1"
+	debugModeEnabled := os.Getenv("AMFORA_DEBUG") == "1"
 	if debugModeEnabled {
 		writer, err = os.Create("debug.log")
 		if err != nil {

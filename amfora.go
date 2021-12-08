@@ -26,7 +26,7 @@ func main() {
 		panic(err)
 	}
 
-	debugModeEnabled := os.Getenv("DEBUG") == "1"
+	debugModeEnabled := os.Getenv("AMFORA_DEBUG") == "1"
 	if debugModeEnabled {
 		log.Println("Debug mode enabled")
 	}

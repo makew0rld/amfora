@@ -10,6 +10,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/display"
+	"github.com/makeworld-the-better-one/amfora/logger"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
 )
 
@@ -20,10 +21,15 @@ var (
 )
 
 func main() {
-	// err := logger.Init()
-	// if err != nil {
-	// 	panic(err)
-	// }
+	log, err := logger.GetLogger()
+	if err != nil {
+		panic(err)
+	}
+
+	debugModeEnabled := os.Getenv("AMFORA_DEBUG") == "1"
+	if debugModeEnabled {
+		log.Println("Debug mode enabled")
+	}
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--version" || os.Args[1] == "-v" {
@@ -42,7 +48,7 @@ func main() {
 		}
 	}
 
-	err := config.Init()
+	err = config.Init()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Config error: %v\n", err)
 		os.Exit(1)

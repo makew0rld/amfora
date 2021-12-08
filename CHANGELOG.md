@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Fixed
+- Deadlock when loading an invalid `about:` URL (#277)
+
+
 ## [1.9.0] - 2021-12-07
 ### Added
 - Support for version 1.1 JSON feeds

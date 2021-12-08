@@ -33,8 +33,8 @@ var dlChoiceCh = make(chan string)
 var dlModal = cview.NewModal()
 
 func dlInit() {
-	panels.AddPanel("dl", dlModal, false, false)
-	panels.AddPanel("dlChoice", dlChoiceModal, false, false)
+	panels.AddPanel(PanelDownload, dlModal, false, false)
+	panels.AddPanel(PanelDownloadChoiceModal, dlChoiceModal, false, false)
 
 	dlm := dlModal
 	chm := dlChoiceModal
@@ -96,7 +96,7 @@ func dlInit() {
 	frame.SetTitle(" Download ")
 	dlm.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		if buttonLabel == "Ok" {
-			panels.HidePanel("dl")
+			panels.HidePanel(PanelDownload)
 			App.SetFocus(tabs[curTab].view)
 			App.Draw()
 		}
@@ -141,29 +141,29 @@ func dlChoice(text, u string, resp *gemini.Response) {
 		choice = "Open"
 	} else {
 		dlChoiceModal.SetText(text)
-		panels.ShowPanel("dlChoice")
-		panels.SendToFront("dlChoice")
+		panels.ShowPanel(PanelDownloadChoiceModal)
+		panels.SendToFront(PanelDownloadChoiceModal)
 		App.SetFocus(dlChoiceModal)
 		App.Draw()
 		choice = <-dlChoiceCh
 	}
 
 	if choice == "Download" {
-		panels.HidePanel("dlChoice")
+		panels.HidePanel(PanelDownloadChoiceModal)
 		App.Draw()
 		downloadURL(config.DownloadsDir, u, resp)
 		resp.Body.Close() // Only close when the file is downloaded
 		return
 	}
 	if choice == "Open" {
-		panels.HidePanel("dlChoice")
+		panels.HidePanel(PanelDownloadChoiceModal)
 		App.Draw()
 		open(u, resp)
 		return
 	}
 
 	// They chose the "Cancel" button
-	panels.HidePanel("dlChoice")
+	panels.HidePanel(PanelDownloadChoiceModal)
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 }
@@ -200,7 +200,7 @@ func open(u string, resp *gemini.Response) {
 		return
 	}
 
-	panels.HidePanel("dl")
+	panels.HidePanel(PanelDownload)
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 
@@ -267,15 +267,15 @@ func downloadURL(dir, u string, resp *gemini.Response) string {
 	// Display
 	dlModal.ClearButtons()
 	dlModal.AddButtons([]string{"Downloading..."})
-	panels.ShowPanel("dl")
-	panels.SendToFront("dl")
+	panels.ShowPanel(PanelDownload)
+	panels.SendToFront(PanelDownload)
 	App.SetFocus(dlModal)
 	App.Draw()
 
 	_, err = io.Copy(io.MultiWriter(f, bar), resp.Body)
 	done = true
 	if err != nil {
-		panels.HidePanel("dl")
+		panels.HidePanel(PanelDownload)
 		Error("Download Error", err.Error())
 		f.Close()
 		os.Remove(savePath) // Remove partial file

@@ -87,7 +87,7 @@ func Init(version, commit, builtBy string) {
 		}(tabs[curTab])
 	})
 
-	panels.AddPanel("browser", browser, true, true)
+	panels.AddPanel(PanelBrowser, browser, true, true)
 
 	helpInit()
 
@@ -187,7 +187,6 @@ func Init(version, commit, builtBy string) {
 					if i <= len(tabs[tab].page.Links) && i > 0 {
 						// Open new tab and load link
 						oldTab := tab
-						NewTab()
 						// Resolve and follow link manually
 						prevParsed, _ := url.Parse(tabs[oldTab].page.URL)
 						nextParsed, err := url.Parse(tabs[oldTab].page.Links[i-1])
@@ -196,7 +195,7 @@ func Init(version, commit, builtBy string) {
 							reset()
 							return
 						}
-						URL(prevParsed.ResolveReference(nextParsed).String())
+						NewTabWithURL(prevParsed.ResolveReference(nextParsed).String())
 						return
 					}
 				} else {
@@ -277,9 +276,16 @@ func Init(version, commit, builtBy string) {
 			// It's focused on a modal right now, nothing should interrupt
 			return event
 		}
-		_, ok = App.GetFocus().(*cview.Table)
-		if ok {
+		frontPanelName, _ := panels.GetFrontPanel()
+		if frontPanelName == PanelHelp {
 			// It's focused on help right now
+			if config.TranslateKeyEvent(event) == config.CmdQuit {
+				// Allow quit key to work, but nothing else
+				Stop()
+				return nil
+			}
+			// Pass everything else directly, inhibiting other keybindings
+			// like for editing the URL
 			return event
 		}
 
@@ -328,8 +334,7 @@ func Init(version, commit, builtBy string) {
 					Error("URL Error", err.Error())
 					return nil
 				}
-				NewTab()
-				URL(next)
+				NewTabWithURL(next)
 			} else {
 				NewTab()
 			}
@@ -377,6 +382,17 @@ func Stop() {
 // NewTab opens a new tab and switches to it, displaying the
 // the default empty content because there's no URL.
 func NewTab() {
+	NewTabWithURL("about:newtab")
+
+	bottomBar.SetLabel("")
+	bottomBar.SetText("")
+	tabs[NumTabs()-1].saveBottomBar()
+
+}
+
+// NewTabWithURL opens a new tab and switches to it, displaying the
+// the URL provided.
+func NewTabWithURL(url string) {
 	// Create TextView and change curTab
 	// Set the TextView options, and the changed func to App.Draw()
 	// SetDoneFunc to do link highlighting
@@ -393,8 +409,16 @@ func NewTab() {
 	curTab = NumTabs()
 
 	tabs = append(tabs, makeNewTab())
-	temp := newTabPage // Copy
-	setPage(tabs[curTab], &temp)
+
+	var interstitial string
+	if !strings.HasPrefix(url, "about:") {
+		interstitial = "Loading " + url + "..."
+	}
+
+	setPage(tabs[curTab], renderPageFromString(interstitial))
+
+	// Regardless of the starting URL, about:newtab will
+	// be the history root.
 	tabs[curTab].addToHistory("about:newtab")
 	tabs[curTab].history.pos = 0 // Manually set as first page
 
@@ -406,9 +430,7 @@ func NewTab() {
 	browser.SetCurrentTab(strconv.Itoa(curTab))
 	App.SetFocus(tabs[curTab].view)
 
-	bottomBar.SetLabel("")
-	bottomBar.SetText("")
-	tabs[curTab].saveBottomBar()
+	URL(url)
 
 	// Draw just in case
 	App.Draw()
@@ -529,11 +551,11 @@ func URL(u string) {
 
 func RenderFromString(str string) {
 	t := tabs[curTab]
-	page, _ := renderPageFromString(str)
+	page := renderPageFromString(str)
 	setPage(t, page)
 }
 
-func renderPageFromString(str string) (*structs.Page, bool) {
+func renderPageFromString(str string) *structs.Page {
 	rendered, links := renderer.RenderGemini(str, textWidth(), false)
 	page := &structs.Page{
 		Mediatype: structs.TextGemini,
@@ -543,7 +565,7 @@ func renderPageFromString(str string) (*structs.Page, bool) {
 		TermWidth: termW,
 	}
 
-	return page, true
+	return page
 }
 
 func NumTabs() int {

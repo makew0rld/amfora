@@ -260,13 +260,13 @@ func openSubscriptionModal(validFeed, subscribed bool) bool {
 		}
 	}
 
-	panels.ShowPanel("yesno")
-	panels.SendToFront("yesno")
+	panels.ShowPanel(PanelYesNoModal)
+	panels.SendToFront(PanelYesNoModal)
 	App.SetFocus(yesNoModal)
 	App.Draw()
 
 	resp := <-yesNoCh
-	panels.HidePanel("yesno")
+	panels.HidePanel(PanelYesNoModal)
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 	return resp

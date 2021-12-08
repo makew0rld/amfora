@@ -29,7 +29,7 @@ var bkmkCh = make(chan bkmkAction)
 var bkmkModalText string // The current text of the input field in the modal
 
 func bkmkInit() {
-	panels.AddPanel("bkmk", bkmkModal, false, false)
+	panels.AddPanel(PanelBookmarks, bkmkModal, false, false)
 
 	m := bkmkModal
 	if viper.GetBool("a-general.color") {
@@ -111,13 +111,13 @@ func openBkmkModal(name string, exists bool) (string, bkmkAction) {
 			bkmkModalText = text
 		})
 
-	panels.ShowPanel("bkmk")
-	panels.SendToFront("bkmk")
+	panels.ShowPanel(PanelBookmarks)
+	panels.SendToFront(PanelBookmarks)
 	App.SetFocus(bkmkModal)
 	App.Draw()
 
 	action := <-bkmkCh
-	panels.HidePanel("bkmk")
+	panels.HidePanel(PanelBookmarks)
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 

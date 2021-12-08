@@ -48,8 +48,8 @@
 
 		let nextFD = 100;
 
-		const files = {
-			"/cache/amfora/tofu.toml": "",
+		const seedFiles = {
+			"/cache": true, "/data": true, "/data/.config": true, "/data/.config/amfora": true,
 			"/data/.config/amfora/config.toml": `
 				[a-general]
 				home = "gemini://gemini.circumlunar.space"
@@ -62,13 +62,29 @@
 			`,
 		};
 
+		const files = Object.assign({}, seedFiles, JSON.parse(localStorage.amforaFS || "{}"));
+
+		function storeFiles() {
+			const storedFiles = Object.assign({}, files);
+			for (const key in storedFiles)
+				if (key in seedFiles)
+					delete storedFiles[key];
+			localStorage.amforaFS = JSON.stringify(storedFiles);
+		}
+
 		const amforaFS = {
+			constants: {O_WRONLY: 1, O_RDWR: 2, O_CREAT: 64, O_TRUNC: 512, O_APPEND: 1024, O_EXCL: 128},
 			open(path, flags, mode, callback) {
 				console.info('fs open', path, flags, mode, callback);
-				if (path == '/dev/tty')
+				if (path == '/dev/tty') {
 					return callback(null, termFD);
-				else if (!(path in files))
+				} else if (flags & this.constants.O_CREAT) {
+					if ((flags & this.constants.O_EXCL) && files[path])
+						return callback({code: "EEXIST"});
+					files[path] = "";
+				} else if (!(path in files)) {
 					return callback({code: "ENOENT"});
+				}
 
 				const fd = nextFD++;
 				fds[fd] = {path, flags, mode, position: 0};
@@ -77,7 +93,35 @@
 			},
 			stat(path, callback) {
 				console.info('fs stat', path);
-				callback({code: "ENOSYS"});
+				if (path in files) {
+					const data = files[path];
+					const isDir = (data === true);
+					const size = isDir ? 4096 : new TextEncoder().encode(data).length;
+					callback(null, {
+						ino: Object.keys(files).indexOf(path),
+						dev: 0, rdev: 0,
+						uid: 101, gid: 101,
+						size: size,
+						mode: isDir ? 040700 : 0660,
+						nlink: 1,
+						blksize: 4096,
+						blocks: Math.ceil(size / 4096),
+						atimeMs: 0, mtimeMs: 0, ctimeMs: 0,
+					});
+				} else {
+					callback({code: "ENOENT"});
+				}
+			},
+			fstat(fd, callback) {
+				if (fd in fds)
+					this.stat(fds[fd].path, (err, stat) => {
+						// why is this Golang FS api so undocumented and strange
+						if (stat)
+							stat.isDirectory = (files[fds[fd].path] === true) ? () => true : () => false;
+						callback(err, stat);
+					});
+				else
+					callback({ code: "EBADF" });
 			},
 			async read(fd, buffer, offset, length, position, callback) {
 				let numBytes = 0;
@@ -107,17 +151,37 @@
 
 				callback(null, numBytes, buffer);
 			},
-			writeSync(fd, buf) {
-				if (fd == 1 || fd == 2) { // stdout, stderr
-					return goStubFS.writeSync(fd, buf);
-				} else if (fd == termFD) { // for xterm.js tty
+			write(fd, buf, offset, length, position, callback) {
+				if (fd === termFD) { // for xterm.js tty
 					term.write(buf);
+					callback(null, buf.length);
+				} else if (fd === 1 || fd === 2) { // stdout, stderr
+					callback(null, goStubFS.writeSync(fd, buf));
 				} else {
-					console.error("Unhandled write to fd", "|", fd, buf);
+					const desc = fds[fd];
+					if (!desc)
+						return callback({ code: "EBADF" });
+
+					const text = new TextDecoder().decode(buf);
+					console.info('Write to file', desc.path, text, position, offset, length == buf.length);
+
+					if (position || offset || length != buf.length)
+						return callback({ code: "ENOSYS" });
+
+					files[desc.path] = text;
+					callback(null, buf.length);
+
+					storeFiles();
 				}
-				return buf.length;
 			},
-			mkdir: (path, perm, callback) => callback(null),
+			mkdir: (path, perm, callback) => {
+				console.info('mkdir', path);
+				if (files[path])
+					return callback({ code: "EEXIST" });
+
+				files[path] = true;
+				callback(null);
+			}
 		};
 
 		globalThis.fs = Object.assign({}, goStubFS, amforaFS);

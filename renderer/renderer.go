@@ -231,13 +231,13 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 
 					wrappedLink = wrapLine(linkText, width,
 						strings.Repeat(" ", indent)+
-							`["`+strconv.Itoa(num-1)+`"]`+linkTag,
+							`["`+strconv.Itoa(num-1)+`"]`,
 						`[::-][""]`,
 						false, // Don't indent the first line, it's the one with link number
 					)
 
 					wrappedLink[0] = `[::b][` + strconv.Itoa(num) + "[][::-]" + spacing +
-						`["` + strconv.Itoa(num-1) + `"]` + linkTag +
+						`["` + strconv.Itoa(num-1) + `"]` +
 						wrappedLink[0] + `[::-][""]`
 				}
 			}
@@ -341,8 +341,12 @@ func RenderGemini(s string, width int, proxied bool) (string, []string) {
 		// Lines are modified below to always end with \r\n
 		buf = strings.TrimSuffix(buf, "\r\n")
 
-		rendered += fmt.Sprintf("[%s]", config.GetColorString("preformatted_text")) +
-			buf + fmt.Sprintf("[%s:%s:-]\r\n", config.GetColorString("regular_text"), config.GetColorString("bg"))
+		if viper.GetBool("a-general.color") {
+			rendered += fmt.Sprintf("[%s]", config.GetColorString("preformatted_text")) +
+				buf + fmt.Sprintf("[%s:%s:-]\r\n", config.GetColorString("regular_text"), config.GetColorString("bg"))
+		} else {
+			rendered += buf + "\r\n"
+		}
 	}
 
 	// processRegular processes non-preformatted sections

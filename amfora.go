@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	version = "v1.9.0"
+	version = "v1.9.2"
 	commit  = "unknown"
 	builtBy = "unknown"
 )
@@ -94,6 +94,7 @@ func main() {
 		}
 		display.NewTabWithURL(url)
 	} else if !isStdinEmpty() {
+		display.NewTab()
 		renderFromStdin()
 	} else {
 		display.NewTab()

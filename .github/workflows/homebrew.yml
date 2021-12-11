@@ -12,5 +12,6 @@ jobs:
         with:
           # A PR will be sent to github.com/Homebrew/homebrew-core to update this formula:
           formula-name: amfora
+          download-url: https://github.com/makeworld-the-better-one/amfora.git
         env:
           COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}

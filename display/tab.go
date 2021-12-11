@@ -220,7 +220,7 @@ func makeNewTab() *tab {
 			CustomCommand(commandNum, tabURL)
 			return nil
 		}
-		// Target link command key: 1-9, 0, COMMANDTARGET1-COMMANDTERGET10
+		// Target link command key: 1-9, 0, COMMANDTARGET1-COMMANDTARGET10
 		if cmd >= config.CmdCommandTarget1 && cmd <= config.CmdCommandTarget0 {
 			commandNum := int(cmd - config.CmdCommandTarget1)
 			currentURL := t.page.URL

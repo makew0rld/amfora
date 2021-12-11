@@ -540,13 +540,10 @@ func Reload() {
 func URL(u string) {
 	t := tabs[curTab]
 	if strings.HasPrefix(u, "about:") {
-		if final, ok := handleAbout(t, u); ok {
-			t.addToHistory(final)
-		}
-		return
+		go goURL(t, u)
+	} else {
+		go goURL(t, fixUserURL(u))
 	}
-
-	go goURL(t, fixUserURL(u))
 }
 
 func RenderFromString(str string) {

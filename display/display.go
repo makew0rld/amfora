@@ -69,8 +69,8 @@ func Init(version, commit, builtBy string) {
 		renderer.TermColor = "terminal256"
 	case termenv.ANSI:
 		renderer.TermColor = "terminal16"
-	default:
-		renderer.TermColor = "terminal8"
+	case termenv.Ascii:
+		renderer.TermColor = ""
 	}
 
 	App.EnableMouse(false)

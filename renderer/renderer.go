@@ -336,6 +336,8 @@ func RenderGemini(s string, width int, proxied bool) (string, []string) {
 	// processPre is for rendering preformatted blocks
 	processPre := func() {
 
+		syntaxHighlighted := false
+
 		// Perform syntax highlighting if language is set
 		if lang != "" {
 			style := styles.Get(styleName)
@@ -359,12 +361,13 @@ func RenderGemini(s string, width int, proxied bool) (string, []string) {
 					// Strip extra newline added by Chroma and replace buffer
 					buf = string(trailingNewline.ReplaceAll(formattedBuffer.Bytes(), []byte{}))
 				}
+				syntaxHighlighted = true
 			}
 		}
 
 		// Support ANSI color codes in preformatted blocks - see #59
-		// This will also execute if code highlighting language is set
-		if viper.GetBool("a-general.color") && (viper.GetBool("a-general.ansi") || lang != "") {
+		// This will also execute if code highlighting was successful for this block
+		if viper.GetBool("a-general.color") && (viper.GetBool("a-general.ansi") || syntaxHighlighted) {
 			buf = cview.TranslateANSI(buf)
 			// The TranslateANSI function will reset the colors when it encounters
 			// an ANSI reset code, injecting a full reset tag: [-:-:-]

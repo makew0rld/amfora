@@ -13,7 +13,7 @@ func CustomCommand(num int, url string) {
 	if num < 0 {
 		num = 0
 	}
-	num = num + 1
+	num++
 	if num > 9 {
 		num = 0
 	}
@@ -27,7 +27,7 @@ func CustomCommand(num int, url string) {
 		}
 		Info(msg)
 	} else {
-		Error("Command Error", "Command " + strconv.Itoa(num) + " not defined")
+		Error("Command Error", "Command "+strconv.Itoa(num)+" not defined")
 		return
 	}
 

@@ -15,6 +15,7 @@ import (
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/go-gemini"
+	"github.com/muesli/termenv"
 	"github.com/spf13/viper"
 )
 
@@ -59,6 +60,18 @@ var App = cview.NewApplication()
 
 func Init(version, commit, builtBy string) {
 	aboutInit(version, commit, builtBy)
+
+	// Detect terminal colors for syntax highlighting
+	switch termenv.ColorProfile() {
+	case termenv.TrueColor:
+		renderer.TermColor = "terminal16m"
+	case termenv.ANSI256:
+		renderer.TermColor = "terminal256"
+	case termenv.ANSI:
+		renderer.TermColor = "terminal16"
+	case termenv.Ascii:
+		renderer.TermColor = ""
+	}
 
 	App.EnableMouse(false)
 	App.SetRoot(layout, true)

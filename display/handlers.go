@@ -493,7 +493,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 				// Disable read timeout and go back to start
 				res.SetReadTimeout(0) //nolint: errcheck
 				res.Body.(*rr.RestartReader).Restart()
-				go dlChoice("That file could not be displayed. What would you like to do?", u, res)
+				dlChoice("That file could not be displayed. What would you like to do?", u, res)
 			}
 		}()
 		return ret("", false)
@@ -503,6 +503,6 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	// Disable read timeout and go back to start
 	res.SetReadTimeout(0) //nolint: errcheck
 	res.Body.(*rr.RestartReader).Restart()
-	go dlChoice("That file could not be displayed. What would you like to do?", u, res)
+	dlChoice("That file could not be displayed. What would you like to do?", u, res)
 	return ret("", false)
 }

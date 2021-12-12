@@ -156,12 +156,12 @@ func makeNewTab() *tab {
 			if t.hasContent() {
 				savePath, err := downloadPage(t.page)
 				if err != nil {
-					Error("Download Error", fmt.Sprintf("Error saving page content: %v", err))
+					go Error("Download Error", fmt.Sprintf("Error saving page content: %v", err))
 				} else {
-					Info(fmt.Sprintf("Page content saved to %s. ", savePath))
+					go Info(fmt.Sprintf("Page content saved to %s. ", savePath))
 				}
 			} else {
-				Info("The current page has no content, so it couldn't be downloaded.")
+				go Info("The current page has no content, so it couldn't be downloaded.")
 			}
 			return nil
 		case config.CmdBack:

@@ -178,7 +178,7 @@ func makeNewTab() *tab {
 			currentURL := tabs[curTab].page.URL
 			err := clipboard.WriteAll(currentURL)
 			if err != nil {
-				Error("Copy Error", err.Error())
+				go Error("Copy Error", err.Error())
 				return nil
 			}
 			return nil
@@ -193,14 +193,14 @@ func makeNewTab() *tab {
 			if err != nil {
 				err := clipboard.WriteAll(selectedURL)
 				if err != nil {
-					Error("Copy Error", err.Error())
+					go Error("Copy Error", err.Error())
 					return nil
 				}
 				return nil
 			}
 			err = clipboard.WriteAll(copiedURL.String())
 			if err != nil {
-				Error("Copy Error", err.Error())
+				go Error("Copy Error", err.Error())
 				return nil
 			}
 			return nil

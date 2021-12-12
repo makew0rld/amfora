@@ -86,7 +86,7 @@ func makeNewTab() *tab {
 			linkN, _ := strconv.Atoi(currentSelection[0])
 			tabs[tab].page.Selected = tabs[tab].page.Links[linkN]
 			tabs[tab].page.SelectedID = currentSelection[0]
-			followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[linkN])
+			go followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[linkN])
 			return
 		}
 		if len(currentSelection) == 0 && (key == tcell.KeyEnter || key == tcell.KeyTab) {
@@ -209,7 +209,7 @@ func makeNewTab() *tab {
 		if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
 			if int(cmd) <= len(t.page.Links) {
 				// It's a valid link number
-				followLink(&t, t.page.URL, t.page.Links[cmd-1])
+				go followLink(&t, t.page.URL, t.page.Links[cmd-1])
 				return nil
 			}
 		}

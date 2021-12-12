@@ -241,7 +241,7 @@ func Init(version, commit, builtBy string) {
 			}
 			if i <= len(tabs[tab].page.Links) && i > 0 {
 				// It's a valid link number
-				followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[i-1])
+				go followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[i-1])
 				return
 			}
 			// Invalid link number, don't do anything

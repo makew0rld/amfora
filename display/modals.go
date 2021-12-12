@@ -16,24 +16,21 @@ import (
 // The bookmark modal is in bookmarks.go
 
 var infoModal = cview.NewModal()
-
 var errorModal = cview.NewModal()
-var errorModalDone = make(chan struct{})
-
 var inputModal = cview.NewModal()
-var inputCh = make(chan string)
-var inputModalText string // The current text of the input field in the modal
-
 var yesNoModal = cview.NewModal()
 
-// Channel to receive yesNo answer on
+var inputCh = make(chan string)
 var yesNoCh = make(chan bool)
+
+var inputModalText string // The current text of the input field in the modal
+
+// Internal channel used to know when a modal has been dismissed
+var modalDone = make(chan struct{})
 
 func modalInit() {
 	infoModal.AddButtons([]string{"Ok"})
-
 	errorModal.AddButtons([]string{"Ok"})
-
 	yesNoModal.AddButtons([]string{"Yes", "No"})
 
 	panels.AddPanel(PanelInfoModal, infoModal, false, false)
@@ -145,6 +142,7 @@ func modalInit() {
 		panels.HidePanel(PanelInfoModal)
 		App.SetFocus(tabs[curTab].view)
 		App.Draw()
+		modalDone <- struct{}{}
 	})
 
 	errorModal.SetBorder(true)
@@ -153,7 +151,7 @@ func modalInit() {
 		panels.HidePanel(PanelErrorModal)
 		App.SetFocus(tabs[curTab].view)
 		App.Draw()
-		errorModalDone <- struct{}{}
+		modalDone <- struct{}{}
 	})
 
 	inputModal.SetBorder(true)
@@ -183,7 +181,7 @@ func modalInit() {
 	dlInit()
 }
 
-// Error displays an error on the screen in a modal.
+// Error displays an error on the screen in a modal, and blocks until dismissed by the user.
 func Error(title, text string) {
 	if text == "" {
 		text = "No additional information."
@@ -203,19 +201,21 @@ func Error(title, text string) {
 	App.SetFocus(errorModal)
 	App.Draw()
 
-	<-errorModalDone
+	<-modalDone
 }
 
-// Info displays some info on the screen in a modal.
+// Info displays some info on the screen in a modal, and blocks until dismissed by the user.
 func Info(s string) {
 	infoModal.SetText(s)
 	panels.ShowPanel(PanelInfoModal)
 	panels.SendToFront(PanelInfoModal)
 	App.SetFocus(infoModal)
 	App.Draw()
+
+	<-modalDone
 }
 
-// Input pulls up a modal that asks for input, and returns the user's input.
+// Input pulls up a modal that asks for input, waits for that input, and returns it.
 // It returns an bool indicating if the user chose to send input or not.
 func Input(prompt string, sensitive bool) (string, bool) {
 	// Remove elements and re-add them - to clear input text and keep input in focus
@@ -257,7 +257,7 @@ func Input(prompt string, sensitive bool) (string, bool) {
 	return resp, true
 }
 
-// YesNo displays a modal asking a yes-or-no question.
+// YesNo displays a modal asking a yes-or-no question, waits for an answer, then returns it as a bool.
 func YesNo(prompt string) bool {
 	if viper.GetBool("a-general.color") {
 		m := yesNoModal
@@ -289,7 +289,7 @@ func YesNo(prompt string) bool {
 }
 
 // Tofu displays the TOFU warning modal.
-// It returns a bool indicating whether the user wants to continue.
+// It blocks then returns a bool indicating whether the user wants to continue.
 func Tofu(host string, expiry time.Time) bool {
 	// Reuses yesNoModal, with error color
 

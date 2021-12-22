@@ -25,9 +25,11 @@ func Open(path string) (string, error) {
 	case xdgOpenNotFoundErr == nil:
 		// Use start rather than run or output in order
 		// to make application run in background.
-		if err := exec.Command(xdgOpenPath, path).Start(); err != nil {
+		proc := exec.Command(xdgOpenPath, path)
+		if err := proc.Start(); err != nil {
 			return "", err
 		}
+		go proc.Wait() // Prevent zombies, see #219
 		return "Opened in default system viewer", nil
 	default:
 		return "", fmt.Errorf("could not determine default system viewer. " +

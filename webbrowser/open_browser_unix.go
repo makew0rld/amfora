@@ -34,14 +34,18 @@ func Open(url string) (string, error) {
 	case xdgOpenNotFoundErr == nil: // Prefer xdg-open over $BROWSER
 		// Use start rather than run or output in order
 		// to make browser running in background.
-		if err := exec.Command(xdgOpenPath, url).Start(); err != nil {
+		proc := exec.Command(xdgOpenPath, url)
+		if err := proc.Start(); err != nil {
 			return "", err
 		}
+		go proc.Wait() // Prevent zombies, see #219
 		return "Opened in system default web browser", nil
 	case envBrowser != "":
-		if err := exec.Command(envBrowser, url).Start(); err != nil {
+		proc := exec.Command(envBrowser, url)
+		if err := proc.Start(); err != nil {
 			return "", err
 		}
+		go proc.Wait() // Prevent zombies, see #219
 		return "Opened in system default web browser", nil
 	default:
 		return "", fmt.Errorf("could not determine system browser")

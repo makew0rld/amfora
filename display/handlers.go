@@ -48,16 +48,18 @@ func handleHTTP(u string, showInfo bool) bool {
 	}
 
 	// Custom command
-	var err error
+	var proc *exec.Cmd
 	if len(config.HTTPCommand) > 1 {
-		err = exec.Command(config.HTTPCommand[0], append(config.HTTPCommand[1:], u)...).Start()
+		proc = exec.Command(config.HTTPCommand[0], append(config.HTTPCommand[1:], u)...)
 	} else {
-		err = exec.Command(config.HTTPCommand[0], u).Start()
+		proc = exec.Command(config.HTTPCommand[0], u)
 	}
+	err := proc.Start()
 	if err != nil {
 		Error("HTTP Error", "Error executing custom browser command: "+err.Error())
 		return false
 	}
+	go proc.Wait() // Prevent zombies, see #219
 	Info("Opened with: " + config.HTTPCommand[0])
 
 	App.Draw()
@@ -104,15 +106,17 @@ func handleOther(u string) {
 
 	// Custom application command
 
-	var err error
+	var proc *exec.Cmd
 	if len(handler) > 1 {
-		err = exec.Command(handler[0], append(handler[1:], u)...).Start()
+		proc = exec.Command(handler[0], append(handler[1:], u)...)
 	} else {
-		err = exec.Command(handler[0], u).Start()
+		proc = exec.Command(handler[0], u)
 	}
+	err := proc.Start()
 	if err != nil {
 		Error("URL Error", "Error executing custom command: "+err.Error())
 	}
+	go proc.Wait() // Prevent zombies, see #219
 	Info("Opened with: " + handler[0])
 	App.Draw()
 }

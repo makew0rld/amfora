@@ -191,6 +191,7 @@ func open(u string, resp *gemini.Response) {
 			Error("File Opening Error", "Error executing custom command: "+err.Error())
 			return
 		}
+		go proc.Wait() // Prevent zombies, see #219
 		Info("Opened with " + cmd[0])
 		return
 	}
@@ -214,11 +215,13 @@ func open(u string, resp *gemini.Response) {
 		Info("Opened in default system viewer")
 	} else {
 		cmd := mediaHandler.Cmd
-		err := exec.Command(cmd[0], append(cmd[1:], path)...).Start()
+		proc := exec.Command(cmd[0], append(cmd[1:], path)...)
+		err := proc.Start()
 		if err != nil {
 			Error("File Opening Error", "Error executing custom command: "+err.Error())
 			return
 		}
+		go proc.Wait() // Prevent zombies, see #219
 		Info("Opened with " + cmd[0])
 	}
 	App.Draw()

@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Syntax highlighting for preformatted text blocks with alt text (#252, #263, [wiki page](https://github.com/makeworld-the-better-one/amfora/wiki/Source-Code-Highlighting))
 
+### Fixed
+- Modal can't be closed when opening non-gemini text URLs from the commandline (#283, #284)
+
 
 ## [1.9.2] - 2021-12-10
 ### Fixed

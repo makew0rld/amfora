@@ -48,16 +48,19 @@ func handleHTTP(u string, showInfo bool) bool {
 	}
 
 	// Custom command
-	var err error
+	var proc *exec.Cmd
 	if len(config.HTTPCommand) > 1 {
-		err = exec.Command(config.HTTPCommand[0], append(config.HTTPCommand[1:], u)...).Start()
+		proc = exec.Command(config.HTTPCommand[0], append(config.HTTPCommand[1:], u)...)
 	} else {
-		err = exec.Command(config.HTTPCommand[0], u).Start()
+		proc = exec.Command(config.HTTPCommand[0], u)
 	}
+	err := proc.Start()
 	if err != nil {
 		Error("HTTP Error", "Error executing custom browser command: "+err.Error())
 		return false
 	}
+	//nolint:errcheck
+	go proc.Wait() // Prevent zombies, see #219
 	Info("Opened with: " + config.HTTPCommand[0])
 
 	App.Draw()
@@ -104,15 +107,18 @@ func handleOther(u string) {
 
 	// Custom application command
 
-	var err error
+	var proc *exec.Cmd
 	if len(handler) > 1 {
-		err = exec.Command(handler[0], append(handler[1:], u)...).Start()
+		proc = exec.Command(handler[0], append(handler[1:], u)...)
 	} else {
-		err = exec.Command(handler[0], u).Start()
+		proc = exec.Command(handler[0], u)
 	}
+	err := proc.Start()
 	if err != nil {
 		Error("URL Error", "Error executing custom command: "+err.Error())
 	}
+	//nolint:errcheck
+	go proc.Wait() // Prevent zombies, see #219
 	Info("Opened with: " + handler[0])
 	App.Draw()
 }
@@ -352,7 +358,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			// Disable read timeout and go back to start
 			res.SetReadTimeout(0) //nolint: errcheck
 			res.Body.(*rr.RestartReader).Restart()
-			go dlChoice("That page is too large. What would you like to do?", u, res)
+			dlChoice("That page is too large. What would you like to do?", u, res)
 			return ret("", false)
 		}
 		if errors.Is(err, renderer.ErrTimedOut) {
@@ -360,7 +366,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 			// Disable read timeout and go back to start
 			res.SetReadTimeout(0) //nolint: errcheck
 			res.Body.(*rr.RestartReader).Restart()
-			go dlChoice("Loading that page timed out. What would you like to do?", u, res)
+			dlChoice("Loading that page timed out. What would you like to do?", u, res)
 			return ret("", false)
 		}
 		if err != nil {
@@ -493,7 +499,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 				// Disable read timeout and go back to start
 				res.SetReadTimeout(0) //nolint: errcheck
 				res.Body.(*rr.RestartReader).Restart()
-				go dlChoice("That file could not be displayed. What would you like to do?", u, res)
+				dlChoice("That file could not be displayed. What would you like to do?", u, res)
 			}
 		}()
 		return ret("", false)
@@ -503,6 +509,6 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	// Disable read timeout and go back to start
 	res.SetReadTimeout(0) //nolint: errcheck
 	res.Body.(*rr.RestartReader).Restart()
-	go dlChoice("That file could not be displayed. What would you like to do?", u, res)
+	dlChoice("That file could not be displayed. What would you like to do?", u, res)
 	return ret("", false)
 }

@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Syntax highlighting for preformatted text blocks with alt text (#252, #263, [wiki page](https://github.com/makeworld-the-better-one/amfora/wiki/Source-Code-Highlighting))
 
+### Changed
+- Center text automatically, removing `left_margin` from the config (#233)
+- `max_width` defaults to 80 columns instead of 100 (#233)
+
+### Fixed
+- Modal can't be closed when opening non-gemini text URLs from the commandline (#283, #284)
+- External programs started by Amfora remain as zombie processes (#219)
+- Prevent link lines (and other types) from being wider than the `max_width` setting (#280)
+
 
 ## [1.9.2] - 2021-12-10
 ### Fixed

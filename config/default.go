@@ -70,11 +70,8 @@ bullets = true
 # Whether to show link after link text
 show_link = false
 
-# A number from 0 to 1, indicating what percentage of the terminal width the left margin should take up.
-left_margin = 0.15
-
 # The max number of columns to wrap a page's text to. Preformatted blocks are not wrapped.
-max_width = 100
+max_width = 80
 
 # 'downloads' is the path to a downloads folder.
 # An empty value means the code will find the default downloads folder for your system.

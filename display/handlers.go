@@ -241,7 +241,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		return ret(handleAbout(t, u))
 	}
 
-	u = normalizeURL(u)
+	u = client.NormalizeURL(u)
 	u = cache.Redirect(u)
 
 	parsed, err := url.Parse(u)
@@ -376,7 +376,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 
 		page.TermWidth = termW
 
-		if !client.HasClientCert(parsed.Host) {
+		if !client.HasClientCert(parsed.Host, parsed.Path) {
 			// Don't cache pages with client certs
 			go cache.AddPage(page)
 		}

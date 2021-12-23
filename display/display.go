@@ -11,6 +11,7 @@ import (
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
+	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
@@ -228,12 +229,12 @@ func Init(version, commit, builtBy string) {
 
 						u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
 						// Don't use the cached version of the search
-						cache.RemovePage(normalizeURL(u))
+						cache.RemovePage(client.NormalizeURL(u))
 						URL(u)
 					} else {
 						// Full URL
 						// Don't use cached version for manually entered URL
-						cache.RemovePage(normalizeURL(fixUserURL(query)))
+						cache.RemovePage(client.NormalizeURL(client.FixUserURL(query)))
 						URL(query)
 					}
 					return
@@ -555,7 +556,7 @@ func URL(u string) {
 	if strings.HasPrefix(u, "about:") {
 		go goURL(t, u)
 	} else {
-		go goURL(t, fixUserURL(u))
+		go goURL(t, client.FixUserURL(u))
 	}
 }
 

@@ -99,13 +99,17 @@ underline = true
 
 [auth.certs]
 # Client certificates
-# Set domain name equal to path to client cert
-# "example.com" = 'mycert.crt'
+# Set URL equal to path to client cert file
+#
+# "example.com" = 'mycert.crt'      # Cert is used for all paths on this domain
+# "example.com/dir/"=  'mycert.crt' # Cert is used for /dir/ and everything below only
+#
+# See the comment at the beginning of this file for examples of all valid types of
+# URLs, ports and schemes can be used too
 
 [auth.keys]
 # Client certificate keys
-# Set domain name equal to path to key for the client cert above
-# "example.com" = 'mycert.key'
+# Same as [auth.certs] but the path is to the client key file.
 
 
 [keybindings]

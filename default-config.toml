@@ -330,6 +330,9 @@ workers = 3
 # The number of subscription updates displayed per page.
 entries_per_page = 20
 
+# Set to false to remove the explanatory text from the top of the subscription page
+header = true
+
 
 [theme]
 # This section is for changing the COLORS used in Amfora.

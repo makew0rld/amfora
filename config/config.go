@@ -263,6 +263,7 @@ func Init() error {
 	viper.SetDefault("subscriptions.update_interval", 1800)
 	viper.SetDefault("subscriptions.workers", 3)
 	viper.SetDefault("subscriptions.entries_per_page", 20)
+	viper.SetDefault("subscriptions.header", true)
 
 	viper.SetConfigFile(configPath)
 	viper.SetConfigType("toml")

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Syntax highlighting for preformatted text blocks with alt text (#252, #263, [wiki page](https://github.com/makeworld-the-better-one/amfora/wiki/Source-Code-Highlighting))
 - [Client certificates](https://github.com/makeworld-the-better-one/amfora/wiki/Client-Certificates) can be restricted to certain paths of a host (#115)
+- `header` config option in `[subscriptions]` to allow disabling the header text on the subscriptions page (#191)
 
 ### Changed
 - Center text automatically, removing `left_margin` from the config (#233)

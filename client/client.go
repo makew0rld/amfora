@@ -48,6 +48,7 @@ func Init() error {
 		// in the config
 		pu, _ := normalizeURL(FixUserURL(certURL))
 		if pu == nil {
+			//nolint:goerr113
 			return errors.New("[auth.certs]: couldn't normalize URL: " + certURL)
 		}
 		confCerts[certMapKey{pu.Host, pu.Path}] = certsViper.GetString(certURL)
@@ -57,6 +58,7 @@ func Init() error {
 	for _, keyURL := range keysViper.AllKeys() {
 		pu, _ := normalizeURL(FixUserURL(keyURL))
 		if pu == nil {
+			//nolint:goerr113
 			return errors.New("[auth.keys]: couldn't normalize URL: " + keyURL)
 		}
 		confKeys[certMapKey{pu.Host, pu.Path}] = keysViper.GetString(keyURL)

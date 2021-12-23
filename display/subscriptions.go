@@ -98,7 +98,8 @@ func Subscriptions(t *tab, u string) string {
 		// Render page
 
 		if viper.GetBool("subscriptions.header") {
-			rawPage += "You can use Ctrl-X to subscribe to a page, or to an Atom/RSS/JSON feed. See the online wiki for more.\n" +
+			rawPage += "You can use Ctrl-X to subscribe to a page, or to an Atom/RSS/JSON feed." +
+				"See the online wiki for more.\n" +
 				"If you just opened Amfora then updates may appear incrementally. Reload the page to see them.\n\n"
 		}
 		rawPage += "=> about:manage-subscriptions Manage subscriptions\n\n"

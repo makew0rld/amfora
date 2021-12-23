@@ -13,6 +13,7 @@ func Open(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	//nolint:errcheck
 	go proc.Wait() // Prevent zombies, see #219
 	return "Opened in default system viewer", nil
 }

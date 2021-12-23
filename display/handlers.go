@@ -59,6 +59,7 @@ func handleHTTP(u string, showInfo bool) bool {
 		Error("HTTP Error", "Error executing custom browser command: "+err.Error())
 		return false
 	}
+	//nolint:errcheck
 	go proc.Wait() // Prevent zombies, see #219
 	Info("Opened with: " + config.HTTPCommand[0])
 
@@ -116,6 +117,7 @@ func handleOther(u string) {
 	if err != nil {
 		Error("URL Error", "Error executing custom command: "+err.Error())
 	}
+	//nolint:errcheck
 	go proc.Wait() // Prevent zombies, see #219
 	Info("Opened with: " + handler[0])
 	App.Draw()

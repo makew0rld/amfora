@@ -38,6 +38,7 @@ func Open(url string) (string, error) {
 		if err := proc.Start(); err != nil {
 			return "", err
 		}
+		//nolint:errcheck
 		go proc.Wait() // Prevent zombies, see #219
 		return "Opened in system default web browser", nil
 	case envBrowser != "":
@@ -45,6 +46,7 @@ func Open(url string) (string, error) {
 		if err := proc.Start(); err != nil {
 			return "", err
 		}
+		//nolint:errcheck
 		go proc.Wait() // Prevent zombies, see #219
 		return "Opened in system default web browser", nil
 	default:

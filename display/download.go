@@ -191,6 +191,7 @@ func open(u string, resp *gemini.Response) {
 			Error("File Opening Error", "Error executing custom command: "+err.Error())
 			return
 		}
+		//nolint:errcheck
 		go proc.Wait() // Prevent zombies, see #219
 		Info("Opened with " + cmd[0])
 		return
@@ -221,6 +222,7 @@ func open(u string, resp *gemini.Response) {
 			Error("File Opening Error", "Error executing custom command: "+err.Error())
 			return
 		}
+		//nolint:errcheck
 		go proc.Wait() // Prevent zombies, see #219
 		Info("Opened with " + cmd[0])
 	}

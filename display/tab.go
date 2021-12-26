@@ -20,9 +20,20 @@ const (
 	tabModeLoading
 )
 
+// tabHistoryPageCache is fields from the Page struct, cached here to solve #122
+// See structs/structs.go for an explanation of the fields.
+type tabHistoryPageCache struct {
+	row        int
+	column     int
+	selected   string
+	selectedID string
+	mode       structs.PageMode
+}
+
 type tabHistory struct {
-	urls []string
-	pos  int // Position: where in the list of URLs we are
+	urls      []string
+	pos       int // Position: where in the list of URLs we are
+	pageCache []*tabHistoryPageCache
 }
 
 // tab hold the information needed for each browser tab.
@@ -290,6 +301,21 @@ func makeNewTab() *tab {
 	return &t
 }
 
+// historyCachePage caches certain info about the current page in the tab's history,
+// see #122 for details.
+func (t *tab) historyCachePage() {
+	if t.page == nil || t.page.URL == "" || t.history.pageCache == nil || len(t.history.pageCache) == 0 {
+		return
+	}
+	t.history.pageCache[t.history.pos] = &tabHistoryPageCache{
+		row:        t.page.Row,
+		column:     t.page.Column,
+		selected:   t.page.Selected,
+		selectedID: t.page.SelectedID,
+		mode:       t.page.Mode,
+	}
+}
+
 // addToHistory adds the given URL to history.
 // It assumes the URL is currently being loaded and displayed on the page.
 func (t *tab) addToHistory(u string) {
@@ -297,9 +323,15 @@ func (t *tab) addToHistory(u string) {
 		// We're somewhere in the middle of the history instead, with URLs ahead and behind.
 		// The URLs ahead need to be removed so this new URL is the most recent item in the history
 		t.history.urls = t.history.urls[:t.history.pos+1]
+		// Same for page cache
+		t.history.pageCache = t.history.pageCache[:t.history.pos+1]
 	}
 	t.history.urls = append(t.history.urls, u)
 	t.history.pos++
+
+	// Cache page info for #122
+	t.history.pageCache = append(t.history.pageCache, &tabHistoryPageCache{}) // Add new spot
+	t.historyCachePage()                                                      // Fill it with data
 }
 
 // pageUp scrolls up 75% of the height of the terminal, like Bombadillo.

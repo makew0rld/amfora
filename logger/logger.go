@@ -9,11 +9,11 @@ import (
 	"os"
 )
 
-var logger *log.Logger
+var Logger *log.Logger
 
 func GetLogger() (*log.Logger, error) {
-	if logger != nil {
-		return logger, nil
+	if Logger != nil {
+		return Logger, nil
 	}
 
 	var writer io.Writer
@@ -30,15 +30,15 @@ func GetLogger() (*log.Logger, error) {
 		writer = ioutil.Discard
 	}
 
-	logger = log.New(writer, "", log.LstdFlags)
+	Logger = log.New(writer, "", log.LstdFlags)
 
 	if !debugModeEnabled {
 		// Clear all flags to skip log output formatting step to increase
 		// performance somewhat if we're not logging anything
-		logger.SetFlags(0)
+		Logger.SetFlags(0)
 	}
 
-	logger.Println("Started logger")
+	Logger.Println("Started logger")
 
-	return logger, nil
+	return Logger, nil
 }

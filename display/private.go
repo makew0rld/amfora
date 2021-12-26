@@ -137,6 +137,9 @@ func setPage(t *tab, p *structs.Page) {
 //
 // It should be called in a goroutine.
 func goURL(t *tab, u string) {
+	// Update page cache in history for #122
+	t.historyCachePage()
+
 	final, displayed := handleURL(t, u, 0)
 	if displayed {
 		t.addToHistory(final)

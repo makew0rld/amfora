@@ -1,0 +1,32 @@
+app-id: space.makeworld.amfora
+runtime: org.freedesktop.Platform
+runtime-version: "21.08"
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.golang
+command: amfora
+
+rename-desktop-file: amfora.desktop
+
+finish-args:
+  - --share=network
+  - --filesystem=xdg-downloads
+
+build-options:
+  build-args:
+    - --share=network
+#   env:
+#     - GOBIN=/app/bin
+#     - GOROOT=/usr/lib/sdk/golang
+
+modules:
+  - name: amfora
+    buildsystem: simple
+    build-commands:
+      - . /usr/lib/sdk/golang/enable.sh; make GO=$GOROOT/bin/go
+      - make install PREFIX=/app
+      - export GOPATH=$PWD
+    sources:
+      - type: git
+        url: https://github.com/makeworld-the-better-one/amfora
+        tag: v1.9.0

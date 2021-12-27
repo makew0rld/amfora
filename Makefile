@@ -8,7 +8,7 @@ VERSION ?= $(GITV)
 COMMIT  ?= $(GITC)
 BUILDER ?= Makefile
 
-GO      := go
+GO      ?= go
 INSTALL := install
 RM      := rm
 

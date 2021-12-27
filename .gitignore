@@ -1,3 +1,8 @@
+# Flatpak
+build-dir
+.flatpak-builder
+
+
 # Binaries
 amfora
 amfora.exe

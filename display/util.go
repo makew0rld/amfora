@@ -32,12 +32,6 @@ func makeContentLayout(tv *cview.TextView, leftMargin int) *cview.Flex {
 	return vert
 }
 
-// makeTabLabel takes a string and adds spacing to it, making it
-// suitable for display as a tab label.
-func makeTabLabel(s string) string {
-	return " " + s + " "
-}
-
 // tabNumber gets the index of the tab in the tabs slice. It returns -1
 // if the tab is not in that slice.
 func tabNumber(t *tab) int {

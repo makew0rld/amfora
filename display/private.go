@@ -118,7 +118,7 @@ func setPage(t *tab, p *structs.Page) {
 	tabNum := tabNumber(t)
 	browser.AddTab(
 		strconv.Itoa(tabNum),
-		makeTabLabel(strconv.Itoa(tabNum+1)),
+		t.label(),
 		makeContentLayout(t.view, leftMargin()),
 	)
 	App.Draw()

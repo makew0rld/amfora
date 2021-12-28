@@ -3,6 +3,7 @@ package display
 import (
 	"fmt"
 	"net/url"
+	"path"
 	"strconv"
 	"strings"
 
@@ -389,7 +390,7 @@ func (t *tab) applyHorizontalScroll() {
 		// Scrolled to the right far enough that no left margin is needed
 		browser.AddTab(
 			strconv.Itoa(i),
-			makeTabLabel(strconv.Itoa(i+1)),
+			t.label(),
 			makeContentLayout(t.view, 0),
 		)
 		t.view.ScrollTo(t.page.Row, t.page.Column-leftMargin())
@@ -397,7 +398,7 @@ func (t *tab) applyHorizontalScroll() {
 		// Left margin is still needed, but is not necessarily at the right size by default
 		browser.AddTab(
 			strconv.Itoa(i),
-			makeTabLabel(strconv.Itoa(i+1)),
+			t.label(),
 			makeContentLayout(t.view, leftMargin()-t.page.Column),
 		)
 	}
@@ -507,4 +508,36 @@ func (t *tab) highlightedURL() string {
 		return selectedURL
 	}
 	return ""
+}
+
+// label returns the label to use for the tab name
+func (t *tab) label() string {
+	tn := tabNumber(t)
+	if tn < 0 {
+		// Invalid tab, shouldn't happen
+		return ""
+	}
+
+	// Increment so there's no tab 0 in the label
+	tn++
+
+	if t.page.URL == "" || t.page.URL == "about:newtab" {
+		// Just use tab number
+		// Spaces around to keep original Amfora look
+		return fmt.Sprintf(" %d ", tn)
+	}
+	if strings.HasPrefix(t.page.URL, "about:") {
+		// Don't look for domain, put the whole URL except query strings
+		return strings.SplitN(t.page.URL, "?", 2)[0]
+	}
+	if strings.HasPrefix(t.page.URL, "file://") {
+		// File URL, use file or folder as tab name
+		return path.Base(t.page.URL[7:])
+	}
+	// Otherwise, it's a Gemini URL
+	pu, err := url.Parse(t.page.URL)
+	if err != nil {
+		return fmt.Sprintf(" %d ", tn)
+	}
+	return pu.Host
 }

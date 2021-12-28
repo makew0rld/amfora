@@ -88,7 +88,7 @@ func Init(version, commit, builtBy string) {
 				// Overwrite all tabs with a new, differently sized, left margin
 				browser.AddTab(
 					strconv.Itoa(i),
-					makeTabLabel(strconv.Itoa(i+1)),
+					tabs[i].label(),
 					makeContentLayout(tabs[i].view, leftMargin()),
 				)
 				if tabs[i] == t {
@@ -438,7 +438,7 @@ func NewTabWithURL(url string) {
 
 	browser.AddTab(
 		strconv.Itoa(curTab),
-		makeTabLabel(strconv.Itoa(curTab+1)),
+		tabs[curTab].label(),
 		makeContentLayout(tabs[curTab].view, leftMargin()),
 	)
 	browser.SetCurrentTab(strconv.Itoa(curTab))

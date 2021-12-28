@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Center text automatically, removing `left_margin` from the config (#233)
 - `max_width` defaults to 80 columns instead of 100 (#233)
+- Tabs have the domain of the current page instead of numbers (#202)
 
 ### Fixed
 - Modal can't be closed when opening non-gemini text URLs from the commandline (#283, #284)

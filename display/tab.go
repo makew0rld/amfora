@@ -39,12 +39,13 @@ type tabHistory struct {
 
 // tab hold the information needed for each browser tab.
 type tab struct {
-	page     *structs.Page
-	view     *cview.TextView
-	history  *tabHistory
-	mode     tabMode
-	barLabel string // The bottomBar label for the tab
-	barText  string // The bottomBar text for the tab
+	page             *structs.Page
+	view             *cview.TextView
+	history          *tabHistory
+	mode             tabMode
+	barLabel         string // The bottomBar label for the tab
+	barText          string // The bottomBar text for the tab
+	preferURLHandler bool   // For #143, use URL handler over proxy
 }
 
 // makeNewTab initializes an tab struct with no content.
@@ -98,6 +99,7 @@ func makeNewTab() *tab {
 			linkN, _ := strconv.Atoi(currentSelection[0])
 			tabs[tab].page.Selected = tabs[tab].page.Links[linkN]
 			tabs[tab].page.SelectedID = currentSelection[0]
+			tabs[tab].preferURLHandler = false // Reset in case
 			go followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[linkN])
 			return
 		}
@@ -216,11 +218,24 @@ func makeNewTab() *tab {
 				return nil
 			}
 			return nil
+		case config.CmdURLHandlerOpen:
+			currentSelection := t.view.GetHighlights()
+			t.preferURLHandler = true
+			// Copied code from when enter key is pressed
+			if len(currentSelection) > 0 {
+				bottomBar.SetLabel("")
+				linkN, _ := strconv.Atoi(currentSelection[0])
+				t.page.Selected = t.page.Links[linkN]
+				t.page.SelectedID = currentSelection[0]
+				go followLink(&t, t.page.URL, t.page.Links[linkN])
+			}
+			return nil
 		}
 		// Number key: 1-9, 0, LINK1-LINK10
 		if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
 			if int(cmd) <= len(t.page.Links) {
 				// It's a valid link number
+				t.preferURLHandler = false // Reset in case
 				go followLink(&t, t.page.URL, t.page.Links[cmd-1])
 				return nil
 			}

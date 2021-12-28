@@ -216,6 +216,8 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		}
 		t.mode = tabModeDone
 
+		t.preferURLHandler = false
+
 		go func(p *structs.Page) {
 			if b && t.hasContent() && !t.isAnAboutPage() && viper.GetBool("subscriptions.popup") {
 				// The current page might be an untracked feed, and the user wants
@@ -261,7 +263,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	}
 
 	if strings.HasPrefix(u, "http") {
-		if proxy == "" || proxy == "off" {
+		if proxy == "" || proxy == "off" || t.preferURLHandler {
 			// No proxy available
 			handleHTTP(u, true)
 			return ret("", false)
@@ -280,7 +282,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 
 	if !strings.HasPrefix(u, "http") && !strings.HasPrefix(u, "gemini") && !strings.HasPrefix(u, "file") {
 		// Not a Gemini URL
-		if proxy == "" || proxy == "off" {
+		if proxy == "" || proxy == "off" || t.preferURLHandler {
 			// No proxy available
 			handleOther(u)
 			return ret("", false)

@@ -188,6 +188,7 @@ underline = true
 # bind_copy_target_url
 # bind_beginning: moving to beginning of page (top left)
 # bind_end: same but the for the end (bottom left)
+# bind_url_handler_open: Open highlighted URL with URL handler (#143)
 
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.

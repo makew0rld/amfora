@@ -384,7 +384,9 @@ func Init() error {
 				if !ok {
 					return fmt.Errorf(`include: value for "%s" is not a string: %v`, k2, v2)
 				}
-				setColor(k2, colorStr)
+				if err := setColor(k2, colorStr); err != nil {
+					return err
+				}
 			}
 		}
 		for k, v := range configTheme.AllSettings() {
@@ -392,7 +394,9 @@ func Init() error {
 			if !ok {
 				return fmt.Errorf(`value for "%s" is not a string: %v`, k, v)
 			}
-			setColor(k, colorStr)
+			if err := setColor(k, colorStr); err != nil {
+				return err
+			}
 		}
 	}
 	if viper.GetBool("a-general.color") {

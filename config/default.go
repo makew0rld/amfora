@@ -376,6 +376,15 @@ header = true
 # bottombar_bg
 # scrollbar: The scrollbar that appears on the right for long pages
 
+# You can also set an 'include' key to process another TOML file that contains theme keys.
+# Example:
+#   include = "my/path/to/special-theme.toml"
+#
+# Any other theme keys will override this external file.
+# You can use this special key to switch between themes easily.
+# Download other themes here: https://github.com/makeworld-the-better-one/amfora/tree/master/contrib/themes
+
+
 # hdg_1
 # hdg_2
 # hdg_3

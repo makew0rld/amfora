@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `header` config option in `[subscriptions]` to allow disabling the header text on the subscriptions page (#191)
 - Selected link and scroll position stays for non-cached pages (#122)
 - Keybinding to open URL with URL handler instead of configured proxy (#143)
+- `include` theme key to import themes from an external file (#154)
 
 ### Changed
 - Center text automatically, removing `left_margin` from the config (#233)

@@ -347,29 +347,52 @@ func Init() error {
 	cache.SetMaxPages(viper.GetInt("cache.max_pages"))
 	cache.SetTimeout(viper.GetInt("cache.timeout"))
 
+	setColor := func(k string, colorStr string) error {
+		colorStr = strings.ToLower(colorStr)
+		var color tcell.Color
+		if colorStr == "default" {
+			if strings.HasSuffix(k, "bg") {
+				color = tcell.ColorDefault
+			} else {
+				return fmt.Errorf(`"default" is only valid for a background color (color ending in "bg"), not "%s"`, k)
+			}
+		} else {
+			color = tcell.GetColor(colorStr)
+			if color == tcell.ColorDefault {
+				return fmt.Errorf(`invalid color format for "%s": %s`, k, colorStr)
+			}
+		}
+		SetColor(k, color)
+		return nil
+	}
+
 	// Setup theme
 	configTheme := viper.Sub("theme")
 	if configTheme != nil {
+		// Include key comes first
+		if incPath := configTheme.GetString("include"); incPath != "" {
+			incViper := viper.New()
+			incViper.SetConfigFile(incPath)
+			incViper.SetConfigType("toml")
+			err = incViper.ReadInConfig()
+			if err != nil {
+				return err
+			}
+
+			for k2, v2 := range incViper.AllSettings() {
+				colorStr, ok := v2.(string)
+				if !ok {
+					return fmt.Errorf(`include: value for "%s" is not a string: %v`, k2, v2)
+				}
+				setColor(k2, colorStr)
+			}
+		}
 		for k, v := range configTheme.AllSettings() {
 			colorStr, ok := v.(string)
 			if !ok {
 				return fmt.Errorf(`value for "%s" is not a string: %v`, k, v)
 			}
-			colorStr = strings.ToLower(colorStr)
-			var color tcell.Color
-			if colorStr == "default" {
-				if strings.HasSuffix(k, "bg") {
-					color = tcell.ColorDefault
-				} else {
-					return fmt.Errorf(`"default" is only valid for a background color (color ending in "bg"), not "%s"`, k)
-				}
-			} else {
-				color = tcell.GetColor(colorStr)
-				if color == tcell.ColorDefault {
-					return fmt.Errorf(`invalid color format for "%s": %s`, k, colorStr)
-				}
-			}
-			SetColor(k, color)
+			setColor(k, colorStr)
 		}
 	}
 	if viper.GetBool("a-general.color") {

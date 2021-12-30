@@ -6,11 +6,13 @@ import (
 	"io/ioutil"
 	"net"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/makeworld-the-better-one/go-gemini"
+	gemsocks5 "github.com/makeworld-the-better-one/go-gemini-socks5"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
@@ -38,6 +40,10 @@ func Init() error {
 	fetchClient = &gemini.Client{
 		ConnectTimeout: 10 * time.Second, // Default is 15
 		ReadTimeout:    time.Duration(viper.GetInt("a-general.page_max_time")) * time.Second,
+	}
+
+	if socksHost := os.Getenv("AMFORA_SOCKS5"); socksHost != "" {
+		fetchClient.Proxy = gemsocks5.ProxyFunc(socksHost, nil)
 	}
 
 	// Populate config maps

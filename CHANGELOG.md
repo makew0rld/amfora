@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Selected link and scroll position stays for non-cached pages (#122)
 - Keybinding to open URL with URL handler instead of configured proxy (#143)
 - `include` theme key to import themes from an external file (#154)
+- Support SOCKS5 proxying by setting `AMFORA_SOCKS5` environment variable (#155)
 
 ### Changed
 - Center text automatically, removing `left_margin` from the config (#233)

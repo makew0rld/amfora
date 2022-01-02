@@ -221,7 +221,7 @@ func KeyInit() {
 		CmdCopyTargetURL:  "keybindings.bind_copy_target_url",
 		CmdBeginning:      "keybindings.bind_beginning",
 		CmdEnd:            "keybindings.bind_end",
-    CmdURLHandlerOpen: "keybindings.bind_url_handler_open",
+		CmdURLHandlerOpen: "keybindings.bind_url_handler_open",
 		CmdCommand1:       "keybindings.bind_command1",
 		CmdCommand2:       "keybindings.bind_command2",
 		CmdCommand3:       "keybindings.bind_command3",

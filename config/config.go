@@ -348,6 +348,9 @@ func Init() error {
 	cache.SetTimeout(viper.GetInt("cache.timeout"))
 
 	setColor := func(k string, colorStr string) error {
+		if k == "include" {
+			return nil
+		}
 		colorStr = strings.ToLower(colorStr)
 		var color tcell.Color
 		if colorStr == "default" {

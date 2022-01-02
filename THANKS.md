@@ -26,3 +26,4 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 * mooff (@awfulcooking)
 * Josias (@justjosias)
 * mntn (@mntn-xyz)
+* Maxime Bouillot (@Arkaeriit)

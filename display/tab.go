@@ -86,7 +86,7 @@ func makeNewTab() *tab {
 			linkN, _ := strconv.Atoi(currentSelection[0])
 			tabs[tab].page.Selected = tabs[tab].page.Links[linkN]
 			tabs[tab].page.SelectedID = currentSelection[0]
-			followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[linkN])
+			go followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[linkN])
 			return
 		}
 		if len(currentSelection) == 0 && (key == tcell.KeyEnter || key == tcell.KeyTab) {
@@ -156,12 +156,12 @@ func makeNewTab() *tab {
 			if t.hasContent() {
 				savePath, err := downloadPage(t.page)
 				if err != nil {
-					Error("Download Error", fmt.Sprintf("Error saving page content: %v", err))
+					go Error("Download Error", fmt.Sprintf("Error saving page content: %v", err))
 				} else {
-					Info(fmt.Sprintf("Page content saved to %s. ", savePath))
+					go Info(fmt.Sprintf("Page content saved to %s. ", savePath))
 				}
 			} else {
-				Info("The current page has no content, so it couldn't be downloaded.")
+				go Info("The current page has no content, so it couldn't be downloaded.")
 			}
 			return nil
 		case config.CmdBack:
@@ -178,7 +178,7 @@ func makeNewTab() *tab {
 			currentURL := tabs[curTab].page.URL
 			err := clipboard.WriteAll(currentURL)
 			if err != nil {
-				Error("Copy Error", err.Error())
+				go Error("Copy Error", err.Error())
 				return nil
 			}
 			return nil
@@ -193,14 +193,14 @@ func makeNewTab() *tab {
 			if err != nil {
 				err := clipboard.WriteAll(selectedURL)
 				if err != nil {
-					Error("Copy Error", err.Error())
+					go Error("Copy Error", err.Error())
 					return nil
 				}
 				return nil
 			}
 			err = clipboard.WriteAll(copiedURL.String())
 			if err != nil {
-				Error("Copy Error", err.Error())
+				go Error("Copy Error", err.Error())
 				return nil
 			}
 			return nil
@@ -209,7 +209,7 @@ func makeNewTab() *tab {
 		if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
 			if int(cmd) <= len(t.page.Links) {
 				// It's a valid link number
-				followLink(&t, t.page.URL, t.page.Links[cmd-1])
+				go followLink(&t, t.page.URL, t.page.Links[cmd-1])
 				return nil
 			}
 		}

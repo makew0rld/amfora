@@ -29,4 +29,5 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 * Michael McDonagh (@m-mcdonagh)
 * mooff (@awfulcooking)
 * Josias (@justjosias)
+* mntn (@mntn-xyz)
 `)

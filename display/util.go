@@ -63,7 +63,14 @@ func isValidTab(t *tab) bool {
 }
 
 func leftMargin() int {
-	return int(float64(termW) * viper.GetFloat64("a-general.left_margin"))
+	// Return the left margin size that centers the text, assuming it's the max width
+	// https://github.com/makeworld-the-better-one/amfora/issues/233
+
+	lm := (termW - viper.GetInt("a-general.max_width")) / 2
+	if lm < 0 {
+		return 0
+	}
+	return lm
 }
 
 func textWidth() int {
@@ -73,13 +80,11 @@ func textWidth() int {
 		return viper.GetInt("a-general.max_width")
 	}
 
-	rightMargin := leftMargin()
-	if leftMargin() > 10 {
-		// 10 is the max right margin
-		rightMargin = 10
-	}
+	// Subtract left and right margin from total width to get text width
+	// Left and right margin are equal because text is automatically centered, see:
+	// https://github.com/makeworld-the-better-one/amfora/issues/233
 
-	max := termW - leftMargin() - rightMargin
+	max := termW - leftMargin()*2
 	if max < viper.GetInt("a-general.max_width") {
 		return max
 	}

@@ -142,7 +142,8 @@ Features in *italics* are in the master branch, but not in the latest release.
   - So is subscribing to a page, to know when it changes
 - [x] Open non-text files in another application
   - [x] Ability to stream content instead of downloading it first
-- [x] Run custom commands using the current or selected URL as an argument
+- [x] *Highlighting of preformatted code blocks that list a language in the alt text*
+- [x] *Run custom commands using the current or selected URL as an argument*
 - [ ] Stream support
 - [ ] Table of contents for pages
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>
@@ -163,6 +164,7 @@ Amfora ❤️ open source!
 - [progressbar](https://github.com/schollz/progressbar)
 - [go-humanize](https://github.com/dustin/go-humanize)
 - [gofeed](https://github.com/mmcdole/gofeed)
+- [chroma](https://github.com/alecthomas/chroma) for source code syntax highlighting
 - [clipboard](https://github.com/atotto/clipboard)
 - [termenv](https://github.com/muesli/termenv)
 

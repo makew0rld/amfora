@@ -11,6 +11,7 @@ import (
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
+	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
@@ -87,7 +88,7 @@ func Init(version, commit, builtBy string) {
 				// Overwrite all tabs with a new, differently sized, left margin
 				browser.AddTab(
 					strconv.Itoa(i),
-					makeTabLabel(strconv.Itoa(i+1)),
+					tabs[i].label(),
 					makeContentLayout(tabs[i].view, leftMargin()),
 				)
 				if tabs[i] == t {
@@ -228,12 +229,12 @@ func Init(version, commit, builtBy string) {
 
 						u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
 						// Don't use the cached version of the search
-						cache.RemovePage(normalizeURL(u))
+						cache.RemovePage(client.NormalizeURL(u))
 						URL(u)
 					} else {
 						// Full URL
 						// Don't use cached version for manually entered URL
-						cache.RemovePage(normalizeURL(fixUserURL(query)))
+						cache.RemovePage(client.NormalizeURL(client.FixUserURL(query)))
 						URL(query)
 					}
 					return
@@ -437,7 +438,7 @@ func NewTabWithURL(url string) {
 
 	browser.AddTab(
 		strconv.Itoa(curTab),
-		makeTabLabel(strconv.Itoa(curTab+1)),
+		tabs[curTab].label(),
 		makeContentLayout(tabs[curTab].view, leftMargin()),
 	)
 	browser.SetCurrentTab(strconv.Itoa(curTab))
@@ -555,7 +556,7 @@ func URL(u string) {
 	if strings.HasPrefix(u, "about:") {
 		go goURL(t, u)
 	} else {
-		go goURL(t, fixUserURL(u))
+		go goURL(t, client.FixUserURL(u))
 	}
 }
 

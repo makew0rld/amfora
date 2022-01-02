@@ -285,6 +285,7 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_beginning", []string{"Home", "g"})
 	viper.SetDefault("keybindings.bind_end", []string{"End", "G"})
 	viper.SetDefault("keybindings.shift_numbers", "")
+	viper.SetDefault("keybindings.bind_url_handler_open", "Ctrl-U")
 	viper.SetDefault("url-handlers.other", "default")
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
@@ -293,6 +294,7 @@ func Init() error {
 	viper.SetDefault("subscriptions.update_interval", 1800)
 	viper.SetDefault("subscriptions.workers", 3)
 	viper.SetDefault("subscriptions.entries_per_page", 20)
+	viper.SetDefault("subscriptions.header", true)
 
 	viper.SetConfigFile(configPath)
 	viper.SetConfigType("toml")
@@ -375,29 +377,56 @@ func Init() error {
 	cache.SetMaxPages(viper.GetInt("cache.max_pages"))
 	cache.SetTimeout(viper.GetInt("cache.timeout"))
 
+	setColor := func(k string, colorStr string) error {
+		colorStr = strings.ToLower(colorStr)
+		var color tcell.Color
+		if colorStr == "default" {
+			if strings.HasSuffix(k, "bg") {
+				color = tcell.ColorDefault
+			} else {
+				return fmt.Errorf(`"default" is only valid for a background color (color ending in "bg"), not "%s"`, k)
+			}
+		} else {
+			color = tcell.GetColor(colorStr)
+			if color == tcell.ColorDefault {
+				return fmt.Errorf(`invalid color format for "%s": %s`, k, colorStr)
+			}
+		}
+		SetColor(k, color)
+		return nil
+	}
+
 	// Setup theme
 	configTheme := viper.Sub("theme")
 	if configTheme != nil {
+		// Include key comes first
+		if incPath := configTheme.GetString("include"); incPath != "" {
+			incViper := viper.New()
+			incViper.SetConfigFile(incPath)
+			incViper.SetConfigType("toml")
+			err = incViper.ReadInConfig()
+			if err != nil {
+				return err
+			}
+
+			for k2, v2 := range incViper.AllSettings() {
+				colorStr, ok := v2.(string)
+				if !ok {
+					return fmt.Errorf(`include: value for "%s" is not a string: %v`, k2, v2)
+				}
+				if err := setColor(k2, colorStr); err != nil {
+					return err
+				}
+			}
+		}
 		for k, v := range configTheme.AllSettings() {
 			colorStr, ok := v.(string)
 			if !ok {
 				return fmt.Errorf(`value for "%s" is not a string: %v`, k, v)
 			}
-			colorStr = strings.ToLower(colorStr)
-			var color tcell.Color
-			if colorStr == "default" {
-				if strings.HasSuffix(k, "bg") {
-					color = tcell.ColorDefault
-				} else {
-					return fmt.Errorf(`"default" is only valid for a background color (color ending in "bg"), not "%s"`, k)
-				}
-			} else {
-				color = tcell.GetColor(colorStr)
-				if color == tcell.ColorDefault {
-					return fmt.Errorf(`invalid color format for "%s": %s`, k, colorStr)
-				}
+			if err := setColor(k, colorStr); err != nil {
+				return err
 			}
-			SetColor(k, color)
 		}
 	}
 	if viper.GetBool("a-general.color") {

@@ -99,13 +99,17 @@ underline = true
 
 [auth.certs]
 # Client certificates
-# Set domain name equal to path to client cert
-# "example.com" = 'mycert.crt'
+# Set URL equal to path to client cert file
+#
+# "example.com" = 'mycert.crt'      # Cert is used for all paths on this domain
+# "example.com/dir/"=  'mycert.crt' # Cert is used for /dir/ and everything below only
+#
+# See the comment at the beginning of this file for examples of all valid types of
+# URLs, ports and schemes can be used too
 
 [auth.keys]
 # Client certificate keys
-# Set domain name equal to path to key for the client cert above
-# "example.com" = 'mycert.key'
+# Same as [auth.certs] but the path is to the client key file.
 
 
 [commands]
@@ -230,6 +234,7 @@ underline = true
 # bind_copy_target_url
 # bind_beginning: moving to beginning of page (top left)
 # bind_end: same but the for the end (bottom left)
+# bind_url_handler_open: Open highlighted URL with URL handler (#143)
 
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.
@@ -375,6 +380,9 @@ workers = 3
 # The number of subscription updates displayed per page.
 entries_per_page = 20
 
+# Set to false to remove the explanatory text from the top of the subscription page
+header = true
+
 
 [theme]
 # This section is for changing the COLORS used in Amfora.
@@ -413,6 +421,15 @@ entries_per_page = 20
 # bottombar_text: The color of the text you type
 # bottombar_bg
 # scrollbar: The scrollbar that appears on the right for long pages
+
+# You can also set an 'include' key to process another TOML file that contains theme keys.
+# Example:
+#   include = "my/path/to/special-theme.toml"
+#
+# Any other theme keys will override this external file.
+# You can use this special key to switch between themes easily.
+# Download other themes here: https://github.com/makeworld-the-better-one/amfora/tree/master/contrib/themes
+
 
 # hdg_1
 # hdg_2

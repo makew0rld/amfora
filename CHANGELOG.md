@@ -7,10 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Syntax highlighting for preformatted text blocks with alt text (#252, #263, [wiki page](https://github.com/makeworld-the-better-one/amfora/wiki/Source-Code-Highlighting))
+- [Client certificates](https://github.com/makeworld-the-better-one/amfora/wiki/Client-Certificates) can be restricted to certain paths of a host (#115)
+- `header` config option in `[subscriptions]` to allow disabling the header text on the subscriptions page (#191)
+- Selected link and scroll position stays for non-cached pages (#122)
+- Keybinding to open URL with URL handler instead of configured proxy (#143)
+- `include` theme key to import themes from an external file (#154)
+- Support SOCKS5 proxying by setting `AMFORA_SOCKS5` environment variable (#155)
 
 ### Changed
 - Center text automatically, removing `left_margin` from the config (#233)
 - `max_width` defaults to 80 columns instead of 100 (#233)
+- Tabs have the domain of the current page instead of numbers (#202)
 
 ### Fixed
 - Modal can't be closed when opening non-gemini text URLs from the commandline (#283, #284)

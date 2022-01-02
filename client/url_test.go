@@ -1,5 +1,5 @@
 //nolint: lll
-package display
+package client
 
 import (
 	"testing"
@@ -36,7 +36,7 @@ var normalizeURLTests = []struct {
 
 func TestNormalizeURL(t *testing.T) {
 	for _, tt := range normalizeURLTests {
-		actual := normalizeURL(tt.u)
+		actual := NormalizeURL(tt.u)
 		if actual != tt.expected {
 			t.Errorf("normalizeURL(%s): expected %s, actual %s", tt.u, tt.expected, actual)
 		}

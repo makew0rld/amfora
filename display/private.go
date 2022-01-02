@@ -118,7 +118,7 @@ func setPage(t *tab, p *structs.Page) {
 	tabNum := tabNumber(t)
 	browser.AddTab(
 		strconv.Itoa(tabNum),
-		makeTabLabel(strconv.Itoa(tabNum+1)),
+		t.label(),
 		makeContentLayout(t.view, leftMargin()),
 	)
 	App.Draw()
@@ -137,6 +137,9 @@ func setPage(t *tab, p *structs.Page) {
 //
 // It should be called in a goroutine.
 func goURL(t *tab, u string) {
+	// Update page cache in history for #122
+	t.historyCachePage()
+
 	final, displayed := handleURL(t, u, 0)
 	if displayed {
 		t.addToHistory(final)

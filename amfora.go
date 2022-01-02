@@ -54,7 +54,12 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Config error: %v\n", err)
 		os.Exit(1)
 	}
-	client.Init()
+
+	err = client.Init()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Client error: %v\n", err)
+		os.Exit(1)
+	}
 
 	err = subscriptions.Init()
 	if err != nil {

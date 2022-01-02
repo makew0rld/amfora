@@ -22,12 +22,12 @@ func CustomCommand(num int, url string) {
 	if len(cmd) > 0 {
 		msg, err := command.RunCommand(cmd, url)
 		if err != nil {
-			Error("Command Error", err.Error())
+			go Error("Command Error", err.Error())
 			return
 		}
-		Info(msg)
+		go Info(msg)
 	} else {
-		Error("Command Error", "Command "+strconv.Itoa(num)+" not defined")
+		go Error("Command Error", "Command "+strconv.Itoa(num)+" not defined")
 		return
 	}
 

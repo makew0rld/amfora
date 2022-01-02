@@ -8,9 +8,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-// NOTE: CmdLink[1-90], CmdTab[1-90], and CmdCommand[1-90] need to be
-// in-order and consecutive. This property is used to simplify key
-// handling in display/display.go and display/tab.go
+// NOTE: CmdLink[1-90], CmdTab[1-90], CmdCommand[1-90], and
+// CmdCommandTarget[1-90] need to be in-order and consecutive. This
+// property is used to simplify key handling in display/display.go
+// and display/tab.go
 type Command int
 
 const (

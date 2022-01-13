@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	code.rocketnine.space/tslocum/cview v1.5.6-0.20210530175404-7e8817f20bdc
-	github.com/alecthomas/chroma v0.9.2
+	github.com/alecthomas/chroma v0.10.0
 	github.com/atotto/clipboard v0.1.4
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
@@ -24,7 +24,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	golang.org/x/text v0.3.6
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect

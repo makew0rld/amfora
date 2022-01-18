@@ -12,7 +12,7 @@ require (
 	github.com/google/go-cmp v0.5.0 // indirect
 	github.com/makeworld-the-better-one/go-gemini v0.13.0
 	github.com/makeworld-the-better-one/go-gemini-socks5 v1.0.0
-	github.com/makeworld-the-better-one/rr v0.0.0-20220118144240-b31c79b0ff42
+	github.com/makeworld-the-better-one/rr v1.0.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
 	github.com/mmcdole/gofeed v1.1.2

@@ -146,6 +146,8 @@ github.com/makeworld-the-better-one/go-gemini v0.13.0 h1:CwUKLldUlZwWolG1/xKkYVg
 github.com/makeworld-the-better-one/go-gemini v0.13.0/go.mod h1:F+3x+R1xeYK90jMtBq+U+8Sh64r2dHleDZ/en3YgSmg=
 github.com/makeworld-the-better-one/go-gemini-socks5 v1.0.0 h1:D2o1rIfP/KOxcL3m3rzo4cfWNqfcGaMIhnU0keJc1+o=
 github.com/makeworld-the-better-one/go-gemini-socks5 v1.0.0/go.mod h1:mfPK9BfBAAyLKuxPEbZi8mgrGmVlzMKVTGElVspuVR8=
+github.com/makeworld-the-better-one/rr v0.0.0-20220118144240-b31c79b0ff42 h1:s+0WxoBcnkZo1TX1jLRLF69k0G8Jgf7L8I+usThLbgg=
+github.com/makeworld-the-better-one/rr v0.0.0-20220118144240-b31c79b0ff42/go.mod h1:sd3i5WAdkx/7ALu3V6AbVUyDw8uqmDQv55LgHta0f7g=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-isatty v0.0.3/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=

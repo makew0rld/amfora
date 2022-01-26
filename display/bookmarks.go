@@ -2,6 +2,8 @@ package display
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
@@ -27,6 +29,9 @@ const (
 // bkmkCh is for the user action
 var bkmkCh = make(chan bkmkAction)
 var bkmkModalText string // The current text of the input field in the modal
+
+// Regex for extracting top level 1 heading. The title will extracted from the 1st submatch.
+var topHeadingRegex = regexp.MustCompile(`(?m)^#[^#][\t ]*[^\s].*$`)
 
 func bkmkInit() {
 	panels.AddPanel(PanelBookmarks, bkmkModal, false, false)
@@ -159,7 +164,17 @@ func addBookmark() {
 		return
 	}
 	name, exists := bookmarks.Get(p.URL)
+
+	// Retrieve & use top level 1 heading for name if bookmark does not already exist.
+	if !exists {
+		match := topHeadingRegex.FindString(p.Raw)
+		if match != "" {
+			name = strings.TrimSpace(match[1:])
+		}
+	}
+
 	// Open a bookmark modal with the current name of the bookmark, if it exists
+	// otherwise use the top level 1 heading as a suggested name
 	newName, action := openBkmkModal(name, exists)
 
 	//nolint:exhaustive

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keybinding to open URL with URL handler instead of configured proxy (#143)
 - `include` theme key to import themes from an external file (#154, #290)
 - Support SOCKS5 proxying by setting `AMFORA_SOCKS5` environment variable (#155)
+- When bookmarking a page, the first level one heading is suggested as the name (#267, #293)
 
 ### Changed
 - Center text automatically, removing `left_margin` from the config (#233)

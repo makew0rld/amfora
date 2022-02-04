@@ -228,7 +228,7 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_close_tab", "Ctrl-W")
 	viper.SetDefault("keybindings.bind_next_tab", "F2")
 	viper.SetDefault("keybindings.bind_prev_tab", "F1")
-	viper.SetDefault("keybindings.bind_quit", []string{"Ctrl-C", "Ctrl-Q", "q"})
+	viper.SetDefault("keybindings.bind_quit", []string{"Ctrl-C", "Ctrl-Q", "Q"})
 	viper.SetDefault("keybindings.bind_help", "?")
 	viper.SetDefault("keybindings.bind_link1", "1")
 	viper.SetDefault("keybindings.bind_link2", "2")

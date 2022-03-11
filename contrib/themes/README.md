@@ -157,6 +157,22 @@ Contributed by **[@luetage](https://github.com/luetage)**
 
 ![screenshot of Tokyo Night theme](https://user-images.githubusercontent.com/13988217/130348393-69986b51-ddd7-4310-90ae-382461502535.png)
 
+## Rosé Pine
+
+Contributed by **[@mvllow](https://github.com/mvllow)**.
+
+### Rosé Pine
+
+<img width="705" alt="screenshot of Rosé Pine theme" src="https://user-images.githubusercontent.com/47515065/157936679-e8538caa-b6b7-4a0c-94b3-3a4c3a1a5e05.png">
+
+### Rosé Pine Moon
+
+<img width="705" alt="screenshot of Rosé Pine Moon theme" src="https://user-images.githubusercontent.com/47515065/157936710-ae6c346a-1fae-4ba4-b57f-279c96136afd.png">
+
+### Rosé Pine Dawn
+
+<img width="705" alt="screenshot of Rosé Pine Dawn theme" src="https://user-images.githubusercontent.com/47515065/157936744-fc8a2d33-4c4e-4440-a866-c83a84c6da25.png">
+
 ## Yours?
 
 Contribute your own theme by opening a PR.

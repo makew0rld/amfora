@@ -166,6 +166,12 @@ func makeNewTab() *tab {
 		case config.CmdPgdn:
 			t.pageDown()
 			return nil
+		case config.CmdHalfPgup:
+			t.halfPageUp()
+			return nil
+		case config.CmdHalfPgdn:
+			t.halfPageDown()
+			return nil
 		case config.CmdSave:
 			if t.hasContent() {
 				savePath, err := downloadPage(t.page)
@@ -350,25 +356,40 @@ func (t *tab) addToHistory(u string) {
 	t.historyCachePage()                                                      // Fill it with data
 }
 
-// pageUp scrolls up 75% of the height of the terminal, like Bombadillo.
-func (t *tab) pageUp() {
-	t.page.Row -= (termH / 4) * 3
+// Scrolls by the given fraction of the display height
+func (t *tab) relativeScroll(scrollAmount float32) {
+	t.page.Row += int(float32(termH) * scrollAmount)
+
+	// Clamp to page bounds
+	height, _ := t.view.GetBufferSize()
 	if t.page.Row < 0 {
 		t.page.Row = 0
 	}
-	t.applyScroll()
-}
-
-// pageDown scrolls down 75% of the height of the terminal, like Bombadillo.
-func (t *tab) pageDown() {
-	height, _ := t.view.GetBufferSize()
-
-	t.page.Row += (termH / 4) * 3
 	if t.page.Row > height {
 		t.page.Row = height
 	}
 
 	t.applyScroll()
+}
+
+// pageUp scrolls up 75% of the height of the terminal, like Bombadillo.
+func (t *tab) pageUp() {
+	t.relativeScroll(-0.75)
+}
+
+// pageDown scrolls down 75% of the height of the terminal, like Bombadillo.
+func (t *tab) pageDown() {
+	t.relativeScroll(0.75)
+}
+
+// halfPageUp scrolls up 50% of the height of the terminal, like vim and less.
+func (t *tab) halfPageUp() {
+	t.relativeScroll(-0.5)
+}
+
+// halfPageDown scrolls down 75% of the height of the terminal, like vim and less.
+func (t *tab) halfPageDown() {
+	t.relativeScroll(0.5)
 }
 
 // hasContent returns false when the tab's page is malformed,

@@ -49,6 +49,8 @@ const (
 	CmdMoveRight
 	CmdPgup
 	CmdPgdn
+	CmdHalfPgup
+	CmdHalfPgdn
 	CmdNewTab
 	CmdCloseTab
 	CmdNextTab
@@ -187,6 +189,8 @@ func KeyInit() {
 		CmdMoveRight:      "keybindings.bind_moveright",
 		CmdPgup:           "keybindings.bind_pgup",
 		CmdPgdn:           "keybindings.bind_pgdn",
+		CmdHalfPgup:       "keybindings.bind_half_pgup",
+		CmdHalfPgdn:       "keybindings.bind_half_pgdn",
 		CmdNewTab:         "keybindings.bind_new_tab",
 		CmdCloseTab:       "keybindings.bind_close_tab",
 		CmdNextTab:        "keybindings.bind_next_tab",

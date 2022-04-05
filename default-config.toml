@@ -173,6 +173,8 @@ underline = true
 # bind_moveright
 # bind_pgup
 # bind_pgdn
+# bind_half_pgup
+# bind_half_pgdn
 # bind_new_tab
 # bind_close_tab
 # bind_next_tab

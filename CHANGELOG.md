@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `max_width` defaults to 80 columns instead of 100 (#233)
 - Tabs have the domain of the current page instead of numbers (#202)
 - Closing Amfora with <kbd>q</kbd> was removed in favor of <kbd>Shift-q</kbd> (#243)
+- Paging up or down scrolls by 50% instead of 75%, to match `less` (#303)
 
 ### Fixed
 - Modal can't be closed when opening non-gemini text URLs from the commandline (#283, #284)

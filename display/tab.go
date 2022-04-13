@@ -352,7 +352,7 @@ func (t *tab) addToHistory(u string) {
 
 // pageUp scrolls up 75% of the height of the terminal, like Bombadillo.
 func (t *tab) pageUp() {
-	t.page.Row -= (termH / 4) * 3
+	t.page.Row -= termH / 2
 	if t.page.Row < 0 {
 		t.page.Row = 0
 	}
@@ -363,7 +363,7 @@ func (t *tab) pageUp() {
 func (t *tab) pageDown() {
 	height, _ := t.view.GetBufferSize()
 
-	t.page.Row += (termH / 4) * 3
+	t.page.Row += termH / 2
 	if t.page.Row > height {
 		t.page.Row = height
 	}

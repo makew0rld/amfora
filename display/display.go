@@ -202,14 +202,18 @@ func Init(version, commit, builtBy string) {
 						// Open new tab and load link
 						oldTab := tab
 						// Resolve and follow link manually
-						prevParsed, _ := url.Parse(tabs[oldTab].page.URL)
 						nextParsed, err := url.Parse(tabs[oldTab].page.Links[i-1])
 						if err != nil {
 							Error("URL Error", "link URL could not be parsed")
 							reset()
 							return
 						}
-						NewTabWithURL(prevParsed.ResolveReference(nextParsed).String())
+						if tabs[oldTab].hasContent() && !tabs[oldTab].isAnAboutPage() {
+							prevParsed, _ := url.Parse(tabs[oldTab].page.URL)
+							NewTabWithURL(prevParsed.ResolveReference(nextParsed).String())
+						} else {
+							NewTabWithURL(nextParsed.String())
+						}
 						return
 					}
 				} else {

@@ -8,24 +8,105 @@
 .Nm amfora
 .Op Ar url
 .Sh DESCRIPTION
-The
 .Nm
-is a gemini client in your terminal.
-The documentation is maintained at
-.Lk https://github.com/makeworld-the-better-one/amfora/wiki
-.Sh KEY BINDINGS
-.It ?
+is a fancy gemini client in your terminal.
+.Nm
+also supports subscription through gemini, atom, RSS, and JSON Feed files.
+caches documents (aka "pages") it loads, to reduce latency: if you're navigating through history, or simply just returning to the same page again.
+.Ss BOOKMARKS
+.Nm
+stores it's bookmarks in an XML format called XBEL, located at ~/.local/share/amfora/bookmarks.xml by default.
+If the $XDG_DATA_HOME variable is set then the configuration file can be found at $XDG_DATA_HOME/amfora/bookmarks.xml.
+.Pp
+On Windows, the file can be found at %APPDATA%\amfora\bookmarks.xml, which usually expands to C:\Users\<username>\AppData\Roaming\amfora\bookmarks.xml.
+.Ss CONFIGURATION
+.Nm
+configuration file is located at ~/.config/amfora/config.toml by default.
+If the $XDG_CONFIG_HOME variable is set then the configuration file can be found at $XDG_CONFIG_HOME/amfora/config.toml.
+.Pp
+On Windows, the configuration file can be found at %APPDATA%\amfora\config.toml, which usually expands to C:\Users\<username>\AppData\Roaming\amfora\config.toml.
+.Pp
+The default config file can be viewed at default-config.toml.
+.Nm
+will place that file in the config file location if it doesn't exist.
+.Sh DEFAULT KEY BINDINGS
+You can view the keybindings in the help menu, which can be brought up using ? and exited with Esc.
+The keybindings in the help will update if you change your keybindings in the config.
+.Pp
+.Bl -column "Brq, Bro, Brc" description
+.It Ic \&?
 Open help menu
-.It q
-Exit amfora
-.\" .Sh EXAMPLES
+.It Ic Space
+Open bottom bar
+.It Ic Esc
+Close menu/bar
+.It Ic q
+Exit
+.Nm
+.It Ic 0-9
+Access link 1-10 on page
+.It Ic Tab or Enter
+Begin link highlighting
+.It Ic Shift-Tab
+Highlight previous link
+.It Ic Tab
+Highlight next link
+.It Ic Ctrl-T
+Open highlighted link in new tab
+.It Ic Ctrl-X
+Subscribe to current page
+.It Ic Ctrl-A
+Visit subscription feed
+.El
+.Sh BOTTOM BAR COMMANDS
+.Bl -tag -width Ds -compact
+.It Cm new:N
+Visit link N
+.It Cm about:version
+.Nm
+version info
+.It Cm about:subscriptions
+Visit subscription feed
+.It Cm about:manage-subscriptions
+Visit unsubscribe list
+.El
+.Sh EXAMPLES
+.Ss Bookmarks
+.Pp
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xbel
+  PUBLIC "+//IDN python.org//DTD XML Bookmark Exchange Language 1.1//EN//XML"
+         "http://www.python.org/topics/xml/dtds/xbel-1.1.dtd">
+<xbel version="1.1">
+    <bookmark href="gemini://example.com/">
+        <title>Example Bookmark</title>
+    </bookmark>
+</xbel>
+.Pp
 .\" .Sh ERRORS
 .\" .Sh ENVIRONMENT
+.Sh FILES
+.Bl -tag -width Ds -compact
+.It Pa ~/.config/amfora/config.toml
+.It Pa ~/.local/share/amfora/bookmarks.xml
+.It Pa $XDG_CONFIG_HOME/amfora/config.toml
+.It Pa $XDG_DATA_HOME/amfora/bookmarks.xml
+.El
 .Sh STANDARDS
-.Lk https://gemini.circumlunar.space/docs/specification.gmi
+.Bl -tag -width Ds -compact
+.It Lk https://gemini.circumlunar.space/docs/specification.gmi
+Gemini Protocol
+.It Lk https://toml.io/en/
+Configuration syntax
+.It Lk http://pyxml.sourceforge.net/topics/xbel/docs/html/xbel.html
+Bookmark syntax
+.El
 .Sh HISTORY
 .Nm
 development started in June, 2020.
+.Sh SEE ALSO
+.Lk https://github.com/makeworld-the-better-one/amfora/wiki
+.Xr bombadillo
 .\" .Sh AUTHORS
 .\" .Sh CAVEATS
 .\" .Sh BUGS

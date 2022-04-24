@@ -11,14 +11,35 @@
 .Nm
 is a fancy gemini client in your terminal.
 .Nm
-also supports subscription through gemini, atom, RSS, and JSON Feed files.
+is written in Go and supports tabs, caching, theming, proxying, subscriptions, client certificates, external link handling, and a built in search engine.
+Subscriptions are supported through gemini, atom, RSS, and JSON Feed files.
+.Nm
 caches documents (aka "pages") it loads, to reduce latency: if you're navigating through history, or simply just returning to the same page again.
+.Nm
+supports proxies so that certain types of URLs will not require opening another application.
+.Pp
+.Nm
+allows you to set the command to be run when following links that are non-Gemini URLs.
+For example, you may want mailto: links to be opened with your email client, or magnet: links to be opened with your torrent software.
+These settings are overriden by the settings in the [proxies] section.
+.Pp
+By default, when clicking a non-text file, Amfora will present you with options to either Open or Download the file.
+If you choose Open, Amfora will download the file to a temporary folder, and then open it using your OS's default application for that file type.
+You can configure what applications Amfora uses if you want to override this behaviour. You can also configure whether streaming is used.
+.Pp
+By default
+.Nm
+will automatically attempt to highlight blocks of preformatted source code.
+This is accomplished by searching for a string at the start of the alt text; if the string corresponds to a supported language name or MIME type, then the syntax will be highlighted if possible.
+.Nm
 .Ss BOOKMARKS
 .Nm
 stores it's bookmarks in an XML format called XBEL, located at ~/.local/share/amfora/bookmarks.xml by default.
 If the $XDG_DATA_HOME variable is set then the configuration file can be found at $XDG_DATA_HOME/amfora/bookmarks.xml.
 .Pp
 On Windows, the file can be found at %APPDATA%\amfora\bookmarks.xml, which usually expands to C:\Users\<username>\AppData\Roaming\amfora\bookmarks.xml.
+.Pp
+.Sx EXAMPLE BOOKMARK
 .Ss CONFIGURATION
 .Nm
 configuration file is located at ~/.config/amfora/config.toml by default.
@@ -33,7 +54,7 @@ will place that file in the config file location if it doesn't exist.
 You can view the keybindings in the help menu, which can be brought up using ? and exited with Esc.
 The keybindings in the help will update if you change your keybindings in the config.
 .Pp
-.Bl -column "Brq, Bro, Brc" description
+.Bl -column
 .It Ic \&?
 Open help menu
 .It Ic Space
@@ -60,7 +81,7 @@ Visit subscription feed
 .El
 .Sh BOTTOM BAR COMMANDS
 .Bl -tag -width Ds -compact
-.It Cm new:N
+.It Cm new: Va N
 Visit link N
 .It Cm about:version
 .Nm
@@ -71,7 +92,7 @@ Visit subscription feed
 Visit unsubscribe list
 .El
 .Sh EXAMPLES
-.Ss Bookmarks
+.Ss Example Bookmark
 .Pp
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xbel
@@ -82,15 +103,51 @@ Visit unsubscribe list
         <title>Example Bookmark</title>
     </bookmark>
 </xbel>
-.Pp
+.Ss Example Proxy
+[proxies]
+# Allows setting a Gemini proxy for different schemes.
+# The settings are similar to the url-handlers section above.
+# E.g. to open a gopher page by connecting to a Gemini proxy server:
+#   gopher = "example.com:123"
+#
+# Port 1965 is assumed if no port is specified.
+#
+# NOTE: These settings override any external handlers specified in
+# the url-handlers section.
+#
+# Note that HTTP and HTTPS are treated as separate protocols here
+.Ss Example Certificate
+[auth]
+# Authentication settings
+
+[auth.certs]
+# Client certificates
+# Set domain name equal to path to client cert
+# "example.com" = "mycert.crt"
+"astrobotany.mozz.us" = "~/.local/share/amfora/astrobotany-cert.pem"
+
+[auth.keys]
+# Client certificate keys
+# Set domain name equal to path to key for the client cert above
+# "example.com" = "mycert.key"
+"astrobotany.mozz.us" = "~/.local/share/amfora/astrobotany-key.pem"
 .\" .Sh ERRORS
 .\" .Sh ENVIRONMENT
 .Sh FILES
+.Ss *NIX
 .Bl -tag -width Ds -compact
 .It Pa ~/.config/amfora/config.toml
 .It Pa ~/.local/share/amfora/bookmarks.xml
+.El
+.Ss XDG
+.Bl -tag -width Ds -compact
 .It Pa $XDG_CONFIG_HOME/amfora/config.toml
 .It Pa $XDG_DATA_HOME/amfora/bookmarks.xml
+.El
+.Ss WINDOWS
+.Bl -tag -width Ds -compact
+.It Pa %APPDATA%\eamfora\econfig.toml
+.It Pa %APPDATA%\eamfora\ebookmarks.xml
 .El
 .Sh STANDARDS
 .Bl -tag -width Ds -compact
@@ -100,6 +157,8 @@ Gemini Protocol
 Configuration syntax
 .It Lk http://pyxml.sourceforge.net/topics/xbel/docs/html/xbel.html
 Bookmark syntax
+.It Lk https://www.iana.org/assignments/media-types/media-types.xhtml
+Media Types
 .El
 .Sh HISTORY
 .Nm
@@ -108,6 +167,9 @@ development started in June, 2020.
 .Lk https://github.com/makeworld-the-better-one/amfora/wiki
 .Xr bombadillo
 .\" .Sh AUTHORS
-.\" .Sh CAVEATS
+.Sh CAVEATS
+Using OpenSSL on Windows is not so easy.
+One way is to install Chocolatey, and run
+.Qq choco install openssl
 .\" .Sh BUGS
 .\" .Sh SECURITY CONSIDERATIONS

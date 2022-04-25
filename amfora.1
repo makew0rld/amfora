@@ -14,45 +14,83 @@ is a fancy gemini client in your terminal.
 is written in Go and supports tabs, caching, theming, proxying, subscriptions, client certificates, external link handling, and a built in search engine.
 Subscriptions are supported through gemini, atom, RSS, and JSON Feed files.
 .Nm
-caches documents (aka "pages") it loads, to reduce latency: if you're navigating through history, or simply just returning to the same page again.
+caches documents
+.Pq aka Qq pages
+it loads, to reduce latency: if you
+.Ap
+re navigating through history, or simply just returning to the same page again.
 .Nm
 supports proxies so that certain types of URLs will not require opening another application.
 .Pp
+The
 .Nm
-allows you to set the command to be run when following links that are non-Gemini URLs.
+config allows you to set the command to be run when following links that are non-Gemini URLs.
 For example, you may want mailto: links to be opened with your email client, or magnet: links to be opened with your torrent software.
-These settings are overriden by the settings in the [proxies] section.
+In
+.Nm
+you can specify proxies so that certain types of URLs will not require opening another application.
+In the config,
+.Bq proxies
+take precedence over
+.Bo url-handlers Bc .
 .Pp
-By default, when clicking a non-text file, Amfora will present you with options to either Open or Download the file.
-If you choose Open, Amfora will download the file to a temporary folder, and then open it using your OS's default application for that file type.
-You can configure what applications Amfora uses if you want to override this behaviour. You can also configure whether streaming is used.
+By default, when clicking a non-text file,
+.Nm
+will present you with options to either Open or Download the file.
+If you choose Open,
+.Nm
+will download the file to a temporary folder, and then open it using your OS
+.Ap
+s default application for that file type.
+You can configure what applications
+.Nm
+uses if you want to override this behaviour.
+You can also configure whether streaming is used.
 .Pp
 By default
 .Nm
 will automatically attempt to highlight blocks of preformatted source code.
 This is accomplished by searching for a string at the start of the alt text; if the string corresponds to a supported language name or MIME type, then the syntax will be highlighted if possible.
-.Nm
 .Ss BOOKMARKS
 .Nm
-stores it's bookmarks in an XML format called XBEL, located at ~/.local/share/amfora/bookmarks.xml by default.
-If the $XDG_DATA_HOME variable is set then the configuration file can be found at $XDG_DATA_HOME/amfora/bookmarks.xml.
+stores it's bookmarks in an XML format called XBEL, located at
+.Pa ~/.local/share/amfora/bookmarks.xml
+by default.
+If the
+.Va XDG_DATA_HOME
+variable is set then the configuration file can be found at
+.Pa XDG_DATA_HOME/amfora/bookmarks.xml .
 .Pp
-On Windows, the file can be found at %APPDATA%\amfora\bookmarks.xml, which usually expands to C:\Users\<username>\AppData\Roaming\amfora\bookmarks.xml.
+On Windows, the file can be found at
+.Pa %APPDATA%\eamfora\ebookmarks.xml ,
+which usually expands to
+.Pa C:\eUsers\e<username>\eAppData\eRoaming\eamfora\ebookmarks.xml .
 .Pp
+See
 .Sx EXAMPLE BOOKMARK
 .Ss CONFIGURATION
+A default configuration file is generated on first use if it doesn
+.Ap
+t already exist.
 .Nm
-configuration file is located at ~/.config/amfora/config.toml by default.
-If the $XDG_CONFIG_HOME variable is set then the configuration file can be found at $XDG_CONFIG_HOME/amfora/config.toml.
+configuration is located from
+.Pa ~/.config/amfora/config.toml
+by default.
+If the
+.Va $XDG_CONFIG_HOME
+variable is set then the configuration file can be found at
+.Pa $XDG_CONFIG_HOME/amfora/config.toml .
 .Pp
-On Windows, the configuration file can be found at %APPDATA%\amfora\config.toml, which usually expands to C:\Users\<username>\AppData\Roaming\amfora\config.toml.
-.Pp
-The default config file can be viewed at default-config.toml.
-.Nm
-will place that file in the config file location if it doesn't exist.
+On Windows, the configuration file can be found at
+.Pa %APPDATA%\eamfora\econfig.toml ,
+which usually expands to
+.Pa C:\eUsers\e<username>\eAppData\eRoaming\eamfora\econfig.toml .
 .Sh DEFAULT KEY BINDINGS
-You can view the keybindings in the help menu, which can be brought up using ? and exited with Esc.
-The keybindings in the help will update if you change your keybindings in the config.
+You can view the keybindings in the help menu, which can be brought up using
+.Ic \&?
+and exited with
+.Ic Esc .
+The keybindings in the help menu will update if you change your keybindings in the config.
 .Pp
 .Bl -column
 .It Ic \&?
@@ -92,7 +130,7 @@ Visit subscription feed
 Visit unsubscribe list
 .El
 .Sh EXAMPLES
-.Ss Example Bookmark
+.Ss EXAMPLE BOOKMARK
 .Pp
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xbel
@@ -103,7 +141,7 @@ Visit unsubscribe list
         <title>Example Bookmark</title>
     </bookmark>
 </xbel>
-.Ss Example Proxy
+.Ss EXAMPLE PROXY
 [proxies]
 # Allows setting a Gemini proxy for different schemes.
 # The settings are similar to the url-handlers section above.
@@ -116,7 +154,7 @@ Visit unsubscribe list
 # the url-handlers section.
 #
 # Note that HTTP and HTTPS are treated as separate protocols here
-.Ss Example Certificate
+.Ss EXAMPLE CERTIFICATE
 [auth]
 # Authentication settings
 
@@ -164,12 +202,24 @@ Media Types
 .Nm
 development started in June, 2020.
 .Sh SEE ALSO
-.Lk https://github.com/makeworld-the-better-one/amfora/wiki
-.Xr bombadillo
-.\" .Sh AUTHORS
+The official documentation is maintained in two places:
+.Bl -tag -width Ds -compact
+.It Lk gemini://makeworld.space/amfora-wiki/
+.It Lk https://github.com/makeworld-the-better-one/amfora/wiki
+.El
+.Sh AUTHORS
+The principle author of the
+.Nm
+project is
+.An makeworld Aq Mt makeworld@protonmail.com .
 .Sh CAVEATS
 Using OpenSSL on Windows is not so easy.
 One way is to install Chocolatey, and run
 .Qq choco install openssl
+.Pp
+.Nm
+does not support gopher or other non-web protocols - check out
+.Lk https://bombadillo.colorfield.space/ "bombadillo"
+for that.
 .\" .Sh BUGS
 .\" .Sh SECURITY CONSIDERATIONS

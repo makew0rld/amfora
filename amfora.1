@@ -51,23 +51,6 @@ By default
 .Nm
 will automatically attempt to highlight blocks of preformatted source code.
 This is accomplished by searching for a string at the start of the alt text; if the string corresponds to a supported language name or MIME type, then the syntax will be highlighted if possible.
-.Ss BOOKMARKS
-.Nm
-stores it's bookmarks in an XML format called XBEL, located at
-.Pa ~/.local/share/amfora/bookmarks.xml
-by default.
-If the
-.Va XDG_DATA_HOME
-variable is set then the configuration file can be found at
-.Pa XDG_DATA_HOME/amfora/bookmarks.xml .
-.Pp
-On Windows, the file can be found at
-.Pa %APPDATA%\eamfora\ebookmarks.xml ,
-which usually expands to
-.Pa C:\eUsers\e<username>\eAppData\eRoaming\eamfora\ebookmarks.xml .
-.Pp
-See
-.Sx EXAMPLE BOOKMARK
 .Ss CONFIGURATION
 A default configuration file is generated on first use if it doesn
 .Ap
@@ -85,14 +68,18 @@ On Windows, the configuration file can be found at
 .Pa %APPDATA%\eamfora\econfig.toml ,
 which usually expands to
 .Pa C:\eUsers\e<username>\eAppData\eRoaming\eamfora\econfig.toml .
-.Sh DEFAULT KEY BINDINGS
+.Pp
+In this directory you can also create a gemtext file called
+.Pa newtab.gmi
+to customize your new tab page.
+.Ss DEFAULT KEY BINDINGS
 You can view the keybindings in the help menu, which can be brought up using
 .Ic \&?
 and exited with
 .Ic Esc .
 The keybindings in the help menu will update if you change your keybindings in the config.
 .Pp
-.Bl -column
+.Bl -tag -width "XXXXXXXXXXXXXXXXXXXXXXXXXXX" -compact
 .It Ic \&?
 Open help menu
 .It Ic Space
@@ -104,7 +91,11 @@ Exit
 .Nm
 .It Ic 0-9
 Access link 1-10 on page
-.It Ic Tab or Enter
+.It Ic F1
+Previous tab
+.It Ic F2
+Next tab
+.It Ic Tab or Ic Enter
 Begin link highlighting
 .It Ic Shift-Tab
 Highlight previous link
@@ -116,11 +107,16 @@ Open highlighted link in new tab
 Subscribe to current page
 .It Ic Ctrl-A
 Visit subscription feed
+.It Ic Ctrl-S
+Save loaded page to disk
+.It Ic Ctrl-C
+Hard quit
 .El
-.Sh BOTTOM BAR COMMANDS
-.Bl -tag -width Ds -compact
+.Ss BOTTOM BAR COMMANDS
+.Bl -tag -width "XXXXXXXXXXXXXXXXXXXXXXXXXXX" -compact
 .It Cm new: Va N
-Visit link N
+Visit link
+.Va N
 .It Cm about:version
 .Nm
 version info
@@ -128,7 +124,44 @@ version info
 Visit subscription feed
 .It Cm about:manage-subscriptions
 Visit unsubscribe list
+.It Va foo
+Search the geminispace for
+.Va foo .
 .El
+.Ss BOOKMARKS
+.Nm
+stores it's bookmarks in an XML format called XBEL, located at
+.Pa ~/.local/share/amfora/bookmarks.xml
+by default.
+If the
+.Va XDG_DATA_HOME
+variable is set then the configuration file can be found at
+.Pa XDG_DATA_HOME/amfora/bookmarks.xml .
+.Pp
+On Windows, the file can be found at
+.Pa %APPDATA%\eamfora\ebookmarks.xml ,
+which usually expands to
+.Pa C:\eUsers\e<username>\eAppData\eRoaming\eamfora\ebookmarks.xml .
+.Pp
+See
+.Sx EXAMPLE BOOKMARK
+.Sh FILES
+.Ss *NIX
+.Bl -tag -width Ds -compact
+.It Pa ~/.config/amfora/config.toml
+.It Pa ~/.local/share/amfora/bookmarks.xml
+.El
+.Ss XDG
+.Bl -tag -width Ds -compact
+.It Pa $XDG_CONFIG_HOME/amfora/config.toml
+.It Pa $XDG_DATA_HOME/amfora/bookmarks.xml
+.El
+.Ss WINDOWS
+.Bl -tag -width Ds -compact
+.It Pa %APPDATA%\eamfora\econfig.toml
+.It Pa %APPDATA%\eamfora\ebookmarks.xml
+.El
+.\" .Sh EXIT STATUS
 .Sh EXAMPLES
 .Ss EXAMPLE BOOKMARK
 .Pp
@@ -169,23 +202,17 @@ Visit unsubscribe list
 # Set domain name equal to path to key for the client cert above
 # "example.com" = "mycert.key"
 "astrobotany.mozz.us" = "~/.local/share/amfora/astrobotany-key.pem"
-.\" .Sh ERRORS
-.\" .Sh ENVIRONMENT
-.Sh FILES
-.Ss *NIX
+.\" .Sh DIAGNOSTICS
+.Sh SEE ALSO
+The official documentation is maintained in two places:
 .Bl -tag -width Ds -compact
-.It Pa ~/.config/amfora/config.toml
-.It Pa ~/.local/share/amfora/bookmarks.xml
+.It Lk gemini://makeworld.space/amfora-wiki/
+.It Lk https://github.com/makeworld-the-better-one/amfora/wiki
 .El
-.Ss XDG
+.Pp
 .Bl -tag -width Ds -compact
-.It Pa $XDG_CONFIG_HOME/amfora/config.toml
-.It Pa $XDG_DATA_HOME/amfora/bookmarks.xml
-.El
-.Ss WINDOWS
-.Bl -tag -width Ds -compact
-.It Pa %APPDATA%\eamfora\econfig.toml
-.It Pa %APPDATA%\eamfora\ebookmarks.xml
+.It agena.py gemini-to-gopher proxy.
+.It duckling-proxy.go gemini-to-HTTPS proxy.
 .El
 .Sh STANDARDS
 .Bl -tag -width Ds -compact
@@ -200,18 +227,22 @@ Media Types
 .El
 .Sh HISTORY
 .Nm
-development started in June, 2020.
-.Sh SEE ALSO
-The official documentation is maintained in two places:
-.Bl -tag -width Ds -compact
-.It Lk gemini://makeworld.space/amfora-wiki/
-.It Lk https://github.com/makeworld-the-better-one/amfora/wiki
-.El
+v1.0 was released on GitHub June 1, 2020 with tabs, TOFU, colors, history and input.
+Bookmarks, charsets, and search were added in v1.1 on Jun 24.
+Downloading was implemented in v1.3 on Jul 2. Themeing came in v1.4 on Jul 28.
+Emojies and extended proxy support came in v1.5 on Sep 01.
+Client certificates were implemented in v1.6 on Nov 4.
+Subscriptions were implemented in v1.7 on Dec 20, and a GitHub wiki was also started.
+v1.8 added media type handlers on Feb 17, 2021.
+v1.9 began storing bookmarks in XBEL on Dec 7.
 .Sh AUTHORS
 The principle author of the
 .Nm
 project is
 .An makeworld Aq Mt makeworld@protonmail.com .
+By v1.9.2, 47 people had committed to the amfora repository, see
+.Pa THANKS.md
+in the source for more information.
 .Sh CAVEATS
 Using OpenSSL on Windows is not so easy.
 One way is to install Chocolatey, and run
@@ -221,5 +252,6 @@ One way is to install Chocolatey, and run
 does not support gopher or other non-web protocols - check out
 .Lk https://bombadillo.colorfield.space/ "bombadillo"
 for that.
-.\" .Sh BUGS
+. Sh BUGS
+There are sometimes known UI rendering glitches.
 .\" .Sh SECURITY CONSIDERATIONS

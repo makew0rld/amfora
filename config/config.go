@@ -375,7 +375,12 @@ func Init() error {
 		// Include key comes first
 		if incPath := configTheme.GetString("include"); incPath != "" {
 			incViper := viper.New()
-			incViper.SetConfigFile(incPath)
+			newIncPath, err := homedir.Expand(incPath)
+			if err == nil {
+				incViper.SetConfigFile(newIncPath)
+			} else {
+				incViper.SetConfigFile(incPath)
+			}
 			incViper.SetConfigType("toml")
 			err = incViper.ReadInConfig()
 			if err != nil {

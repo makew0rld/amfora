@@ -253,7 +253,7 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	}
 
 	// check if a prompt is needed to handle this url
-	prompt := viper.GetBool("url-prompts.default")
+	prompt := viper.GetBool("url-prompts.other")
 	if viper.IsSet("url-prompts." + parsed.Scheme) {
 		prompt = viper.GetBool("url-prompts." + parsed.Scheme)
 	}

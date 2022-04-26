@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"sync"
 
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
@@ -53,9 +52,6 @@ var browser = cview.NewTabbedPanels()
 var layout = cview.NewFlex()
 
 var newTabPage structs.Page
-
-// Global mutex for changing the size of the left margin on all tabs.
-var reformatMu = sync.Mutex{}
 
 var App = cview.NewApplication()
 

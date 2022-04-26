@@ -257,6 +257,7 @@ func Init() error {
 	viper.SetDefault("keybindings.shift_numbers", "")
 	viper.SetDefault("keybindings.bind_url_handler_open", "Ctrl-U")
 	viper.SetDefault("url-handlers.other", "default")
+	viper.SetDefault("url-prompts.other", false)
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
 	viper.SetDefault("cache.timeout", 1800)

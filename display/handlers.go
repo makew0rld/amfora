@@ -252,6 +252,15 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		return ret("", false)
 	}
 
+	// check if a prompt is needed to handle this url
+	prompt := viper.GetBool("url-prompts.other")
+	if viper.IsSet("url-prompts." + parsed.Scheme) {
+		prompt = viper.GetBool("url-prompts." + parsed.Scheme)
+	}
+	if prompt && !(YesNo("Follow URL?\n" + u)) {
+		return ret("", false)
+	}
+
 	proxy := strings.TrimSpace(viper.GetString("proxies." + parsed.Scheme))
 	usingProxy := false
 

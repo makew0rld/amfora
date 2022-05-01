@@ -257,6 +257,7 @@ func Init() error {
 	viper.SetDefault("keybindings.shift_numbers", "")
 	viper.SetDefault("keybindings.bind_url_handler_open", "Ctrl-U")
 	viper.SetDefault("url-handlers.other", "default")
+	viper.SetDefault("url-prompts.other", false)
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
 	viper.SetDefault("cache.timeout", 1800)
@@ -375,7 +376,12 @@ func Init() error {
 		// Include key comes first
 		if incPath := configTheme.GetString("include"); incPath != "" {
 			incViper := viper.New()
-			incViper.SetConfigFile(incPath)
+			newIncPath, err := homedir.Expand(incPath)
+			if err == nil {
+				incViper.SetConfigFile(newIncPath)
+			} else {
+				incViper.SetConfigFile(incPath)
+			}
 			incViper.SetConfigType("toml")
 			err = incViper.ReadInConfig()
 			if err != nil {

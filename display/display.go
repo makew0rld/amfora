@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"sync"
 
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
@@ -54,9 +53,6 @@ var layout = cview.NewFlex()
 
 var newTabPage structs.Page
 
-// Global mutex for changing the size of the left margin on all tabs.
-var reformatMu = sync.Mutex{}
-
 var App = cview.NewApplication()
 
 func Init(version, commit, builtBy string) {
@@ -82,23 +78,18 @@ func Init(version, commit, builtBy string) {
 		termH = height
 
 		// Make sure the current tab content is reformatted when the terminal size changes
-		go func(t *tab) {
-			reformatMu.Lock() // Only allow one reformat job at a time
-			for i := range tabs {
-				// Overwrite all tabs with a new, differently sized, left margin
-				browser.AddTab(
-					strconv.Itoa(i),
-					tabs[i].label(),
-					makeContentLayout(tabs[i].view, leftMargin()),
-				)
-				if tabs[i] == t {
-					// Reformat page ASAP, in the middle of loop
-					reformatPageAndSetView(t, t.page)
-				}
+		for i := range tabs {
+			// Overwrite all tabs with a new, differently sized, left margin
+			browser.AddTab(
+				strconv.Itoa(i),
+				tabs[i].label(),
+				makeContentLayout(tabs[i].view, leftMargin()),
+			)
+			if tabs[i] == tabs[curTab] {
+				// Reformat page ASAP, in the middle of loop
+				reformatPageAndSetView(tabs[curTab], tabs[curTab].page)
 			}
-			App.Draw()
-			reformatMu.Unlock()
-		}(tabs[curTab])
+		}
 	})
 
 	panels.AddPanel(PanelBrowser, browser, true, true)

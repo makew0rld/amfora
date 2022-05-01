@@ -218,6 +218,18 @@ underline = true
 # application on your computer for opening this kind of URI.
 other = 'default'
 
+[url-prompts]
+# Specify whether a confirmation prompt should be shown before following URL schemes.
+# The special key 'other' matches all schemes that don't match any other key.
+#
+# Example: prompt on every non-gemini URL
+# other = true
+# gemini = false
+#
+# Example: only prompt on HTTP(S)
+# other = false
+# http = true
+# https = true
 
 # [[mediatype-handlers]] section
 # ---------------------------------

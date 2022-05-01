@@ -547,7 +547,7 @@ func (t *tab) label() string {
 	}
 	if strings.HasPrefix(t.page.URL, "file://") {
 		// File URL, use file or folder as tab name
-		return path.Base(t.page.URL[7:])
+		return cview.Escape(path.Base(t.page.URL[7:]))
 	}
 	// Otherwise, it's a Gemini URL
 	pu, err := url.Parse(t.page.URL)

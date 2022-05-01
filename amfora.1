@@ -6,7 +6,7 @@
 .Nd fancy terminal gemini browser
 .Sh SYNOPSIS
 .Nm amfora
-.Op Ar url
+.Op Ar gemini-url
 .Sh DESCRIPTION
 .Nm
 is a fancy gemini client in your terminal.
@@ -16,9 +16,7 @@ Subscriptions are supported through gemini, atom, RSS, and JSON Feed files.
 .Nm
 caches documents
 .Pq aka Qq pages
-it loads, to reduce latency: if you
-.Ap
-re navigating through history, or simply just returning to the same page again.
+it loads, to reduce latency: if you're navigating through history, or simply just returning to the same page again.
 .Nm
 supports proxies so that certain types of URLs will not require opening another application.
 .Pp
@@ -39,9 +37,7 @@ By default, when clicking a non-text file,
 will present you with options to either Open or Download the file.
 If you choose Open,
 .Nm
-will download the file to a temporary folder, and then open it using your OS
-.Ap
-s default application for that file type.
+will download the file to a temporary folder, and then open it using your OS's default application for that file type.
 You can configure what applications
 .Nm
 uses if you want to override this behaviour.
@@ -50,11 +46,9 @@ You can also configure whether streaming is used.
 By default
 .Nm
 will automatically attempt to highlight blocks of preformatted source code.
-This is accomplished by searching for a string at the start of the alt text; if the string corresponds to a supported language name or MIME type, then the syntax will be highlighted if possible.
+This is accomplished by searching for a string at the start of the alt text; if the string corresponds to a language name or MIME type supported by chroma.go, then the syntax will be highlighted if possible.
 .Ss CONFIGURATION
-A default configuration file is generated on first use if it doesn
-.Ap
-t already exist.
+A default configuration file is generated on first use if it doesn't already exist.
 .Nm
 configuration is located from
 .Pa ~/.config/amfora/config.toml
@@ -114,7 +108,7 @@ Hard quit
 .El
 .Ss BOTTOM BAR COMMANDS
 .Bl -tag -width "XXXXXXXXXXXXXXXXXXXXXXXXXXX" -compact
-.It Cm new: Va N
+.It Cm new: Ns Va N
 Visit link
 .Va N
 .It Cm about:version
@@ -164,7 +158,7 @@ See
 .\" .Sh EXIT STATUS
 .Sh EXAMPLES
 .Ss EXAMPLE BOOKMARK
-.Pp
+.Bd -literal
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xbel
   PUBLIC "+//IDN python.org//DTD XML Bookmark Exchange Language 1.1//EN//XML"
@@ -174,7 +168,9 @@ See
         <title>Example Bookmark</title>
     </bookmark>
 </xbel>
+.Ed
 .Ss EXAMPLE PROXY
+.Bd -literal
 [proxies]
 # Allows setting a Gemini proxy for different schemes.
 # The settings are similar to the url-handlers section above.
@@ -187,7 +183,9 @@ See
 # the url-handlers section.
 #
 # Note that HTTP and HTTPS are treated as separate protocols here
+.Ed
 .Ss EXAMPLE CERTIFICATE
+.Bd -literal
 [auth]
 # Authentication settings
 
@@ -202,6 +200,7 @@ See
 # Set domain name equal to path to key for the client cert above
 # "example.com" = "mycert.key"
 "astrobotany.mozz.us" = "~/.local/share/amfora/astrobotany-key.pem"
+.Ed
 .\" .Sh DIAGNOSTICS
 .Sh SEE ALSO
 The official documentation is maintained in two places:
@@ -252,6 +251,6 @@ One way is to install Chocolatey, and run
 does not support gopher or other non-web protocols - check out
 .Lk https://bombadillo.colorfield.space/ "bombadillo"
 for that.
-. Sh BUGS
+.Sh BUGS
 There are sometimes known UI rendering glitches.
 .\" .Sh SECURITY CONSIDERATIONS

@@ -73,7 +73,7 @@ and exited with
 .Ic Esc .
 The keybindings in the help menu will update if you change your keybindings in the config.
 .Pp
-.Bl -tag -width "XXXXXXXXXXXXXXXXXXXXXXXXXXX" -compact
+.Bl -tag -width 16v -compact
 .It Ic \&?
 Open help menu
 .It Ic Space
@@ -107,7 +107,7 @@ Save loaded page to disk
 Hard quit
 .El
 .Ss BOTTOM BAR COMMANDS
-.Bl -tag -width "XXXXXXXXXXXXXXXXXXXXXXXXXXX" -compact
+.Bl -tag -width 16v -compact
 .It Cm new: Ns Va N
 Visit link
 .Va N
@@ -141,21 +141,27 @@ See
 .Sx EXAMPLE BOOKMARK
 .Sh FILES
 .Ss *NIX
-.Bl -tag -width Ds -compact
+.Bl -tag -width 2v -compact
 .It Pa ~/.config/amfora/config.toml
 .It Pa ~/.local/share/amfora/bookmarks.xml
 .El
 .Ss XDG
-.Bl -tag -width Ds -compact
+.Bl -tag -width 2v -compact
 .It Pa $XDG_CONFIG_HOME/amfora/config.toml
 .It Pa $XDG_DATA_HOME/amfora/bookmarks.xml
 .El
 .Ss WINDOWS
-.Bl -tag -width Ds -compact
+.Bl -tag -width 2v -compact
 .It Pa %APPDATA%\eamfora\econfig.toml
 .It Pa %APPDATA%\eamfora\ebookmarks.xml
 .El
-.\" .Sh EXIT STATUS
+.Sh EXIT STATUS
+.Nm
+exits
+.Va 0
+on success, and
+.Va 1
+if an error occurs.
 .Sh EXAMPLES
 .Ss EXAMPLE BOOKMARK
 .Bd -literal
@@ -201,20 +207,22 @@ See
 # "example.com" = "mycert.key"
 "astrobotany.mozz.us" = "~/.local/share/amfora/astrobotany-key.pem"
 .Ed
-.\" .Sh DIAGNOSTICS
+.Sh DIAGNOSTICS
+Errors are printed to
+.Dv stderr .
 .Sh SEE ALSO
 The official documentation is maintained in two places:
-.Bl -tag -width Ds -compact
+.Bl -tag -width 2v -compact
 .It Lk gemini://makeworld.space/amfora-wiki/
 .It Lk https://github.com/makeworld-the-better-one/amfora/wiki
 .El
 .Pp
-.Bl -tag -width Ds -compact
+.Bl -tag -width 2v -compact
 .It agena.py gemini-to-gopher proxy.
 .It duckling-proxy.go gemini-to-HTTPS proxy.
 .El
 .Sh STANDARDS
-.Bl -tag -width Ds -compact
+.Bl -tag -width 2v -compact
 .It Lk https://gemini.circumlunar.space/docs/specification.gmi
 Gemini Protocol
 .It Lk https://toml.io/en/

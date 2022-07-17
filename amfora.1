@@ -6,7 +6,7 @@
 .Nd fancy terminal gemini browser
 .Sh SYNOPSIS
 .Nm amfora
-.Op Ar gemini-url
+.Op Fl h | Fl v | Ar gemini-url
 .Sh DESCRIPTION
 .Nm
 is a fancy gemini client in your terminal.
@@ -124,7 +124,7 @@ Search the geminispace for
 .El
 .Ss BOOKMARKS
 .Nm
-stores it's bookmarks in an XML format called XBEL, located at
+stores its bookmarks in an XML format called XBEL, located at
 .Pa ~/.local/share/amfora/bookmarks.xml
 by default.
 If the
@@ -233,15 +233,17 @@ Bookmark syntax
 Media Types
 .El
 .Sh HISTORY
-.Nm
-v1.0 was released on GitHub June 1, 2020 with tabs, TOFU, colors, history and input.
-Bookmarks, charsets, and search were added in v1.1 on Jun 24.
-Downloading was implemented in v1.3 on Jul 2. Themeing came in v1.4 on Jul 28.
-Emojies and extended proxy support came in v1.5 on Sep 01.
-Client certificates were implemented in v1.6 on Nov 4.
-Subscriptions were implemented in v1.7 on Dec 20, and a GitHub wiki was also started.
-v1.8 added media type handlers on Feb 17, 2021.
-v1.9 began storing bookmarks in XBEL on Dec 7.
+.Bl -tag -width 2v -compact
+.It v1.0 was released on June 1, 2020 with tabs, TOFU, colors, history and input.
+.It Bookmarks, charsets, and search were added in v1.1 on Jun 24.
+.It Downloading was implemented in v1.3 on Jul 2.
+.It Themeing came in v1.4 on Jul 28.
+.It Emojies and extended proxy support came in v1.5 on Sep 01.
+.It Client certificates were implemented in v1.6 on Nov 4.
+.It Subscriptions and a wiki were implemented in v1.7 on Dec 20.
+.It v1.8 added media type handlers on Feb 17, 2021.
+.It v1.9 began storing bookmarks in XBEL on Dec 7.
+.El
 .Sh AUTHORS
 The principle author of the
 .Nm

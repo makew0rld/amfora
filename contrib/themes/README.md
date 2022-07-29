@@ -109,15 +109,13 @@ Contributed by **[@sergetymo](https://github.com/sergetymo)**.
 ## Ayu Light
 Contributed by **[@sergetymo](https://github.com/sergetymo)**.
 
-TODO: Update screenshots
-
-![screenshot of one dark theme](https://user-images.githubusercontent.com/65758149/101183151-c8920700-3657-11eb-87f5-7d1d6ae616f2.png)
+![screenshot of Ayu Light theme](https://user-images.githubusercontent.com/65758149/181745417-48a92840-10d2-4659-950d-fbc9b3588d5c.png)
 
 <details>
 <summary>More screenshots</summary>
 
-![screenshot of bookmark modal](https://user-images.githubusercontent.com/65758149/101183267-f8410f00-3657-11eb-97fa-10f88a9d8de4.png)
-![screenshot of error modal](https://user-images.githubusercontent.com/65758149/101183206-da73aa00-3657-11eb-8733-5040c8aefb99.png)
+![screenshot of bookmark modal](https://user-images.githubusercontent.com/65758149/181745413-b5a15120-2ff6-4879-8539-0f02f0eece21.png)
+![screenshot of error modal](https://user-images.githubusercontent.com/65758149/181745400-c3e9ba95-aee4-4956-91a8-3dddcbad48cc.png)
 </details>
 
 

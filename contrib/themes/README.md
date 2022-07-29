@@ -106,6 +106,21 @@ Contributed by **[@sergetymo](https://github.com/sergetymo)**.
 ![screenshot of error modal](https://user-images.githubusercontent.com/65758149/101183206-da73aa00-3657-11eb-8733-5040c8aefb99.png)
 </details>
 
+## Ayu Light
+Contributed by **[@sergetymo](https://github.com/sergetymo)**.
+
+TODO: Update screenshots
+
+![screenshot of one dark theme](https://user-images.githubusercontent.com/65758149/101183151-c8920700-3657-11eb-87f5-7d1d6ae616f2.png)
+
+<details>
+<summary>More screenshots</summary>
+
+![screenshot of bookmark modal](https://user-images.githubusercontent.com/65758149/101183267-f8410f00-3657-11eb-97fa-10f88a9d8de4.png)
+![screenshot of error modal](https://user-images.githubusercontent.com/65758149/101183206-da73aa00-3657-11eb-8733-5040c8aefb99.png)
+</details>
+
+
 ## Atelier Forest
 
 Contributed by **[@joyalicegu](https://github.com/joyalicegu)**.

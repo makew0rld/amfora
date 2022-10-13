@@ -32,4 +32,5 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 * mntn (@mntn-xyz)
 * Maxime Bouillot (@Arkaeriit)
 * Emily (@emily-is-my-username)
+* Autumn! (@autumnull)
 `)

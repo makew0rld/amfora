@@ -215,9 +215,10 @@ func Init(version, commit, builtBy string) {
 					// We don't want to convert legitimate
 					// :// links to search terms.
 					query := strings.TrimSpace(query)
-					if (strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
+					if ((strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
 						(!strings.HasPrefix(query, "//") && !strings.Contains(query, "://") &&
-							!strings.Contains(query, ".")) && !strings.HasPrefix(query, "about:") {
+							!strings.Contains(query, ".")) && !strings.HasPrefix(query, "about:")) &&
+						!(query == "localhost" || strings.HasPrefix(query, "localhost/") || strings.HasPrefix(query, "localhost:")) {
 						// Has a space and follows regex, OR
 						// doesn't start with "//", contain "://", and doesn't have a dot either.
 						// Then it's a search

@@ -231,13 +231,25 @@ func makeNewTab() *tab {
 			}
 			return nil
 		}
-		// Number key: 1-9, 0, LINK1-LINK10
+		// Number key: 1-9, 0
 		if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
-			if int(cmd) <= len(t.page.Links) {
-				// It's a valid link number
-				t.preferURLHandler = false // Reset in case
-				go followLink(&t, t.page.URL, t.page.Links[cmd-1])
-				return nil
+			if cmd == config.CmdLink0 {
+				t.page.LinkSelector += "0"
+			} else {
+				t.page.LinkSelector += fmt.Sprint(cmd)
+			}
+			if isCompleteLinkSelector(t.page.LinkSelector) {
+				i := toLinkIndex(t.page.LinkSelector)
+				t.page.LinkSelector = ""
+				bottomBar.SetLabel("")
+				if i < len(t.page.Links) {
+					// It's a valid link number
+					t.preferURLHandler = false // Reset in case
+					go followLink(&t, t.page.URL, t.page.Links[i])
+					return nil
+				}
+			} else {
+				bottomBar.SetLabel(t.page.LinkSelector + " ")
 			}
 		}
 
@@ -315,6 +327,29 @@ func makeNewTab() *tab {
 	})
 
 	return &t
+}
+
+func isCompleteLinkSelector(linkSelector string) bool {
+	leadingZeroes := 0
+	for _, c := range linkSelector {
+		if c != '0' {
+			break
+		}
+		leadingZeroes++
+	}
+	completeLinkSelectorLen := leadingZeroes*2 + 1
+	if len(linkSelector) > completeLinkSelectorLen {
+		panic(fmt.Sprintf("link selector '%s' too long", linkSelector))
+	}
+	return len(linkSelector) == completeLinkSelectorLen
+}
+
+func toLinkIndex(linkSelector string) int {
+	linkNumber, err := strconv.Atoi(linkSelector)
+	if err != nil || linkNumber < 1 {
+		panic(fmt.Sprint("invalid link selector: ", err))
+	}
+	return linkNumber - 1
 }
 
 // historyCachePage caches certain info about the current page in the tab's history,

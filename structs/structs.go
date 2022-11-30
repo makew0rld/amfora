@@ -27,6 +27,7 @@ type Page struct {
 	Raw          string    // The raw response, as received over the network
 	Content      string    // The processed content, NOT raw. Uses cview color tags. It will also have a left margin.
 	Links        []string  // URLs, for each region in the content.
+	LinkSelector string    // The partial link selection while it is being typed.
 	Row          int       // Vertical scroll position
 	Column       int       // Horizontal scroll position - does not map exactly to a cview.TextView because it includes left margin size changes, see #197
 	TermWidth    int       // The terminal width when the Content was set, to know when reformatting should happen.

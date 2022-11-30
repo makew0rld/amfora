@@ -155,15 +155,16 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 			}
 
 			links = append(links, url)
-			num := numLinks + len(links) // Visible link number, one-indexed
+			num := numLinks + len(links) // Link number, one-indexed
 
+			linkSelector := toLinkSelector(num)
 			var indent int
 			if num > 99 {
-				// Indent link text by 3 or more spaces
-				indent = len(strconv.Itoa(num)) + 4 // +4 indent for spaces and brackets
+				// Indent link text by 7 or more spaces
+				indent = len(linkSelector) + 3 // +3 indent for space and brackets
 			} else {
 				// One digit and two digit links have the same spacing - see #60
-				indent = 5 // +4 indent for spaces and brackets, and 1 for link number
+				indent = 6 // +4 indent for spaces and brackets, and 1 for link number
 			}
 
 			// Spacing after link number: 1 or 2 spaces?
@@ -172,8 +173,8 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 				// One space to keep it in line with other links - see #60
 				spacing = " "
 			} else {
-				// One digit numbers use two spaces
-				spacing = "  "
+				// One digit numbers use three spaces
+				spacing = "   "
 			}
 
 			// Underline non-gemini links if enabled
@@ -209,7 +210,7 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 
 					// Add special stuff to first line, like the link number
 					wrappedLink[0] = fmt.Sprintf(`[%s::b][`, config.GetColorString("link_number")) +
-						strconv.Itoa(num) + "[]" + "[-::-]" + spacing +
+						linkSelector + "[]" + "[-::-]" + spacing +
 						`["` + strconv.Itoa(num-1) + `"][` + config.GetColorString("amfora_link") + `]` +
 						wrappedLink[0] + `[-][""]`
 				} else {
@@ -222,7 +223,7 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 						false, // Don't indent the first line, it's the one with link number
 					)
 
-					wrappedLink[0] = `[::b][` + strconv.Itoa(num) + "[][::-]  " +
+					wrappedLink[0] = `[::b][` + linkSelector + "[][::-]  " +
 						`["` + strconv.Itoa(num-1) + `"]` +
 						wrappedLink[0] + `[""]`
 				}
@@ -240,7 +241,7 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 					)
 
 					wrappedLink[0] = fmt.Sprintf(`[%s::b][`, config.GetColorString("link_number")) +
-						strconv.Itoa(num) + "[][-::-]" + spacing +
+						linkSelector + "[][-::-]" + spacing +
 						`["` + strconv.Itoa(num-1) + `"]` + linkTag +
 						wrappedLink[0] + `[-::-][""]`
 				} else {
@@ -253,7 +254,7 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 						false, // Don't indent the first line, it's the one with link number
 					)
 
-					wrappedLink[0] = `[::b][` + strconv.Itoa(num) + "[][::-]" + spacing +
+					wrappedLink[0] = `[::b][` + linkSelector + "[][::-]" + spacing +
 						`["` + strconv.Itoa(num-1) + `"]` +
 						wrappedLink[0] + `[::-][""]`
 				}
@@ -315,6 +316,14 @@ func convertRegularGemini(s string, numLinks, width int, proxied bool) (string, 
 	}
 
 	return strings.Join(wrappedLines, "\r\n"), links
+}
+
+func toLinkSelector(num int) string {
+	if num <= 9 {
+		return strconv.Itoa(num)
+	}
+	digitCnt := len(strconv.Itoa(num))
+	return strings.Repeat("0", digitCnt-1) + strconv.Itoa(num)
 }
 
 // RenderGemini converts text/gemini into a cview displayable format.

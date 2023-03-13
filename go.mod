@@ -10,7 +10,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gdamore/tcell/v2 v2.3.3
 	github.com/google/go-cmp v0.5.0 // indirect
-	github.com/makeworld-the-better-one/go-gemini v0.13.0
+	github.com/makeworld-the-better-one/go-gemini v0.13.1
 	github.com/makeworld-the-better-one/go-gemini-socks5 v1.0.0
 	github.com/makeworld-the-better-one/rr v1.0.0
 	github.com/mitchellh/go-homedir v1.1.0
@@ -26,7 +26,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/text v0.3.8
+	golang.org/x/text v0.7.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect

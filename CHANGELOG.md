@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevent link lines (and other types) from being wider than the `max_width` setting (#280)
 - `new:7` on new tab page fails to open link (#306)
 - Slashes aren't decoded in redirect URLs (#322, #324)
+- Typing `localhost` in the bottom bar actually loads localhost instead of searching (#326, #327)
 
 
 ## [1.9.2] - 2021-12-10

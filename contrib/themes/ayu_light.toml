@@ -1,0 +1,56 @@
+# Ayu Light theme ported to Amfora
+# by Serge Tymoshenko <serge@tymo.name>
+
+bg = "#fcfcfc"
+fg = "#5c6166"
+tab_num = "#5c6166"
+tab_divider = "#5c6166"
+bottombar_bg = "#fcfcfc"
+bottombar_text = "#5c6166"
+bottombar_label = "#5c6166"
+
+hdg_1 = "#fa8d3e"
+hdg_2 = "#f2ae49"
+hdg_3 = "#f2ae49"
+amfora_link = "#399ee6"
+foreign_link = "#a37acc"
+link_number = "#5c6166"
+regular_text = "#5c6166"
+quote_text = "#4cbf99"
+preformatted_text = "#86b300"
+list_text = "#5c6166"
+
+btn_bg = "#55b4d4"
+btn_text = "#fcfcfc"
+
+dl_choice_modal_bg = "#f2ae49"
+dl_choice_modal_text = "#fcfcfc"
+
+dl_modal_bg = "#f2ae49"
+dl_modal_text = "#fcfcfc"
+
+info_modal_bg = "#f2ae49"
+info_modal_text = "#fcfcfc"
+
+error_modal_bg = "#f07171"
+error_modal_text = "#fcfcfc"
+
+yesno_modal_bg = "#f2ae49"
+yesno_modal_text = "#fcfcfc"
+
+tofu_modal_bg = "#ed9366"
+tofu_modal_text = "#282c34"
+
+input_modal_bg = "#f2ae49"
+input_modal_text = "#fcfcfc"
+input_modal_field_bg = "#e6ba7e"
+input_modal_field_text = "#5c6166"
+
+bkmk_modal_bg = "#f2ae49"
+bkmk_modal_text = "#fcfcfc"
+bkmk_modal_label = "#fcfcfc"
+bkmk_modal_field_bg = "#e6ba7e"
+bkmk_modal_field_text = "#5c6166"
+
+subscription_modal_bg = "#f2ae49"
+subscription_modal_text = "#5c6166"

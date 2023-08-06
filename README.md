@@ -19,6 +19,10 @@ It also aims to be completely cross platform, with full Windows support. If you'
 
 It fully passes Sean Conman's client torture test, as well as the Egsam one.
 
+## Project Status
+
+Amfora is in maintenance mode. When possible, I’ll make/merge bug fixes, and maybe slowly merge feature PRs by others. See my [blog post](https://www.makeworld.space/2023/08/bye_gemini.html) for details.
+
 ## Installation
 
 ### Binary

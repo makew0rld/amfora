@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tabs have the domain of the current page instead of numbers (#202)
 - Closing Amfora with <kbd>q</kbd> was removed in favor of <kbd>Shift-q</kbd> (#243)
 - Paging up or down scrolls by 50% instead of 75%, to match `less` (#303)
+- Update deps, require Go 1.17 (#336)
+- Show local directory index file if available (#319)
 
 ### Fixed
 - Modal can't be closed when opening non-gemini text URLs from the commandline (#283, #284)

@@ -29,7 +29,7 @@ Happy browsing!
 => https://github.com/makeworld-the-better-one/amfora/wiki Amfora Wiki [GitHub]
 => gemini://makeworld.space/amfora-wiki/ Amfora Wiki [On Gemini!]
 
-=> gemini://gemini.circumlunar.space Project Gemini
+=> gemini://geminiprotocol.net Project Gemini
 `
 
 // Read the new tab content from a file if it exists or fallback to a default page.

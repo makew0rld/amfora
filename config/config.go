@@ -190,7 +190,7 @@ func Init() error {
 
 	// Setup main config
 
-	viper.SetDefault("a-general.home", "gemini://gemini.circumlunar.space")
+	viper.SetDefault("a-general.home", "gemini://geminiprotocol.net")
 	viper.SetDefault("a-general.auto_redirect", false)
 	viper.SetDefault("a-general.http", "default")
 	viper.SetDefault("a-general.search", "gemini://geminispace.info/search")

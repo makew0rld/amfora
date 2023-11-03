@@ -25,7 +25,7 @@ var defaultConf = []byte(`# This is the default config file.
 
 [a-general]
 # Press Ctrl-H to access it
-home = "gemini://gemini.circumlunar.space"
+home = "gemini://geminiprotocol.net"
 
 # Follow up to 5 Gemini redirects without prompting.
 # A prompt is always shown after the 5th redirect and for redirects to protocols other than Gemini.

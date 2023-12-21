@@ -5,7 +5,7 @@ env:
 
 before:
   hooks:
-    - go mod download
+    - go mod vendor
     - go generate ./...
 
 builds:

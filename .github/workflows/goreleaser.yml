@@ -24,3 +24,14 @@ jobs:
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GH_REPOS }}
+      - name: Generate release tarball
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          tar czf amfora-${VERSION}.tar.gz --transform "s,^,amfora-${VERSION}/," --exclude dist *
+      - name: Upload release tarball
+        uses: softprops/action-gh-release@master
+        with:
+          files: amfora-*.tar.gz
+          append_body: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_REPOS }}

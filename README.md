@@ -147,6 +147,7 @@ Features in *italics* are in the master branch, but not in the latest release.
 - [x] Open non-text files in another application
   - [x] Ability to stream content instead of downloading it first
 - [x] *Highlighting of preformatted code blocks that list a language in the alt text*
+- [x] *Run custom commands using the current or selected URL as an argument*
 - [ ] Stream support
 - [ ] Table of contents for pages
 - [ ] Search in pages with <kbd>Ctrl-F</kbd>

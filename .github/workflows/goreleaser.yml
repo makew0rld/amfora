@@ -23,4 +23,4 @@ jobs:
           version: 0.x
           args: release --rm-dist
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_REPOS }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

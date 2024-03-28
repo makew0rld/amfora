@@ -31,6 +31,7 @@ var bottomBar = cview.NewInputField()
 
 var originalText []byte
 var searchBar = cview.NewInputField()
+var tagsRegex = regexp.MustCompile(`\[[a-zA-Z0-9_,;: \-\."#]+[^\[]*\]`)
 var searchString = ""
 var matches = 0
 var curMatch = 0
@@ -295,7 +296,6 @@ func Init(version, commit, builtBy string) {
 			searchIdx := searchRegex.FindAllIndex(originalText, -1)
 
 			// find all positions of tags
-			tagsRegex := regexp.MustCompile(`\[.*?[^\[]\]`)
 			tagsIdx := tagsRegex.FindAllIndex(originalText, -1)
 
 			text := []byte("")

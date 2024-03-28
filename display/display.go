@@ -184,7 +184,6 @@ func Init(version, commit, builtBy string) {
         text := make([]byte, 0)
         matches = 0
         lastMatch := 0
-        var isMatch bool
 
         // loops through all occurrences and check if they
         // discard if they lie within tags.
@@ -192,21 +191,17 @@ func Init(version, commit, builtBy string) {
         // with the actual search strings replaced by tagged regions
         // to highlight.
         for i, match := range searchIdx {
-          isMatch = true
           for _, tag := range tagsIdx {
             if match[0] >= tag[0] && match[1] <= tag[1] {
-              isMatch = false
               break
             }
           }
 
-          if isMatch {
-            matches++
-            text = append(text, originalText[lastMatch:match[0]]...)
-            replacement := []byte(fmt.Sprint(`["search-`, i, `"]`, searchString, `[""]`))
-            text = append(text, replacement...)
-            lastMatch = match[0] + len(searchString)
-          }
+          matches++
+          text = append(text, originalText[lastMatch:match[0]]...)
+          replacement := []byte(fmt.Sprint(`["search-`, i, `"]`, searchString, `[""]`))
+          text = append(text, replacement...)
+          lastMatch = match[0] + len(searchString)
         }
         text = append(text, originalText[lastMatch:]...)
 

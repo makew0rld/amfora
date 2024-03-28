@@ -49,6 +49,9 @@ var helpCells = strings.TrimSpace(
 		"%s\tSave the current page to your downloads.\n" +
 		"%s\tView subscriptions\n" +
 		"%s\tAdd or update a subscription\n" +
+    "%s\tSearch the page content for a string\n" +
+    "%s\tFind next search match\n" +
+    "%s\tFind previous search match\n" +
 		"%s\tQuit\n")
 
 var helpTable = cview.NewTextView()
@@ -110,6 +113,9 @@ func helpInit() {
 		config.GetKeyBinding(config.CmdSave),
 		config.GetKeyBinding(config.CmdSub),
 		config.GetKeyBinding(config.CmdAddSub),
+    config.GetKeyBinding(config.CmdSearch),
+    config.GetKeyBinding(config.CmdNextMatch),
+    config.GetKeyBinding(config.CmdPrevMatch),
 		config.GetKeyBinding(config.CmdQuit),
 	)
 

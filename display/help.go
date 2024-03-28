@@ -33,6 +33,7 @@ var helpCells = strings.TrimSpace(
 		"Enter, Tab\tOn a page this will start link highlighting.\n" +
 		"\tPress Tab and Shift-Tab to pick different links.\n" +
 		"\tPress Enter again to go to one, or Esc to stop.\n" +
+		"%s\tOpen the highlighted URL with a URL handler instead of the configured proxy\n" +
 		"%s\tGo to a specific tab. (Default: Shift-NUMBER)\n" +
 		"%s\tGo to the last tab.\n" +
 		"%s\tPrevious tab\n" +
@@ -55,8 +56,8 @@ var helpTable = cview.NewTextView()
 // Help displays the help and keybindings.
 func Help() {
 	helpTable.ScrollToBeginning()
-	panels.ShowPanel("help")
-	panels.SendToFront("help")
+	panels.ShowPanel(PanelHelp)
+	panels.SendToFront(PanelHelp)
 	App.SetFocus(helpTable)
 }
 
@@ -67,7 +68,7 @@ func helpInit() {
 	helpTable.SetPadding(0, 0, 1, 1)
 	helpTable.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEsc || key == tcell.KeyEnter {
-			panels.HidePanel("help")
+			panels.HidePanel(PanelHelp)
 			App.SetFocus(tabs[curTab].view)
 			App.Draw()
 		}
@@ -95,6 +96,7 @@ func helpInit() {
 		config.GetKeyBinding(config.CmdEdit),
 		config.GetKeyBinding(config.CmdCopyPageURL),
 		config.GetKeyBinding(config.CmdCopyTargetURL),
+		config.GetKeyBinding(config.CmdURLHandlerOpen),
 		tabKeys,
 		config.GetKeyBinding(config.CmdTab0),
 		config.GetKeyBinding(config.CmdPrevTab),
@@ -122,5 +124,5 @@ func helpInit() {
 
 	w.Flush()
 
-	panels.AddPanel("help", helpTable, true, false)
+	panels.AddPanel(PanelHelp, helpTable, true, false)
 }

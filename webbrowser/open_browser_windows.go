@@ -1,3 +1,4 @@
+//go:build windows && (!linux || !darwin || !freebsd || !netbsd || !openbsd)
 // +build windows
 // +build !linux !darwin !freebsd !netbsd !openbsd
 
@@ -7,9 +8,12 @@ import "os/exec"
 
 // Open opens `url` in default system browser.
 func Open(url string) (string, error) {
-	err := exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	proc := exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
+	err := proc.Start()
 	if err != nil {
 		return "", err
 	}
+	//nolint:errcheck
+	go proc.Wait() // Prevent zombies, see #219
 	return "Opened in system default web browser", nil
 }

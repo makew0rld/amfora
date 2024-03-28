@@ -1,4 +1,4 @@
-[theme]
+#[theme]
 bg = "#ffffff"
 tab_num = "#000000"
 tab_divider = "#000000"

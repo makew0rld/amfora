@@ -61,7 +61,6 @@ func Init() error {
 
 		err = os.Remove(config.OldBkmkPath)
 		if err != nil {
-			//nolint:goerr113
 			return fmt.Errorf(
 				"couldn't delete old bookmarks file (%s), you must delete it yourself to prevent duplicate bookmarks: %w",
 				config.OldBkmkPath,

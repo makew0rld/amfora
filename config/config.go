@@ -15,6 +15,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/muesli/termenv"
 	"github.com/rkoesters/xdg/basedir"
 	"github.com/rkoesters/xdg/userdirs"
 	"github.com/spf13/viper"
@@ -59,9 +60,16 @@ var MediaHandlers = make(map[string]MediaHandler)
 // Defaults to ScrollBarAuto on an invalid value
 var ScrollBar cview.ScrollBarVisibility
 
+// Whether the user's terminal is dark or light
+// Defaults to dark, but is determined in Init()
+// Used to prevent white text on a white background with the default theme
+var hasDarkTerminalBackground bool
+
 func Init() error {
 
 	// *** Set paths ***
+	// Windows uses paths under APPDATA, Unix systems use XDG paths
+	// Windows systems use XDG paths if variables are defined, see #255
 
 	home, err := homedir.Dir()
 	if err != nil {
@@ -78,10 +86,10 @@ func Init() error {
 	}
 
 	// Store config directory and file paths
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_CONFIG_HOME") == "" {
 		configDir = amforaAppData
 	} else {
-		// Unix / POSIX system
+		// Unix / POSIX system, or Windows with XDG_CONFIG_HOME defined
 		configDir = filepath.Join(basedir.ConfigHome, "amfora")
 	}
 	configPath = filepath.Join(configDir, "config.toml")
@@ -94,7 +102,7 @@ func Init() error {
 	}
 
 	// Store TOFU db directory and file paths
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_CACHE_HOME") == "" {
 		// Windows just stores it in APPDATA along with other stuff
 		tofuDBDir = amforaAppData
 	} else {
@@ -104,7 +112,7 @@ func Init() error {
 	tofuDBPath = filepath.Join(tofuDBDir, "tofu.toml")
 
 	// Store bookmarks dir and path
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_DATA_HOME") == "" {
 		// Windows just keeps it in APPDATA along with other Amfora files
 		bkmkDir = amforaAppData
 	} else {
@@ -115,18 +123,12 @@ func Init() error {
 	BkmkPath = filepath.Join(bkmkDir, "bookmarks.xml")
 
 	// Feeds dir and path
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && os.Getenv("XDG_DATA_HOME") == "" {
 		// In APPDATA beside other Amfora files
 		subscriptionDir = amforaAppData
 	} else {
 		// XDG data dir on POSIX systems
-		xdg_data, ok := os.LookupEnv("XDG_DATA_HOME")
-		if ok && strings.TrimSpace(xdg_data) != "" {
-			subscriptionDir = filepath.Join(xdg_data, "amfora")
-		} else {
-			// Default to ~/.local/share/amfora
-			subscriptionDir = filepath.Join(home, ".local", "share", "amfora")
-		}
+		subscriptionDir = filepath.Join(basedir.DataHome, "amfora")
 	}
 	SubscriptionPath = filepath.Join(subscriptionDir, "subscriptions.json")
 
@@ -188,21 +190,23 @@ func Init() error {
 
 	// Setup main config
 
-	viper.SetDefault("a-general.home", "gemini://gemini.circumlunar.space")
+	viper.SetDefault("a-general.home", "gemini://geminiprotocol.net")
 	viper.SetDefault("a-general.auto_redirect", false)
 	viper.SetDefault("a-general.http", "default")
 	viper.SetDefault("a-general.search", "gemini://geminispace.info/search")
 	viper.SetDefault("a-general.color", true)
 	viper.SetDefault("a-general.ansi", true)
+	viper.SetDefault("a-general.highlight_code", true)
+	viper.SetDefault("a-general.highlight_style", "monokai")
 	viper.SetDefault("a-general.bullets", true)
 	viper.SetDefault("a-general.show_link", false)
-	viper.SetDefault("a-general.left_margin", 0.15)
-	viper.SetDefault("a-general.max_width", 100)
+	viper.SetDefault("a-general.max_width", 80)
 	viper.SetDefault("a-general.downloads", "")
 	viper.SetDefault("a-general.temp_downloads", "")
 	viper.SetDefault("a-general.page_max_size", 2097152)
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.scrollbar", "auto")
+	viper.SetDefault("a-general.underline", true)
 	viper.SetDefault("keybindings.bind_reload", []string{"R", "Ctrl-R"})
 	viper.SetDefault("keybindings.bind_home", "Backspace")
 	viper.SetDefault("keybindings.bind_bookmarks", "Ctrl-B")
@@ -224,7 +228,7 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_close_tab", "Ctrl-W")
 	viper.SetDefault("keybindings.bind_next_tab", "F2")
 	viper.SetDefault("keybindings.bind_prev_tab", "F1")
-	viper.SetDefault("keybindings.bind_quit", []string{"Ctrl-C", "Ctrl-Q", "q"})
+	viper.SetDefault("keybindings.bind_quit", []string{"Ctrl-C", "Ctrl-Q", "Q"})
 	viper.SetDefault("keybindings.bind_help", "?")
 	viper.SetDefault("keybindings.bind_link1", "1")
 	viper.SetDefault("keybindings.bind_link2", "2")
@@ -254,7 +258,9 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_next_match", "n")
 	viper.SetDefault("keybindings.bind_prev_match", "p")
 	viper.SetDefault("keybindings.shift_numbers", "")
-	viper.SetDefault("url-handlers.other", "off")
+	viper.SetDefault("keybindings.bind_url_handler_open", "Ctrl-U")
+	viper.SetDefault("url-handlers.other", "default")
+	viper.SetDefault("url-prompts.other", false)
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
 	viper.SetDefault("cache.timeout", 1800)
@@ -262,6 +268,7 @@ func Init() error {
 	viper.SetDefault("subscriptions.update_interval", 1800)
 	viper.SetDefault("subscriptions.workers", 3)
 	viper.SetDefault("subscriptions.entries_per_page", 20)
+	viper.SetDefault("subscriptions.header", true)
 
 	viper.SetConfigFile(configPath)
 	viper.SetConfigType("toml")
@@ -344,24 +351,77 @@ func Init() error {
 	cache.SetMaxPages(viper.GetInt("cache.max_pages"))
 	cache.SetTimeout(viper.GetInt("cache.timeout"))
 
+	setColor := func(k string, colorStr string) error {
+		if k == "include" {
+			return nil
+		}
+		colorStr = strings.ToLower(colorStr)
+		var color tcell.Color
+		if colorStr == "default" {
+			if strings.HasSuffix(k, "bg") {
+				color = tcell.ColorDefault
+			} else {
+				return fmt.Errorf(`"default" is only valid for a background color (color ending in "bg"), not "%s"`, k)
+			}
+		} else {
+			color = tcell.GetColor(colorStr)
+			if color == tcell.ColorDefault {
+				return fmt.Errorf(`invalid color format for "%s": %s`, k, colorStr)
+			}
+		}
+		SetColor(k, color)
+		return nil
+	}
+
 	// Setup theme
 	configTheme := viper.Sub("theme")
 	if configTheme != nil {
+		// Include key comes first
+		if incPath := configTheme.GetString("include"); incPath != "" {
+			incViper := viper.New()
+			newIncPath, err := homedir.Expand(incPath)
+			if err == nil {
+				incViper.SetConfigFile(newIncPath)
+			} else {
+				incViper.SetConfigFile(incPath)
+			}
+			incViper.SetConfigType("toml")
+			err = incViper.ReadInConfig()
+			if err != nil {
+				return err
+			}
+
+			for k2, v2 := range incViper.AllSettings() {
+				colorStr, ok := v2.(string)
+				if !ok {
+					return fmt.Errorf(`include: value for "%s" is not a string: %v`, k2, v2)
+				}
+				if err := setColor(k2, colorStr); err != nil {
+					return err
+				}
+			}
+		}
 		for k, v := range configTheme.AllSettings() {
 			colorStr, ok := v.(string)
 			if !ok {
 				return fmt.Errorf(`value for "%s" is not a string: %v`, k, v)
 			}
-			color := tcell.GetColor(strings.ToLower(colorStr))
-			if color == tcell.ColorDefault {
-				return fmt.Errorf(`invalid color format for "%s": %s`, k, colorStr)
+			if err := setColor(k, colorStr); err != nil {
+				return err
 			}
-			SetColor(k, color)
 		}
 	}
 	if viper.GetBool("a-general.color") {
 		cview.Styles.PrimitiveBackgroundColor = GetColor("bg")
-	} // Otherwise it's black by default
+	} else {
+		// No colors allowed, set background to black instead of default
+		themeMu.Lock()
+		theme["bg"] = tcell.ColorBlack
+		cview.Styles.PrimitiveBackgroundColor = tcell.ColorBlack
+		themeMu.Unlock()
+	}
+
+	hasDarkTerminalBackground = termenv.HasDarkBackground()
 
 	// Parse HTTP command
 	HTTPCommand = viper.GetStringSlice("a-general.http")

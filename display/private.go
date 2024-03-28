@@ -1,5 +1,8 @@
 package display
 
+// This file contains the functions that aren't part of the public API.
+// The funcs are for network and displaying.
+
 import (
 	"net/url"
 	"strconv"
@@ -9,17 +12,20 @@ import (
 	"github.com/makeworld-the-better-one/amfora/structs"
 )
 
-// This file contains the functions that aren't part of the public API.
-// The funcs are for network and displaying.
-
-// followLink should be used when the user "clicks" a link on a page.
-// Not when a URL is opened on a new tab for the first time.
-// It will handle setting the bottomBar.
+// followLink should be used when the user "clicks" a link on a page,
+// but not when a URL is opened on a new tab for the first time.
+//
+// It will handle updating the bottomBar.
+//
+// It should be called with the `go` keyword to spawn a new goroutine if
+// it would otherwise block the UI loop, such as when called from an input
+// handler.
+//
+// It blocks until navigation is finished, and we've completed any user
+// interaction related to loading the URL (such as info, error modals)
 func followLink(t *tab, prev, next string) {
 	if strings.HasPrefix(next, "about:") {
-		if final, ok := handleAbout(t, next); ok {
-			t.addToHistory(final)
-		}
+		goURL(t, next)
 		return
 	}
 
@@ -29,7 +35,7 @@ func followLink(t *tab, prev, next string) {
 			Error("URL Error", err.Error())
 			return
 		}
-		go goURL(t, nextURL)
+		goURL(t, nextURL)
 		return
 	}
 	// No content on current tab, so the "prev" URL is not valid.
@@ -39,7 +45,7 @@ func followLink(t *tab, prev, next string) {
 		Error("URL Error", "Link URL could not be parsed")
 		return
 	}
-	go goURL(t, next)
+	goURL(t, next)
 }
 
 // reformatPage will take the raw page content and reformat it according to the current terminal dimensions.
@@ -112,7 +118,7 @@ func setPage(t *tab, p *structs.Page) {
 	tabNum := tabNumber(t)
 	browser.AddTab(
 		strconv.Itoa(tabNum),
-		makeTabLabel(strconv.Itoa(tabNum+1)),
+		t.label(),
 		makeContentLayout(t.view, leftMargin()),
 	)
 	App.Draw()
@@ -131,9 +137,15 @@ func setPage(t *tab, p *structs.Page) {
 //
 // It should be called in a goroutine.
 func goURL(t *tab, u string) {
+	// Update page cache in history for #122
+	t.historyCachePage()
+
 	final, displayed := handleURL(t, u, 0)
 	if displayed {
 		t.addToHistory(final)
+	} else if t.page.URL == "" {
+		// The tab is showing interstitial or no content. Let's go to about:newtab.
+		handleAbout(t, "about:newtab")
 	}
 	if t == tabs[curTab] {
 		// Display the bottomBar state that handleURL set

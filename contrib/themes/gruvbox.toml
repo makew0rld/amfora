@@ -1,4 +1,4 @@
-[theme]
+#[theme]
 # This section is for changing the COLORS used in Amfora.
 # These colors only apply if 'color' is enabled above.
 # Colors can be set using a W3C color name, or a hex value such as "#ffffff".

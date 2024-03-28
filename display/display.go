@@ -6,15 +6,16 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"sync"
 
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
 	"github.com/makeworld-the-better-one/amfora/cache"
+	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/go-gemini"
+	"github.com/muesli/termenv"
 	"github.com/spf13/viper"
 )
 
@@ -58,13 +59,22 @@ var layout = cview.NewFlex()
 
 var newTabPage structs.Page
 
-// Global mutex for changing the size of the left margin on all tabs.
-var reformatMu = sync.Mutex{}
-
 var App = cview.NewApplication()
 
 func Init(version, commit, builtBy string) {
 	aboutInit(version, commit, builtBy)
+
+	// Detect terminal colors for syntax highlighting
+	switch termenv.ColorProfile() {
+	case termenv.TrueColor:
+		renderer.TermColor = "terminal16m"
+	case termenv.ANSI256:
+		renderer.TermColor = "terminal256"
+	case termenv.ANSI:
+		renderer.TermColor = "terminal16"
+	case termenv.Ascii:
+		renderer.TermColor = ""
+	}
 
 	App.EnableMouse(false)
 	App.SetRoot(layout, true)
@@ -74,26 +84,21 @@ func Init(version, commit, builtBy string) {
 		termH = height
 
 		// Make sure the current tab content is reformatted when the terminal size changes
-		go func(t *tab) {
-			reformatMu.Lock() // Only allow one reformat job at a time
-			for i := range tabs {
-				// Overwrite all tabs with a new, differently sized, left margin
-				browser.AddTab(
-					strconv.Itoa(i),
-					makeTabLabel(strconv.Itoa(i+1)),
-					makeContentLayout(tabs[i].view, leftMargin()),
-				)
-				if tabs[i] == t {
-					// Reformat page ASAP, in the middle of loop
-					reformatPageAndSetView(t, t.page)
-				}
+		for i := range tabs {
+			// Overwrite all tabs with a new, differently sized, left margin
+			browser.AddTab(
+				strconv.Itoa(i),
+				tabs[i].label(),
+				makeContentLayout(tabs[i].view, leftMargin()),
+			)
+			if tabs[i] == tabs[curTab] {
+				// Reformat page ASAP, in the middle of loop
+				reformatPageAndSetView(tabs[curTab], tabs[curTab].page)
 			}
-			App.Draw()
-			reformatMu.Unlock()
-		}(tabs[curTab])
+		}
 	})
 
-	panels.AddPanel("browser", browser, true, true)
+	panels.AddPanel(PanelBrowser, browser, true, true)
 
 	helpInit()
 
@@ -102,8 +107,6 @@ func Init(version, commit, builtBy string) {
 	layout.AddItem(bottomBar, 1, 1, false)
 
 	if viper.GetBool("a-general.color") {
-		layout.SetBackgroundColor(config.GetColor("bg"))
-
 		bottomBar.SetBackgroundColor(config.GetColor("bottombar_bg"))
 		bottomBar.SetLabelColor(config.GetColor("bottombar_label"))
 		bottomBar.SetFieldBackgroundColor(config.GetColor("bottombar_bg"))
@@ -112,7 +115,7 @@ func Init(version, commit, builtBy string) {
 		browser.SetTabBackgroundColor(config.GetColor("bg"))
 		browser.SetTabBackgroundColorFocused(config.GetColor("tab_num"))
 		browser.SetTabTextColor(config.GetColor("tab_num"))
-		browser.SetTabTextColorFocused(config.GetColor("bg"))
+		browser.SetTabTextColorFocused(config.GetColor("ColorBg"))
 		browser.SetTabSwitcherDivider(
 			"",
 			fmt.Sprintf("[%s:%s]|[-]", config.GetColorString("tab_divider"), config.GetColorString("bg")),
@@ -195,16 +198,19 @@ func Init(version, commit, builtBy string) {
 					if i <= len(tabs[tab].page.Links) && i > 0 {
 						// Open new tab and load link
 						oldTab := tab
-						NewTab()
 						// Resolve and follow link manually
-						prevParsed, _ := url.Parse(tabs[oldTab].page.URL)
 						nextParsed, err := url.Parse(tabs[oldTab].page.Links[i-1])
 						if err != nil {
 							Error("URL Error", "link URL could not be parsed")
 							reset()
 							return
 						}
-						URL(prevParsed.ResolveReference(nextParsed).String())
+						if tabs[oldTab].hasContent() && !tabs[oldTab].isAnAboutPage() {
+							prevParsed, _ := url.Parse(tabs[oldTab].page.URL)
+							NewTabWithURL(prevParsed.ResolveReference(nextParsed).String())
+						} else {
+							NewTabWithURL(nextParsed.String())
+						}
 						return
 					}
 				} else {
@@ -215,21 +221,22 @@ func Init(version, commit, builtBy string) {
 					// We don't want to convert legitimate
 					// :// links to search terms.
 					query := strings.TrimSpace(query)
-					if (strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
+					if ((strings.Contains(query, " ") && !hasSpaceisURL.MatchString(query)) ||
 						(!strings.HasPrefix(query, "//") && !strings.Contains(query, "://") &&
-							!strings.Contains(query, ".")) && !strings.HasPrefix(query, "about:") {
+							!strings.Contains(query, ".")) && !strings.HasPrefix(query, "about:")) &&
+						!(query == "localhost" || strings.HasPrefix(query, "localhost/") || strings.HasPrefix(query, "localhost:")) {
 						// Has a space and follows regex, OR
 						// doesn't start with "//", contain "://", and doesn't have a dot either.
 						// Then it's a search
 
 						u := viper.GetString("a-general.search") + "?" + gemini.QueryEscape(query)
 						// Don't use the cached version of the search
-						cache.RemovePage(normalizeURL(u))
+						cache.RemovePage(client.NormalizeURL(u))
 						URL(u)
 					} else {
 						// Full URL
 						// Don't use cached version for manually entered URL
-						cache.RemovePage(normalizeURL(fixUserURL(query)))
+						cache.RemovePage(client.NormalizeURL(client.FixUserURL(query)))
 						URL(query)
 					}
 					return
@@ -237,7 +244,7 @@ func Init(version, commit, builtBy string) {
 			}
 			if i <= len(tabs[tab].page.Links) && i > 0 {
 				// It's a valid link number
-				followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[i-1])
+				go followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[i-1])
 				return
 			}
 			// Invalid link number, don't do anything
@@ -368,9 +375,16 @@ func Init(version, commit, builtBy string) {
 			// It's focused on a modal right now, nothing should interrupt
 			return event
 		}
-		_, ok = App.GetFocus().(*cview.Table)
-		if ok {
+		frontPanelName, _ := panels.GetFrontPanel()
+		if frontPanelName == PanelHelp {
 			// It's focused on help right now
+			if config.TranslateKeyEvent(event) == config.CmdQuit {
+				// Allow quit key to work, but nothing else
+				Stop()
+				return nil
+			}
+			// Pass everything else directly, inhibiting other keybindings
+			// like for editing the URL
 			return event
 		}
 
@@ -452,8 +466,7 @@ func Init(version, commit, builtBy string) {
 					Error("URL Error", err.Error())
 					return nil
 				}
-				NewTab()
-				URL(next)
+				NewTabWithURL(next)
 			} else {
 				NewTab()
 			}
@@ -501,6 +514,17 @@ func Stop() {
 // NewTab opens a new tab and switches to it, displaying the
 // the default empty content because there's no URL.
 func NewTab() {
+	NewTabWithURL("about:newtab")
+
+	bottomBar.SetLabel("")
+	bottomBar.SetText("")
+	tabs[NumTabs()-1].saveBottomBar()
+
+}
+
+// NewTabWithURL opens a new tab and switches to it, displaying the
+// the URL provided.
+func NewTabWithURL(url string) {
 	// Create TextView and change curTab
 	// Set the TextView options, and the changed func to App.Draw()
 	// SetDoneFunc to do link highlighting
@@ -517,22 +541,28 @@ func NewTab() {
 	curTab = NumTabs()
 
 	tabs = append(tabs, makeNewTab())
-	temp := newTabPage // Copy
-	setPage(tabs[curTab], &temp)
+
+	var interstitial string
+	if !strings.HasPrefix(url, "about:") {
+		interstitial = "Loading " + url + "..."
+	}
+
+	setPage(tabs[curTab], renderPageFromString(interstitial))
+
+	// Regardless of the starting URL, about:newtab will
+	// be the history root.
 	tabs[curTab].addToHistory("about:newtab")
 	tabs[curTab].history.pos = 0 // Manually set as first page
 
 	browser.AddTab(
 		strconv.Itoa(curTab),
-		makeTabLabel(strconv.Itoa(curTab+1)),
+		tabs[curTab].label(),
 		makeContentLayout(tabs[curTab].view, leftMargin()),
 	)
 	browser.SetCurrentTab(strconv.Itoa(curTab))
 	App.SetFocus(tabs[curTab].view)
 
-	bottomBar.SetLabel("")
-	bottomBar.SetText("")
-	tabs[curTab].saveBottomBar()
+	URL(url)
 
 	// Draw just in case
 	App.Draw()
@@ -642,13 +672,29 @@ func Reload() {
 func URL(u string) {
 	t := tabs[curTab]
 	if strings.HasPrefix(u, "about:") {
-		if final, ok := handleAbout(t, u); ok {
-			t.addToHistory(final)
-		}
-		return
+		go goURL(t, u)
+	} else {
+		go goURL(t, client.FixUserURL(u))
+	}
+}
+
+func RenderFromString(str string) {
+	t := tabs[curTab]
+	page := renderPageFromString(str)
+	setPage(t, page)
+}
+
+func renderPageFromString(str string) *structs.Page {
+	rendered, links := renderer.RenderGemini(str, textWidth(), false)
+	page := &structs.Page{
+		Mediatype: structs.TextGemini,
+		Raw:       str,
+		Content:   rendered,
+		Links:     links,
+		TermWidth: termW,
 	}
 
-	go goURL(t, fixUserURL(u))
+	return page
 }
 
 func NumTabs() int {

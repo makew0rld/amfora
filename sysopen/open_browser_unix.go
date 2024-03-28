@@ -1,3 +1,4 @@
+//go:build linux || freebsd || netbsd || openbsd
 // +build linux freebsd netbsd openbsd
 
 //nolint:goerr113
@@ -20,16 +21,19 @@ func Open(path string) (string, error) {
 	switch {
 	case xorgDisplay == "" && waylandDisplay == "":
 		return "", fmt.Errorf("no display server was found. " +
-			"You may set a default [[mediatype-handlers]] command in the config")
+			"You may set a default command in the config")
 	case xdgOpenNotFoundErr == nil:
 		// Use start rather than run or output in order
 		// to make application run in background.
-		if err := exec.Command(xdgOpenPath, path).Start(); err != nil {
+		proc := exec.Command(xdgOpenPath, path)
+		if err := proc.Start(); err != nil {
 			return "", err
 		}
+		//nolint:errcheck
+		go proc.Wait() // Prevent zombies, see #219
 		return "Opened in default system viewer", nil
 	default:
 		return "", fmt.Errorf("could not determine default system viewer. " +
-			"Set a catch-all [[mediatype-handlers]] command in the config")
+			"Set a catch-all command in the config")
 	}
 }

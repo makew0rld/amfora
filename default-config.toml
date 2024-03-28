@@ -1,5 +1,16 @@
 # This is the default config file.
 # It also shows all the default values, if you don't create the file.
+# You can edit this file to set your own configuration for Amfora.
+
+# When Amfora updates, defaults may change, but this file on your drive will not.
+# You can always get the latest defaults on GitHub.
+# https://github.com/makeworld-the-better-one/amfora/blob/master/default-config.toml
+
+# Please also check out the Amfora Wiki for more help
+# https://github.com/makeworld-the-better-one/amfora/wiki
+# gemini://makeworld.space/amfora-wiki/
+
+
 
 # All URL values may omit the scheme and/or port, as well as the beginning double slash
 # Valid URL examples:
@@ -11,7 +22,7 @@
 
 [a-general]
 # Press Ctrl-H to access it
-home = "gemini://gemini.circumlunar.space"
+home = "gemini://geminiprotocol.net"
 
 # Follow up to 5 Gemini redirects without prompting.
 # A prompt is always shown after the 5th redirect and for redirects to protocols other than Gemini.
@@ -23,7 +34,7 @@ auto_redirect = false
 # If a command is set, than the URL will be added (in quotes) to the end of the command.
 # A space will be prepended to the URL.
 #
-# The best to define a command is using a string array.
+# The best way to define a command is using a string array.
 # Examples:
 # http = ['firefox']
 # http = ['custom-browser', '--flag', '--option=2']
@@ -44,17 +55,20 @@ color = true
 # Whether ANSI color codes from the page content should be rendered
 ansi = true
 
+# Whether or not to support source code highlighting in preformatted blocks based on alt text
+highlight_code = true
+
+# Which highlighting style to use (see https://xyproto.github.io/splash/docs/)
+highlight_style = "monokai"
+
 # Whether to replace list asterisks with unicode bullets
 bullets = true
 
 # Whether to show link after link text
 show_link = false
 
-# A number from 0 to 1, indicating what percentage of the terminal width the left margin should take up.
-left_margin = 0.15
-
 # The max number of columns to wrap a page's text to. Preformatted blocks are not wrapped.
-max_width = 100
+max_width = 80
 
 # 'downloads' is the path to a downloads folder.
 # An empty value means the code will find the default downloads folder for your system.
@@ -71,6 +85,10 @@ page_max_time = 10
 # "auto" means the scrollbar only appears when the page is longer than the window.
 scrollbar = "auto"
 
+# Underline non-gemini URLs
+# This is done to help color blind users
+underline = true
+
 
 [auth]
 # Authentication settings
@@ -78,13 +96,17 @@ scrollbar = "auto"
 
 [auth.certs]
 # Client certificates
-# Set domain name equal to path to client cert
-# "example.com" = 'mycert.crt'
+# Set URL equal to path to client cert file
+#
+# "example.com" = 'mycert.crt'      # Cert is used for all paths on this domain
+# "example.com/dir/"=  'mycert.crt' # Cert is used for /dir/ and everything below only
+#
+# See the comment at the beginning of this file for examples of all valid types of
+# URLs, ports and schemes can be used too
 
 [auth.keys]
 # Client certificate keys
-# Set domain name equal to path to key for the client cert above
-# "example.com" = 'mycert.key'
+# Same as [auth.certs] but the path is to the client key file.
 
 
 [keybindings]
@@ -163,24 +185,48 @@ scrollbar = "auto"
 # bind_copy_target_url
 # bind_beginning: moving to beginning of page (top left)
 # bind_end: same but the for the end (bottom left)
+# bind_url_handler_open: Open highlighted URL with URL handler (#143)
 
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.
 # E.g. to open FTP URLs with FileZilla set the following key:
-#   ftp = 'filezilla'
-# You can set any scheme to "off" or "" to disable handling it, or
+#   ftp = ['filezilla']
+# You can set any scheme to 'off' or '' to disable handling it, or
 # just leave the key unset.
 #
 # DO NOT use this for setting the HTTP command.
 # Use the http setting in the "a-general" section above.
 #
 # NOTE: These settings are overrided by the ones in the proxies section.
+#
+# The best way to define a command is using a string array.
+# Examples:
+# magnet = ['transmission']
+# foo = ['custom-browser', '--flag', '--option=2']
+# tel = ['/path/with spaces/in it/telephone']
+#
 # Note the use of single quotes, so that backslashes will not be escaped.
+# Using just a string will also work, but it is deprecated, and will degrade if
+# you use paths with spaces.
 
 # This is a special key that defines the handler for all URL schemes for which
 # no handler is defined.
-other = 'off'
+# It uses the special value 'default', which will try and use the default
+# application on your computer for opening this kind of URI.
+other = 'default'
 
+[url-prompts]
+# Specify whether a confirmation prompt should be shown before following URL schemes.
+# The special key 'other' matches all schemes that don't match any other key.
+#
+# Example: prompt on every non-gemini URL
+# other = true
+# gemini = false
+#
+# Example: only prompt on HTTP(S)
+# other = false
+# http = true
+# https = true
 
 # [[mediatype-handlers]] section
 # ---------------------------------
@@ -297,11 +343,18 @@ workers = 3
 # The number of subscription updates displayed per page.
 entries_per_page = 20
 
+# Set to false to remove the explanatory text from the top of the subscription page
+header = true
+
 
 [theme]
 # This section is for changing the COLORS used in Amfora.
 # These colors only apply if 'color' is enabled above.
 # Colors can be set using a W3C color name, or a hex value such as "#ffffff".
+# Setting a background to "default" keeps the terminal default
+# If your terminal has transparency, set any background to "default" to keep it transparent
+# The key "bg" is already set to "default", but this can be used on other backgrounds,
+# like for modals.
 
 # Note that not all colors will work on terminals that do not have truecolor support.
 # If you want to stick to the standard 16 or 256 colors, you can get
@@ -320,6 +373,7 @@ entries_per_page = 20
 # EXAMPLES:
 # hdg_1 = "green"
 # hdg_2 = "#5f0000"
+# bg = "default"
 
 # Available keys to set:
 
@@ -330,6 +384,15 @@ entries_per_page = 20
 # bottombar_text: The color of the text you type
 # bottombar_bg
 # scrollbar: The scrollbar that appears on the right for long pages
+
+# You can also set an 'include' key to process another TOML file that contains theme keys.
+# Example:
+#   include = "my/path/to/special-theme.toml"
+#
+# Any other theme keys will override this external file.
+# You can use this special key to switch between themes easily.
+# Download other themes here: https://github.com/makeworld-the-better-one/amfora/tree/master/contrib/themes
+
 
 # hdg_1
 # hdg_2

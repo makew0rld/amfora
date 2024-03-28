@@ -35,6 +35,12 @@ func handleFile(u string) (*structs.Page, bool) {
 		if u[len(u)-1] != '/' {
 			u += "/"
 		}
+		for _, index := range []string{"index.gmi", "index.gemini"} {
+			m, err := os.Stat(uri.Path + "/" + index)
+			if err == nil && !m.IsDir() {
+				return handleFile(u + index)
+			}
+		}
 		return createDirectoryListing(u)
 	case mode.IsRegular():
 		if fi.Size() > viper.GetInt64("a-general.page_max_size") {

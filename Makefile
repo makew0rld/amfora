@@ -21,15 +21,15 @@ clean:
 
 .PHONY: install
 install: amfora amfora.desktop
-	$(INSTALL) -d $(PREFIX)/bin/
-	$(INSTALL) -m 755 amfora $(PREFIX)/bin/amfora
-	$(INSTALL) -d $(PREFIX)/share/applications/
-	$(INSTALL) -m 644 amfora.desktop $(PREFIX)/share/applications/amfora.desktop
+	$(INSTALL) -d $(DESTDIR)$(PREFIX)/bin/
+	$(INSTALL) -m 755 amfora $(DESTDIR)$(PREFIX)/bin/amfora
+	$(INSTALL) -d $(DESTDIR)$(PREFIX)/share/applications/
+	$(INSTALL) -m 644 amfora.desktop $(DESTDIR)$(PREFIX)/share/applications/amfora.desktop
 
 .PHONY: uninstall
 uninstall:
-	$(RM) -f $(PREFIX)/bin/amfora
-	$(RM) -f $(PREFIX)/share/applications/amfora.desktop
+	$(RM) -f $(DESTDIR)$(PREFIX)/bin/amfora
+	$(RM) -f $(DESTDIR)$(PREFIX)/share/applications/amfora.desktop
 
 # Development helpers
 

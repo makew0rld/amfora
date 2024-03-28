@@ -3,6 +3,7 @@ package display
 import (
 	"fmt"
 	"net/url"
+	"path"
 	"strconv"
 	"strings"
 
@@ -21,19 +22,31 @@ const (
 	tabModeSearch
 )
 
+// tabHistoryPageCache is fields from the Page struct, cached here to solve #122
+// See structs/structs.go for an explanation of the fields.
+type tabHistoryPageCache struct {
+	row        int
+	column     int
+	selected   string
+	selectedID string
+	mode       structs.PageMode
+}
+
 type tabHistory struct {
-	urls []string
-	pos  int // Position: where in the list of URLs we are
+	urls      []string
+	pos       int // Position: where in the list of URLs we are
+	pageCache []*tabHistoryPageCache
 }
 
 // tab hold the information needed for each browser tab.
 type tab struct {
-	page     *structs.Page
-	view     *cview.TextView
-	history  *tabHistory
-	mode     tabMode
-	barLabel string // The bottomBar label for the tab
-	barText  string // The bottomBar text for the tab
+	page             *structs.Page
+	view             *cview.TextView
+	history          *tabHistory
+	mode             tabMode
+	barLabel         string // The bottomBar label for the tab
+	barText          string // The bottomBar text for the tab
+	preferURLHandler bool   // For #143, use URL handler over proxy
 }
 
 // makeNewTab initializes an tab struct with no content.
@@ -87,7 +100,8 @@ func makeNewTab() *tab {
 			linkN, _ := strconv.Atoi(currentSelection[0])
 			tabs[tab].page.Selected = tabs[tab].page.Links[linkN]
 			tabs[tab].page.SelectedID = currentSelection[0]
-			followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[linkN])
+			tabs[tab].preferURLHandler = false // Reset in case
+			go followLink(tabs[tab], tabs[tab].page.URL, tabs[tab].page.Links[linkN])
 			return
 		}
 		if len(currentSelection) == 0 && (key == tcell.KeyEnter || key == tcell.KeyTab) {
@@ -95,7 +109,7 @@ func makeNewTab() *tab {
 			tabs[tab].page.Mode = structs.ModeLinkSelect
 
 			tabs[tab].view.Highlight("0")
-			tabs[tab].view.ScrollToHighlight()
+			tabs[tab].scrollToHighlight()
 			// Display link URL in bottomBar
 			bottomBar.SetLabel("[::b]Link: [::-]")
 			bottomBar.SetText(tabs[tab].page.Links[0])
@@ -116,7 +130,7 @@ func makeNewTab() *tab {
 				return
 			}
 			tabs[tab].view.Highlight(strconv.Itoa(index))
-			tabs[tab].view.ScrollToHighlight()
+			tabs[tab].scrollToHighlight()
 			// Display link URL in bottomBar
 			bottomBar.SetLabel("[::b]Link: [::-]")
 			bottomBar.SetText(tabs[tab].page.Links[index])
@@ -157,12 +171,12 @@ func makeNewTab() *tab {
 			if t.hasContent() {
 				savePath, err := downloadPage(t.page)
 				if err != nil {
-					Error("Download Error", fmt.Sprintf("Error saving page content: %v", err))
+					go Error("Download Error", fmt.Sprintf("Error saving page content: %v", err))
 				} else {
-					Info(fmt.Sprintf("Page content saved to %s. ", savePath))
+					go Info(fmt.Sprintf("Page content saved to %s. ", savePath))
 				}
 			} else {
-				Info("The current page has no content, so it couldn't be downloaded.")
+				go Info("The current page has no content, so it couldn't be downloaded.")
 			}
 			return nil
 		case config.CmdBack:
@@ -179,13 +193,13 @@ func makeNewTab() *tab {
 			currentURL := tabs[curTab].page.URL
 			err := clipboard.WriteAll(currentURL)
 			if err != nil {
-				Error("Copy Error", err.Error())
+				go Error("Copy Error", err.Error())
 				return nil
 			}
 			return nil
 		case config.CmdCopyTargetURL:
 			currentURL := t.page.URL
-			selectedURL := t.HighlightedURL()
+			selectedURL := t.highlightedURL()
 			if selectedURL == "" {
 				return nil
 			}
@@ -194,15 +208,27 @@ func makeNewTab() *tab {
 			if err != nil {
 				err := clipboard.WriteAll(selectedURL)
 				if err != nil {
-					Error("Copy Error", err.Error())
+					go Error("Copy Error", err.Error())
 					return nil
 				}
 				return nil
 			}
 			err = clipboard.WriteAll(copiedURL.String())
 			if err != nil {
-				Error("Copy Error", err.Error())
+				go Error("Copy Error", err.Error())
 				return nil
+			}
+			return nil
+		case config.CmdURLHandlerOpen:
+			currentSelection := t.view.GetHighlights()
+			t.preferURLHandler = true
+			// Copied code from when enter key is pressed
+			if len(currentSelection) > 0 {
+				bottomBar.SetLabel("")
+				linkN, _ := strconv.Atoi(currentSelection[0])
+				t.page.Selected = t.page.Links[linkN]
+				t.page.SelectedID = currentSelection[0]
+				go followLink(&t, t.page.URL, t.page.Links[linkN])
 			}
 			return nil
 		}
@@ -210,12 +236,14 @@ func makeNewTab() *tab {
 		if cmd >= config.CmdLink1 && cmd <= config.CmdLink0 {
 			if int(cmd) <= len(t.page.Links) {
 				// It's a valid link number
-				followLink(&t, t.page.URL, t.page.Links[cmd-1])
+				t.preferURLHandler = false // Reset in case
+				go followLink(&t, t.page.URL, t.page.Links[cmd-1])
 				return nil
 			}
 		}
 
 		// Scrolling stuff
+		// Copied in scrollTo
 
 		key := event.Key()
 		mod := event.Modifiers()
@@ -290,6 +318,21 @@ func makeNewTab() *tab {
 	return &t
 }
 
+// historyCachePage caches certain info about the current page in the tab's history,
+// see #122 for details.
+func (t *tab) historyCachePage() {
+	if t.page == nil || t.page.URL == "" || t.history.pageCache == nil || len(t.history.pageCache) == 0 {
+		return
+	}
+	t.history.pageCache[t.history.pos] = &tabHistoryPageCache{
+		row:        t.page.Row,
+		column:     t.page.Column,
+		selected:   t.page.Selected,
+		selectedID: t.page.SelectedID,
+		mode:       t.page.Mode,
+	}
+}
+
 // addToHistory adds the given URL to history.
 // It assumes the URL is currently being loaded and displayed on the page.
 func (t *tab) addToHistory(u string) {
@@ -297,14 +340,20 @@ func (t *tab) addToHistory(u string) {
 		// We're somewhere in the middle of the history instead, with URLs ahead and behind.
 		// The URLs ahead need to be removed so this new URL is the most recent item in the history
 		t.history.urls = t.history.urls[:t.history.pos+1]
+		// Same for page cache
+		t.history.pageCache = t.history.pageCache[:t.history.pos+1]
 	}
 	t.history.urls = append(t.history.urls, u)
 	t.history.pos++
+
+	// Cache page info for #122
+	t.history.pageCache = append(t.history.pageCache, &tabHistoryPageCache{}) // Add new spot
+	t.historyCachePage()                                                      // Fill it with data
 }
 
 // pageUp scrolls up 75% of the height of the terminal, like Bombadillo.
 func (t *tab) pageUp() {
-	t.page.Row -= (termH / 4) * 3
+	t.page.Row -= termH / 2
 	if t.page.Row < 0 {
 		t.page.Row = 0
 	}
@@ -315,7 +364,7 @@ func (t *tab) pageUp() {
 func (t *tab) pageDown() {
 	height, _ := t.view.GetBufferSize()
 
-	t.page.Row += (termH / 4) * 3
+	t.page.Row += termH / 2
 	if t.page.Row > height {
 		t.page.Row = height
 	}
@@ -357,7 +406,7 @@ func (t *tab) applyHorizontalScroll() {
 		// Scrolled to the right far enough that no left margin is needed
 		browser.AddTab(
 			strconv.Itoa(i),
-			makeTabLabel(strconv.Itoa(i+1)),
+			t.label(),
 			makeContentLayout(t.view, 0),
 		)
 		t.view.ScrollTo(t.page.Row, t.page.Column-leftMargin())
@@ -365,7 +414,7 @@ func (t *tab) applyHorizontalScroll() {
 		// Left margin is still needed, but is not necessarily at the right size by default
 		browser.AddTab(
 			strconv.Itoa(i),
-			makeTabLabel(strconv.Itoa(i+1)),
+			t.label(),
 			makeContentLayout(t.view, leftMargin()-t.page.Column),
 		)
 	}
@@ -376,6 +425,39 @@ func (t *tab) applyHorizontalScroll() {
 func (t *tab) applyScroll() {
 	t.view.ScrollTo(t.page.Row, 0)
 	t.applyHorizontalScroll()
+}
+
+// scrollTo scrolls the current tab to specified position. Like
+// cview.TextView.ScrollTo but using the custom scrolling logic required by #196.
+func (t *tab) scrollTo(row, col int) {
+	height, width := t.view.GetBufferSize()
+
+	// Keep row and col within limits
+
+	if row < 0 {
+		row = 0
+	} else if row > height {
+		row = height
+	}
+	if col < 0 {
+		col = 0
+	} else if col > width {
+		col = width
+	}
+
+	t.page.Row = row
+	t.page.Column = col
+	t.applyScroll()
+	App.Draw()
+}
+
+// scrollToHighlight scrolls the current tab to specified position. Like
+// cview.TextView.ScrollToHighlight but using the custom scrolling logic
+// required by #196.
+func (t *tab) scrollToHighlight() {
+	t.view.ScrollToHighlight()
+	App.Draw()
+	t.scrollTo(t.view.GetScrollOffset())
 }
 
 // saveBottomBar saves the current bottomBar values in the tab.
@@ -432,8 +514,8 @@ func (t *tab) applyAll() {
 	}
 }
 
-// HighlightedURL returns the currently selected URL
-func (t *tab) HighlightedURL() string {
+// highlightedURL returns the currently selected URL
+func (t *tab) highlightedURL() string {
 	currentSelection := tabs[curTab].view.GetHighlights()
 
 	if len(currentSelection) > 0 {
@@ -442,4 +524,36 @@ func (t *tab) HighlightedURL() string {
 		return selectedURL
 	}
 	return ""
+}
+
+// label returns the label to use for the tab name
+func (t *tab) label() string {
+	tn := tabNumber(t)
+	if tn < 0 {
+		// Invalid tab, shouldn't happen
+		return ""
+	}
+
+	// Increment so there's no tab 0 in the label
+	tn++
+
+	if t.page.URL == "" || t.page.URL == "about:newtab" {
+		// Just use tab number
+		// Spaces around to keep original Amfora look
+		return fmt.Sprintf(" %d ", tn)
+	}
+	if strings.HasPrefix(t.page.URL, "about:") {
+		// Don't look for domain, put the whole URL except query strings
+		return strings.SplitN(t.page.URL, "?", 2)[0]
+	}
+	if strings.HasPrefix(t.page.URL, "file://") {
+		// File URL, use file or folder as tab name
+		return cview.Escape(path.Base(t.page.URL[7:]))
+	}
+	// Otherwise, it's a Gemini URL
+	pu, err := url.Parse(t.page.URL)
+	if err != nil {
+		return fmt.Sprintf(" %d ", tn)
+	}
+	return pu.Host
 }

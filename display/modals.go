@@ -16,29 +16,27 @@ import (
 // The bookmark modal is in bookmarks.go
 
 var infoModal = cview.NewModal()
-
 var errorModal = cview.NewModal()
-
 var inputModal = cview.NewModal()
-var inputCh = make(chan string)
-var inputModalText string // The current text of the input field in the modal
-
 var yesNoModal = cview.NewModal()
 
-// Channel to receive yesNo answer on
+var inputCh = make(chan string)
 var yesNoCh = make(chan bool)
+
+var inputModalText string // The current text of the input field in the modal
+
+// Internal channel used to know when a modal has been dismissed
+var modalDone = make(chan struct{})
 
 func modalInit() {
 	infoModal.AddButtons([]string{"Ok"})
-
 	errorModal.AddButtons([]string{"Ok"})
-
 	yesNoModal.AddButtons([]string{"Yes", "No"})
 
-	panels.AddPanel("info", infoModal, false, false)
-	panels.AddPanel("error", errorModal, false, false)
-	panels.AddPanel("input", inputModal, false, false)
-	panels.AddPanel("yesno", yesNoModal, false, false)
+	panels.AddPanel(PanelInfoModal, infoModal, false, false)
+	panels.AddPanel(PanelErrorModal, errorModal, false, false)
+	panels.AddPanel(PanelInputModal, inputModal, false, false)
+	panels.AddPanel(PanelYesNoModal, yesNoModal, false, false)
 
 	// Color setup
 	if viper.GetBool("a-general.color") {
@@ -49,7 +47,7 @@ func modalInit() {
 		m.SetTextColor(config.GetColor("info_modal_text"))
 		form := m.GetForm()
 		form.SetButtonBackgroundColorFocused(config.GetColor("btn_text"))
-		form.SetButtonTextColorFocused(config.GetColor("btn_bg"))
+		form.SetButtonTextColorFocused(config.GetTextColor("btn_bg", "btn_text"))
 		frame := m.GetFrame()
 		frame.SetBorderColor(config.GetColor("info_modal_text"))
 		frame.SetTitleColor(config.GetColor("info_modal_text"))
@@ -61,7 +59,7 @@ func modalInit() {
 		m.SetTextColor(config.GetColor("error_modal_text"))
 		form = m.GetForm()
 		form.SetButtonBackgroundColorFocused(config.GetColor("btn_text"))
-		form.SetButtonTextColorFocused(config.GetColor("btn_bg"))
+		form.SetButtonTextColorFocused(config.GetTextColor("btn_bg", "btn_text"))
 		frame = errorModal.GetFrame()
 		frame.SetBorderColor(config.GetColor("error_modal_text"))
 		frame.SetTitleColor(config.GetColor("error_modal_text"))
@@ -78,14 +76,14 @@ func modalInit() {
 		form.SetFieldBackgroundColor(config.GetColor("input_modal_field_bg"))
 		form.SetFieldTextColor(config.GetColor("input_modal_field_text"))
 		form.SetButtonBackgroundColorFocused(config.GetColor("btn_text"))
-		form.SetButtonTextColorFocused(config.GetColor("btn_bg"))
+		form.SetButtonTextColorFocused(config.GetTextColor("btn_bg", "btn_text"))
 
 		m = yesNoModal
 		m.SetButtonBackgroundColor(config.GetColor("btn_bg"))
 		m.SetButtonTextColor(config.GetColor("btn_text"))
 		form = m.GetForm()
 		form.SetButtonBackgroundColorFocused(config.GetColor("btn_text"))
-		form.SetButtonTextColorFocused(config.GetColor("btn_bg"))
+		form.SetButtonTextColorFocused(config.GetTextColor("btn_bg", "btn_text"))
 	} else {
 		m := infoModal
 		m.SetBackgroundColor(tcell.ColorBlack)
@@ -141,17 +139,19 @@ func modalInit() {
 	frame.SetTitleAlign(cview.AlignCenter)
 	frame.SetTitle(" Info ")
 	infoModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-		panels.HidePanel("info")
+		panels.HidePanel(PanelInfoModal)
 		App.SetFocus(tabs[curTab].view)
 		App.Draw()
+		modalDone <- struct{}{}
 	})
 
 	errorModal.SetBorder(true)
 	errorModal.GetFrame().SetTitleAlign(cview.AlignCenter)
 	errorModal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-		panels.HidePanel("error")
+		panels.HidePanel(PanelErrorModal)
 		App.SetFocus(tabs[curTab].view)
 		App.Draw()
+		modalDone <- struct{}{}
 	})
 
 	inputModal.SetBorder(true)
@@ -181,7 +181,7 @@ func modalInit() {
 	dlInit()
 }
 
-// Error displays an error on the screen in a modal.
+// Error displays an error on the screen in a modal, and blocks until dismissed by the user.
 func Error(title, text string) {
 	if text == "" {
 		text = "No additional information."
@@ -196,22 +196,26 @@ func Error(title, text string) {
 
 	errorModal.GetFrame().SetTitle(title)
 	errorModal.SetText(text)
-	panels.ShowPanel("error")
-	panels.SendToFront("error")
+	panels.ShowPanel(PanelErrorModal)
+	panels.SendToFront(PanelErrorModal)
 	App.SetFocus(errorModal)
 	App.Draw()
+
+	<-modalDone
 }
 
-// Info displays some info on the screen in a modal.
+// Info displays some info on the screen in a modal, and blocks until dismissed by the user.
 func Info(s string) {
 	infoModal.SetText(s)
-	panels.ShowPanel("info")
-	panels.SendToFront("info")
+	panels.ShowPanel(PanelInfoModal)
+	panels.SendToFront(PanelInfoModal)
 	App.SetFocus(infoModal)
 	App.Draw()
+
+	<-modalDone
 }
 
-// Input pulls up a modal that asks for input, and returns the user's input.
+// Input pulls up a modal that asks for input, waits for that input, and returns it.
 // It returns an bool indicating if the user chose to send input or not.
 func Input(prompt string, sensitive bool) (string, bool) {
 	// Remove elements and re-add them - to clear input text and keep input in focus
@@ -236,14 +240,14 @@ func Input(prompt string, sensitive bool) (string, bool) {
 	}
 
 	inputModal.SetText(prompt + " ")
-	panels.ShowPanel("input")
-	panels.SendToFront("input")
+	panels.ShowPanel(PanelInputModal)
+	panels.SendToFront(PanelInputModal)
 	App.SetFocus(inputModal)
 	App.Draw()
 
 	resp := <-inputCh
 
-	panels.HidePanel("input")
+	panels.HidePanel(PanelInputModal)
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 
@@ -253,7 +257,7 @@ func Input(prompt string, sensitive bool) (string, bool) {
 	return resp, true
 }
 
-// YesNo displays a modal asking a yes-or-no question.
+// YesNo displays a modal asking a yes-or-no question, waits for an answer, then returns it as a bool.
 func YesNo(prompt string) bool {
 	if viper.GetBool("a-general.color") {
 		m := yesNoModal
@@ -272,20 +276,20 @@ func YesNo(prompt string) bool {
 	}
 	yesNoModal.GetFrame().SetTitle("")
 	yesNoModal.SetText(prompt)
-	panels.ShowPanel("yesno")
-	panels.SendToFront("yesno")
+	panels.ShowPanel(PanelYesNoModal)
+	panels.SendToFront(PanelYesNoModal)
 	App.SetFocus(yesNoModal)
 	App.Draw()
 
 	resp := <-yesNoCh
-	panels.HidePanel("yesno")
+	panels.HidePanel(PanelYesNoModal)
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 	return resp
 }
 
 // Tofu displays the TOFU warning modal.
-// It returns a bool indicating whether the user wants to continue.
+// It blocks then returns a bool indicating whether the user wants to continue.
 func Tofu(host string, expiry time.Time) bool {
 	// Reuses yesNoModal, with error color
 
@@ -305,18 +309,18 @@ func Tofu(host string, expiry time.Time) bool {
 	frame.SetTitle(" TOFU ")
 	m.SetText(
 		//nolint:lll
-		fmt.Sprintf("%s's certificate has changed, possibly indicating an security issue. The certificate would have expired %s. Are you sure you want to continue? ",
+		fmt.Sprintf("%s's certificate has changed, possibly indicating a security issue. The certificate would have expired %s. Are you sure you want to continue? ",
 			host,
 			humanize.Time(expiry),
 		),
 	)
-	panels.ShowPanel("yesno")
-	panels.SendToFront("yesno")
+	panels.ShowPanel(PanelYesNoModal)
+	panels.SendToFront(PanelYesNoModal)
 	App.SetFocus(yesNoModal)
 	App.Draw()
 
 	resp := <-yesNoCh
-	panels.HidePanel("yesno")
+	panels.HidePanel(PanelYesNoModal)
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 	return resp

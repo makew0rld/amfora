@@ -2,6 +2,8 @@ package display
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 
 	"code.rocketnine.space/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
@@ -28,8 +30,11 @@ const (
 var bkmkCh = make(chan bkmkAction)
 var bkmkModalText string // The current text of the input field in the modal
 
+// Regex for extracting top level 1 heading. The title will extracted from the 1st submatch.
+var topHeadingRegex = regexp.MustCompile(`(?m)^#[^#][\t ]*[^\s].*$`)
+
 func bkmkInit() {
-	panels.AddPanel("bkmk", bkmkModal, false, false)
+	panels.AddPanel(PanelBookmarks, bkmkModal, false, false)
 
 	m := bkmkModal
 	if viper.GetBool("a-general.color") {
@@ -41,8 +46,10 @@ func bkmkInit() {
 		form.SetLabelColor(config.GetColor("bkmk_modal_label"))
 		form.SetFieldBackgroundColor(config.GetColor("bkmk_modal_field_bg"))
 		form.SetFieldTextColor(config.GetColor("bkmk_modal_field_text"))
+		form.SetFieldBackgroundColorFocused(config.GetColor("bkmk_modal_field_text"))
+		form.SetFieldTextColorFocused(config.GetTextColor("bkmk_modal_field_bg", "bkmk_modal_field_text"))
 		form.SetButtonBackgroundColorFocused(config.GetColor("btn_text"))
-		form.SetButtonTextColorFocused(config.GetColor("btn_bg"))
+		form.SetButtonTextColorFocused(config.GetTextColor("btn_bg", "btn_text"))
 		frame := m.GetFrame()
 		frame.SetBorderColor(config.GetColor("bkmk_modal_text"))
 		frame.SetTitleColor(config.GetColor("bkmk_modal_text"))
@@ -109,13 +116,13 @@ func openBkmkModal(name string, exists bool) (string, bkmkAction) {
 			bkmkModalText = text
 		})
 
-	panels.ShowPanel("bkmk")
-	panels.SendToFront("bkmk")
+	panels.ShowPanel(PanelBookmarks)
+	panels.SendToFront(PanelBookmarks)
 	App.SetFocus(bkmkModal)
 	App.Draw()
 
 	action := <-bkmkCh
-	panels.HidePanel("bkmk")
+	panels.HidePanel(PanelBookmarks)
 	App.SetFocus(tabs[curTab].view)
 	App.Draw()
 
@@ -157,7 +164,17 @@ func addBookmark() {
 		return
 	}
 	name, exists := bookmarks.Get(p.URL)
+
+	// Retrieve & use top level 1 heading for name if bookmark does not already exist.
+	if !exists {
+		match := topHeadingRegex.FindString(p.Raw)
+		if match != "" {
+			name = strings.TrimSpace(match[1:])
+		}
+	}
+
 	// Open a bookmark modal with the current name of the bookmark, if it exists
+	// otherwise use the top level 1 heading as a suggested name
 	newName, action := openBkmkModal(name, exists)
 
 	//nolint:exhaustive

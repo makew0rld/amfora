@@ -148,9 +148,7 @@ func Init(version, commit, builtBy string) {
 		// Use for errors.
 		reset := func() {
       if searchMode {
-			  tabs[tab].mode = tabModeDone
-        searchMode = false
-        bottomBar.SetText(bottomBarText)
+        resetSearch()
       }
 			bottomBar.SetLabel("")
 			tabs[tab].applyAll()
@@ -399,11 +397,7 @@ func Init(version, commit, builtBy string) {
 				return nil
 			case config.CmdInvalid:
 				if event.Key() == tcell.KeyEsc {
-					tabs[curTab].mode = tabModeDone
-					tabs[curTab].view.SetBytes(originalText)
-          searchMode = false
-          bottomBar.SetText(bottomBarText)
-          bottomBar.SetLabel("")
+          resetSearch()
 					return nil
 				}
 			}
@@ -689,4 +683,12 @@ func renderPageFromString(str string) *structs.Page {
 
 func NumTabs() int {
 	return len(tabs)
+}
+
+func resetSearch() {
+  tabs[curTab].view.SetBytes(originalText)
+  tabs[curTab].mode = tabModeDone
+  searchMode = false
+  bottomBar.SetLabel("")
+  bottomBar.SetText(bottomBarText)
 }

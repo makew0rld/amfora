@@ -1,0 +1,202 @@
+.Dd April 16, 2022
+.Dt AMFORA 1
+.Os
+.Sh NAME
+.Nm amfora
+.Nd fancy terminal gemini browser
+.Sh SYNOPSIS
+.Nm amfora
+.Op Fl h | Fl v | Ar gemini-url
+.Sh DESCRIPTION
+.Nm
+is a fancy gemini client in your terminal, written in Go; supporting tabs,
+caching, theming, proxying, subscriptions, client certificates,
+external link handling, syntax highlighting, and a built in search engine.
+Subscriptions are supported through gemini, atom, RSS, and JSON Feed files.
+.Ss DEFAULT KEY BINDINGS
+The following key bindings update in the help menu upon config change:
+.Pp
+.Bl -tag -width 16v -compact
+.It Ic \&?
+Open help menu
+.It Ic 0-9
+Access link 1-10 on page
+.It Ic Ctrl-A
+Visit subscription feed
+.It Ic Ctrl-C
+Hard quit
+.It Ic Ctrl-S
+Save loaded page to disk
+.It Ic Ctrl-T
+Open highlighted link in new tab
+.It Ic Ctrl-X
+Subscribe to current page
+.It Ic F1
+Previous tab
+.It Ic F2
+Next tab
+.It Ic Esc
+Close menu/bar
+.It Ic Space
+Open bottom bar
+.It Ic Tab No or Ic Enter
+Begin link highlighting
+.It Ic Tab
+Highlight next link
+.It Ic Shift-Tab
+Highlight previous link
+.It Ic Shift-q
+Exit
+.El
+.Ss BOTTOM BAR COMMANDS
+.Bl -tag -width 16v -compact
+.It Cm about:about
+About meta page
+.It Cm about:manage-subscriptions
+Unsubscribe list
+.It Cm about:subscriptions
+Subscription feed
+.It Cm about:version
+Version info
+.It Va foo
+Search the geminispace for
+.Va foo .
+.It Cm new\&: Ns Va N
+Visit link
+.Va N
+.El
+.Ss CONFIGURATION
+A well-commented default configuration file, written in TOML,
+is generated on first use if it doesn't already exist.
+.Pp
+In the configuration directory you can also create a gemtext file called
+.Pa newtab.gmi
+to customize your new tab page.
+.Ss BOOKMARKS
+.Nm
+stores its bookmarks in an XML format called XBEL, located at
+.Pa ~/.local/share/amfora/bookmarks.xml
+by default.
+If the
+.Va XDG_DATA_HOME
+variable is set then the configuration file can be found at
+.Pa XDG_DATA_HOME/amfora/bookmarks.xml .
+.Pp
+On Windows, the file can be found at
+.Pa %APPDATA%\eamfora\ebookmarks.xml ,
+which usually expands to
+.Pa C:\eUsers\e<username>\eAppData\eRoaming\eamfora\ebookmarks.xml .
+.Pp
+See
+.Sx EXAMPLE BOOKMARK
+.Sh FILES
+.Ss *NIX
+.Bl -tag -width "~/.local/share/amfora/bookmarks.xml" -compact
+.It Pa ~/.config/amfora/config.toml
+.It Pa ~/.local/share/amfora/bookmarks.xml
+.El
+.Ss XDG
+.Bl -tag -width "$XDG_CONFIG_HOME/amfora/config.toml" -compact
+.It Pa $XDG_CONFIG_HOME/amfora/config.toml
+.It Pa $XDG_DATA_HOME/amfora/bookmarks.xml
+.El
+.Ss WINDOWS
+.Bl -tag -width "%APPDATA%\eamfora\ebookmarks.toml" -compact
+.It Pa %APPDATA%\eamfora\econfig.toml
+.It Pa %APPDATA%\eamfora\ebookmarks.xml
+.El
+.Sh EXIT STATUS
+.Nm
+exits
+.Va 0
+on success, and
+.Va 1
+if an error occurs.
+.Sh EXAMPLES
+.Ss EXAMPLE BOOKMARK
+.Bd -literal
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xbel
+  PUBLIC "+//IDN python.org//DTD XML Bookmark Exchange Language 1.1//EN//XML"
+         "http://www.python.org/topics/xml/dtds/xbel-1.1.dtd">
+<xbel version="1.1">
+    <bookmark href="gemini://example.com/">
+        <title>Example Bookmark</title>
+    </bookmark>
+</xbel>
+.Ed
+.Ss EXAMPLE PROXY
+.Bd -literal
+[proxies]
+# Allows setting a Gemini proxy for different schemes.
+# The settings are similar to the url-handlers section above.
+# E.g. to open a gopher page by connecting to a Gemini proxy server:
+#   gopher = "example.com:123"
+#
+# Port 1965 is assumed if no port is specified.
+#
+# NOTE: These settings override any external handlers specified in
+# the url-handlers section.
+#
+# Note that HTTP and HTTPS are treated as separate protocols here
+.Ed
+.Ss EXAMPLE CERTIFICATE
+.Bd -literal
+[auth]
+# Authentication settings
+
+[auth.certs]
+# Client certificates
+# Set domain name equal to path to client cert
+# "example.com" = "mycert.crt"
+"astrobotany.mozz.us" = "~/.local/share/amfora/astrobotany-cert.pem"
+
+[auth.keys]
+# Client certificate keys
+# Set domain name equal to path to key for the client cert above
+# "example.com" = "mycert.key"
+"astrobotany.mozz.us" = "~/.local/share/amfora/astrobotany-key.pem"
+.Ed
+.Sh DIAGNOSTICS
+Errors are printed to
+.Va stderr .
+.Sh SEE ALSO
+The official documentation is maintained in two places:
+.Bl -tag -width 2v -compact
+.It Lk gemini://makeworld.space/amfora-wiki/
+.It Lk https://github.com/makeworld-the-better-one/amfora/wiki
+.El
+.Pp
+.Bl -tag -width 2v -compact
+.It agena.py gemini-to-gopher proxy.
+.It Lk https://bombadillo.colorfield.space/ bombadillo
+.It duckling-proxy.go gemini-to-HTTPS proxy.
+.El
+.Sh STANDARDS
+.Bl -tag -width 2v -compact
+.It Lk https://geminiprotocol.net/docs/tech-overview.gmi
+Gemini Technical Overview
+.It Lk https://toml.io/en/
+Configuration syntax
+.It Lk http://pyxml.sourceforge.net/topics/xbel/docs/html/xbel.html
+Bookmark syntax
+.It Lk https://www.iana.org/assignments/media-types/media-types.xhtml
+Media Types
+.El
+.Sh HISTORY
+The
+.Nm
+utility was originally written by
+.An makeworld Aq Mt makeworld@protonmail.com
+for Linux in 2020.
+.Sh CAVEATS
+Using OpenSSL on Windows is not so easy.
+One way is to install Chocolatey, and run
+.Ql choco install openssl
+.Pp
+.Nm
+does not support gopher or other non-web protocols - check out
+.Lk https://bombadillo.colorfield.space/ bombadillo
+for that.
+.Sh BUGS
+There are sometimes known UI rendering glitches.

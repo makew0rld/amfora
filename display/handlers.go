@@ -8,11 +8,14 @@ import (
 	"net/url"
 	"os/exec"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/makeworld-the-better-one/amfora/cache"
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
+	"github.com/makeworld-the-better-one/amfora/logger"
+	"github.com/makeworld-the-better-one/amfora/openssl"
 	"github.com/makeworld-the-better-one/amfora/renderer"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
@@ -480,7 +483,40 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 		Error("Bad Request", escapeMeta(res.Meta))
 		return ret("", false)
 	case 60:
-		Error("Client Certificate Required", escapeMeta(res.Meta))
+		ok := YesNo("This page requires certificate which we could not find in your config.\nWould you like Amfora to create a new certificate for that page?")
+		if !ok {
+			Error("Client Certificate Required", escapeMeta(res.Meta))
+			return ret("", false)
+		}
+
+		username, ok := Input("Certificate Username", false)
+		if !ok {
+			return ret("", false)
+		}
+
+		days, ok := Input("Certificate Expire Days (default: 1825)", false)
+		if !ok {
+			return ret("", false)
+		}
+
+		daysInt, err := strconv.ParseInt(days, 0, 0)
+		if err != nil {
+			return ret("Days supposed to be int value", false)
+		}
+
+		err = openssl.CallOpenSSL(t.page.URL, username, int(daysInt))
+		if err != nil {
+			logger.Logger.Fatal(err)
+			return ret(err.Error(), true)
+		}
+
+		err = client.CreateNewCertRow(t.page.URL)
+		if err != nil {
+			logger.Logger.Fatal(err)
+			return ret("", false)
+		}
+
+		Info("Creating certificate successfull")
 		return ret("", false)
 	case 61:
 		Error("Certificate Not Authorised", escapeMeta(res.Meta))

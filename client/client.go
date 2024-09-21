@@ -3,14 +3,18 @@ package client
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/makeworld-the-better-one/amfora/logger"
+	"github.com/makeworld-the-better-one/amfora/openssl"
 	"github.com/makeworld-the-better-one/go-gemini"
 	gemsocks5 "github.com/makeworld-the-better-one/go-gemini-socks5"
 	"github.com/mitchellh/go-homedir"
@@ -211,4 +215,34 @@ func fetchWithProxy(proxyHostname, proxyPort, u string, c *gemini.Client) (*gemi
 // FetchWithProxy is the same as Fetch, but uses a proxy.
 func FetchWithProxy(proxyHostname, proxyPort, u string) (*gemini.Response, error) {
 	return fetchWithProxy(proxyHostname, proxyPort, u, fetchClient)
+}
+
+func CreateNewCertRow(url string) error {
+	cut, ok := strings.CutPrefix(url, "gemini://")
+	if !ok {
+		return errors.New(fmt.Sprint("invalid url", url))
+	}
+	url = cut
+
+	dir, err := openssl.GetCertsDir()
+	if err != nil {
+		logger.Logger.Fatal(err)
+	}
+
+	certPath := filepath.Join(dir, url, "cert.pem")
+	keyPath := filepath.Join(dir, url, "key.pem")
+
+	viper.Set("auth.certs", map[string]string{url: certPath})
+	viper.Set("auth.keys", map[string]string{url: keyPath})
+
+	if err = viper.WriteConfig(); err != nil {
+		logger.Logger.Println(err)
+		return err
+	}
+	if err = viper.WriteConfig(); err != nil {
+		logger.Logger.Println(err)
+		return err
+	}
+
+	return nil
 }

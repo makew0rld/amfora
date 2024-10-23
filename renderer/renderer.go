@@ -49,7 +49,7 @@ func RenderPlainText(s string) string {
 	// It used to add a left margin, now this is done elsewhere.
 	// The function is kept for convenience and in case rendering
 	// is needed in the future.
-	return cview.Escape(s)
+	return fmt.Sprintf("[%s]", config.GetColorString("preformatted_text")) + cview.Escape(s)
 }
 
 // wrapLine wraps a line to the provided width, and adds the provided prefix and suffix to each wrapped line.

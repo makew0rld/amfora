@@ -1,4 +1,4 @@
-//nolint
+// nolint
 package display
 
 //go:generate ./thanks.sh

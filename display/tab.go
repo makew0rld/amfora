@@ -19,6 +19,7 @@ type tabMode int
 const (
 	tabModeDone tabMode = iota
 	tabModeLoading
+	tabModeSearch
 )
 
 // tabHistoryPageCache is fields from the Page struct, cached here to solve #122

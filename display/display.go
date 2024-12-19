@@ -29,6 +29,14 @@ var termH int
 // The user input and URL display bar at the bottom
 var bottomBar = cview.NewInputField()
 
+var originalText []byte
+var tagsRegex = regexp.MustCompile(`\[[a-zA-Z0-9_,;: \-\."#]+[^\[]*\]`)
+var searchMode = false
+var searchString = ""
+var bottomBarText = ""
+var matches = 0
+var curMatch = 0
+
 // When the bottom bar string has a space, this regex decides whether it's
 // a non-encoded URL or a search string.
 // See this comment for details:
@@ -139,6 +147,9 @@ func Init(version, commit, builtBy string) {
 		// Reset func to set the bottomBar back to what it was before
 		// Use for errors.
 		reset := func() {
+			if searchMode {
+				resetSearch()
+			}
 			bottomBar.SetLabel("")
 			tabs[tab].applyAll()
 			App.SetFocus(tabs[tab].view)
@@ -147,6 +158,63 @@ func Init(version, commit, builtBy string) {
 		//nolint:exhaustive
 		switch key {
 		case tcell.KeyEnter:
+
+			if searchMode {
+				// Escape the search string to not find regexp symbols
+				searchString = regexp.QuoteMeta(bottomBar.GetText())
+
+				if strings.TrimSpace(searchString) == "" {
+					// Ignore
+					reset()
+					return
+				}
+
+				if tabs[tab].mode != tabModeSearch {
+					originalText = tabs[curTab].view.GetBytes(false)
+				}
+				tabs[tab].mode = tabModeSearch
+
+				// find all positions of the search string
+				searchRegex := regexp.MustCompile(searchString)
+				searchIdx := searchRegex.FindAllIndex(originalText, -1)
+
+				// find all positions of tags
+				tagsIdx := tagsRegex.FindAllIndex(originalText, -1)
+
+				text := make([]byte, 0)
+				matches = 0
+				lastMatch := 0
+
+				// loops through all occurrences and check if they
+				// discard if they lie within tags.
+				// []byte text is build from the original text buffer
+				// with the actual search strings replaced by tagged regions
+				// to highlight.
+				for i, match := range searchIdx {
+					for _, tag := range tagsIdx {
+						if match[0] >= tag[0] && match[1] <= tag[1] {
+							break
+						}
+					}
+
+					matches++
+					text = append(text, originalText[lastMatch:match[0]]...)
+					replacement := []byte(fmt.Sprint(`["search-`, i, `"]`, searchString, `[""]`))
+					text = append(text, replacement...)
+					lastMatch = match[0] + len(searchString)
+				}
+				text = append(text, originalText[lastMatch:]...)
+
+				tabs[curTab].view.SetBytes(text)
+
+				curMatch = 0
+				tabs[curTab].view.Highlight(fmt.Sprint("search-", "0"))
+				tabs[curTab].view.ScrollToHighlight()
+				App.SetFocus(tabs[tab].view)
+
+				return
+			}
+
 			// Figure out whether it's a URL, link number, or search
 			// And send out a request
 
@@ -305,6 +373,31 @@ func Init(version, commit, builtBy string) {
 		// keybinding in config/config.go and update the help panel in display/help.go
 
 		cmd := config.TranslateKeyEvent(event)
+		if tabs[curTab].mode == tabModeSearch {
+			switch cmd {
+			case config.CmdNextMatch:
+				if curMatch < (matches - 1) {
+					curMatch++
+					tabs[curTab].view.Highlight(fmt.Sprint("search-", curMatch))
+				}
+				tabs[curTab].view.ScrollToHighlight()
+				return nil
+			case config.CmdPrevMatch:
+				if curMatch > 0 {
+					curMatch--
+					tabs[curTab].view.Highlight(fmt.Sprint("search-", curMatch))
+				}
+				tabs[curTab].view.ScrollToHighlight()
+				return nil
+			case config.CmdInvalid:
+				if event.Key() == tcell.KeyEsc {
+					resetSearch()
+					return nil
+				}
+			}
+			return event
+		}
+
 		if tabs[curTab].mode == tabModeDone {
 			// All the keys and operations that can only work while NOT loading
 			//nolint:exhaustive
@@ -320,6 +413,13 @@ func Init(version, commit, builtBy string) {
 				bottomBar.SetLabel("[::b]URL/Num./Search: [::-]")
 				bottomBar.SetText("")
 				// Don't save bottom bar, so that whenever you switch tabs, it's not in that mode
+				App.SetFocus(bottomBar)
+				return nil
+			case config.CmdSearch:
+				bottomBar.SetLabel("[::b]Search: [::-]")
+				bottomBarText = bottomBar.GetText()
+				bottomBar.SetText("")
+				searchMode = true
 				App.SetFocus(bottomBar)
 				return nil
 			case config.CmdEdit:
@@ -577,4 +677,12 @@ func renderPageFromString(str string) *structs.Page {
 
 func NumTabs() int {
 	return len(tabs)
+}
+
+func resetSearch() {
+	tabs[curTab].view.SetBytes(originalText)
+	tabs[curTab].mode = tabModeDone
+	searchMode = false
+	bottomBar.SetLabel("")
+	bottomBar.SetText(bottomBarText)
 }

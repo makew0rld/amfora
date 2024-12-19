@@ -187,6 +187,11 @@ underline = true
 # bind_end: same but the for the end (bottom left)
 # bind_url_handler_open: Open highlighted URL with URL handler (#143)
 
+# Search
+# bind_search = "/"
+# bind_next_match = "n"
+# bind_prev_match = "N"
+
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.
 # E.g. to open FTP URLs with FileZilla set the following key:

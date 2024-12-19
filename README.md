@@ -118,39 +118,31 @@ brew upgrade --fetch-HEAD amfora
 </details>
 
 
-## Features / Roadmap
+## Features
 Features in *italics* are in the master branch, but not in the latest release.
 
-- [x] URL browsing with TOFU and error handling
-- [x] Tabbed browsing
-- [x] Support ANSI color codes on pages, even for Windows
-- [x] Styled page content (headings, links)
-- [x] Basic forward/backward history, for each tab
-- [x] Input (Status Code 10 & 11)
-- [x] Multiple charset support (over 55)
-- [x] Built-in search (uses geminispace.info by default)
-- [x] Bookmarks
-- [x] Download pages and arbitrary data
-- [x] Theming
+- URL browsing with TOFU and error handling
+- Tabbed browsing
+- Support ANSI color codes on pages, even for Windows
+- Styled page content (headings, links)
+- Basic forward/backward history, for each tab
+- Input (Status Code 10 & 11)
+- Multiple charset support (over 55)
+- Built-in search (uses geminispace.info by default)
+- Bookmarks
+- Download pages and arbitrary data
+- Theming
   - Check out the [user contributed themes](https://github.com/makeworld-the-better-one/amfora/tree/master/contrib/themes)!
-- [x] Proxying
+- Proxying
   - Schemes like Gopher or HTTP can be proxied through a Gemini server
-- [x] Client certificate support
-  - [ ] Full client certificate UX within the client
-    - Create transient and permanent certs within the client, per domain
-    - Manage and browse them
-    - Similar to [Kristall](https://github.com/MasterQ32/kristall)
-    - https://lists.orbitalfox.eu/archives/gemini/2020/001400.html
-- [x] Subscriptions
+- Client certificate support
+- Subscriptions
   - Subscribing to RSS, Atom, and [JSON Feeds](https://jsonfeed.org/) are all supported
   - So is subscribing to a page, to know when it changes
-- [x] Open non-text files in another application
-  - [x] Ability to stream content instead of downloading it first
-- [x] *Highlighting of preformatted code blocks that list a language in the alt text*
-- [ ] Stream support
-- [ ] Table of contents for pages
-- [ ] Search in pages with <kbd>Ctrl-F</kbd>
-- [ ] Persistent history
+- Open non-text files in another application
+  - Ability to stream content instead of downloading it first
+- Highlighting of preformatted code blocks that list a language in the alt text
+- *Search in pages with <kbd>Ctrl-F</kbd>*
 
 
 ## Usage & Configuration

@@ -143,6 +143,7 @@ Features in *italics* are in the master branch, but not in the latest release.
   - Ability to stream content instead of downloading it first
 - Highlighting of preformatted code blocks that list a language in the alt text
 - *Search in pages with <kbd>Ctrl-F</kbd>*
+- *Run custom commands using the current or selected URL as an argument*
 
 
 ## Usage & Configuration

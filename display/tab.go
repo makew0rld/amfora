@@ -241,6 +241,29 @@ func makeNewTab() *tab {
 				return nil
 			}
 		}
+		// Command key: 1-9, 0, COMMAND1
+		if cmd >= config.CmdCommand1 && cmd <= config.CmdCommand0 {
+			commandNum := int(cmd - config.CmdCommand1)
+			tabURL := tabs[curTab].page.URL
+			CustomCommand(commandNum, tabURL)
+			return nil
+		}
+		// Target link command key: 1-9, 0, COMMANDTARGET1-COMMANDTARGET10
+		if cmd >= config.CmdCommandTarget1 && cmd <= config.CmdCommandTarget0 {
+			commandNum := int(cmd - config.CmdCommandTarget1)
+			currentURL := t.page.URL
+			selectedURL := t.highlightedURL()
+
+			if selectedURL == "" {
+				return nil
+			}
+			u, _ := url.Parse(currentURL)
+			parsedURL, err := u.Parse(selectedURL)
+			if err == nil {
+				CustomCommand(commandNum, parsedURL.String())
+			}
+			return nil
+		}
 
 		// Scrolling stuff
 		// Copied in scrollTo

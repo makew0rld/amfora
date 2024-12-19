@@ -31,3 +31,4 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 * Autumn! (@autumnull)
 * William Rehwinkel (@FiskFan1999)
 * Frank Seifferth (@seifferth)
+* Robin Schubert (@Schubisu)

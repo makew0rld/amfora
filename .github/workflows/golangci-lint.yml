@@ -14,19 +14,26 @@ on:
       - '**.desktop'
       - 'LICENSE'
 
+permissions:
+  # Required: allow read access to the content for analysis.
+  contents: read
+  # Optional: allow read access to pull request. Use with `only-new-issues` option.
+  pull-requests: read
+  # Optional: allow write access to checks to allow the action to annotate code in the PR.
+  checks: write
+
 jobs:
   golangci:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: 1.22
-      - uses: actions/checkout@v3
+          go-version: stable
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v6
         with:
-          # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
-          version: v1.43
+          version: v1.60
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           only-new-issues: true

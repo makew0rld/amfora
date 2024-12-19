@@ -1,4 +1,4 @@
-//nolint
+// nolint
 package display
 
 //go:generate ./thanks.sh
@@ -34,4 +34,5 @@ Thank you to the following contributors, who have helped make Amfora great. FOSS
 * Emily (@emily-is-my-username)
 * Autumn! (@autumnull)
 * William Rehwinkel (@FiskFan1999)
+* Frank Seifferth (@seifferth)
 `)

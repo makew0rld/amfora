@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Search in pages (#36, #240)
+- Support for custom commands (#262, #265)
 
 ### Changed
 - Use preformatted_text color for rendering plain text files (#351)

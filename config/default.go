@@ -25,7 +25,7 @@ var defaultConf = []byte(`# This is the default config file.
 
 [a-general]
 # Press Ctrl-H to access it
-home = "gemini://gemini.circumlunar.space"
+home = "gemini://geminiprotocol.net"
 
 # Follow up to 5 Gemini redirects without prompting.
 # A prompt is always shown after the 5th redirect and for redirects to protocols other than Gemini.
@@ -236,6 +236,11 @@ underline = true
 # bind_end: same but the for the end (bottom left)
 # bind_url_handler_open: Open highlighted URL with URL handler (#143)
 
+# Search
+# bind_search = "/"
+# bind_next_match = "n"
+# bind_prev_match = "N"
+
 [url-handlers]
 # Allows setting the commands to run for various URL schemes.
 # E.g. to open FTP URLs with FileZilla set the following key:
@@ -264,6 +269,18 @@ underline = true
 # application on your computer for opening this kind of URI.
 other = 'default'
 
+[url-prompts]
+# Specify whether a confirmation prompt should be shown before following URL schemes.
+# The special key 'other' matches all schemes that don't match any other key.
+#
+# Example: prompt on every non-gemini URL
+# other = true
+# gemini = false
+#
+# Example: only prompt on HTTP(S)
+# other = false
+# http = true
+# https = true
 
 # [[mediatype-handlers]] section
 # ---------------------------------

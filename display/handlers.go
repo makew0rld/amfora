@@ -14,12 +14,12 @@ import (
 	"github.com/makeworld-the-better-one/amfora/client"
 	"github.com/makeworld-the-better-one/amfora/config"
 	"github.com/makeworld-the-better-one/amfora/renderer"
-	"github.com/makeworld-the-better-one/amfora/rr"
 	"github.com/makeworld-the-better-one/amfora/structs"
 	"github.com/makeworld-the-better-one/amfora/subscriptions"
 	"github.com/makeworld-the-better-one/amfora/sysopen"
 	"github.com/makeworld-the-better-one/amfora/webbrowser"
 	"github.com/makeworld-the-better-one/go-gemini"
+	"github.com/makeworld-the-better-one/rr"
 	"github.com/spf13/viper"
 )
 
@@ -249,6 +249,15 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	parsed, err := url.Parse(u)
 	if err != nil {
 		Error("URL Error", err.Error())
+		return ret("", false)
+	}
+
+	// check if a prompt is needed to handle this url
+	prompt := viper.GetBool("url-prompts.other")
+	if viper.IsSet("url-prompts." + parsed.Scheme) {
+		prompt = viper.GetBool("url-prompts." + parsed.Scheme)
+	}
+	if prompt && !(YesNo("Follow URL?\n" + u)) {
 		return ret("", false)
 	}
 

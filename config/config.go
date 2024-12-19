@@ -190,7 +190,7 @@ func Init() error {
 
 	// Setup main config
 
-	viper.SetDefault("a-general.home", "gemini://gemini.circumlunar.space")
+	viper.SetDefault("a-general.home", "gemini://geminiprotocol.net")
 	viper.SetDefault("a-general.auto_redirect", false)
 	viper.SetDefault("a-general.http", "default")
 	viper.SetDefault("a-general.search", "gemini://geminispace.info/search")
@@ -238,7 +238,7 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_close_tab", "Ctrl-W")
 	viper.SetDefault("keybindings.bind_next_tab", "F2")
 	viper.SetDefault("keybindings.bind_prev_tab", "F1")
-	viper.SetDefault("keybindings.bind_quit", []string{"Ctrl-C", "Ctrl-Q", "q"})
+	viper.SetDefault("keybindings.bind_quit", []string{"Ctrl-C", "Ctrl-Q", "Q"})
 	viper.SetDefault("keybindings.bind_help", "?")
 	viper.SetDefault("keybindings.bind_link1", "1")
 	viper.SetDefault("keybindings.bind_link2", "2")
@@ -284,9 +284,13 @@ func Init() error {
 	viper.SetDefault("keybindings.bind_copy_target_url", "c")
 	viper.SetDefault("keybindings.bind_beginning", []string{"Home", "g"})
 	viper.SetDefault("keybindings.bind_end", []string{"End", "G"})
+	viper.SetDefault("keybindings.bind_search", "/")
+	viper.SetDefault("keybindings.bind_next_match", "n")
+	viper.SetDefault("keybindings.bind_prev_match", "N")
 	viper.SetDefault("keybindings.shift_numbers", "")
 	viper.SetDefault("keybindings.bind_url_handler_open", "Ctrl-U")
 	viper.SetDefault("url-handlers.other", "default")
+	viper.SetDefault("url-prompts.other", false)
 	viper.SetDefault("cache.max_size", 0)
 	viper.SetDefault("cache.max_pages", 20)
 	viper.SetDefault("cache.timeout", 1800)
@@ -378,6 +382,9 @@ func Init() error {
 	cache.SetTimeout(viper.GetInt("cache.timeout"))
 
 	setColor := func(k string, colorStr string) error {
+		if k == "include" {
+			return nil
+		}
 		colorStr = strings.ToLower(colorStr)
 		var color tcell.Color
 		if colorStr == "default" {
@@ -402,7 +409,12 @@ func Init() error {
 		// Include key comes first
 		if incPath := configTheme.GetString("include"); incPath != "" {
 			incViper := viper.New()
-			incViper.SetConfigFile(incPath)
+			newIncPath, err := homedir.Expand(incPath)
+			if err == nil {
+				incViper.SetConfigFile(newIncPath)
+			} else {
+				incViper.SetConfigFile(incPath)
+			}
 			incViper.SetConfigType("toml")
 			err = incViper.ReadInConfig()
 			if err != nil {

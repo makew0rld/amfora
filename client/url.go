@@ -47,11 +47,6 @@ func normalizeURL(u string) (*url.URL, string) {
 	// gemini://example.com -> gemini://example.com/
 	if parsed.Path == "" {
 		parsed.Path = "/"
-	} else {
-		// Decode and re-encode path
-		// This removes needless encoding, like that of ASCII chars
-		// And encodes anything that wasn't but should've been
-		parsed.RawPath = strings.ReplaceAll(url.PathEscape(parsed.Path), "%2F", "/")
 	}
 
 	// Do the same to the query string

@@ -53,6 +53,9 @@ var helpCells = strings.TrimSpace(
 		"\t(Default: Alt-Shift-NUMBER)\n" +
 		"%s\tExecute a custom command using the selected URL as an argument.\n" +
 		"\t(Default: Alt-NUMBER)\n" +
+		"%s\tSearch the page content for a string\n" +
+		"%s\tFind next search match\n" +
+		"%s\tFind previous search match\n" +
 		"%s\tQuit\n")
 
 var helpTable = cview.NewTextView()
@@ -120,6 +123,9 @@ func helpInit() {
 		config.GetKeyBinding(config.CmdAddSub),
 		commandKeys,
 		commandTargetKeys,
+		config.GetKeyBinding(config.CmdSearch),
+		config.GetKeyBinding(config.CmdNextMatch),
+		config.GetKeyBinding(config.CmdPrevMatch),
 		config.GetKeyBinding(config.CmdQuit),
 	)
 

@@ -19,6 +19,7 @@ type tabMode int
 const (
 	tabModeDone tabMode = iota
 	tabModeLoading
+	tabModeSearch
 )
 
 // tabHistoryPageCache is fields from the Page struct, cached here to solve #122
@@ -375,7 +376,7 @@ func (t *tab) addToHistory(u string) {
 
 // pageUp scrolls up 75% of the height of the terminal, like Bombadillo.
 func (t *tab) pageUp() {
-	t.page.Row -= (termH / 4) * 3
+	t.page.Row -= termH / 2
 	if t.page.Row < 0 {
 		t.page.Row = 0
 	}
@@ -386,7 +387,7 @@ func (t *tab) pageUp() {
 func (t *tab) pageDown() {
 	height, _ := t.view.GetBufferSize()
 
-	t.page.Row += (termH / 4) * 3
+	t.page.Row += termH / 2
 	if t.page.Row > height {
 		t.page.Row = height
 	}
@@ -570,7 +571,7 @@ func (t *tab) label() string {
 	}
 	if strings.HasPrefix(t.page.URL, "file://") {
 		// File URL, use file or folder as tab name
-		return path.Base(t.page.URL[7:])
+		return cview.Escape(path.Base(t.page.URL[7:]))
 	}
 	// Otherwise, it's a Gemini URL
 	pu, err := url.Parse(t.page.URL)

@@ -84,6 +84,9 @@ const (
 	CmdBeginning
 	CmdEnd
 	CmdURLHandlerOpen // See #143
+	CmdSearch
+	CmdNextMatch
+	CmdPrevMatch
 )
 
 type keyBinding struct {
@@ -242,6 +245,9 @@ func KeyInit() {
 		CmdCommandTarget8: "keybindings.bind_command_target8",
 		CmdCommandTarget9: "keybindings.bind_command_target9",
 		CmdCommandTarget0: "keybindings.bind_command_target0",
+		CmdSearch:         "keybindings.bind_search",
+		CmdNextMatch:      "keybindings.bind_next_match",
+		CmdPrevMatch:      "keybindings.bind_prev_match",
 	}
 	// This is split off to allow shift_numbers to override bind_tab[1-90]
 	// (This is needed for older configs so that the default bind_tab values

@@ -6,23 +6,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Search in pages (#36, #240)
+
+### Changed
+- Use preformatted_text color for rendering plain text files (#351)
+
+
+## [1.10.0] - 2024-03-17
+### Added
 - Syntax highlighting for preformatted text blocks with alt text (#252, #263, [wiki page](https://github.com/makeworld-the-better-one/amfora/wiki/Source-Code-Highlighting))
 - [Client certificates](https://github.com/makeworld-the-better-one/amfora/wiki/Client-Certificates) can be restricted to certain paths of a host (#115)
 - `header` config option in `[subscriptions]` to allow disabling the header text on the subscriptions page (#191)
 - Selected link and scroll position stays for non-cached pages (#122)
 - Keybinding to open URL with URL handler instead of configured proxy (#143)
-- `include` theme key to import themes from an external file (#154)
+- `include` theme key to import themes from an external file (#154, #290)
 - Support SOCKS5 proxying by setting `AMFORA_SOCKS5` environment variable (#155)
+- When bookmarking a page, the first level one heading is suggested as the name (#267, #293)
+- Confirmation prompts for URL schemes in new `[url-prompts]` config section (#301, #302)
 
 ### Changed
 - Center text automatically, removing `left_margin` from the config (#233)
 - `max_width` defaults to 80 columns instead of 100 (#233)
 - Tabs have the domain of the current page instead of numbers (#202)
+- Closing Amfora with <kbd>q</kbd> was removed in favor of <kbd>Shift-q</kbd> (#243)
+- Paging up or down scrolls by 50% instead of 75%, to match `less` (#303)
+- Update deps, require Go 1.17 (#336)
+- Show local directory index file if available (#319)
+- Updated Project Gemini URLs (#342)
 
 ### Fixed
 - Modal can't be closed when opening non-gemini text URLs from the commandline (#283, #284)
 - External programs started by Amfora remain as zombie processes (#219)
 - Prevent link lines (and other types) from being wider than the `max_width` setting (#280)
+- `new:7` on new tab page fails to open link (#306)
+- Slashes aren't decoded in redirect URLs (#322, #324)
+- Typing `localhost` in the bottom bar actually loads localhost instead of searching (#326, #327)
 
 
 ## [1.9.2] - 2021-12-10

@@ -106,6 +106,19 @@ Contributed by **[@sergetymo](https://github.com/sergetymo)**.
 ![screenshot of error modal](https://user-images.githubusercontent.com/65758149/101183206-da73aa00-3657-11eb-8733-5040c8aefb99.png)
 </details>
 
+## Ayu Light
+Contributed by **[@sergetymo](https://github.com/sergetymo)**.
+
+![screenshot of Ayu Light theme](https://user-images.githubusercontent.com/65758149/181745417-48a92840-10d2-4659-950d-fbc9b3588d5c.png)
+
+<details>
+<summary>More screenshots</summary>
+
+![screenshot of bookmark modal](https://user-images.githubusercontent.com/65758149/181745413-b5a15120-2ff6-4879-8539-0f02f0eece21.png)
+![screenshot of error modal](https://user-images.githubusercontent.com/65758149/181745400-c3e9ba95-aee4-4956-91a8-3dddcbad48cc.png)
+</details>
+
+
 ## Atelier Forest
 
 Contributed by **[@joyalicegu](https://github.com/joyalicegu)**.
@@ -156,6 +169,22 @@ Contributed by **[@knix3](https://github.com/knix3)**
 Contributed by **[@luetage](https://github.com/luetage)**
 
 ![screenshot of Tokyo Night theme](https://user-images.githubusercontent.com/13988217/130348393-69986b51-ddd7-4310-90ae-382461502535.png)
+
+## Rosé Pine
+
+Contributed by **[@mvllow](https://github.com/mvllow)**.
+
+### Rosé Pine
+
+<img width="702" alt="screenshot of Rosé Pine theme" src="https://user-images.githubusercontent.com/47515065/157946507-c672e775-e1f1-429a-87a3-0ce947365977.png">
+
+### Rosé Pine Moon
+
+<img width="702" alt="screenshot of Rosé Pine Moon theme" src="https://user-images.githubusercontent.com/47515065/157946274-f4527098-4101-4825-9cc5-563cf541c7ba.png">
+
+### Rosé Pine Dawn
+
+<img width="702" alt="screenshot of Rosé Pine Dawn theme" src="https://user-images.githubusercontent.com/47515065/157946746-7de92443-1a1b-4758-aa6e-717d7b26ebdf.png">
 
 ## Yours?
 

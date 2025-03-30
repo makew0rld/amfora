@@ -248,7 +248,7 @@ underline = true
 # DO NOT use this for setting the HTTP command.
 # Use the http setting in the "a-general" section above.
 #
-# NOTE: These settings are overrided by the ones in the proxies section.
+# NOTE: These settings are overridden by the ones in the proxies section.
 #
 # The best way to define a command is using a string array.
 # Examples:

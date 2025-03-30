@@ -44,7 +44,7 @@ func tabNumber(t *tab) int {
 	return -1
 }
 
-// escapeMeta santizes a META string for use within a cview modal.
+// escapeMeta sanitizes a META string for use within a cview modal.
 func escapeMeta(meta string) string {
 	return cview.Escape(strings.ReplaceAll(meta, "\n", ""))
 }

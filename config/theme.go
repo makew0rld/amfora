@@ -27,7 +27,7 @@ var theme = map[string]tcell.Color{
 	"ColorFg": ColorFg,
 
 	// Default values below
-	// Only the 16 Xterm system tcell.Colors are used, because those are the tcell.Colors overrided
+	// Only the 16 Xterm system tcell.Colors are used, because those are the tcell.Colors overridden
 	// by the user's default terminal theme
 
 	// Used for cview.Styles.PrimitiveBackgroundColor

@@ -284,7 +284,7 @@ func makeNewTab() *tab {
 			// Scrolling to the right
 
 			if t.page.Column >= leftMargin() {
-				// Scrolled right far enought that no left margin is needed
+				// Scrolled right far enough that no left margin is needed
 				if (t.page.Column-leftMargin())+boxW >= width {
 					// And scrolled as far as possible to the right
 					return nil

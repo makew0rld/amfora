@@ -204,14 +204,14 @@ func handleURL(t *tab, u string, numRedirects int) (string, bool) {
 	defer App.Draw() // Just in case
 
 	// Save for resetting on error
-	oldLable := t.barLabel
+	oldLabel := t.barLabel
 	oldText := t.barText
 
 	// Custom return function
 	ret := func(s string, b bool) (string, bool) {
 		if !b {
 			// Reset bottomBar if page wasn't loaded
-			t.barLabel = oldLable
+			t.barLabel = oldLabel
 			t.barText = oldText
 		}
 		t.mode = tabModeDone

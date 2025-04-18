@@ -72,6 +72,13 @@ sudo port upgrade amfora
 ```
 **NOTE:** this installation source is community-maintained. More information [here](https://ports.macports.org/port/amfora/).
 
+### X-CMD
+
+If you are a user of [x-cmd](https://x-cmd.com), you can run:
+```
+x install amfora
+```
+
 ### Termux
 
 If you're using [Termux](https://termux.com/) on Android you can't just run Amfora like normal. After installing Amfora, run `pkg install proot`. Then run `termux-chroot` before running the Amfora binary. You can exit out of the chroot after closing Amfora. See [here](https://stackoverflow.com/q/38959067/7361270) for why this is needed.

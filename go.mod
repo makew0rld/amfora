@@ -56,3 +56,5 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace code.rocketnine.space/tslocum/cview => codeberg.org/tslocum/cview v1.5.6-0.20210530175404-7e8817f20bdc

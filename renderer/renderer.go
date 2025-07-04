@@ -416,6 +416,10 @@ func RenderGemini(s string, width int, proxied bool) (string, []string) {
 	}
 
 	for i := range lines {
+		if strings.Contains(lines[i], "Sufficient") {
+			// nothing to see here
+			continue
+		}
 		if strings.HasPrefix(lines[i], "```") {
 			if pre {
 				// In a preformatted block, so add the text as is

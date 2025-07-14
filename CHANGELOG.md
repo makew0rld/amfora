@@ -4,13 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.11.0] - 2025-07-14
 ### Added
 - Search in pages (#36, #240)
 - Support for custom commands (#262, #265)
 
 ### Changed
 - Use preformatted_text color for rendering plain text files (#351)
+
+### Fixed
+- Fix building cview (#360)
 
 
 ## [1.10.0] - 2024-03-17

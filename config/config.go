@@ -208,6 +208,7 @@ func Init() error {
 	viper.SetDefault("a-general.page_max_time", 10)
 	viper.SetDefault("a-general.scrollbar", "auto")
 	viper.SetDefault("a-general.underline", true)
+	viper.SetDefault("a-general.show_opened_modal", true)
 	viper.SetDefault("commands.command1", "")
 	viper.SetDefault("commands.command2", "")
 	viper.SetDefault("commands.command3", "")

@@ -193,7 +193,9 @@ func open(u string, resp *gemini.Response) {
 		}
 		//nolint:errcheck
 		go proc.Wait() // Prevent zombies, see #219
-		Info("Opened with " + cmd[0])
+		if viper.GetBool("a-general.show_opened_modal") {
+			Info("Opened with " + cmd[0])
+		}
 		return
 	}
 
@@ -213,7 +215,9 @@ func open(u string, resp *gemini.Response) {
 			Error("System Viewer Error", err.Error())
 			return
 		}
-		Info("Opened in default system viewer")
+		if viper.GetBool("a-general.show_opened_modal") {
+			Info("Opened in default system viewer")
+		}
 	} else {
 		cmd := mediaHandler.Cmd
 		proc := exec.Command(cmd[0], append(cmd[1:], path)...)
@@ -224,7 +228,9 @@ func open(u string, resp *gemini.Response) {
 		}
 		//nolint:errcheck
 		go proc.Wait() // Prevent zombies, see #219
-		Info("Opened with " + cmd[0])
+		if viper.GetBool("a-general.show_opened_modal") {
+			Info("Opened with " + cmd[0])
+		}
 	}
 	App.Draw()
 }

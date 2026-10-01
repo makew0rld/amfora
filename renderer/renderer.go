@@ -331,9 +331,10 @@ func RenderGemini(s string, width int, proxied bool) (string, []string) {
 	links := make([]string, 0)
 
 	// Process and wrap non preformatted lines
-	rendered := "" // Final result
+	var out strings.Builder // Final result
 	pre := false
 	buf := "" // Block of regular or preformatted lines
+	var bufB strings.Builder
 
 	// Language, formatter, and style for syntax highlighting
 	lang := ""
@@ -342,7 +343,7 @@ func RenderGemini(s string, width int, proxied bool) (string, []string) {
 
 	// processPre is for rendering preformatted blocks
 	processPre := func() {
-
+		buf = bufB.String()
 		syntaxHighlighted := false
 
 		// Perform syntax highlighting if language is set
@@ -397,21 +398,24 @@ func RenderGemini(s string, width int, proxied bool) (string, []string) {
 		buf = strings.TrimSuffix(buf, "\r\n")
 
 		if viper.GetBool("a-general.color") {
-			rendered += fmt.Sprintf("[%s]", config.GetColorString("preformatted_text")) +
-				buf + fmt.Sprintf("[%s:%s:-]\r\n", config.GetColorString("regular_text"), config.GetColorString("bg"))
+			fmt.Fprintf(&out, "[%s]", config.GetColorString("preformatted_text"))
+			out.WriteString(buf)
+			fmt.Fprintf(&out, "[%s:%s:-]\r\n", config.GetColorString("regular_text"), config.GetColorString("bg"))
 		} else {
-			rendered += buf + "\r\n"
+			out.WriteString(buf)
+			out.WriteString("\r\n")
 		}
 	}
 
 	// processRegular processes non-preformatted sections
 	processRegular := func() {
+		buf = bufB.String()
 		// ANSI not allowed in regular text - see #59
 		buf = ansiRegex.ReplaceAllString(buf, "")
 
 		ren, lks := convertRegularGemini(buf, len(links), width, proxied)
 		links = append(links, lks...)
-		rendered += ren
+		out.WriteString(ren)
 	}
 
 	for i := range lines {
@@ -437,12 +441,13 @@ func RenderGemini(s string, width int, proxied bool) (string, []string) {
 					}
 				}
 			}
-			buf = "" // Clear buffer for next block
+			bufB.Reset()
 			pre = !pre
 			continue
 		}
 		// Lines always end with \r\n for Windows compatibility
-		buf += strings.TrimSuffix(lines[i], "\r") + "\r\n"
+		bufB.WriteString(strings.TrimSuffix(lines[i], "\r"))
+		bufB.WriteString("\r\n")
 	}
 	// Gone through all the lines, but there still is likely a block in the buffer
 	if pre {
@@ -453,5 +458,5 @@ func RenderGemini(s string, width int, proxied bool) (string, []string) {
 		processRegular()
 	}
 
-	return rendered, links
+	return out.String(), links
 }

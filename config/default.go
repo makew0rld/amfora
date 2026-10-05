@@ -92,6 +92,9 @@ scrollbar = "auto"
 # This is done to help color blind users
 underline = true
 
+# Whether to show the "Opened with ..." info modal after a file is opened
+show_opened_modal = true
+
 
 [auth]
 # Authentication settings

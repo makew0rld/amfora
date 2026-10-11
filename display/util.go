@@ -35,9 +35,10 @@ func makeContentLayout(tv *cview.TextView, leftMargin int) *cview.Flex {
 // tabNumber gets the index of the tab in the tabs slice. It returns -1
 // if the tab is not in that slice.
 func tabNumber(t *tab) int {
-	tempTabs := tabs
-	for i := range tempTabs {
-		if tempTabs[i] == t {
+	tabMu.RLock()
+	defer tabMu.RUnlock()
+	for i := range tabs {
+		if tabs[i] == t {
 			return i
 		}
 	}
@@ -51,6 +52,9 @@ func escapeMeta(meta string) string {
 
 // isValidTab indicates whether the passed tab is still being used, even if it's not currently displayed.
 func isValidTab(t *tab) bool {
+	if t == nil || t.IsClosed() {
+		return false
+	}
 	return tabNumber(t) != -1
 }
 

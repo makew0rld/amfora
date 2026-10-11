@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 
 	"codeberg.org/tslocum/cview"
 	"github.com/gdamore/tcell/v2"
@@ -19,6 +20,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+var tabMu sync.RWMutex
 var tabs []*tab // Slice of all the current browser tabs
 var curTab = -1 // What tab is currently visible - index for the tabs slice (-1 means there are no tabs)
 
@@ -85,6 +87,9 @@ func Init(version, commit, builtBy string) {
 		termW = width
 		termH = height
 
+		tabMu.RLock()
+		defer tabMu.RUnlock()
+
 		// Make sure the current tab content is reformatted when the terminal size changes
 		for i := range tabs {
 			// Overwrite all tabs with a new, differently sized, left margin
@@ -93,7 +98,7 @@ func Init(version, commit, builtBy string) {
 				tabs[i].label(),
 				makeContentLayout(tabs[i].view, leftMargin()),
 			)
-			if tabs[i] == tabs[curTab] {
+			if curTab >= 0 && curTab < len(tabs) && tabs[i] == tabs[curTab] {
 				// Reformat page ASAP, in the middle of loop
 				reformatPageAndSetView(tabs[curTab], tabs[curTab].page)
 			}
@@ -496,31 +501,33 @@ func Stop() {
 func NewTab() {
 	NewTabWithURL("about:newtab")
 
+	tabMu.RLock()
+	defer tabMu.RUnlock()
 	bottomBar.SetLabel("")
 	bottomBar.SetText("")
-	tabs[NumTabs()-1].saveBottomBar()
-
+	if len(tabs) > 0 {
+		tabs[len(tabs)-1].saveBottomBar()
+	}
 }
 
 // NewTabWithURL opens a new tab and switches to it, displaying the
 // the URL provided.
 func NewTabWithURL(url string) {
-	// Create TextView and change curTab
-	// Set the TextView options, and the changed func to App.Draw()
-	// SetDoneFunc to do link highlighting
-	// Add view to pages and switch to it
+	tabMu.Lock()
+	defer tabMu.Unlock()
 
 	// Process current tab before making a new one
-	if curTab > -1 {
+	if curTab > -1 && curTab < len(tabs) {
 		// Turn off link selecting mode in the current tab
 		tabs[curTab].view.Highlight("")
 		// Save bottomBar state
 		tabs[curTab].saveBottomBar()
 	}
 
-	curTab = NumTabs()
+	curTab = len(tabs)
 
-	tabs = append(tabs, makeNewTab())
+	t := makeNewTab()
+	tabs = append(tabs, t)
 
 	var interstitial string
 	if !strings.HasPrefix(url, "about:") {
@@ -542,7 +549,11 @@ func NewTabWithURL(url string) {
 	browser.SetCurrentTab(strconv.Itoa(curTab))
 	App.SetFocus(tabs[curTab].view)
 
-	URL(url)
+	if strings.HasPrefix(url, "about:") {
+		go goURL(t, url)
+	} else {
+		go goURL(t, client.FixUserURL(url))
+	}
 
 	// Draw just in case
 	App.Draw()
@@ -550,26 +561,26 @@ func NewTabWithURL(url string) {
 
 // CloseTab closes the current tab and switches to the one to its left.
 func CloseTab() {
-	// Basically the NewTab() func inverted
+	tabMu.Lock()
+	defer tabMu.Unlock()
 
-	// TODO: Support closing middle tabs, by renumbering all the maps
-	// So that tabs to the right of the closed tabs point to the right places
-	// For now you can only close the right-most tab
-	if curTab != NumTabs()-1 {
-		return
-	}
-
-	if NumTabs() <= 1 {
+	if len(tabs) <= 1 {
 		// There's only one tab open, close the app instead
 		Stop()
 		return
 	}
 
+	if curTab != len(tabs)-1 {
+		return
+	}
+
+	closedTab := tabs[curTab]
 	tabs = tabs[:len(tabs)-1]
+	closedTab.Close()
 	browser.RemoveTab(strconv.Itoa(curTab))
 
 	if curTab <= 0 {
-		curTab = NumTabs() - 1
+		curTab = len(tabs) - 1
 	} else {
 		curTab--
 	}
@@ -588,20 +599,28 @@ func CloseTab() {
 // The tab numbers are clamped to the end, so for example numbers like -5 and 1000 are still valid.
 // This means that calling something like SwitchTab(curTab - 1) will never cause an error.
 func SwitchTab(tab int) {
+	tabMu.Lock()
+	defer tabMu.Unlock()
+
+	n := len(tabs)
+	if n == 0 {
+		return
+	}
+
 	if tab < 0 {
 		tab = 0
 	}
-	if tab > NumTabs()-1 {
-		tab = NumTabs() - 1
+	if tab > n-1 {
+		tab = n - 1
 	}
 
 	// Save current tab attributes
-	if curTab > -1 {
+	if curTab > -1 && curTab < len(tabs) {
 		// Save bottomBar state
 		tabs[curTab].saveBottomBar()
 	}
 
-	curTab = tab % NumTabs()
+	curTab = tab % n
 
 	// Display tab
 	reformatPageAndSetView(tabs[curTab], tabs[curTab].page)
@@ -615,7 +634,15 @@ func SwitchTab(tab int) {
 }
 
 func Reload() {
-	if tabs[curTab].page.URL == "about:newtab" && config.CustomNewTab {
+	tabMu.RLock()
+	if curTab < 0 || curTab >= len(tabs) {
+		tabMu.RUnlock()
+		return
+	}
+	current := tabs[curTab]
+	tabMu.RUnlock()
+
+	if current.page.URL == "about:newtab" && config.CustomNewTab {
 		// Re-render new tab, similar to Init()
 		newTabContent := getNewTabContent()
 		tmpTermW := termW
@@ -629,28 +656,38 @@ func Reload() {
 			Mediatype: structs.TextGemini,
 		}
 		temp := newTabPage // Copy
-		setPage(tabs[curTab], &temp)
+		setPage(current, &temp)
 		return
 	}
 
-	if !tabs[curTab].hasContent() {
+	if !current.hasContent() {
 		return
 	}
 
 	go func(t *tab) {
-		cache.RemovePage(tabs[curTab].page.URL)
+		cache.RemovePage(t.page.URL)
 		handleURL(t, t.page.URL, 0) // goURL is not used bc history shouldn't be added to
-		if t == tabs[curTab] {
+		tabMu.RLock()
+		isCur := (curTab >= 0 && curTab < len(tabs) && t == tabs[curTab])
+		tabMu.RUnlock()
+		if isCur {
 			// Display the bottomBar state that handleURL set
 			t.applyBottomBar()
 		}
-	}(tabs[curTab])
+	}(current)
 }
 
 // URL loads and handles the provided URL for the current tab.
 // It should be an absolute URL.
 func URL(u string) {
+	tabMu.RLock()
+	if curTab < 0 || curTab >= len(tabs) {
+		tabMu.RUnlock()
+		return
+	}
 	t := tabs[curTab]
+	tabMu.RUnlock()
+
 	if strings.HasPrefix(u, "about:") {
 		go goURL(t, u)
 	} else {
@@ -659,7 +696,14 @@ func URL(u string) {
 }
 
 func RenderFromString(str string) {
+	tabMu.RLock()
+	if curTab < 0 || curTab >= len(tabs) {
+		tabMu.RUnlock()
+		return
+	}
 	t := tabs[curTab]
+	tabMu.RUnlock()
+
 	page := renderPageFromString(str)
 	setPage(t, page)
 }
@@ -678,12 +722,22 @@ func renderPageFromString(str string) *structs.Page {
 }
 
 func NumTabs() int {
+	tabMu.RLock()
+	defer tabMu.RUnlock()
 	return len(tabs)
 }
 
 func resetSearch() {
-	tabs[curTab].view.SetBytes(originalText)
-	tabs[curTab].mode = tabModeDone
+	tabMu.RLock()
+	if curTab < 0 || curTab >= len(tabs) {
+		tabMu.RUnlock()
+		return
+	}
+	t := tabs[curTab]
+	tabMu.RUnlock()
+
+	t.view.SetBytes(originalText)
+	t.mode = tabModeDone
 	searchMode = false
 	bottomBar.SetLabel("")
 	bottomBar.SetText(bottomBarText)

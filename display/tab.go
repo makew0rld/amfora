@@ -6,6 +6,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"sync"
 
 	"codeberg.org/tslocum/cview"
 	"github.com/atotto/clipboard"
@@ -40,6 +41,11 @@ type tabHistory struct {
 
 // tab hold the information needed for each browser tab.
 type tab struct {
+	mu               sync.RWMutex
+	stateMu          sync.Mutex
+	locked           bool
+	rLockCount       int
+	closed           bool
 	page             *structs.Page
 	view             *cview.TextView
 	history          *tabHistory
@@ -47,6 +53,80 @@ type tab struct {
 	barLabel         string // The bottomBar label for the tab
 	barText          string // The bottomBar text for the tab
 	preferURLHandler bool   // For #143, use URL handler over proxy
+}
+
+// Lock locks the tab for exclusive writing/modification.
+func (t *tab) Lock() {
+	t.mu.Lock()
+	t.stateMu.Lock()
+	t.locked = true
+	t.stateMu.Unlock()
+}
+
+// Unlock unlocks the tab mutex. It guards the lock state so it does not
+// call Unlock on an unlocked mutex.
+func (t *tab) Unlock() {
+	t.stateMu.Lock()
+	if !t.locked {
+		t.stateMu.Unlock()
+		return
+	}
+	t.locked = false
+	t.stateMu.Unlock()
+	t.mu.Unlock()
+}
+
+// RLock acquires a read lock on the tab.
+func (t *tab) RLock() {
+	t.mu.RLock()
+	t.stateMu.Lock()
+	t.rLockCount++
+	t.stateMu.Unlock()
+}
+
+// RUnlock releases a read lock on the tab. It guards against releasing
+// when no read lock is held.
+func (t *tab) RUnlock() {
+	t.stateMu.Lock()
+	if t.rLockCount <= 0 {
+		t.stateMu.Unlock()
+		return
+	}
+	t.rLockCount--
+	t.stateMu.Unlock()
+	t.mu.RUnlock()
+}
+
+// IsClosed returns whether the tab has been closed.
+func (t *tab) IsClosed() bool {
+	t.stateMu.Lock()
+	defer t.stateMu.Unlock()
+	return t.closed
+}
+
+// Close marks the tab as closed and performs cleanup.
+func (t *tab) Close() {
+	t.Cleanup()
+}
+
+// Cleanup releases tab buffer resources and guards mutex lock state
+// during tab disposal.
+func (t *tab) Cleanup() {
+	if t == nil {
+		return
+	}
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	t.stateMu.Lock()
+	if t.closed {
+		t.stateMu.Unlock()
+		return
+	}
+	t.closed = true
+	t.locked = false
+	t.rLockCount = 0
+	t.stateMu.Unlock()
 }
 
 // makeNewTab initializes an tab struct with no content.

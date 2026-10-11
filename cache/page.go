@@ -68,23 +68,34 @@ func AddPage(p *structs.Page) {
 		return
 	}
 
+	mu.Lock()
+	defer mu.Unlock()
+
 	// Remove earlier pages to make room for this one
 	// There should only ever be 1 page to remove at most,
 	// but this handles more just in case.
-	for NumPages() >= maxPages && maxPages > 0 {
-		RemovePage(urls[0])
+	for len(pages) >= maxPages && maxPages > 0 && len(urls) > 0 {
+		delete(pages, urls[0])
+		removeURL(urls[0])
 	}
 	// Do the same but for cache size
-	for SizePages()+p.Size() > maxSize && maxSize > 0 {
-		RemovePage(urls[0])
+	for sizePagesLocked()+p.Size() > maxSize && maxSize > 0 && len(urls) > 0 {
+		delete(pages, urls[0])
+		removeURL(urls[0])
 	}
 
-	mu.Lock()
-	defer mu.Unlock()
 	pages[p.URL] = p
 	// Remove the URL if it was already there, then add it to the end
 	removeURL(p.URL)
 	urls = append(urls, p.URL)
+}
+
+func sizePagesLocked() int {
+	n := 0
+	for _, page := range pages {
+		n += page.Size()
+	}
+	return n
 }
 
 // RemovePage will remove a page from the cache.
